@@ -27,4 +27,8 @@ Pinout description:
 
 ## 3. Usage
 
+In this example, the project has the following pinout configuration that is similar to what we have for the original CAN-PWM firmware.
+
+<img src="assets/stm32cubemx.png" alt="drawing">
+
 > In process
