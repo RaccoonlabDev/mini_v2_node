@@ -14,30 +14,30 @@ FILE(GLOB driversSources    Drivers/STM32F1xx_HAL_Driver/Src)
 
 
 set(STM32CUBEMX_GENERATED_FILES
-    Core/Src/main.cpp
-    Core/Src/stm32f1xx_hal_msp.c
-    Core/Src/stm32f1xx_hal_timebase_tim.c
-    Core/Src/stm32f1xx_it.c
-    Core/Src/system_stm32f1xx.c
+    mini_v2/Core/Src/main.cpp
+    mini_v2/Core/Src/stm32f1xx_hal_msp.c
+    mini_v2/Core/Src/stm32f1xx_hal_timebase_tim.c
+    mini_v2/Core/Src/stm32f1xx_it.c
+    mini_v2/Core/Src/system_stm32f1xx.c
 
-    Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc_ex.c
-    Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c
-    Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_can.c
-    Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c
-    Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c
-    Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c
-    Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c
-    Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c
-    Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c
-    Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c
-    Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c
-    Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c
-    Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c
-    Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c
-    Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c
-    Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c
+    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc_ex.c
+    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c
+    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_can.c
+    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c
+    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c
+    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c
+    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c
+    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c
+    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c
+    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c
+    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c
+    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c
+    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c
+    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c
+    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c
+    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c
 
-    startup_stm32f103xb.s
+    mini_v2/startup_stm32f103xb.s
 )
 
 message(STM32CUBEMX_GENERATED_FILES="${STM32CUBEMX_GENERATED_FILES}")
@@ -50,11 +50,11 @@ target_compile_definitions(${EXECUTABLE} PRIVATE
 )
 
 target_include_directories(${EXECUTABLE} PRIVATE
-    Core/Inc
-    Drivers/CMSIS/Device/ST/STM32F1xx/Include
-    Drivers/CMSIS/Include
-    Drivers/STM32F1xx_HAL_Driver/Inc
-    Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
+    mini_v2/Core/Inc
+    mini_v2/Drivers/CMSIS/Device/ST/STM32F1xx/Include
+    mini_v2/Drivers/CMSIS/Include
+    mini_v2/Drivers/STM32F1xx_HAL_Driver/Inc
+    mini_v2/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
 )
 
 target_compile_options(${EXECUTABLE} PRIVATE
@@ -69,7 +69,7 @@ target_compile_options(${EXECUTABLE} PRIVATE
 )
 
 target_link_options(${EXECUTABLE} PRIVATE
-    -T${CMAKE_SOURCE_DIR}/STM32F103T8Ux_FLASH.ld
+    -T${CMAKE_SOURCE_DIR}/mini_v2/STM32F103T8Ux_FLASH.ld
     -mcpu=cortex-m3
     -mthumb
     --specs=nosys.specs
