@@ -25,10 +25,24 @@ Pinout description:
 
 <img src="https://docs.raccoonlab.co/assets/img/mini_v2_pinout.c14a3021.png" alt="drawing">
 
-## 3. Usage
+## 3. STM32CubeMX
 
 In this example, the project has the following pinout configuration that is similar to what we have for the original CAN-PWM firmware.
 
 <img src="assets/stm32cubemx.png" alt="drawing">
 
-> In process
+## 4. Usage example
+
+You are expected to use Makefile to work with the project.
+
+To build the project:
+
+```bash
+make build
+```
+
+To upload the firmware to the target:
+
+```bash
+make upload
+```

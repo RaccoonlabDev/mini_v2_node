@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.15.3)
 project(cyphal_example CXX C ASM)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+
 add_definitions(-DBXCAN_MAX_IFACE_INDEX=0)
 set(PLATFORM bxcan)
 include(Libs/Cyphal/CMakeLists.txt)
