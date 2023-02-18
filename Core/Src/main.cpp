@@ -21,8 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "application.hpp"
-#include "kocherga.hpp"
+// #include "application.hpp"
+// #include "kocherga.hpp"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -103,7 +103,7 @@ int main(void)
   MX_TIM3_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
-  application_entry_point();
+  // application_entry_point();
   /* USER CODE END 2 */
 
   /* Infinite loop */
