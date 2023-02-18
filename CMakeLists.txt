@@ -1,46 +1,29 @@
 cmake_minimum_required(VERSION 3.15.3)
-project(mini_v2_example CXX C ASM)
+project(cyphal_example CXX C ASM)
 
+add_definitions(-DBXCAN_MAX_IFACE_INDEX=0)
 set(PLATFORM bxcan)
-# include(Libs/Cyphal/CMakeLists.txt)
+include(Libs/Cyphal/CMakeLists.txt)
 
-set(TOOLCHAIN_PREFIX /opt/gcc-arm-none-eabi-10-2020-q4-major/bin/arm-none-eabi-)
+set(TOOLCHAIN_PREFIX arm-none-eabi-)
 set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc)
 set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
 set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
 
-FILE(GLOB coreSources       Core/Src)
-FILE(GLOB driversSources    Drivers/STM32F1xx_HAL_Driver/Src)
+FILE(GLOB coreSources       mini_v2/Core/Src/*)
+FILE(GLOB driversSources    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/*.c)
 
 
 set(STM32CUBEMX_GENERATED_FILES
-    mini_v2/Core/Src/main.cpp
-    mini_v2/Core/Src/stm32f1xx_hal_msp.c
-    mini_v2/Core/Src/stm32f1xx_hal_timebase_tim.c
-    mini_v2/Core/Src/stm32f1xx_it.c
-    mini_v2/Core/Src/system_stm32f1xx.c
+    ${coreSources}
+    ${driversSources}
+    ${SRC}
 
-    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc_ex.c
-    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c
-    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_can.c
-    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c
-    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c
-    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c
-    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c
-    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c
-    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c
-    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c
-    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c
-    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c
-    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c
-    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c
-    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c
-    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c
+    Libs/Cyphal/tests/stm32f103/application.cpp
+    Libs/Cyphal/tests/stm32f103/params.cpp
 
     mini_v2/startup_stm32f103xb.s
 )
-
-message(STM32CUBEMX_GENERATED_FILES="${STM32CUBEMX_GENERATED_FILES}")
 
 set(EXECUTABLE ${PROJECT_NAME}.out)
 add_executable(${EXECUTABLE} ${STM32CUBEMX_GENERATED_FILES})
@@ -49,12 +32,20 @@ target_compile_definitions(${EXECUTABLE} PRIVATE
     -DSTM32F103xB
 )
 
+include_directories(Libs/Cyphal/libcyphal)
+include_directories(Libs/Cyphal/Libs/libcanard/libcanard)
+include_directories(Libs/Cyphal/Libs/libparams/libparams)
+include_directories(Libs/Cyphal/Libs/o1heap/o1heap)
+include_directories(build/nunavut_out)
+
 target_include_directories(${EXECUTABLE} PRIVATE
     mini_v2/Core/Inc
     mini_v2/Drivers/CMSIS/Device/ST/STM32F1xx/Include
     mini_v2/Drivers/CMSIS/Include
     mini_v2/Drivers/STM32F1xx_HAL_Driver/Inc
     mini_v2/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
+
+    Libs/Cyphal/tests/stm32f103
 )
 
 target_compile_options(${EXECUTABLE} PRIVATE
@@ -81,12 +72,13 @@ target_link_options(${EXECUTABLE} PRIVATE
     -Wl,--gc-sections
 )
 
-
 add_custom_command(TARGET ${EXECUTABLE}
     POST_BUILD
-    COMMAND arm-none-eabi-size ${EXECUTABLE})
+    COMMAND arm-none-eabi-size ${EXECUTABLE}
+)
 
 add_custom_command(TARGET ${EXECUTABLE}
     POST_BUILD
     COMMAND arm-none-eabi-objcopy -O ihex ${EXECUTABLE} ${PROJECT_NAME}.hex
-    COMMAND arm-none-eabi-objcopy -O binary ${EXECUTABLE} ${PROJECT_NAME}.bin)
+    COMMAND arm-none-eabi-objcopy -O binary ${EXECUTABLE} ${PROJECT_NAME}.bin
+)
