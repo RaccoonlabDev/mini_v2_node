@@ -5,15 +5,14 @@ This repository is an example of a simple Cyphal application written for [Mini v
 ## 1. Prerequisites
 
 You are expected to use the following software:
-- [STM32CubeMX](https://www.st.com/en/development-tools/stm32cubemx.html) or [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html)
-- Repository with minimal Cyphal implementation for stm32 based on [libcanard](https://github.com/OpenCyphal/libcanard), [o1heap](https://github.com/pavel-kirienko/o1heap) and other.
+- [STM32CubeMX](https://www.st.com/en/development-tools/stm32cubemx.html) or [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html),
+- Repository with minimal Cyphal implementation for stm32 based on [libcanard](https://github.com/OpenCyphal/libcanard), [o1heap](https://github.com/pavel-kirienko/o1heap) and other libraries,
+- [Yukon](https://github.com/OpenCyphal-Garage/yukon).
 
 Hardware requirements:
 - Mini v2 node
 - stm32 sniffer and programmer (for example [RL sniffer and programmer](https://docs.raccoonlab.co/guide/programmer_sniffer/))
 
-Software requirements:
-- [Yukon](https://github.com/OpenCyphal-Garage/yukon)
 
 ## 2. Brief hardware description
 
