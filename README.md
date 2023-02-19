@@ -12,6 +12,8 @@ Hardware requirements:
 - Mini v2 node
 - stm32 sniffer and programmer (for example [RL sniffer and programmer](https://docs.raccoonlab.co/guide/programmer_sniffer/))
 
+Software requirements:
+- [Yukon](https://github.com/OpenCyphal-Garage/yukon)
 
 ## 2. Brief hardware description
 
@@ -31,18 +33,28 @@ In this example, the project has the following pinout configuration that is simi
 
 <img src="assets/stm32cubemx.png" alt="drawing">
 
-## 4. Usage example
+## 4. Usage
 
 You are expected to use Makefile to work with the project.
 
-To build the project:
+**Step 1. Clone the repository with submodules**
+
+```bash
+git clone https://github.com/RaccoonlabDev/mini_v2_node --recursive
+cd mini_v2_node
+git submodule update --init --recursive
+```
+
+**Step 2. Build the project and upload the firmware**
 
 ```bash
 make build
+make upload
 ```
 
-To upload the firmware to the target:
+**Step 3. Setup the environment and run Yukon**
 
 ```bash
-make upload
+source scripts/init.sh
+~/Download/Yukon
 ```
