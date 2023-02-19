@@ -22,7 +22,7 @@ FILE(GLOB driversSources    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/*.c)
 set(STM32CUBEMX_GENERATED_FILES
     ${coreSources}
     ${driversSources}
-    ${SRC}
+    ${CYPHAL_SRC}
 
     Libs/Cyphal/tests/stm32f103/application.cpp
     Libs/Cyphal/tests/stm32f103/params.cpp
@@ -37,7 +37,7 @@ target_compile_definitions(${EXECUTABLE} PRIVATE
     -DSTM32F103xB
 )
 
-include_directories(Libs/Cyphal/libcyphal)
+include_directories(Libs/Cyphal/Cyphal)
 include_directories(Libs/Cyphal/Libs/libcanard/libcanard)
 include_directories(Libs/Cyphal/Libs/libparams/libparams)
 include_directories(Libs/Cyphal/Libs/o1heap/o1heap)
