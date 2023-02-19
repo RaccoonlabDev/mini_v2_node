@@ -15,9 +15,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get install -y make gcc-arm-none-eabi
-          pip install -U nunavut
+          ./repository/scripts/ubuntu.sh
 
-      - run: mkdir -p repository/build/nunavut_out
-      - run: cd repository && ./Libs/Cyphal/scripts/nnvg_generate_c_headers.sh build/nunavut_out
+      - run: cd repository && make generage_dsdl
       - run: cd repository/build && cmake .. && make

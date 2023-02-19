@@ -5,8 +5,8 @@ This repository is an example of a simple Cyphal application written for [Mini v
 ## 1. Prerequisites
 
 You are expected to use the following software:
-- [STM32CubeMX](https://www.st.com/en/development-tools/stm32cubemx.html) or [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html),
-- Repository with minimal Cyphal implementation for stm32 based on [libcanard](https://github.com/OpenCyphal/libcanard), [o1heap](https://github.com/pavel-kirienko/o1heap) and other libraries,
+- (optional) [STM32CubeMX](https://www.st.com/en/development-tools/stm32cubemx.html) or [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html),
+- Repository with minimal Cyphal application implementation based on [libcanard](https://github.com/OpenCyphal/libcanard), [o1heap](https://github.com/pavel-kirienko/o1heap) and other libraries,
 - [Yukon](https://github.com/OpenCyphal-Garage/yukon).
 
 Hardware requirements:
@@ -53,6 +53,7 @@ For details of the connection refer to:
 **Step 3. Build the project and upload the firmware**
 
 ```bash
+make generage_dsdl
 make build
 make upload
 ```
