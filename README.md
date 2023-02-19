@@ -44,14 +44,20 @@ cd mini_v2_node
 git submodule update --init --recursive
 ```
 
-**Step 2. Build the project and upload the firmware**
+**Step 2. Connect Sniffer and programmer to Mini v2 node.**
+
+For details of the connection refer to:
+- [the Programmer connection](https://docs.raccoonlab.co/guide/programmer_sniffer/programmer.html) page,
+- [the Sniffer connection](https://docs.raccoonlab.co/guide/programmer_sniffer/sniffer.html#_4-1-cyphal-usage) page.
+
+**Step 3. Build the project and upload the firmware**
 
 ```bash
 make build
 make upload
 ```
 
-**Step 3. Setup the environment and run Yukon**
+**Step 4. Setup the environment and run Yukon**
 
 ```bash
 source scripts/init.sh
