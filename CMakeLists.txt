@@ -24,8 +24,8 @@ set(STM32CUBEMX_GENERATED_FILES
     ${driversSources}
     ${CYPHAL_SRC}
 
-    Src/simple_app_example/application.cpp
-    Src/simple_app_example/params.cpp
+    Src/simple_cyphal_application/application.cpp
+    Src/simple_cyphal_application/params.cpp
 
     mini_v2/startup_stm32f103xb.s
 )
@@ -50,7 +50,7 @@ target_include_directories(${EXECUTABLE} PRIVATE
     mini_v2/Drivers/STM32F1xx_HAL_Driver/Inc
     mini_v2/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
 
-    Src/simple_app_example
+    Src/simple_cyphal_application
 )
 
 target_compile_options(${EXECUTABLE} PRIVATE
