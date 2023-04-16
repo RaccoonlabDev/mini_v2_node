@@ -2,12 +2,6 @@
 /// Copyright (c) 2022 Dmitry Ponomarev.
 /// Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
 
-/**
- * @file application.cpp
- * @author d.ponomarev
- * @date Jul 11, 2022
- */
-
 #include "application.hpp"
 #include "cyphal.hpp"
 #include "cyphal_registers.hpp"
@@ -20,23 +14,16 @@ void application_entry_point() {
     paramsLoadFromFlash();
 
     Cyphal cyphal;
-    int res = cyphal.init();
+    int cyphal_init_res = cyphal.init();
 
-    
     HAL_GPIO_WritePin(INTERNAL_LED_BLUE_GPIO_Port, INTERNAL_LED_BLUE_Pin, GPIO_PIN_SET);
     HAL_GPIO_WritePin(INTERNAL_LED_GREEN_GPIO_Port, INTERNAL_LED_GREEN_Pin, GPIO_PIN_SET);
     HAL_GPIO_WritePin(INTERNAL_LED_RED_GPIO_Port, INTERNAL_LED_RED_Pin, GPIO_PIN_SET);
 
     while (true) {
-        GPIO_PinState state;
+        GPIO_PinState state = (HAL_GetTick() % 1000 > 500) ? GPIO_PIN_SET : GPIO_PIN_RESET;
 
-        if (HAL_GetTick() % 1000 > 500) {
-            state = GPIO_PIN_SET;
-        } else {
-            state = GPIO_PIN_RESET;
-        }
-    
-        if (res >= 0) {
+        if (cyphal_init_res >= 0) {
             HAL_GPIO_WritePin(INTERNAL_LED_BLUE_GPIO_Port, INTERNAL_LED_BLUE_Pin, state);
         } else {
             HAL_GPIO_WritePin(INTERNAL_LED_RED_GPIO_Port, INTERNAL_LED_RED_Pin, state);
