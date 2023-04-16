@@ -1,14 +1,34 @@
 cmake_minimum_required(VERSION 3.15.3)
-project(cyphal_example CXX C ASM)
+project(application CXX C ASM)
 
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+if(USE_DRONECAN)
+    message(SEND_ERROR "DroneCAN is not implemented yet")
+else()
+    add_definitions(-DBXCAN_MAX_IFACE_INDEX=0)
+    set(PLATFORM bxcan)
+    include(Libs/Cyphal/CMakeLists.txt)
+    set(libsSourceCode ${CYPHAL_SRC})
+    set(libsHeaders
+        Libs/Cyphal/Cyphal
+        Libs/Cyphal/Libs/libcanard/libcanard
+        Libs/Cyphal/Libs/libparams/libparams
+        Libs/Cyphal/Libs/o1heap/o1heap
+        build/nunavut_out
+    )
+    set(applicationSourceCode
+        Src/simple_cyphal_application/application.cpp
+        Src/simple_cyphal_application/params.cpp
+    )
+    set(applicationHeaders
+        Src/simple_cyphal_application
+    )
 endif()
 
 
-add_definitions(-DBXCAN_MAX_IFACE_INDEX=0)
-set(PLATFORM bxcan)
-include(Libs/Cyphal/CMakeLists.txt)
 
 set(TOOLCHAIN_PREFIX arm-none-eabi-)
 set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc)
@@ -22,10 +42,8 @@ FILE(GLOB driversSources    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/*.c)
 set(STM32CUBEMX_GENERATED_FILES
     ${coreSources}
     ${driversSources}
-    ${CYPHAL_SRC}
-
-    Src/simple_cyphal_application/application.cpp
-    Src/simple_cyphal_application/params.cpp
+    ${libsSourceCode}
+    ${applicationSourceCode}
 
     mini_v2/startup_stm32f103xb.s
 )
@@ -37,11 +55,7 @@ target_compile_definitions(${EXECUTABLE} PRIVATE
     -DSTM32F103xB
 )
 
-include_directories(Libs/Cyphal/Cyphal)
-include_directories(Libs/Cyphal/Libs/libcanard/libcanard)
-include_directories(Libs/Cyphal/Libs/libparams/libparams)
-include_directories(Libs/Cyphal/Libs/o1heap/o1heap)
-include_directories(build/nunavut_out)
+include_directories(${libsHeaders})
 
 target_include_directories(${EXECUTABLE} PRIVATE
     mini_v2/Core/Inc
@@ -50,7 +64,7 @@ target_include_directories(${EXECUTABLE} PRIVATE
     mini_v2/Drivers/STM32F1xx_HAL_Driver/Inc
     mini_v2/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
 
-    Src/simple_cyphal_application
+    ${applicationHeaders}
 )
 
 target_compile_options(${EXECUTABLE} PRIVATE
