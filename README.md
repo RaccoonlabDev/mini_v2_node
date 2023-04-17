@@ -1,6 +1,6 @@
-# Mini v2 Cyphal application example
+# Mini v2 node application examples
 
-This repository contains an example of a simple Cyphal application written for the [Mini v2](https://docs.raccoonlab.co/guide/can_pwm/can_pwm_mini_v2.html#pinout) node. It allows you to easily get started with a custom Cyphal application.
+This repository contains an example of a simple Cyphal/DroneCAN applications written for the [Mini v2](https://docs.raccoonlab.co/guide/can_pwm/can_pwm_mini_v2.html#pinout) node. It allows you to easily get started with a custom Cyphal/DroneCAN application.
 
 - [Libs/Cyphal](Libs/Cyphal) is based on the libcanard demo application. It has transport layer (CAN based on platform_specific_components), heap (based on o1heap) and ROM (based on libparams) implementations. It also has a helper script that transpiles source code from DSDL.
 - [mini_v2](mini_v2) is a project generated with the STM32CubeMX. It is based on .ioc file corresponded to the default firmware of the Mini v2 node. You may only need to change it if you want to use an a different peripheral configuration.
@@ -36,7 +36,7 @@ Pinout description:
 
 In this example, the project has the following pinout configuration that is similar to what we have for the original CAN-PWM firmware.
 
-<img src="assets/stm32cubemx.png" alt="drawing">
+<img src="mini_v2/Assets/stm32cubemx.png" alt="drawing">
 
 ## 4. Usage
 
@@ -60,7 +60,7 @@ For details of the connection refer to:
 
 ```bash
 make generage_dsdl
-make build
+make cyphal
 make upload
 ```
 
@@ -71,4 +71,4 @@ source scripts/init.sh
 ~/Download/Yukon
 ```
 
-<img src="assets/yukon.jpg" alt="drawing">
+<img src="assets/yukon.png" alt="drawing">
