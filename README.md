@@ -4,7 +4,7 @@ This repository contains an example of a simple Cyphal application written for t
 
 - [Libs/Cyphal](Libs/Cyphal) is based on the libcanard demo application. It has transport layer (CAN based on platform_specific_components), heap (based on o1heap) and ROM (based on libparams) implementations. It also has a helper script that transpiles source code from DSDL.
 - [mini_v2](mini_v2) is a project generated with the STM32CubeMX. It is based on .ioc file corresponded to the default firmware of the Mini v2 node. You may only need to change it if you want to use an a different peripheral configuration.
-- [Src/simple_cyphal_application](Src/simple_cyphal_application) is the main code for the application. You will need to modify it for your custom application. For now, the sample application just blinks the LED and behaves like a Cyphal node with few registers.
+- [Src/cyphal_application](Src/cyphal_application) is the main code for the application. You will need to modify it for your custom application. For now, the sample application just blinks the LED and behaves like a Cyphal node with few registers.
 
 The process of compiling the software is described in [CMakeLists.txt](CMakeLists.txt). However, it is expected to work with the project (build, generate dsdl, upload firmware) using the make command (see the usage example for details).
 

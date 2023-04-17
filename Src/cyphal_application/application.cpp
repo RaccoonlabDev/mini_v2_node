@@ -7,6 +7,7 @@
 #include "cyphal_registers.hpp"
 #include "main.h"
 #include "string_params.hpp"
+#include "params.hpp"
 #include "storage.h"
 
 void application_entry_point() {
