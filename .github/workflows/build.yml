@@ -3,6 +3,9 @@ name: build
 on: [push]
 jobs:
   build:
+    strategy:
+      matrix:
+        target: [cyphal, dronecan]
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
@@ -18,4 +21,4 @@ jobs:
           ./repository/scripts/ubuntu.sh
 
       - run: cd repository && make generage_dsdl
-      - run: cd repository/build && cmake .. && make
+      - run: cd repository && make ${{ matrix.target }}

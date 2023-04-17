@@ -2,9 +2,13 @@
 # Distributed under the MIT License, available in the file LICENSE.
 # Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
 
-build: clean
+cyphal: clean
 	mkdir -p build
 	cd build && cmake .. && make
+
+dronecan: clean
+	mkdir -p build
+	cd build && cmake -DUSE_DRONECAN=1 .. && make
 
 upload:
 	./scripts/flash.sh build/cyphal_example.bin

@@ -6,18 +6,36 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(PLATFORM bxcan)
+set(libparamsPath ${CMAKE_CURRENT_LIST_DIR}/Libs/libparams)
 
 if(USE_DRONECAN)
-    message(SEND_ERROR "DroneCAN is not implemented yet")
+    include(Libs/libsqcan/CMakeLists.txt)
+    set(libsSourceCode
+        ${libparamsPath}/libparams/rom.c
+        ${libparamsPath}/libparams/storage.c
+        ${libparamsPath}/platform_specific/stm32f103/flash_driver.c
+        ${dronecanSources}
+    )
+    set(libsHeaders
+        ${libparamsPath}/libparams/
+        ${libparamsPath}/platform_specific/stm32f103/
+        ${dronecanHeaders}
+    )
+    set(applicationSourceCode
+        Src/dronecan_application/application.cpp
+        Src/dronecan_application/params.cpp
+    )
+    set(applicationHeaders
+        Src/dronecan_application
+    )
 else()
     add_definitions(-DBXCAN_MAX_IFACE_INDEX=0)
-    set(libparamsCustomPath ${CMAKE_CURRENT_LIST_DIR}/Libs/libparams)
     include(Libs/Cyphal/CMakeLists.txt)
     set(libsSourceCode ${CYPHAL_SRC})
     set(libsHeaders
         Libs/Cyphal/Cyphal
         Libs/Cyphal/Libs/libcanard/libcanard
-        Libs/Cyphal/Libs/libparams/libparams
+        ${libparamsPath}/libparams
         Libs/Cyphal/Libs/o1heap/o1heap
         build/nunavut_out
     )
@@ -40,18 +58,26 @@ set(CMAKE_CXX_STANDARD 20)
 FILE(GLOB coreSources       mini_v2/Core/Src/*)
 FILE(GLOB driversSources    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/*.c)
 
-
-set(STM32CUBEMX_GENERATED_FILES
+set(stm32CubeMxGeneratedFiles
     ${coreSources}
     ${driversSources}
-    ${libsSourceCode}
-    ${applicationSourceCode}
-
     mini_v2/startup_stm32f103xb.s
+)
+set(stm32CubeMxHeaders
+    mini_v2/Core/Inc
+    mini_v2/Drivers/CMSIS/Device/ST/STM32F1xx/Include
+    mini_v2/Drivers/CMSIS/Include
+    mini_v2/Drivers/STM32F1xx_HAL_Driver/Inc
+    mini_v2/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
 )
 
 set(EXECUTABLE ${PROJECT_NAME}.out)
-add_executable(${EXECUTABLE} ${STM32CUBEMX_GENERATED_FILES})
+add_executable(${EXECUTABLE}
+    ${libparams}
+    ${stm32CubeMxGeneratedFiles}
+    ${libsSourceCode}
+    ${applicationSourceCode}
+)
 target_compile_definitions(${EXECUTABLE} PRIVATE
     -DUSE_HAL_DRIVER
     -DSTM32F103xB
@@ -60,12 +86,7 @@ target_compile_definitions(${EXECUTABLE} PRIVATE
 include_directories(${libsHeaders})
 
 target_include_directories(${EXECUTABLE} PRIVATE
-    mini_v2/Core/Inc
-    mini_v2/Drivers/CMSIS/Device/ST/STM32F1xx/Include
-    mini_v2/Drivers/CMSIS/Include
-    mini_v2/Drivers/STM32F1xx_HAL_Driver/Inc
-    mini_v2/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
-
+    ${stm32CubeMxHeaders}
     ${applicationHeaders}
 )
 
