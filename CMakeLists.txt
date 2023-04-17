@@ -1,15 +1,17 @@
 cmake_minimum_required(VERSION 3.15.3)
-project(application CXX C ASM)
+project(cyphal_example CXX C ASM)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
+set(PLATFORM bxcan)
+
 if(USE_DRONECAN)
     message(SEND_ERROR "DroneCAN is not implemented yet")
 else()
     add_definitions(-DBXCAN_MAX_IFACE_INDEX=0)
-    set(PLATFORM bxcan)
+    set(libparamsCustomPath ${CMAKE_CURRENT_LIST_DIR}/Libs/libparams)
     include(Libs/Cyphal/CMakeLists.txt)
     set(libsSourceCode ${CYPHAL_SRC})
     set(libsHeaders
@@ -20,20 +22,20 @@ else()
         build/nunavut_out
     )
     set(applicationSourceCode
-        Src/simple_cyphal_application/application.cpp
-        Src/simple_cyphal_application/params.cpp
+        Src/cyphal_application/application.cpp
+        Src/cyphal_application/params.cpp
     )
     set(applicationHeaders
-        Src/simple_cyphal_application
+        Src/cyphal_application
     )
 endif()
-
 
 
 set(TOOLCHAIN_PREFIX arm-none-eabi-)
 set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc)
 set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
 set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
+set(CMAKE_CXX_STANDARD 20)
 
 FILE(GLOB coreSources       mini_v2/Core/Src/*)
 FILE(GLOB driversSources    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/*.c)

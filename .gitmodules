@@ -1,3 +1,6 @@
 [submodule "Libs/Cyphal"]
 	path = Libs/Cyphal
 	url = git@github.com:RaccoonlabDev/libcanard_stm32_cyphal.git
+[submodule "Libs/libparams"]
+	path = Libs/libparams
+	url = git@github.com:PonomarevDA/libparams.git

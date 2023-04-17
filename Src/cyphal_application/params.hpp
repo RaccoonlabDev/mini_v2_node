@@ -5,7 +5,9 @@
 #ifndef PARAMS_HPP_
 #define PARAMS_HPP_
 
-enum class IntParamsIndexes {
+#include "storage.h"
+
+enum IntParamsIndexes : ParamIndex_t {
     ID,
 
     INTEGER_PARAMS_AMOUNT
