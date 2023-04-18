@@ -7,3 +7,6 @@
 [submodule "Libs/libsqcan"]
 	path = Libs/libsqcan
 	url = git@github.com:RaccoonlabDev/libsqcan.git
+[submodule "Libs/mini_v2_stm32cubemx_project"]
+	path = Libs/mini_v2_stm32cubemx_project
+	url = https://github.com/RaccoonLabHardware/mini_v2_stm32cubemx_project.git

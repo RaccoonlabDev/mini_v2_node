@@ -7,6 +7,7 @@ endif()
 
 set(PLATFORM bxcan)
 set(libparamsPath ${CMAKE_CURRENT_LIST_DIR}/Libs/libparams)
+set(stm32cubeMxProjectPath ${CMAKE_CURRENT_LIST_DIR}/Libs/mini_v2_stm32cubemx_project)
 
 if(USE_DRONECAN)
     include(Libs/libsqcan/CMakeLists.txt)
@@ -55,20 +56,20 @@ set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
 set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
 set(CMAKE_CXX_STANDARD 20)
 
-FILE(GLOB coreSources       mini_v2/Core/Src/*)
-FILE(GLOB driversSources    mini_v2/Drivers/STM32F1xx_HAL_Driver/Src/*.c)
+FILE(GLOB coreSources       ${stm32cubeMxProjectPath}/Core/Src/*)
+FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/STM32F1xx_HAL_Driver/Src/*.c)
 
 set(stm32CubeMxGeneratedFiles
     ${coreSources}
     ${driversSources}
-    mini_v2/startup_stm32f103xb.s
+    ${stm32cubeMxProjectPath}/startup_stm32f103xb.s
 )
 set(stm32CubeMxHeaders
-    mini_v2/Core/Inc
-    mini_v2/Drivers/CMSIS/Device/ST/STM32F1xx/Include
-    mini_v2/Drivers/CMSIS/Include
-    mini_v2/Drivers/STM32F1xx_HAL_Driver/Inc
-    mini_v2/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
+    ${stm32cubeMxProjectPath}/Core/Inc
+    ${stm32cubeMxProjectPath}/Drivers/CMSIS/Device/ST/STM32F1xx/Include
+    ${stm32cubeMxProjectPath}/Drivers/CMSIS/Include
+    ${stm32cubeMxProjectPath}/Drivers/STM32F1xx_HAL_Driver/Inc
+    ${stm32cubeMxProjectPath}/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
 )
 
 set(EXECUTABLE ${PROJECT_NAME}.out)
@@ -102,7 +103,7 @@ target_compile_options(${EXECUTABLE} PRIVATE
 )
 
 target_link_options(${EXECUTABLE} PRIVATE
-    -T${CMAKE_SOURCE_DIR}/mini_v2/STM32F103T8Ux_FLASH.ld
+    -T${stm32cubeMxProjectPath}/STM32F103T8Ux_FLASH.ld
     -mcpu=cortex-m3
     -mthumb
     --specs=nosys.specs
