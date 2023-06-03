@@ -30,11 +30,11 @@ Refer to the [Mini v2 hardware](https://docs.raccoonlab.co/guide/can_pwm/can_pwm
 
 | View | Top view | Bot view |
 | ---- | --- | ------ |
-| <img src="https://docs.raccoonlab.co/assets/img/mini_v2_view.bbf1e631.png" alt="drawing"> | <img src="https://docs.raccoonlab.co/assets/img/mini_v2_view_top.6b0ef99e.png" alt="drawing"> | <img src="https://docs.raccoonlab.co/assets/img/mini_v2_view_bottom.ee41f6d5.png" alt="drawing">|
+| <img src="https://docs.raccoonlab.co/assets/img/view.bbf1e631.png" alt="drawing"> | <img src="https://docs.raccoonlab.co/assets/img/view_top.6b0ef99e.png" alt="drawing"> | <img src="https://docs.raccoonlab.co/assets/img/view_bottom.ee41f6d5.png" alt="drawing">|
 
 Pinout description:
 
-<img src="https://docs.raccoonlab.co/assets/img/mini_v2_pinout.c14a3021.png" alt="drawing">
+<img src="https://docs.raccoonlab.co/assets/img/pinout.c14a3021.png" alt="drawing">
 
 ## 3. STM32CubeMX
 
