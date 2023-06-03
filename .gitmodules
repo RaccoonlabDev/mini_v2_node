@@ -10,3 +10,6 @@
 [submodule "Libs/mini_v2_stm32cubemx_project"]
 	path = Libs/mini_v2_stm32cubemx_project
 	url = https://github.com/RaccoonLabHardware/mini_v2_stm32cubemx_project.git
+[submodule "scripts/tools"]
+	path = scripts/tools
+	url = git@github.com:PonomarevDA/tools.git

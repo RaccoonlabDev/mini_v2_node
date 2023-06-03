@@ -18,7 +18,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          ./repository/scripts/ubuntu.sh
+          ./repository/scripts/tools/install_for_ubuntu.sh --yes
 
       - run: cd repository && make generate_dsdl
       - run: cd repository && make ${{ matrix.target }}

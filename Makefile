@@ -11,7 +11,7 @@ dronecan: clean
 	cd build && cmake -DUSE_DRONECAN=1 .. && make
 
 upload:
-	./scripts/flash.sh build/cyphal_example.bin
+	./scripts/tools/stm32/flash.sh build/cyphal_example.bin
 
 generate_dsdl:
 	mkdir -p build/nunavut_out

@@ -71,7 +71,7 @@ make upload
 **Step 4. Setup the environment and run Yukon**
 
 ```bash
-source scripts/init.sh
+source scripts/tools/cyphal/init.sh
 ~/Download/Yukon
 ```
 
