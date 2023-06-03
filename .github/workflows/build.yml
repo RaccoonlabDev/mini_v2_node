@@ -20,5 +20,5 @@ jobs:
         run: |
           ./repository/scripts/ubuntu.sh
 
-      - run: cd repository && make generage_dsdl
+      - run: cd repository && make generate_dsdl
       - run: cd repository && make ${{ matrix.target }}

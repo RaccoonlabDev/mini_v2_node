@@ -13,7 +13,7 @@ dronecan: clean
 upload:
 	./scripts/flash.sh build/cyphal_example.bin
 
-generage_dsdl:
+generate_dsdl:
 	mkdir -p build/nunavut_out
 	./Libs/Cyphal/scripts/nnvg_generate_c_headers.sh
 
