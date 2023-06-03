@@ -96,6 +96,8 @@ target_include_directories(${EXECUTABLE} PRIVATE
     ${applicationHeaders}
 )
 
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-volatile")
+
 target_compile_options(${EXECUTABLE} PRIVATE
     -mcpu=cortex-m3
     -mthumb
