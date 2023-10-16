@@ -3,4 +3,4 @@
 /// Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
 
 #pragma once
-#define NUM_OF_STR_PARAMS 1
+#define NUM_OF_STR_PARAMS 2
