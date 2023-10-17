@@ -2,10 +2,23 @@ name: build
 
 on: [push]
 jobs:
-  build:
-    strategy:
-      matrix:
-        target: [cyphal, dronecan]
+  build_cyphal:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          path: 'repository'
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: ./repository/scripts/tools/install_for_ubuntu.sh --yes
+
+      - run: cd repository && make generate_dsdl
+      - run: cd repository && make cyphal
+
+  build_dronecan:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
@@ -16,9 +29,17 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Install dependencies
-        run: |
-          ./repository/scripts/tools/install_for_ubuntu.sh --yes
+      - uses: actions/checkout@v3
+        with:
+          repository: RaccoonlabDev/libsqcan
+          path: 'repository/Libs/libsqcan'
+          token: ${{ secrets.ACCESS_TOKEN }}
+          fetch-depth: 0
 
-      - run: cd repository && make generate_dsdl
-      - run: cd repository && make ${{ matrix.target }}
+      - name: Checkout libsqcan
+        run: cd repository/Libs/libsqcan && git checkout dd10256
+
+      - name: Install dependencies
+        run: ./repository/scripts/tools/install_for_ubuntu.sh --yes
+
+      - run: cd repository && make dronecan
