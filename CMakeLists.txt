@@ -7,7 +7,7 @@ endif()
 
 set(PLATFORM bxcan)
 set(libparamsPath ${CMAKE_CURRENT_LIST_DIR}/Libs/libparams)
-set(stm32cubeMxProjectPath ${CMAKE_CURRENT_LIST_DIR}/Libs/mini_v2_stm32cubemx_project)
+set(stm32cubeMxProjectPath ${CMAKE_CURRENT_LIST_DIR}/Libs/mini-v2-software)
 
 if(USE_DRONECAN)
     include(Libs/libsqcan/CMakeLists.txt)
@@ -57,7 +57,7 @@ set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
 set(CMAKE_CXX_STANDARD 20)
 
 FILE(GLOB coreSources       ${stm32cubeMxProjectPath}/Core/Src/*)
-FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/STM32F1xx_HAL_Driver/Src/*.c)
+FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/STM32F1xx_HAL_Driver/Src/*.c*)
 
 set(gitRelatedHeaders
     build/src
