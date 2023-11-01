@@ -1,5 +1,4 @@
 name: build
-
 on: [push]
 jobs:
   build_cyphal:
@@ -8,15 +7,27 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          path: 'repository'
           submodules: recursive
           fetch-depth: 0
 
       - name: Install dependencies
-        run: ./repository/scripts/tools/install_for_ubuntu.sh --yes
+        run: ./scripts/tools/install_for_ubuntu.sh --yes
 
-      - run: cd repository && make generate_dsdl
-      - run: cd repository && make cyphal
+      - run: make generate_dsdl
+      - run: make cyphal
+
+      - name: Archive .bin file
+        uses: actions/upload-artifact@v3
+        with:
+          name: cyphal_firmware.bin
+          path: build/obj/cyphal_example.bin
+
+      - name: Archive .elf file
+        uses: actions/upload-artifact@v3
+        with:
+          name: cyphal_firmware.elf
+          path: build/obj/cyphal_example.elf
+
 
   build_dronecan:
     runs-on: ubuntu-22.04
@@ -24,7 +35,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          path: 'repository'
           token: ${{ secrets.ACCESS_TOKEN }}
           submodules: recursive
           fetch-depth: 0
@@ -32,14 +42,14 @@ jobs:
       - uses: actions/checkout@v3
         with:
           repository: RaccoonlabDev/libsqcan
-          path: 'repository/Libs/libsqcan'
+          path: 'Libs/libsqcan'
           token: ${{ secrets.ACCESS_TOKEN }}
           fetch-depth: 0
 
       - name: Checkout libsqcan
-        run: cd repository/Libs/libsqcan && git checkout dd10256
+        run: cd Libs/libsqcan && git checkout dd10256
 
       - name: Install dependencies
-        run: ./repository/scripts/tools/install_for_ubuntu.sh --yes
+        run: ./scripts/tools/install_for_ubuntu.sh --yes
 
-      - run: cd repository && make dronecan
+      - run: make dronecan
