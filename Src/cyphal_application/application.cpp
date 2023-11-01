@@ -8,7 +8,6 @@
 #include "main.h"
 #include "string_params.hpp"
 #include "params.hpp"
-#include "storage.h"
 
 void application_entry_point() {
     paramsInit(static_cast<uint8_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT), NUM_OF_STR_PARAMS);

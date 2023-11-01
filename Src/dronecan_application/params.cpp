@@ -7,11 +7,11 @@
 #include "storage.h"
 
 IntegerDesc_t integer_desc_pool[] = {
-    {(uint8_t*)"id", 0, 127, 50},
+    {"id", 0, 127, 50},
 };
 IntegerParamValue_t integer_values_pool[sizeof(integer_desc_pool) / sizeof(IntegerDesc_t)];
 
 StringDesc_t __attribute__((weak)) string_desc_pool[NUM_OF_STR_PARAMS] = {
-    {(uint8_t*)"name", "", false},
+    {"name", "", false},
 };
 StringParamValue_t string_values_pool[sizeof(string_desc_pool) / sizeof(StringDesc_t)];

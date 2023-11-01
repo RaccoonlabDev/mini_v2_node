@@ -1,0 +1,17 @@
+example.integer:
+  type: Integer
+  enum: PARAM_EXAMPLE_INTEGER
+  flags: mutable
+  default: 42
+  min: 0
+  max: 255
+
+example.string:
+  type: String
+  enum: PARAM_EXAMPLE_STRING
+  flags: mutable
+  default: "default_string_value"
+
+uavcan.pub.example :
+  data_type: reg.udral.service.actuator.common.Feedback.0.1
+  enum_base: PWM_1_FB

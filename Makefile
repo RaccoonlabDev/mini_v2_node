@@ -7,6 +7,7 @@ BUILD_OBJ_DIR:=build/obj
 
 cyphal: clean autogenerate_git_related_headers
 	mkdir -p ${BUILD_OBJ_DIR}
+	./scripts/prebuild_cyphal.sh
 	cd ${BUILD_OBJ_DIR} && cmake ../.. && make
 
 dronecan: clean autogenerate_git_related_headers
