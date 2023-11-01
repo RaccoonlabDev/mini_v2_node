@@ -42,7 +42,8 @@ else()
     )
     set(applicationSourceCode
         Src/cyphal_application/application.cpp
-        Src/cyphal_application/params.cpp
+        build/src/params.cpp
+        build/src/string_params.cpp
     )
     set(applicationHeaders
         Src/cyphal_application
