@@ -14,6 +14,11 @@ void application_entry_point() {
     paramsInit(static_cast<uint8_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT), NUM_OF_STR_PARAMS);
     paramsLoadFromFlash();
 
+    NodeGetInfoSubscriber::setHardwareVersion(2, 1);
+
+    auto node_name_param_idx = static_cast<ParamIndex_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT);
+    paramsSetStringValue(node_name_param_idx, 19, (const uint8_t*)"co.raccoonlab.mini");
+
     Cyphal cyphal;
     int cyphal_init_res = cyphal.init();
 
