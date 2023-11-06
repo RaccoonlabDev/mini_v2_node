@@ -40,13 +40,10 @@ else()
         Libs/Cyphal/Libs/o1heap/o1heap
         build/nunavut_out
     )
-    set(applicationSourceCode
-        Src/cyphal_application/application.cpp
+    include(Src/cyphal_application/CMakeLists.txt)
+    list(APPEND applicationSourceCode
         build/src/params.cpp
         build/src/string_params.cpp
-    )
-    set(applicationHeaders
-        Src/cyphal_application
     )
 endif()
 
