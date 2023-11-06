@@ -1,5 +1,6 @@
 example.integer:
   type: Integer
+  note: Just an integer register example
   enum: PARAM_EXAMPLE_INTEGER
   flags: mutable
   default: 42
@@ -8,10 +9,17 @@ example.integer:
 
 example.string:
   type: String
+  note: Just a string register example
   enum: PARAM_EXAMPLE_STRING
   flags: mutable
   default: "default_string_value"
 
+# This thing is a short form that generates Integer & String registers related to a publisher with PORT_NAME=example:
+# - Integer register with name `uavcan.pub.example.id`
+# - String register with name `uavcan.pub.example.type`
+# The generated registers have proper flags, data type and min, max and default values.
+# They correspond the standard: https://github.com/OpenCyphal/public_regulated_data_types/blob/master/uavcan/register/384.Access.1.0.dsdl
 uavcan.pub.example :
+  type: Port
   data_type: reg.udral.service.actuator.common.Feedback.0.1
   enum_base: PWM_1_FB

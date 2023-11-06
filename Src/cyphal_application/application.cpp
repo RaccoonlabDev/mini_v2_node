@@ -1,5 +1,5 @@
 /// This software is distributed under the terms of the MIT License.
-/// Copyright (c) 2022 Dmitry Ponomarev.
+/// Copyright (c) 2022-2023 Dmitry Ponomarev.
 /// Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
 
 #include "application.hpp"
@@ -9,15 +9,18 @@
 #include "string_params.hpp"
 #include "params.hpp"
 
-void application_entry_point() {
+void init_persistent_storage() {
     paramsInit(static_cast<uint8_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT), NUM_OF_STR_PARAMS);
     paramsLoadFromFlash();
 
-    NodeGetInfoSubscriber::setHardwareVersion(2, 1);
-
     auto node_name_param_idx = static_cast<ParamIndex_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT);
     paramsSetStringValue(node_name_param_idx, 19, (const uint8_t*)"co.raccoonlab.mini");
+}
 
+void application_entry_point() {
+    init_persistent_storage();
+
+    NodeGetInfoSubscriber::setHardwareVersion(2, 1);
     Cyphal cyphal;
     int cyphal_init_res = cyphal.init();
 
