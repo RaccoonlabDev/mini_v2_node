@@ -78,7 +78,20 @@ source scripts/init.sh
 
 If you are strugguling with the software building, please refer to the build workflow [.github/workflows/build.yml](.github/workflows/build.yml) for a hint. If it doesn't help, you can open an issue.
 
-## 5. Reference
+## 5. Customization
+
+The peripherals are initialised in [Libs/mini-v2-software/Core/Src/main.c](Libs/mini-v2-software/Core/Src/main.c), which are automatically generated based on the configuratation file [can_pwm_v2.ioc](Libs/mini-v2-software/can_pwm_v2.ioc) file. If you want to use a different peripheral configuration, you should update can_pwm_v2.ioc with STM32CubeIDE or STM32CubeMX.
+
+The main application is started in [Src/cyphal_application/application.cpp](Src/cyphal_application/application.cpp).
+By default it just blinks the RGB LED, subscribes to the setpoint topic, controls a single PWM and publishes a feedback to the feedback topic. Note, that the application is as simple as possible and doesn't have safety features like TTL.
+
+You may consider [Src/cyphal_application/setpoint](Src/cyphal_application/setpoint) and [Src/cyphal_application/feedback](Src/cyphal_application/feedback) as examples of Cyphal-subscriber and Cyphal-publisher. It is recommended to create subjects by inhereting from CyphalPublisher or CyphalSubscriber and creating required registers in yaml file. This approach automatically adds all topics to the port.List array, allowing the node is able to advertise its capabilities.
+
+When you add your custom module, don't forget to add source file and path to the file with registers to [Src/cyphal_application/CMakeLists.txt](Src/cyphal_application/CMakeLists.txt). 
+
+You can also easily create custom Integer and String registers. An example is shown in [Src/cyphal_application/params.yaml](Src/cyphal_application/params.yaml).
+
+## 6. Reference
 
 The project has a few dependencies which are attached to the repository as submodules. They are:
 
@@ -86,5 +99,3 @@ The project has a few dependencies which are attached to the repository as submo
 - [Libs/Cyphal](https://github.com/RaccoonlabDev/libcanard_cyphal_application) is a general-purpose application based on the [Cyphal libcanard](https://github.com/OpenCyphal/libcanard), [o1heap](https://github.com/pavel-kirienko/o1heap) and other libraries with minimal required features to start and some features related to UDRAL/DS015.
 - [Src/libparams](https://github.com/PonomarevDA/libparams) is a simple library with ROM driver implementation that allows to store configuration parameters in persistent memory.
 - [not yet] Src/libsqcan is a general-purpose application based on [DroneCAN libcanard](https://github.com/dronecan/libcanard) with minimal required features to start. The DroneCAN part is not publically released yet.
-
-The application related source code is located ib the [Src/cyphal_application](Src/cyphal_application) folder. You will need to modify it for your custom application. For now, the sample application just blinks the LED and behaves like a Cyphal node with few registers.
