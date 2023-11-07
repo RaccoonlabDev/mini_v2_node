@@ -41,7 +41,7 @@ Hardware requirements:
 
 ## 4. Usage
 
-The project is based on CMake build system, but it is proposed to use [Makefile](Makefile) as some kind of wrapper under CMake.
+The project is based on the CMake build system, but it is suggested to interract with [Makefile](Makefile). This is just a wrapper under CMake, useful for its target autocompletion.
 
 **Step 1. Clone the repository with submodules**
 
@@ -53,7 +53,7 @@ git submodule update --init --recursive
 
 **Step 2. Connect Sniffer and Programmer to Mini v2 node.**
 
-An example of connection scheme for Mini v2 node and RL Programmer-Sniffer is shown below:
+An example of connection scheme suitable for bench test for Mini v2 node and RL Programmer-Sniffer is shown below:
 
 <img src="assets/connection.png" alt="drawing">
 
@@ -67,7 +67,23 @@ make cyphal
 make upload
 ```
 
+As a short form, you can build and upload the firmware with a single command:
+
+```bash
+make cyphal upload
+```
+
+A few details about how the build process works:
+- `make generate_dsdl` calls the script to generate C++ headers for Cyphal data types serialization using nunavut. The output goes into [build/compile_output](build/compile_output) and [build/nunavut_out](build/nunavut_out) folders. It is expected that you doesn't often change DSDL, so you typically need to call it only once. 
+- `make cyphal` before the actual build process generates a few files as well. Specifically, it generates:
+    - [build/src/git_software_version.h](build/src/git_software_version.h) that has info about the software version based on latest git tag,
+    - [build/src/git_hash.h](build/src/git_hash.h) with info about the current commit,
+    - C++ source and header files with parameters array and enums based on all associated yaml files with registers (you can find generated files in the same folder: [build/src](build/src)),
+    - [Src/cyphal_application/README.md](Src/cyphal_application/README.md) with info about the supported interface and not port-related registers.
+
 **Step 4. Setup the environment and run Yukon**
+
+Try the command below or use the official yukon/yakut instructions.
 
 ```bash
 source scripts/init.sh
