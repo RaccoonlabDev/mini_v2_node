@@ -8,6 +8,9 @@
 #include "main.h"
 #include "string_params.hpp"
 #include "params.hpp"
+#include "setpoint/setpoint.hpp"
+#include "feedback/feedback.hpp"
+#include "periphery/led/led.hpp"
 
 void init_persistent_storage() {
     paramsInit(static_cast<uint8_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT), NUM_OF_STR_PARAMS);
@@ -18,25 +21,26 @@ void init_persistent_storage() {
 }
 
 void application_entry_point() {
+    LedPeriphery::reset();
     init_persistent_storage();
-
     NodeGetInfoSubscriber::setHardwareVersion(2, 1);
-    Cyphal cyphal;
-    int cyphal_init_res = cyphal.init();
 
-    HAL_GPIO_WritePin(INTERNAL_LED_BLUE_GPIO_Port, INTERNAL_LED_BLUE_Pin, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(INTERNAL_LED_GREEN_GPIO_Port, INTERNAL_LED_GREEN_Pin, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(INTERNAL_LED_RED_GPIO_Port, INTERNAL_LED_RED_Pin, GPIO_PIN_SET);
+    Cyphal cyphal;
+    int init_res = cyphal.init();
+
+    SetpointSubscriber setpoint(&cyphal);
+    init_res |= setpoint.init();
+
+    FeedbackPublisher feedback(&cyphal);
+    init_res |= feedback.init();
 
     while (true) {
-        GPIO_PinState state = (HAL_GetTick() % 1000 > 500) ? GPIO_PIN_SET : GPIO_PIN_RESET;
-
-        if (cyphal_init_res >= 0) {
-            HAL_GPIO_WritePin(INTERNAL_LED_BLUE_GPIO_Port, INTERNAL_LED_BLUE_Pin, state);
-        } else {
-            HAL_GPIO_WritePin(INTERNAL_LED_RED_GPIO_Port, INTERNAL_LED_RED_Pin, state);
-        }
+        auto led_color = (init_res >= 0) ? LedColor::BLUE_COLOR : LedColor::RED_COLOR;
+        LedPeriphery::toggle(led_color);
 
         cyphal.process();
+
+        auto crnt_time_ms = HAL_GetTick();
+        feedback.process(crnt_time_ms);
     }
 }

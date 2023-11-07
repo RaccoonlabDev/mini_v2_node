@@ -1,0 +1,9 @@
+# This is a short form that generates Integer & String registers related to the subscriber with PORT_NAME=setpoint:
+# - Integer register with name `uavcan.pub.setpoint.id`
+# - String register with name `uavcan.pub.setpoint.type`
+# The generated registers have proper flags, data type and min, max and default values.
+# They correspond the standard: https://github.com/OpenCyphal/public_regulated_data_types/blob/master/uavcan/register/384.Access.1.0.dsdl
+uavcan.sub.setpoint:
+  type: Port
+  data_type: reg.udral.service.actuator.common.sp.Vector31
+  enum_base: PARAM_SUB_SETPOINT

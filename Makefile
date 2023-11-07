@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Dmitry Ponomarev
+# Copyright (c) 2022-2023 Dmitry Ponomarev
 # Distributed under the MIT License, available in the file LICENSE.
 # Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
 
@@ -7,7 +7,6 @@ BUILD_OBJ_DIR:=build/obj
 
 cyphal: clean autogenerate_git_related_headers
 	mkdir -p ${BUILD_OBJ_DIR}
-	./scripts/prebuild_cyphal.sh
 	cd ${BUILD_OBJ_DIR} && cmake ../.. && make
 
 dronecan: clean autogenerate_git_related_headers
