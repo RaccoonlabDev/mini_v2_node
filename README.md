@@ -80,12 +80,12 @@ If you are strugguling with the software building, please refer to the build wor
 
 ## 5. Customization
 
-The peripherals are initialised in [Libs/mini-v2-software/Core/Src/main.c](Libs/mini-v2-software/Core/Src/main.c), which are automatically generated based on the configuratation file [can_pwm_v2.ioc](Libs/mini-v2-software/can_pwm_v2.ioc) file. If you want to use a different peripheral configuration, you should update can_pwm_v2.ioc with STM32CubeIDE or STM32CubeMX.
+The peripherals are initialised in [Libs/mini-v2-software/Core/Src/main.c](https://github.com/RaccoonLabHardware/mini-v2-software/blob/main/Core/Src/main.c), which are automatically generated based on the configuratation file [can_pwm_v2.ioc](https://github.com/RaccoonLabHardware/mini-v2-software/blob/main/can_pwm_v2.ioc) file. If you want to use a different peripheral configuration, you should update can_pwm_v2.ioc with STM32CubeIDE or STM32CubeMX.
 
 The main application is started in [Src/cyphal_application/application.cpp](Src/cyphal_application/application.cpp).
-By default it just blinks the RGB LED, subscribes to the setpoint topic, controls a single PWM and publishes a feedback to the feedback topic. Note, that the application is as simple as possible and doesn't have safety features like TTL.
+By default it just blinks the RGB LED, subscribes to the setpoint topic to control PWM1 and publishes a feedback with the latest applied setpoint. Note, that the application is as simple as possible: it controls only a single PWM and doesn't have safety features like TTL, but you are free to extend it as you want.
 
-You may consider [Src/cyphal_application/setpoint](Src/cyphal_application/setpoint) and [Src/cyphal_application/feedback](Src/cyphal_application/feedback) as examples of Cyphal-subscriber and Cyphal-publisher. It is recommended to create subjects by inhereting from CyphalPublisher or CyphalSubscriber and creating required registers in yaml file. This approach automatically adds all topics to the port.List array, allowing the node is able to advertise its capabilities.
+You may consider [Src/cyphal_application/setpoint](Src/cyphal_application/setpoint) and [Src/cyphal_application/feedback](Src/cyphal_application/feedback) as examples of Cyphal-subscriber and Cyphal-publisher. If you create subjects by inhereting from CyphalPublisher and CyphalSubscriber, it will automatically add all topics to the port.List array, so the node is able to advertise its capabilities. This approach doesn't automatically create registers, so you need to add them in yaml file as shown in the examples.
 
 When you add your custom module, don't forget to add source file and path to the file with registers to [Src/cyphal_application/CMakeLists.txt](Src/cyphal_application/CMakeLists.txt). 
 

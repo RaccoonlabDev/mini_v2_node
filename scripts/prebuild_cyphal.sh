@@ -8,3 +8,6 @@ ${REPOSITORY_PATH}/Libs/libparams/scripts/params_generate_array_from_yaml.py \
     c++ \
     params \
     $@
+
+cd $REPOSITORY_PATH/Src/cyphal_application
+${REPOSITORY_PATH}/Libs/libparams/scripts/generate_docs.py $@
