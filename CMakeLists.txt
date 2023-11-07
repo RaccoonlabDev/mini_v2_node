@@ -40,6 +40,7 @@ else()
         Libs/Cyphal/Libs/o1heap/o1heap
         build/nunavut_out
     )
+    set(cyphalRegisters ${CMAKE_CURRENT_LIST_DIR}/Libs/Cyphal/Cyphal/params.yaml)
     include(Src/cyphal_application/CMakeLists.txt)
     list(APPEND applicationSourceCode
         build/src/params.cpp
@@ -118,6 +119,10 @@ target_link_options(${EXECUTABLE} PRIVATE
     -lnosys
     -Wl,-Map=${PROJECT_NAME}.map,--cref
     -Wl,--gc-sections
+)
+
+execute_process(
+    COMMAND ${CMAKE_CURRENT_LIST_DIR}/scripts/prebuild_cyphal.sh ${cyphalRegisters}
 )
 
 add_custom_command(TARGET ${EXECUTABLE}

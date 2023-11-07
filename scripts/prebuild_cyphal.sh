@@ -7,4 +7,4 @@ ${REPOSITORY_PATH}/Libs/libparams/scripts/params_generate_array_from_yaml.py \
     ${BUILD_DIR} \
     c++ \
     params \
-    ${REPOSITORY_PATH}/Libs/Cyphal/Cyphal/params.yaml ${REPOSITORY_PATH}/Src/cyphal_application/params.yaml
+    $@
