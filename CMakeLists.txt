@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15.3)
-project(cyphal_example CXX C ASM)
+project(example CXX C ASM)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
@@ -121,9 +121,11 @@ target_link_options(${EXECUTABLE} PRIVATE
     -Wl,--gc-sections
 )
 
-execute_process(
-    COMMAND ${CMAKE_CURRENT_LIST_DIR}/scripts/prebuild_cyphal.sh ${cyphalRegisters}
-)
+if(NOT USE_DRONECAN)
+    execute_process(
+        COMMAND ${CMAKE_CURRENT_LIST_DIR}/scripts/prebuild_cyphal.sh ${cyphalRegisters}
+    )
+endif()
 
 add_custom_command(TARGET ${EXECUTABLE}
     POST_BUILD

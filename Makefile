@@ -14,7 +14,7 @@ dronecan: clean autogenerate_git_related_headers
 	cd ${BUILD_OBJ_DIR} && cmake -DUSE_DRONECAN=1 ../.. && make
 
 upload:
-	./scripts/tools/stm32/flash.sh ${BUILD_OBJ_DIR}/cyphal_example.bin
+	./scripts/tools/stm32/flash.sh ${BUILD_OBJ_DIR}/example.bin
 
 autogenerate_git_related_headers:
 	mkdir -p ${BUILD_DIR}/src
