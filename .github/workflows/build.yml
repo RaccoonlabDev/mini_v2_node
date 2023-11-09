@@ -20,13 +20,13 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cyphal_firmware.bin
-          path: build/obj/cyphal_example.bin
+          path: build/obj/example.bin
 
       - name: Archive .elf file
         uses: actions/upload-artifact@v3
         with:
           name: cyphal_firmware.elf
-          path: build/obj/cyphal_example.elf
+          path: build/obj/example.elf
 
 
   build_dronecan:
