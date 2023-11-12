@@ -22,13 +22,7 @@ if(USE_DRONECAN)
         ${libparamsPath}/platform_specific/stm32f103/
         ${dronecanHeaders}
     )
-    set(applicationSourceCode
-        Src/dronecan_application/application.cpp
-        Src/dronecan_application/params.cpp
-    )
-    set(applicationHeaders
-        Src/dronecan_application
-    )
+    include(Src/dronecan_application/CMakeLists.txt)
 else()
     add_definitions(-DBXCAN_MAX_IFACE_INDEX=0)
     include(Libs/Cyphal/CMakeLists.txt)
