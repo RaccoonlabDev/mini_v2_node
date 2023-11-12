@@ -57,14 +57,14 @@ An example of connection scheme suitable for bench test for Mini v2 node and RL 
 
 <img src="assets/connection.png" alt="drawing">
 
-For details refer to: [Programmer usage](https://docs.raccoonlab.co/guide/programmer_sniffer/programmer.html) and [Sniffer usage](https://docs.raccoonlab.co/guide/programmer_sniffer/sniffer.html#_4-1-cyphal-usage) pages.
+You can also use other sniffer and programmers. For details refer to: [Programmer usage](https://docs.raccoonlab.co/guide/programmer_sniffer/programmer.html) and [Sniffer usage](https://docs.raccoonlab.co/guide/programmer_sniffer/sniffer.html#_4-1-cyphal-usage) pages.
 
 **Step 3. Build the project and upload the firmware**
 
 ```bash
-make generate_dsdl # you need to call it only before the first build
+make generate_dsdl  # you need to call it only before the first build
 make cyphal
-make upload
+make upload         # it works only with RaccoonLab sniffer-programmer yet
 ```
 
 As a short form, you can build and upload the firmware with a single command:
@@ -89,6 +89,9 @@ Try the command below or use the official yukon/yakut instructions.
 source scripts/init.sh
 ~/Download/Yukon
 ```
+
+Please, refer to the [Mini node docs](https://docs.raccoonlab.co/guide/can_pwm/can_pwm_cyphal.html).
+It has a detailed steps about how to perform bench testing of the node.
 
 **Q&A**
 
