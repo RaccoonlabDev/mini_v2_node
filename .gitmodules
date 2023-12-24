@@ -7,6 +7,6 @@
 [submodule "scripts/tools"]
 	path = scripts/tools
 	url = git@github.com:PonomarevDA/tools.git
-[submodule "Libs/mini-v2-software"]
-	path = Libs/mini-v2-software
+[submodule "Libs/stm32-cube-project"]
+	path = Libs/stm32-cube-project
 	url = https://github.com/RaccoonLabHardware/mini-v2-software.git
