@@ -7,7 +7,7 @@ endif()
 
 set(PLATFORM bxcan)
 set(libparamsPath ${CMAKE_CURRENT_LIST_DIR}/Libs/libparams)
-set(stm32cubeMxProjectPath ${CMAKE_CURRENT_LIST_DIR}/Libs/mini-v2-software)
+set(stm32cubeMxProjectPath ${CMAKE_CURRENT_LIST_DIR}/Libs/stm32-cube-project)
 
 if(USE_DRONECAN)
     include(Libs/libsqcan/CMakeLists.txt)

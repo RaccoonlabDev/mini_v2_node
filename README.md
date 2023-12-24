@@ -99,7 +99,7 @@ If you are strugguling with the software building, please refer to the build wor
 
 ## 5. Customization
 
-The peripherals are initialised in [Libs/mini-v2-software/Core/Src/main.c](https://github.com/RaccoonLabHardware/mini-v2-software/blob/main/Core/Src/main.c), which are automatically generated based on the configuratation file [can_pwm_v2.ioc](https://github.com/RaccoonLabHardware/mini-v2-software/blob/main/can_pwm_v2.ioc) file. If you want to use a different peripheral configuration, you should update can_pwm_v2.ioc with STM32CubeIDE or STM32CubeMX.
+The peripherals are initialised in [Libs/stm32-cube-project/Core/Src/main.c](https://github.com/RaccoonLabHardware/mini-v2-software/blob/main/Core/Src/main.c), which are automatically generated based on the configuratation file [can_pwm_v2.ioc](https://github.com/RaccoonLabHardware/mini-v2-software/blob/main/can_pwm_v2.ioc) file. If you want to use a different peripheral configuration, you should update can_pwm_v2.ioc with STM32CubeIDE or STM32CubeMX.
 
 The main application is started in [Src/cyphal_application/application.cpp](Src/cyphal_application/application.cpp).
 By default it just blinks the RGB LED, subscribes to the setpoint topic to control PWM1 and publishes a feedback with the latest applied setpoint. Note, that the application is as simple as possible: it controls only a single PWM and doesn't have safety features like TTL, but you are free to extend it as you want.
