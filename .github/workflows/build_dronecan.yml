@@ -1,0 +1,27 @@
+name: build_dronecan
+on: [push]
+jobs:
+  build_dronecan:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.ACCESS_TOKEN }}
+          submodules: recursive
+          fetch-depth: 0
+
+      - uses: actions/checkout@v3
+        with:
+          repository: RaccoonlabDev/libsqcan
+          path: 'Libs/libsqcan'
+          token: ${{ secrets.ACCESS_TOKEN }}
+          fetch-depth: 0
+
+      - name: Checkout libsqcan
+        run: cd Libs/libsqcan && git checkout dd10256
+
+      - name: Install dependencies
+        run: ./scripts/tools/install_for_ubuntu.sh --yes
+
+      - run: make dronecan
