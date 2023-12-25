@@ -23,9 +23,9 @@ void init_persistent_storage() {
 void application_entry_point() {
     LedPeriphery::reset();
     init_persistent_storage();
-    NodeGetInfoSubscriber::setHardwareVersion(2, 1);
+    cyphal::NodeGetInfoSubscriber::setHardwareVersion(2, 1);
 
-    Cyphal cyphal;
+    cyphal::Cyphal cyphal;
     int init_res = cyphal.init();
 
     SetpointSubscriber setpoint(&cyphal);

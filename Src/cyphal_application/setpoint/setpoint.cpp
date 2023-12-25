@@ -9,7 +9,7 @@
 #include "params.hpp"
 #include "periphery/pwm/pwm.hpp"
 
-SetpointSubscriber::SetpointSubscriber(Cyphal* driver_) :
+SetpointSubscriber::SetpointSubscriber(cyphal::Cyphal* driver_) :
     CyphalSubscriber(driver_, 0) {
 };
 
@@ -22,14 +22,14 @@ int8_t SetpointSubscriber::init() {
     port_id = paramsGetIntegerValue(IntParamsIndexes::PARAM_SUB_SETPOINT_ID);
     if (driver->subscribe(this,
                 reg_udral_service_actuator_common_sp_Vector31_0_1_EXTENT_BYTES_,
-                CanardTransferKindMessage) < 0) {
+                cyphal::CanardTransferKindMessage) < 0) {
         return -1;
     }
 
     return 0;
 }
 
-void SetpointSubscriber::callback(const CanardRxTransfer& transfer) {
+void SetpointSubscriber::callback(const cyphal::CanardRxTransfer& transfer) {
     const uint8_t* payload = static_cast<const uint8_t*>(transfer.payload);
     size_t payload_len = transfer.payload_size;
     reg_udral_service_actuator_common_sp_Vector31_0_1 msg;
