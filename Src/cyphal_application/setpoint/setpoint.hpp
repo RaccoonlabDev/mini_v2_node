@@ -11,12 +11,12 @@ extern "C" {
 
 #include "cyphal_subscribers.hpp"
 
-class SetpointSubscriber: public CyphalSubscriber {
+class SetpointSubscriber: public cyphal::CyphalSubscriber {
 public:
-    SetpointSubscriber(Cyphal* driver);
+    SetpointSubscriber(cyphal::Cyphal* driver);
     int8_t init();
 private:
-    void callback(const CanardRxTransfer& transfer) override;
+    void callback(const cyphal::CanardRxTransfer& transfer) override;
 };
 
 #ifdef __cplusplus

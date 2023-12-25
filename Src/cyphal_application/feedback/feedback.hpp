@@ -11,9 +11,9 @@
 extern "C" {
 #endif
 
-class FeedbackPublisher: public CyphalPublisher {
+class FeedbackPublisher: public cyphal::CyphalPublisher {
 public:
-    FeedbackPublisher(Cyphal* driver_) : CyphalPublisher(driver_, 0) {};
+    FeedbackPublisher(cyphal::Cyphal* driver_) : CyphalPublisher(driver_, 0) {};
     int8_t init();
     void process(uint32_t crnt_time_ms);
     void publish_msg(uint32_t crnt_time_ms);

@@ -9,6 +9,7 @@ set(applicationSourceCode
 set(applicationHeaders
     Src
     Src/cyphal_application
+    Libs/Cyphal
 )
 
 list(APPEND cyphalRegisters
