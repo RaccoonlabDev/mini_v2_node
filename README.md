@@ -1,6 +1,6 @@
 # Mini v2 node Cyphal/DroneCAN application template
 
-This repository introduces a simple Cyphal/DroneCAN application written for the [RL Mini v2](https://docs.raccoonlab.co/guide/can_pwm/can_pwm_mini_v2.html) and [RL Micro](https://docs.raccoonlab.co/guide/can_pwm/can_pwm_micro.html) nodes. Based on this project you can write your custom application if the original CAN-PWM convertor application doesn't suit your requirements.
+This repository introduces a simple and ready-to-use Cyphal/DroneCAN application template written for the [RL Mini v2](https://docs.raccoonlab.co/guide/can_pwm/can_pwm_mini_v2.html) and [RL Micro](https://docs.raccoonlab.co/guide/can_pwm/can_pwm_micro.html) nodes. Based on this project you can write your custom application if the original CAN-PWM convertor application doesn't suit your requirements.
 
 | View | Top view | Bot view |
 | ---- | --- | ------ |
@@ -8,7 +8,7 @@ This repository introduces a simple Cyphal/DroneCAN application written for the 
 
 The default capabilities of the node are shown on the picture below:
 
-<img src="assets/yukon.png" alt="drawing">
+<img src="https://raw.githubusercontent.com/wiki/RaccoonlabDev/mini_v2_node/assets/yukon.png" alt="drawing">
 
 ## 1. Prerequisites
 
@@ -117,7 +117,7 @@ You can also easily create custom Integer and String registers. An example is sh
 
 An example of connection scheme suitable for bench test for Mini v2 node and RL Programmer-Sniffer is shown below:
 
-<img src="assets/connection.png" alt="drawing">
+<img src="https://raw.githubusercontent.com/wiki/RaccoonlabDev/mini_v2_node/assets/connection.png" alt="drawing">
 
 You can also use other sniffer and programmers. For details refer to: [Programmer usage](https://docs.raccoonlab.co/guide/programmer_sniffer/programmer.html) and [Sniffer usage](https://docs.raccoonlab.co/guide/programmer_sniffer/sniffer.html#_4-1-cyphal-usage) pages.
 
@@ -158,3 +158,7 @@ It has a detailed steps about how to perform bench testing of the node.
 **Q&A**
 
 If you are strugguling with the software building, please refer to the build workflow [.github/workflows/build.yml](.github/workflows/build.yml) for a hint. If it doesn't help, you can open an issue.
+
+## 4. More examples
+
+- [RL UAV Lights node](https://github.com/RaccoonlabDev/uav_lights_node/tree/lights) is based on this template. You can consider it as an example.
