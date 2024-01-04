@@ -155,10 +155,16 @@ source scripts/init.sh
 Please, refer to the [Mini node docs](https://docs.raccoonlab.co/guide/can_pwm/can_pwm_cyphal.html).
 It has a detailed steps about how to perform bench testing of the node.
 
-**Q&A**
+## 4. Q&A
 
-If you are strugguling with the software building, please refer to the build workflow [.github/workflows/build.yml](.github/workflows/build.yml) for a hint. If it doesn't help, you can open an issue.
+If you are strugguling with the software building, please refer to the build workflow [.github/workflows/build.yml](.github/workflows/build.yml) for a hint.
 
-## 4. More examples
+If it doesn't help, you can open [an issue]( https://github.com/RaccoonlabDev/mini_v2_node/issues?q=is%3Aissue+).
+
+## 5. More examples
 
 - [RL UAV Lights node](https://github.com/RaccoonlabDev/uav_lights_node/tree/lights) is based on this template. You can consider it as an example.
+
+## 6. Wiki
+
+> The docs will be migrate to the wiki soon. Please, check [Cyphal docs](https://github.com/RaccoonlabDev/mini_v2_node/wiki/cyphal) and [DroneCAN docs](https://github.com/RaccoonlabDev/mini_v2_node/wiki/dronecan).
