@@ -13,9 +13,6 @@ set(libsHeaders
 )
 
 set(applicationSourceCode
-    ${ROOT_DIR}/Src/periphery/pwm/pwm.cpp
-    ${ROOT_DIR}/Src/periphery/led/led.cpp
-
     ${ROOT_DIR}/Src/dronecan_application/application.cpp
     ${ROOT_DIR}/Src/dronecan_application/params.cpp
 )

@@ -30,7 +30,7 @@ void FeedbackPublisher::publish_msg(uint32_t crnt_time_ms) {
     msg.heartbeat.readiness.value = reg_udral_service_common_Readiness_0_1_ENGAGED;
 
     uint32_t pwm_ccr_reg_value = PwmPeriphery::get_duration(PwmPin::PWM_1);
-    uint32_t pwm_duration = std::clamp(pwm_ccr_reg_value, 1000ul, 2000ul);
+    uint32_t pwm_duration = std::clamp(pwm_ccr_reg_value, (uint32_t)1000, (uint32_t)2000);
     msg.demand_factor_pct = (pwm_duration - 1000) / 10;
     setPortId(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_1_ID));
 

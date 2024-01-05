@@ -1,7 +1,6 @@
 cmake_path(GET CMAKE_CURRENT_LIST_DIR PARENT_PATH SRC_DIR)
 cmake_path(GET SRC_DIR PARENT_PATH ROOT_DIR)
 
-set(PLATFORM bxcan)
 set(libparamsPath ${ROOT_DIR}/Libs/libparams)
 add_definitions(-DBXCAN_MAX_IFACE_INDEX=0)
 include(${ROOT_DIR}/Libs/Cyphal/CMakeLists.txt)
@@ -15,9 +14,6 @@ set(libsHeaders
 )
 
 set(applicationSourceCode
-    ${ROOT_DIR}/Src/periphery/pwm/pwm.cpp
-    ${ROOT_DIR}/Src/periphery/led/led.cpp
-
     ${ROOT_DIR}/Src/cyphal_application/setpoint/setpoint.cpp
     ${ROOT_DIR}/Src/cyphal_application/feedback/feedback.cpp
     ${ROOT_DIR}/Src/cyphal_application/application.cpp
