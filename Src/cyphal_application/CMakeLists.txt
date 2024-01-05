@@ -1,17 +1,37 @@
-set(applicationSourceCode
-    Src/periphery/pwm/pwm.cpp
-    Src/periphery/led/led.cpp
+cmake_path(GET CMAKE_CURRENT_LIST_DIR PARENT_PATH SRC_DIR)
+cmake_path(GET SRC_DIR PARENT_PATH ROOT_DIR)
 
-    Src/cyphal_application/setpoint/setpoint.cpp
-    Src/cyphal_application/feedback/feedback.cpp
-    Src/cyphal_application/application.cpp
+set(PLATFORM bxcan)
+set(libparamsPath ${ROOT_DIR}/Libs/libparams)
+add_definitions(-DBXCAN_MAX_IFACE_INDEX=0)
+include(${ROOT_DIR}/Libs/Cyphal/CMakeLists.txt)
+set(libsSourceCode ${CYPHAL_SRC})
+set(libsHeaders
+    ${ROOT_DIR}/Libs/Cyphal/Cyphal
+    ${ROOT_DIR}/Libs/Cyphal/Libs/libcanard/libcanard
+    ${libparamsPath}/libparams
+    ${ROOT_DIR}/Libs/Cyphal/Libs/o1heap/o1heap
+    ${ROOT_DIR}/build/nunavut_out
+)
+
+set(applicationSourceCode
+    ${ROOT_DIR}/Src/periphery/pwm/pwm.cpp
+    ${ROOT_DIR}/Src/periphery/led/led.cpp
+
+    ${ROOT_DIR}/Src/cyphal_application/setpoint/setpoint.cpp
+    ${ROOT_DIR}/Src/cyphal_application/feedback/feedback.cpp
+    ${ROOT_DIR}/Src/cyphal_application/application.cpp
+
+    ${ROOT_DIR}/build/src/params.cpp
+    ${ROOT_DIR}/build/src/string_params.cpp
 )
 set(applicationHeaders
-    Src
-    Src/cyphal_application
-    Libs/Cyphal
+    ${ROOT_DIR}/Src
+    ${ROOT_DIR}/Src/cyphal_application
+    ${ROOT_DIR}/Libs/Cyphal
 )
 
+set(cyphalRegisters ${ROOT_DIR}/Libs/Cyphal/Cyphal/params.yaml)
 list(APPEND cyphalRegisters
     ${CMAKE_CURRENT_LIST_DIR}/params.yaml
     ${CMAKE_CURRENT_LIST_DIR}/setpoint/params.yaml
