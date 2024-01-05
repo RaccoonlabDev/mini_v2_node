@@ -6,24 +6,24 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(PLATFORM bxcan)
-set(libparamsPath ${CMAKE_CURRENT_LIST_DIR}/Libs/libparams)
 set(stm32cubeMxProjectPath ${CMAKE_CURRENT_LIST_DIR}/Libs/stm32-cube-project)
 
 if(USE_DRONECAN)
+    set(LIBPARAMS_PATH ${CMAKE_CURRENT_LIST_DIR}/Libs/libparams)
+    set(LIBPARAMS_PLATFORM stm32f103)
     include(Libs/libsqcan/CMakeLists.txt)
+    include(Libs/libparams/CMakeLists.txt)
     set(libsSourceCode
-        ${libparamsPath}/libparams/rom.c
-        ${libparamsPath}/libparams/storage.c
-        ${libparamsPath}/platform_specific/stm32f103/flash_driver.c
+        ${libparamsSrc}
         ${dronecanSources}
     )
     set(libsHeaders
-        ${libparamsPath}/libparams/
-        ${libparamsPath}/platform_specific/stm32f103/
+        ${libparamsHeaders}
         ${dronecanHeaders}
     )
     include(Src/dronecan_application/CMakeLists.txt)
 else()
+    set(libparamsPath ${CMAKE_CURRENT_LIST_DIR}/Libs/libparams)
     add_definitions(-DBXCAN_MAX_IFACE_INDEX=0)
     include(Libs/Cyphal/CMakeLists.txt)
     set(libsSourceCode ${CYPHAL_SRC})
