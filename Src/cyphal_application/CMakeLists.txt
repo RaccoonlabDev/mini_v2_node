@@ -33,3 +33,5 @@ list(APPEND cyphalRegisters
     ${CMAKE_CURRENT_LIST_DIR}/setpoint/params.yaml
     ${CMAKE_CURRENT_LIST_DIR}/feedback/params.yaml
 )
+
+add_definitions(-DFLASH_DRIVER_STORAGE_FILE="${ROOT_DIR}/Src/cyphal_application/default_params.yml")
