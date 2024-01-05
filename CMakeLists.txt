@@ -5,43 +5,18 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-set(PLATFORM bxcan)
-set(stm32cubeMxProjectPath ${CMAKE_CURRENT_LIST_DIR}/Libs/stm32-cube-project)
+set(ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
+
+# libparams
+set(LIBPARAMS_PATH ${ROOT_DIR}/Libs/libparams)
+set(LIBPARAMS_PLATFORM stm32f103)
+include(${ROOT_DIR}/Libs/libparams/CMakeLists.txt)
 
 if(USE_DRONECAN)
-    set(LIBPARAMS_PATH ${CMAKE_CURRENT_LIST_DIR}/Libs/libparams)
-    set(LIBPARAMS_PLATFORM stm32f103)
-    include(Libs/libsqcan/CMakeLists.txt)
-    include(Libs/libparams/CMakeLists.txt)
-    set(libsSourceCode
-        ${libparamsSrc}
-        ${dronecanSources}
-    )
-    set(libsHeaders
-        ${libparamsHeaders}
-        ${dronecanHeaders}
-    )
-    include(Src/dronecan_application/CMakeLists.txt)
+    include(${ROOT_DIR}/Src/dronecan_application/CMakeLists.txt)
 else()
-    set(libparamsPath ${CMAKE_CURRENT_LIST_DIR}/Libs/libparams)
-    add_definitions(-DBXCAN_MAX_IFACE_INDEX=0)
-    include(Libs/Cyphal/CMakeLists.txt)
-    set(libsSourceCode ${CYPHAL_SRC})
-    set(libsHeaders
-        Libs/Cyphal/Cyphal
-        Libs/Cyphal/Libs/libcanard/libcanard
-        ${libparamsPath}/libparams
-        Libs/Cyphal/Libs/o1heap/o1heap
-        build/nunavut_out
-    )
-    set(cyphalRegisters ${CMAKE_CURRENT_LIST_DIR}/Libs/Cyphal/Cyphal/params.yaml)
-    include(Src/cyphal_application/CMakeLists.txt)
-    list(APPEND applicationSourceCode
-        build/src/params.cpp
-        build/src/string_params.cpp
-    )
+    include(${ROOT_DIR}/Src/cyphal_application/CMakeLists.txt)
 endif()
-
 
 set(TOOLCHAIN_PREFIX arm-none-eabi-)
 set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc)
@@ -49,11 +24,12 @@ set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
 set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
 set(CMAKE_CXX_STANDARD 20)
 
+set(stm32cubeMxProjectPath ${ROOT_DIR}/Libs/stm32-cube-project)
 FILE(GLOB coreSources       ${stm32cubeMxProjectPath}/Core/Src/*)
 FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/STM32F1xx_HAL_Driver/Src/*.c*)
 
 set(gitRelatedHeaders
-    build/src
+    ${ROOT_DIR}/build/src
 )
 
 set(stm32CubeMxGeneratedFiles
