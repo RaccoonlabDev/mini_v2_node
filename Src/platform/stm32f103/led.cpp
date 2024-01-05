@@ -2,7 +2,7 @@
 /// Copyright (c) 2022-2023 Dmitry Ponomarev.
 /// Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
 
-#include "led.hpp"
+#include "periphery/led/led.hpp"
 #include "main.h"
 
 

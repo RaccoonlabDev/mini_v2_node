@@ -2,7 +2,7 @@
 /// Copyright (c) 2022-2023 Dmitry Ponomarev.
 /// Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
 
-#include "pwm.hpp"
+#include "periphery/pwm/pwm.hpp"
 #include "main.h"
 
 extern TIM_HandleTypeDef htim3;
