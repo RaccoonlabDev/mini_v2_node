@@ -25,16 +25,18 @@ void uavcanReadUniqueID(uint8_t out_uid[4]) {
 }
 
 void uavcanRestartNode() {
-    // do nothing
+}
+
+uint32_t uavcanGetTimeMs() {
+    return HAL_GetTick();
+}
+
+void HAL_NVIC_SystemReset() {
+    std::cout << "The app has been receved Restart command. Ignore." << std::endl;
 }
 
 uint32_t HAL_GetTick() {
     static auto start_time = std::chrono::high_resolution_clock::now();
     auto crnt_time = std::chrono::high_resolution_clock::now();
     return std::chrono::duration_cast<std::chrono::milliseconds>(crnt_time - start_time).count();
-
-}
-
-uint32_t uavcanGetTimeMs() {
-    return HAL_GetTick();
 }

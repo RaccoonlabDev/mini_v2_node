@@ -14,7 +14,7 @@ uint32_t HAL_GetTick();
 static inline uint32_t HAL_GetUIDw0() {return 0;}
 static inline uint32_t HAL_GetUIDw1() {return 0;}
 static inline uint32_t HAL_GetUIDw2() {return 0;}
-static inline void HAL_NVIC_SystemReset() {}
+void HAL_NVIC_SystemReset();
 
 #ifdef __cplusplus
 }
