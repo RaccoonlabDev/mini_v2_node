@@ -10,7 +10,7 @@ set(ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
 # libparams
 set(LIBPARAMS_PATH ${ROOT_DIR}/Libs/libparams)
 set(LIBPARAMS_PLATFORM stm32f103)
-include(${ROOT_DIR}/Libs/libparams/CMakeLists.txt)
+include(${LIBPARAMS_PATH}/CMakeLists.txt)
 
 if(USE_DRONECAN)
     include(${ROOT_DIR}/Src/dronecan_application/CMakeLists.txt)
@@ -54,15 +54,6 @@ add_executable(${EXECUTABLE}
     ${applicationSourceCode}
 )
 
-if(USE_PLATFORM_UBUNTU)
-    message(SEND_ERROR "USE_PLATFORM_UBUNTU is not supported yet!")
-else()
-    target_compile_definitions(${EXECUTABLE} PRIVATE
-        -DUSE_HAL_DRIVER
-        -DSTM32F103xB
-    )
-endif()
-
 include_directories(${libsHeaders})
 
 target_include_directories(${EXECUTABLE} PRIVATE
@@ -73,9 +64,19 @@ target_include_directories(${EXECUTABLE} PRIVATE
 
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-volatile")
 
+if(NOT USE_DRONECAN)
+    execute_process(
+        COMMAND ${CMAKE_CURRENT_LIST_DIR}/scripts/prebuild_cyphal.sh ${cyphalRegisters}
+    )
+endif()
+
 if(USE_PLATFORM_UBUNTU)
     message(SEND_ERROR "USE_PLATFORM_UBUNTU is not supported yet!")
 else()
+    target_compile_definitions(${EXECUTABLE} PRIVATE
+        -DUSE_HAL_DRIVER
+        -DSTM32F103xB
+    )
     target_compile_options(${EXECUTABLE} PRIVATE
         -mcpu=cortex-m3
         -mthumb
@@ -99,17 +100,7 @@ else()
         -Wl,-Map=${PROJECT_NAME}.map,--cref
         -Wl,--gc-sections
     )
-endif()
 
-if(NOT USE_DRONECAN)
-    execute_process(
-        COMMAND ${CMAKE_CURRENT_LIST_DIR}/scripts/prebuild_cyphal.sh ${cyphalRegisters}
-    )
-endif()
-
-if(USE_PLATFORM_UBUNTU)
-    message(SEND_ERROR "USE_PLATFORM_UBUNTU is not supported yet!")
-else()
     add_custom_command(TARGET ${EXECUTABLE}
         POST_BUILD
         COMMAND arm-none-eabi-size ${EXECUTABLE}
