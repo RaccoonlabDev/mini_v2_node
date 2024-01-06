@@ -1,6 +1,5 @@
-/// This software is distributed under the terms of the MIT License.
-/// Copyright (c) 2022-2023 Dmitry Ponomarev.
-/// Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
+// Copyright (C) 2023 Dmitry Ponomarev <ponomarevda96@gmail.com>
+// Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 
 #ifndef SRC_APPLICATION_HPP_
 #define SRC_APPLICATION_HPP_

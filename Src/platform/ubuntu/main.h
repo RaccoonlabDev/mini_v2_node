@@ -9,12 +9,14 @@
 extern "C" {
 #endif
 
-uint32_t HAL_GetTick();
-
 static inline uint32_t HAL_GetUIDw0() {return 0;}
 static inline uint32_t HAL_GetUIDw1() {return 0;}
 static inline uint32_t HAL_GetUIDw2() {return 0;}
+
+uint32_t HAL_GetTick();
 void HAL_NVIC_SystemReset();
+
+uint32_t uavcanGetTimeMs();
 
 #ifdef __cplusplus
 }
