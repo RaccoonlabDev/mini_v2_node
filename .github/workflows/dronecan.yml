@@ -9,14 +9,12 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
-
       - uses: actions/checkout@v3
         with:
           repository: PonomarevDA/dronecan_application
           path: 'Libs/Dronecan'
           token: ${{ secrets.DRONECAN_APPLICATION_TOKEN }}
           fetch-depth: 0
-
       - name: Checkout Dronecan
         run: cd Libs/Dronecan && git checkout df5119c # v0.3.0
 
@@ -24,3 +22,29 @@ jobs:
         run: ./scripts/tools/install_for_ubuntu.sh --yes
 
       - run: make dronecan
+
+  sitl:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - uses: actions/checkout@v3
+        with:
+          repository: PonomarevDA/dronecan_application
+          path: 'Libs/Dronecan'
+          token: ${{ secrets.DRONECAN_APPLICATION_TOKEN }}
+          fetch-depth: 0
+      - name: Checkout Dronecan
+        run: cd Libs/Dronecan && git checkout df5119c # v0.3.0
+
+      - name: Install dependencies
+        run: ./scripts/tools/install_for_ubuntu.sh --yes
+
+      - name: Build SITL DroneCAN
+        run: make sitl_dronecan
+
+      - name: Run SITL for 5 seconds
+        run: timeout 5s make run || res=$?; if [[ $res -ne 124 && $res -ne 0 ]]; then exit $res; fi
