@@ -8,6 +8,10 @@
 #include <string.h>
 #include "main.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void uavcanReadUniqueID(uint8_t out_uid[4]) {
     const uint32_t UNIQUE_ID_16_BYTES[4] = {
         HAL_GetUIDw0(),
@@ -25,3 +29,7 @@ void uavcanRestartNode() {
 uint32_t uavcanGetTimeMs() {
     return HAL_GetTick();
 }
+
+#ifdef __cplusplus
+}
+#endif
