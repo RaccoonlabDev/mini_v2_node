@@ -16,7 +16,7 @@ jobs:
           token: ${{ secrets.DRONECAN_APPLICATION_TOKEN }}
           fetch-depth: 0
       - name: Checkout Dronecan
-        run: cd Libs/Dronecan && git checkout df5119c # v0.3.0
+        run: cd Libs/Dronecan && git checkout bb50fad # v0.3.1
 
       - name: Install dependencies
         run: ./scripts/tools/install_for_ubuntu.sh --yes
@@ -38,7 +38,7 @@ jobs:
           token: ${{ secrets.DRONECAN_APPLICATION_TOKEN }}
           fetch-depth: 0
       - name: Checkout Dronecan
-        run: cd Libs/Dronecan && git checkout df5119c # v0.3.0
+        run: cd Libs/Dronecan && git checkout bb50fad # v0.3.1
 
       - name: Install dependencies
         run: ./scripts/tools/install_for_ubuntu.sh --yes
