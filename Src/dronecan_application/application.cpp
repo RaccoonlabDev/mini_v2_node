@@ -13,8 +13,12 @@ void application_entry_point() {
     paramsInit(static_cast<uint8_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT), NUM_OF_STR_PARAMS);
     paramsLoadFromFlash();
 
+    auto node_id = paramsGetIntegerValue(UAVCAN_NODE_ID);
+    auto node_name = (const char*)paramsGetStringValue(static_cast<uint8_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT));
+
     LedPeriphery::reset();
-    uavcanInitApplication(42);
+    uavcanInitApplication(node_id);
+    uavcanSetNodeName(node_name);
 
     while(true) {
         LedPeriphery::toggle(LedColor::BLUE_COLOR);

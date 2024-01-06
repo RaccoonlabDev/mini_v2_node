@@ -4,8 +4,10 @@
 cmake_path(GET CMAKE_CURRENT_LIST_DIR PARENT_PATH SRC_DIR)
 cmake_path(GET SRC_DIR PARENT_PATH ROOT_DIR)
 
-set(libparamsPath ${ROOT_DIR}/Libs/libparams)
+add_definitions(-DFLASH_DRIVER_STORAGE_FILE="${CMAKE_CURRENT_LIST_DIR}/default_params.yml")
 add_definitions(-DBXCAN_MAX_IFACE_INDEX=0)
+
+set(libparamsPath ${ROOT_DIR}/Libs/libparams)
 include(${ROOT_DIR}/Libs/Cyphal/CMakeLists.txt)
 set(libsSourceCode ${CYPHAL_SRC})
 set(libsHeaders
@@ -36,5 +38,3 @@ list(APPEND cyphalRegisters
     ${CMAKE_CURRENT_LIST_DIR}/setpoint/params.yaml
     ${CMAKE_CURRENT_LIST_DIR}/feedback/params.yaml
 )
-
-add_definitions(-DFLASH_DRIVER_STORAGE_FILE="${ROOT_DIR}/Src/cyphal_application/default_params.yml")

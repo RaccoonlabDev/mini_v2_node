@@ -7,11 +7,11 @@
 #include "storage.h"
 
 IntegerDesc_t integer_desc_pool[] = {
-    {"id", 0, 127, 50},
+    {"uavcan.node.id", 0, 127, 50, MUTABLE},
 };
 IntegerParamValue_t integer_values_pool[sizeof(integer_desc_pool) / sizeof(IntegerDesc_t)];
 
 StringDesc_t __attribute__((weak)) string_desc_pool[NUM_OF_STR_PARAMS] = {
-    {"name", "", false},
+    {"system.name", "co.raccoonlab.mini", IMMUTABLE},
 };
 StringParamValue_t string_values_pool[sizeof(string_desc_pool) / sizeof(StringDesc_t)];
