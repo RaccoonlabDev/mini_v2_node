@@ -6,7 +6,6 @@
 #include "cyphal.hpp"
 #include "cyphal_registers.hpp"
 #include "main.h"
-#include "string_params.hpp"
 #include "params.hpp"
 #include "setpoint/setpoint.hpp"
 #include "feedback/feedback.hpp"

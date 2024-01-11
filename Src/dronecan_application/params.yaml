@@ -1,0 +1,15 @@
+uavcan.node.id:
+  type: Integer
+  note: Defines a node-ID. Allowed values [0,127].
+  enum: PARAM_UAVCAN_NODE_ID
+  flags: mutable
+  default: 42
+  min: 0
+  max: 255
+
+system.name:
+  type: String
+  note: Defines custom node name. If empty, the node will use the default name.
+  enum: PARAM_SYSTEM_NAME
+  flags: mutable
+  default: "co.raccoonlab.mini"
