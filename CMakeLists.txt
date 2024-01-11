@@ -8,6 +8,12 @@ endif()
 # Pathes
 set(ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
 set(LIBPARAMS_PATH ${ROOT_DIR}/Libs/libparams)
+set(BUILD_SRC_DIR ${ROOT_DIR}/build/src)
+if(USE_DRONECAN)
+    set(APPLICATION_DIR ${ROOT_DIR}/Src/dronecan_application)
+else()
+    set(APPLICATION_DIR ${ROOT_DIR}/Src/cyphal_application)
+endif()
 
 # platform
 if(USE_PLATFORM_UBUNTU)
@@ -20,14 +26,8 @@ else()
     set(APP_PLATFORM stm32f103)
 endif()
 
-# libparams
 include(${LIBPARAMS_PATH}/CMakeLists.txt)
-
-if(USE_DRONECAN)
-    include(${ROOT_DIR}/Src/dronecan_application/CMakeLists.txt)
-else()
-    include(${ROOT_DIR}/Src/cyphal_application/CMakeLists.txt)
-endif()
+include(${APPLICATION_DIR}/CMakeLists.txt)
 
 if(USE_PLATFORM_UBUNTU)
 else()
@@ -57,17 +57,15 @@ set(EXECUTABLE ${PROJECT_NAME}.out)
 add_executable(${EXECUTABLE}
     ${libparams}
     ${stm32CubeMxGeneratedFiles}
-    ${libsSourceCode}
     ${applicationSourceCode}
+    ${BUILD_SRC_DIR}/params.cpp
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/pwm.cpp
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/led.cpp
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/platform_specific.cpp
 )
 
-include_directories(${libsHeaders})
-
 target_include_directories(${EXECUTABLE} PRIVATE
-    ${ROOT_DIR}/build/src
+    ${BUILD_SRC_DIR}
     ${stm32CubeMxHeaders}
     ${applicationHeaders}
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}
@@ -75,11 +73,14 @@ target_include_directories(${EXECUTABLE} PRIVATE
 
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-volatile")
 
-if(NOT USE_DRONECAN)
-    execute_process(
-        COMMAND ${CMAKE_CURRENT_LIST_DIR}/scripts/prebuild_cyphal.sh ${cyphalRegisters}
-    )
-endif()
+execute_process(
+    COMMAND ${LIBPARAMS_PATH}/scripts/generate_params.py --out-dir ${BUILD_SRC_DIR} -f ${LIBPARAMS_PARAMS}
+)
+
+execute_process(
+    COMMAND ${LIBPARAMS_PATH}/scripts/generate_docs.py ${LIBPARAMS_PARAMS}
+    WORKING_DIRECTORY ${APPLICATION_DIR}
+)
 
 execute_process(
     COMMAND git rev-parse --short=16 HEAD

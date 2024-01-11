@@ -16,11 +16,14 @@ set(applicationSourceCode
     ${libparamsSrc}
     ${DRONECAN_SOURCES}
     ${ROOT_DIR}/Src/dronecan_application/application.cpp
-    ${ROOT_DIR}/Src/dronecan_application/params.cpp
 )
 set(applicationHeaders
     ${libparamsHeaders}
     ${DRONECAN_HEADERS}
     ${ROOT_DIR}/Src
     ${ROOT_DIR}/Src/dronecan_application
+)
+
+set(LIBPARAMS_PARAMS
+    ${CMAKE_CURRENT_LIST_DIR}/params.yaml
 )

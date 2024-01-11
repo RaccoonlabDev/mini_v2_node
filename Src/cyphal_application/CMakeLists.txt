@@ -9,31 +9,26 @@ add_definitions(-DBXCAN_MAX_IFACE_INDEX=0)
 
 set(libparamsPath ${ROOT_DIR}/Libs/libparams)
 include(${ROOT_DIR}/Libs/Cyphal/CMakeLists.txt)
-set(libsSourceCode ${CYPHAL_SRC})
-set(libsHeaders
-    ${ROOT_DIR}/Libs/Cyphal/Cyphal
-    ${ROOT_DIR}/Libs/Cyphal/Libs/libcanard/libcanard
-    ${libparamsPath}/libparams
-    ${ROOT_DIR}/Libs/Cyphal/Libs/o1heap/o1heap
-    ${ROOT_DIR}/build/nunavut_out
-)
 
 set(applicationSourceCode
+    ${CYPHAL_SRC}
     ${ROOT_DIR}/Src/cyphal_application/setpoint/setpoint.cpp
     ${ROOT_DIR}/Src/cyphal_application/feedback/feedback.cpp
     ${ROOT_DIR}/Src/cyphal_application/application.cpp
-
-    ${ROOT_DIR}/build/src/params.cpp
-    ${ROOT_DIR}/build/src/string_params.cpp
 )
 set(applicationHeaders
+    ${ROOT_DIR}/Libs/Cyphal/Cyphal
+    ${ROOT_DIR}/Libs/Cyphal/Libs/libcanard/libcanard
+    ${ROOT_DIR}/Libs/libparams/libparams
+    ${ROOT_DIR}/Libs/Cyphal/Libs/o1heap/o1heap
+    ${ROOT_DIR}/build/nunavut_out
     ${ROOT_DIR}/Src
     ${ROOT_DIR}/Src/cyphal_application
     ${ROOT_DIR}/Libs/Cyphal
 )
 
-set(cyphalRegisters ${ROOT_DIR}/Libs/Cyphal/Cyphal/params.yaml)
-list(APPEND cyphalRegisters
+set(LIBPARAMS_PARAMS
+    ${ROOT_DIR}/Libs/Cyphal/Cyphal/params.yaml
     ${CMAKE_CURRENT_LIST_DIR}/params.yaml
     ${CMAKE_CURRENT_LIST_DIR}/setpoint/params.yaml
     ${CMAKE_CURRENT_LIST_DIR}/feedback/params.yaml
