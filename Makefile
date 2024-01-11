@@ -34,3 +34,5 @@ autogenerate_git_related_headers:
 	./scripts/tools/stm32/generate_software_version.sh ${BUILD_DIR}/src
 clean:
 	-rm -fR ${BUILD_OBJ_DIR}/
+distclean:
+	-rm -fR ${BUILD_DIR}/
