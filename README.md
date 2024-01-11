@@ -14,9 +14,9 @@ Please, refer Wiki for details:
 
 ### 2. Brief hardware info
 
-| View | Top view | Bottom view | Pinout |
-| ---- | --- | ------ |-|
-| <img src="https://docs.raccoonlab.co/assets/img/view.bbf1e631.png" alt="drawing" width="200"> | <img src="https://docs.raccoonlab.co/assets/img/view_top.6b0ef99e.png" alt="drawing" width="200"> | <img src="https://docs.raccoonlab.co/assets/img/view_bottom.ee41f6d5.png" alt="drawing" width="200"> | <img src="https://docs.raccoonlab.co/assets/img/pinout.c14a3021.png" alt="drawing" width="200"> |
+| Top view | Bottom view | Pinout | STM32CubeMX |
+| --- | ------ |-|-|
+| <img src="https://docs.raccoonlab.co/assets/img/view_top.6b0ef99e.png" alt="drawing" width="200"> | <img src="https://docs.raccoonlab.co/assets/img/view_bottom.ee41f6d5.png" alt="drawing" width="200"> | <img src="https://docs.raccoonlab.co/assets/img/pinout.c14a3021.png" alt="drawing" width="200"> | <img src="https://raw.githubusercontent.com/RaccoonLabHardware/mini_v2_stm32cubemx_project/main/Assets/stm32cubemx.png" alt="drawing" width="200"> |
 
 ### 3. Brief Cyphal template application capabilities
 
