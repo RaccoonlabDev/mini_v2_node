@@ -3,27 +3,35 @@
 
 BUILD_DIR:=build
 BUILD_OBJ_DIR:=build/obj
+IS_SUBMODULE_INITIALIZED := $(shell find Libs/libparams -mindepth 1 | wc -l)
 
 # Cyphal
 generate_dsdl:
 	mkdir -p ${BUILD_DIR}/nunavut_out
 	./Libs/Cyphal/scripts/nnvg_generate_c_headers.sh
-cyphal: clean autogenerate_git_related_headers
+cyphal: check_submodules clean autogenerate_git_related_headers
 	mkdir -p ${BUILD_OBJ_DIR}
 	cd ${BUILD_OBJ_DIR} && cmake ../.. && make
-sitl_cyphal: clean autogenerate_git_related_headers
+sitl_cyphal: check_submodules clean autogenerate_git_related_headers
 	mkdir -p ${BUILD_OBJ_DIR}
 	cd ${BUILD_OBJ_DIR} && cmake -DUSE_PLATFORM_UBUNTU=1 ../.. && make
 
 # Dronecan:
-dronecan: clean autogenerate_git_related_headers
+dronecan: check_submodules clean autogenerate_git_related_headers
 	mkdir -p ${BUILD_OBJ_DIR}
 	cd ${BUILD_OBJ_DIR} && cmake -DUSE_DRONECAN=1 ../.. && make
-sitl_dronecan: clean autogenerate_git_related_headers
+sitl_dronecan: check_submodules clean autogenerate_git_related_headers
 	mkdir -p ${BUILD_OBJ_DIR}
 	cd ${BUILD_OBJ_DIR} && cmake -DUSE_DRONECAN=1 -DUSE_PLATFORM_UBUNTU=1 ../.. && make
 
 # Common:
+check_submodules:
+	@if [ "$(IS_SUBMODULE_INITIALIZED)" -eq 0 ]; then \
+		echo "Error: submodules are empty. Please type: 'git submodule update --init --recursive'"; \
+		exit 1; \
+	else \
+		echo "Directory is fine"; \
+	fi
 upload:
 	./scripts/tools/stm32/flash.sh ${BUILD_OBJ_DIR}/example.bin
 run:
