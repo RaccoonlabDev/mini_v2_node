@@ -5,6 +5,7 @@
 #include "periphery/led/led.hpp"
 
 void LedPeriphery::reset() {
+    // not nothing
 }
 
 void LedPeriphery::toggle(LedColor led_color) {

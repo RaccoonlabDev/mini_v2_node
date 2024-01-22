@@ -13,7 +13,7 @@ extern "C" {
 
 class SetpointSubscriber: public cyphal::CyphalSubscriber {
 public:
-    SetpointSubscriber(cyphal::Cyphal* driver);
+    explicit SetpointSubscriber(cyphal::Cyphal* driver);
     int8_t init();
 private:
     void callback(const cyphal::CanardRxTransfer& transfer) override;

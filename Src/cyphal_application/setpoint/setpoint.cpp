@@ -19,7 +19,7 @@ int8_t SetpointSubscriber::init() {
     PwmPeriphery::init(PwmPin::PWM_3);
     PwmPeriphery::init(PwmPin::PWM_4);
 
-    port_id = paramsGetIntegerValue(IntParamsIndexes::PARAM_SUB_SETPOINT_ID);
+    port_id = static_cast<uint16_t>(paramsGetIntegerValue(IntParamsIndexes::PARAM_SUB_SETPOINT_ID));
     if (driver->subscribe(this,
                 reg_udral_service_actuator_common_sp_Vector31_0_1_EXTENT_BYTES_,
                 cyphal::CanardTransferKindMessage) < 0) {
@@ -30,7 +30,7 @@ int8_t SetpointSubscriber::init() {
 }
 
 void SetpointSubscriber::callback(const cyphal::CanardRxTransfer& transfer) {
-    const uint8_t* payload = static_cast<const uint8_t*>(transfer.payload);
+    auto payload = static_cast<const uint8_t*>(transfer.payload);
     size_t payload_len = transfer.payload_size;
     reg_udral_service_actuator_common_sp_Vector31_0_1 msg;
     if (reg_udral_service_actuator_common_sp_Vector31_0_1_deserialize_(&msg, payload, &payload_len) < 0) {
@@ -38,6 +38,6 @@ void SetpointSubscriber::callback(const cyphal::CanardRxTransfer& transfer) {
     }
 
     float setpoint_clamped = std::clamp(msg.value[0], 0.0f, 1.0f);
-    uint32_t pwm_duration = setpoint_clamped * 1000 + 1000;
+    auto pwm_duration = static_cast<uint32_t>(setpoint_clamped * 1000.0 + 1000);
     PwmPeriphery::set_duration(PwmPin::PWM_1, pwm_duration);
 }
