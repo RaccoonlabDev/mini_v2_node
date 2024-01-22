@@ -7,6 +7,10 @@
 #include "params.hpp"
 #include "periphery/led/led.hpp"
 
+#ifdef HAL_IWDG_MODULE_ENABLED
+extern IWDG_HandleTypeDef hiwdg;
+#endif /* HAL_IWDG_MODULE_ENABLED */
+
 void application_entry_point() {
     paramsInit(static_cast<uint8_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT), NUM_OF_STR_PARAMS);
     paramsLoadFromFlash();
@@ -24,5 +28,9 @@ void application_entry_point() {
     while(true) {
         LedPeriphery::toggle(LedColor::BLUE_COLOR);
         uavcanSpinOnce();
+
+#ifdef HAL_IWDG_MODULE_ENABLED
+        HAL_IWDG_Refresh(&hiwdg);
+#endif  // HAL_IWDG_MODULE_ENABLED
     }
 }

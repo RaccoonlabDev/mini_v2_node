@@ -13,9 +13,6 @@ jobs:
       - name: Install dependencies
         run: ./scripts/tools/install_for_ubuntu.sh --yes
 
-      - run: make generate_dsdl
-      - run: make cyphal
-
       - name: Archive .bin file
         uses: actions/upload-artifact@v3
         with:
@@ -41,7 +38,6 @@ jobs:
         run: |
           ./scripts/tools/install_for_ubuntu.sh --yes
           pip install pytest
-      - run: make generate_dsdl
       - run: make sitl_cyphal
       - run: |
           export REG_DATA_TYPE_PATH="$PWD/Libs/Cyphal/Libs/public_regulated_data_types/uavcan $PWD/Libs/Cyphal/Libs/public_regulated_data_types/reg"
