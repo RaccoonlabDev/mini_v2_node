@@ -3,8 +3,8 @@
 This repo introduces a simple ready-to-use Cyphal/DroneCAN application template for [RL Mini v2](https://docs.raccoonlab.co/guide/can_pwm/can_pwm_mini_v2.html) node.
 
 Please, refer Wiki for details:
-- [Cyphal template application](https://github.com/RaccoonlabDev/mini_v2_node/wiki/cyphal),
-- [DroneCAN template application](https://github.com/RaccoonlabDev/mini_v2_node/wiki/dronecan).
+- [Cyphal template application](https://github.com/RaccoonlabDev/mini_v2_node/wiki/Cyphal-application),
+- [DroneCAN template application](https://github.com/RaccoonlabDev/mini_v2_node/wiki/DroneCAN-application).
 
 ### 1. Key features
 
