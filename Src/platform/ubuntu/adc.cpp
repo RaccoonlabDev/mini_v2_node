@@ -9,9 +9,5 @@ int8_t AdcPeriphery::init() {
 }
 
 uint16_t AdcPeriphery::get(AdcChannel channel) {
-    if (!_is_adc_already_inited || channel >= AdcChannel::ADC_NUMBER_OF_CNANNELS) {
-        return 0;
-    }
-
     return 0;
 }

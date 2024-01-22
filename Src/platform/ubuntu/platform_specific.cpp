@@ -20,11 +20,11 @@ int main() {
 }
 
 void uavcanReadUniqueID(uint8_t out_uid[4]) {
-    const uint32_t UNIQUE_ID_16_BYTES[4] = {0, 0, 0, 0};
     memset(out_uid, 0x00, 16);
 }
 
 void uavcanRestartNode() {
+    // do nothing
 }
 
 uint32_t uavcanGetTimeMs() {
