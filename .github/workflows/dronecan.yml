@@ -18,8 +18,9 @@ jobs:
       - name: Checkout Dronecan
         run: cd Libs/Dronecan && git checkout bb50fad # v0.3.1
 
-      - name: Install dependencies
-        run: ./scripts/tools/install_for_ubuntu.sh --yes
+      - name: Inscripts/tools/stall dependencies
+        run: |
+          sudo apt-get install -y gcc-arm-none-eabi stlink-tools
 
       - run: make dronecan
 
@@ -41,10 +42,12 @@ jobs:
         run: cd Libs/Dronecan && git checkout bb50fad # v0.3.1
 
       - name: Install dependencies
-        run: ./scripts/tools/install_for_ubuntu.sh --yes
+        run: |
+          pip install pyserial python-can pydronecan pycyphal pytest pytest-asyncio yakut
+          pip install -i https://test.pypi.org/simple/ raccoonlab-tools
+          sudo apt-get install -y linux-modules-extra-$(uname -r)
 
-      - name: Build SITL DroneCAN
-        run: make sitl_dronecan
-
-      - name: Run SITL for 5 seconds
-        run: timeout 5s make run || res=$?; if [[ $res -ne 124 && $res -ne 0 ]]; then exit $res; fi
+      - run: make sitl_dronecan
+      - run: |
+          make run &
+          rl-test-dronecan-specification
