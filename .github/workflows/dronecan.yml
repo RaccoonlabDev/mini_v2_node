@@ -15,18 +15,12 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
-      - uses: actions/checkout@v4
-        with:
-          repository: PonomarevDA/dronecan_application
-          path: 'Libs/Dronecan'
-          fetch-depth: 0
-      - name: Checkout Dronecan
-        run: cd Libs/Dronecan && git checkout bb50fad # v0.3.1
 
       - name: Install dependencies
         run: ./scripts/tools/install_for_ubuntu.sh --yes
 
-      - run: make dronecan
+      - name: Build DroneCAN binary
+        run: make dronecan
 
       - name: Upload .bin file
         uses: actions/upload-artifact@v3
