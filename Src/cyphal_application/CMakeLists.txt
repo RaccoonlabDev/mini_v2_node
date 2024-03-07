@@ -12,9 +12,11 @@ include(${ROOT_DIR}/Libs/Cyphal/CMakeLists.txt)
 
 set(applicationSourceCode
     ${CYPHAL_SRC}
+    ${ROOT_DIR}/Src/cyphal_application/circuit_status/circuit_status.cpp
     ${ROOT_DIR}/Src/cyphal_application/setpoint/setpoint.cpp
     ${ROOT_DIR}/Src/cyphal_application/feedback/feedback.cpp
     ${ROOT_DIR}/Src/cyphal_application/application.cpp
+    ${ROOT_DIR}/Libs/Cyphal/Udral/circuit_status.cpp
 )
 set(applicationHeaders
     ${ROOT_DIR}/Libs/Cyphal/Cyphal
@@ -30,6 +32,7 @@ set(applicationHeaders
 set(LIBPARAMS_PARAMS
     ${ROOT_DIR}/Libs/Cyphal/Cyphal/params.yaml
     ${CMAKE_CURRENT_LIST_DIR}/params.yaml
+    ${CMAKE_CURRENT_LIST_DIR}/circuit_status/params.yaml
     ${CMAKE_CURRENT_LIST_DIR}/setpoint/params.yaml
     ${CMAKE_CURRENT_LIST_DIR}/feedback/params.yaml
 )

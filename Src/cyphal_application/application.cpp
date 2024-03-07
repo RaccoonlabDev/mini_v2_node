@@ -9,6 +9,7 @@
 #include "params.hpp"
 #include "setpoint/setpoint.hpp"
 #include "feedback/feedback.hpp"
+#include "circuit_status/circuit_status.hpp"
 #include "periphery/led/led.hpp"
 
 void init_persistent_storage() {
@@ -33,6 +34,9 @@ void application_entry_point() {
     FeedbackPublisher feedback(&cyphal);
     init_res |= feedback.init();
 
+    CircuitStatus crct;
+    init_res |= crct.init();
+
     while (true) {
         auto led_color = (init_res >= 0) ? LedColor::BLUE_COLOR : LedColor::RED_COLOR;
         LedPeriphery::toggle(led_color);
@@ -41,5 +45,6 @@ void application_entry_point() {
 
         auto crnt_time_ms = HAL_GetTick();
         feedback.process(crnt_time_ms);
+        crct.process(crnt_time_ms);
     }
 }

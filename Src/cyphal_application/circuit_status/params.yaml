@@ -1,0 +1,24 @@
+uavcan.pub.crct.5v:
+  type: Port
+  note: |
+    Voltage 5V (after DC-DC).
+    The normal values are within [4.5, 5.5] Volts.
+  data_type: uavcan.si.sample.voltage.Scalar.1.0
+  enum_base: PARAM_PUB_CRCT_5V
+
+uavcan.pub.crct.vin:
+  type: Port
+  note: |
+    Voltage Vin (before DC-DC).
+    It make sense only when you power up the node from Molex 6-pin connector.
+    The normal values are within [5.5, 55] Volts.
+  data_type: uavcan.si.sample.voltage.Scalar.1.0
+  enum_base: PARAM_PUB_CRCT_VIN
+
+uavcan.pub.crct.temperature:
+  type: Port
+  note: |
+    STM32 internal temperature.
+    It it expected that the temperature is a little bit higher then your room environment.
+  data_type: uavcan.si.sample.temperature.Scalar.1.0
+  enum_base: PARAM_PUB_CRCT_TEMPERATURE
