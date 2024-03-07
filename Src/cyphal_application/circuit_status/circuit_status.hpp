@@ -17,15 +17,13 @@ public:
     /**
      * @brief The constructor must be called only after initialization of Cyphal instance!
      */
-    explicit CircuitStatus() : voltage_5v_publisher(cyphal::Cyphal::get_instance(), 65535),
-                               voltage_vin_publisher(cyphal::Cyphal::get_instance(), 65535),
-                               temperature_publisher(cyphal::Cyphal::get_instance(), 65535) {};
+    CircuitStatus() = default;
 
     /**
      * @brief This function should be called once in the beginning of the application
      * @return >= 0 on success and < 0 on error
      */
-    int8_t init();
+    int8_t init() const;
 
     /**
      * @brief This function should be called periodically. It should automatically:
@@ -39,9 +37,15 @@ private:
     void _spin_once();
     void _update_parameters();
 
-    RaccoonLab::CircuitStatusVoltagePublisher voltage_5v_publisher;
-    RaccoonLab::CircuitStatusVoltagePublisher voltage_vin_publisher;
-    RaccoonLab::CircuitStatusTemperaturePublisher temperature_publisher;
+    RaccoonLab::CircuitStatusVoltagePublisher voltage_5v_pub{
+        cyphal::Cyphal::get_instance(), 65535};
+
+    RaccoonLab::CircuitStatusVoltagePublisher voltage_vin_pub{
+        cyphal::Cyphal::get_instance(), 65535};
+
+    RaccoonLab::CircuitStatusTemperaturePublisher temperature_pub{
+        cyphal::Cyphal::get_instance(), 65535};
+
     uint32_t _prev_pub_ts_ms = 0;
 };
 

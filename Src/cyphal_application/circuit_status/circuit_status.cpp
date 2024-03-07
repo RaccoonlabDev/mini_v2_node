@@ -25,7 +25,7 @@
     static const uint16_t AVG_SLOPE = 5;    ///< avg_slope/(3.3/4096)
 #endif
 
-int8_t CircuitStatus::init() {
+int8_t CircuitStatus::init() const {
     return AdcPeriphery::init();
 }
 
@@ -40,25 +40,32 @@ void CircuitStatus::process(uint32_t crnt_time_ms) {
 }
 
 void CircuitStatus::_update_parameters() {
-    voltage_5v_publisher.setPortId(paramsGetIntegerValue(PARAM_PUB_CRCT_5V_ID));
-    voltage_vin_publisher.setPortId(paramsGetIntegerValue(PARAM_PUB_CRCT_VIN_ID));
-    temperature_publisher.setPortId(paramsGetIntegerValue(PARAM_PUB_CRCT_TEMPERATURE_ID));
+    uint16_t port_id;
+
+    port_id = static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_CRCT_5V_ID));
+    voltage_5v_pub.setPortId(port_id);
+
+    port_id = static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_CRCT_VIN_ID));
+    voltage_vin_pub.setPortId(port_id);
+
+    port_id = static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_CRCT_TEMPERATURE_ID));
+    temperature_pub.setPortId(port_id);
 }
 
 void CircuitStatus::_spin_once() {
-    if (voltage_5v_publisher.isEnabled()) {
+    if (voltage_5v_pub.isEnabled()) {
         float volt = AdcPeriphery::get(AdcChannel::ADC_5V) * ADC_RAW_TO_5V;
-        voltage_5v_publisher.publish(uavcan_si_sample_voltage_Scalar_1_0{0, volt});
+        voltage_5v_pub.publish(uavcan_si_sample_voltage_Scalar_1_0{0, volt});
     }
 
-    if (voltage_vin_publisher.isEnabled()) {
+    if (voltage_vin_pub.isEnabled()) {
         float volt = AdcPeriphery::get(AdcChannel::ADC_VIN) * ADC_RAW_TO_VIN;
-        voltage_vin_publisher.publish(uavcan_si_sample_voltage_Scalar_1_0{0, volt});
+        voltage_vin_pub.publish(uavcan_si_sample_voltage_Scalar_1_0{0, volt});
     }
 
-    if (temperature_publisher.isEnabled()) {
+    if (temperature_pub.isEnabled()) {
         uint16_t raw_temperature = AdcPeriphery::get(AdcChannel::ADC_TEMPERATURE);
         float kelvin = (ADC_REF - raw_temperature) / AVG_SLOPE + TEMP_REF + 273;
-        temperature_publisher.publish(uavcan_si_sample_temperature_Scalar_1_0{0, kelvin});
+        temperature_pub.publish(uavcan_si_sample_temperature_Scalar_1_0{0, kelvin});
     }
 }
