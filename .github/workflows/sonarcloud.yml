@@ -8,7 +8,7 @@ jobs:
     env:
       BUILD_WRAPPER_OUT_DIR: bw-output
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
