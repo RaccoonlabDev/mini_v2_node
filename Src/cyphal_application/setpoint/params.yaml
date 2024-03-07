@@ -5,5 +5,5 @@
 # They correspond the standard: https://github.com/OpenCyphal/public_regulated_data_types/blob/master/uavcan/register/384.Access.1.0.dsdl
 uavcan.sub.setpoint:
   type: Port
-  data_type: reg.udral.service.actuator.common.sp.Vector31
+  data_type: reg.udral.service.actuator.common.sp.Vector31.0.1
   enum_base: PARAM_SUB_SETPOINT
