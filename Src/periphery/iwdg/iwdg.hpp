@@ -9,6 +9,10 @@
 
 class WatchdogPeriphery {
 public:
+    /**
+     * @brief Refresh the IWDG
+     * Reload IWDG counter with value defined in the reload register
+     */
     static void refresh();
 };
 

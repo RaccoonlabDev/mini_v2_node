@@ -17,6 +17,12 @@ static void write_blue(GPIO_PinState state) {
     HAL_GPIO_WritePin(INT_RGB_LED_BLUE_GPIO_Port, INT_RGB_LED_BLUE_Pin, state);
 }
 
+void LedPeriphery::set(LedColor color) {
+    write_red(color == LedColor::RED_COLOR ? GPIO_PIN_RESET : GPIO_PIN_SET);
+    write_green(color == LedColor::BLUE_COLOR ? GPIO_PIN_RESET : GPIO_PIN_SET);
+    write_blue(color == LedColor::GREEN_COLOR ? GPIO_PIN_RESET : GPIO_PIN_SET);
+}
+
 void LedPeriphery::reset() {
     write_red(GPIO_PIN_SET);
     write_green(GPIO_PIN_SET);
@@ -25,9 +31,10 @@ void LedPeriphery::reset() {
 
 void LedPeriphery::toggle(LedColor color) {
     auto crnt_time_ms = HAL_GetTick();
-    GPIO_PinState state = (crnt_time_ms % 1000 > 500) ? GPIO_PIN_SET : GPIO_PIN_RESET;
 
-    write_red(color == LedColor::RED_COLOR ? state : GPIO_PIN_SET);
-    write_green(color == LedColor::BLUE_COLOR ? state : GPIO_PIN_SET);
-    write_blue(color == LedColor::GREEN_COLOR ? state : GPIO_PIN_SET);
+    if (crnt_time_ms % 1000 > 500) {
+        set(color);
+    } else {
+        reset();
+    }
 }

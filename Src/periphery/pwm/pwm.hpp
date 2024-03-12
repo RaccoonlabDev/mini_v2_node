@@ -27,8 +27,19 @@ enum class PwmPin {
 
 class PwmPeriphery {
 public:
+    /**
+     * @return 0 on success, otherwise < 0
+     */
     static int8_t init(PwmPin pin);
+
+    /**
+     * @brief Set the duration of the PWM signal for a specific PWM pin in microseconds
+     */
     static void set_duration(const PwmPin pin, uint32_t duration_us);
+
+    /**
+     * @return the duration of the PWM signal for a specific PWM pin in microseconds
+     */
     static uint32_t get_duration(PwmPin pin);
 };
 

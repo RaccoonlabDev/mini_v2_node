@@ -22,7 +22,22 @@ enum class LedColor {
 
 class LedPeriphery {
 public:
+    /**
+     * @brief Set the specific RGB LED color 
+     */
+    static void set(LedColor color);
+
+    /**
+     * @brief Turn off the RGB LED
+     */
     static void reset();
+
+    /**
+     * @brief Toggle the state of an RGB LED by alternating between setting
+     * the LED to a specific color and turning it off.
+     * @note If the current time is within the first set the given color,
+     * otherwise turn off the RGB LED
+     */
     static void toggle(LedColor led_color);
 };
 
