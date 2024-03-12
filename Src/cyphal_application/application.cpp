@@ -11,6 +11,7 @@
 #include "feedback/feedback.hpp"
 #include "circuit_status/circuit_status.hpp"
 #include "periphery/led/led.hpp"
+#include "periphery/iwdg/iwdg.hpp"
 
 void init_persistent_storage() {
     paramsInit(static_cast<uint8_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT), NUM_OF_STR_PARAMS);
@@ -46,5 +47,7 @@ void application_entry_point() {
         auto crnt_time_ms = HAL_GetTick();
         feedback.process(crnt_time_ms);
         crct.process(crnt_time_ms);
+
+        WatchdogPeriphery::refresh();
     }
 }

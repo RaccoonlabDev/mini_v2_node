@@ -6,10 +6,7 @@
 #include "main.h"
 #include "params.hpp"
 #include "periphery/led/led.hpp"
-
-#ifdef HAL_IWDG_MODULE_ENABLED
-extern IWDG_HandleTypeDef hiwdg;
-#endif /* HAL_IWDG_MODULE_ENABLED */
+#include "periphery/iwdg/iwdg.hpp"
 
 void application_entry_point() {
     paramsInit(static_cast<uint8_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT), NUM_OF_STR_PARAMS);
@@ -29,8 +26,6 @@ void application_entry_point() {
         LedPeriphery::toggle(LedColor::BLUE_COLOR);
         uavcanSpinOnce();
 
-#ifdef HAL_IWDG_MODULE_ENABLED
-        HAL_IWDG_Refresh(&hiwdg);
-#endif  // HAL_IWDG_MODULE_ENABLED
+        WatchdogPeriphery::refresh();
     }
 }

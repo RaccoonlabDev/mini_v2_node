@@ -61,6 +61,7 @@ add_executable(${EXECUTABLE}
     ${BUILD_SRC_DIR}/params.cpp
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/adc.cpp
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/pwm.cpp
+    ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/iwdg.cpp
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/led.cpp
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/platform_specific.cpp
 )
@@ -110,7 +111,7 @@ else()
     )
 
     target_link_options(${EXECUTABLE} PRIVATE
-        -T${stm32cubeMxProjectPath}/STM32F103T8Ux_FLASH.ld
+        -T${stm32cubeMxProjectPath}/STM32F103T8UX_FLASH.ld
         -mcpu=cortex-m3
         -mthumb
         --specs=nosys.specs
