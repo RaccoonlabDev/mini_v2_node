@@ -65,7 +65,9 @@ add_executable(${EXECUTABLE}
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/pwm.cpp
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/iwdg.cpp
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/led.cpp
+    ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/temperature_sensor.cpp
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/platform_specific.cpp
+
 )
 
 target_include_directories(${EXECUTABLE} PRIVATE

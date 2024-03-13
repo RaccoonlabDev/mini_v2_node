@@ -65,7 +65,7 @@ void CircuitStatus::_spin_once() {
 
     if (temperature_pub.isEnabled()) {
         uint16_t raw_temperature = AdcPeriphery::get(AdcChannel::ADC_TEMPERATURE);
-        float kelvin = (ADC_REF - raw_temperature) / AVG_SLOPE + TEMP_REF + 273;
+        float kelvin = AdcPeriphery::stm32Temperature(raw_temperature);
         temperature_pub.publish(uavcan_si_sample_temperature_Scalar_1_0{0, kelvin});
     }
 }
