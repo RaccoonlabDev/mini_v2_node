@@ -59,7 +59,6 @@ void CircuitStatusModule::spin_once() {
 
         circuit_status.voltage = AdcPeriphery::stm32Voltage(vol_raw);
         circuit_status.current = AdcPeriphery::stm32Current(cur_raw);
-        // circuit_status.current = AdcPeriphery::stm32Current(cur_raw);
 
         publish_error = dronecan_equipment_circuit_status_publish(&circuit_status, &circuit_status_transfer_id);
         circuit_status_transfer_id ++;
