@@ -1,7 +1,7 @@
 #!/bin/bash
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 REPOSITORY_PATH="$(dirname "$SCRIPT_DIR")"
-INIT_SCRIPT_PATH=$SCRIPT_DIR/tools/cyphal/init.sh
+INIT_SCRIPT_PATH=$SCRIPT_DIR/tools/scripts/cyphal/init.sh
 DSDL_DIR="$REPOSITORY_PATH/Libs/Cyphal/Libs/public_regulated_data_types"
 
 export REG_DATA_TYPE_PATH="$DSDL_DIR/uavcan $DSDL_DIR/reg"
