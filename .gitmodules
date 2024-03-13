@@ -1,6 +1,9 @@
 [submodule "Libs/Cyphal"]
 	path = Libs/Cyphal
 	url = git@github.com:RaccoonlabDev/libcanard_stm32_cyphal.git
+[submodule "Libs/Dronecan"]
+	path = Libs/Dronecan
+	url = git@github.com:PonomarevDA/dronecan_application.git
 [submodule "Libs/libparams"]
 	path = Libs/libparams
 	url = git@github.com:PonomarevDA/libparams.git

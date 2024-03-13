@@ -10,9 +10,12 @@
 #include "params.hpp"
 #include "periphery/led/led.hpp"
 #include "periphery/iwdg/iwdg.hpp"
+#include "periphery/pwm/pwm.hpp"
+#include "modules/CircuitStatusModule.hpp"
+
 
 void application_entry_point() {
-    paramsInit(static_cast<uint8_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT), NUM_OF_STR_PARAMS);
+    paramsInit(static_cast<uint8_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT), NUM_OF_STR_PARAMS, -1, 1);
     paramsLoadFromFlash();
 
     auto node_id = paramsGetIntegerValue(IntParamsIndexes::PARAM_UAVCAN_NODE_ID);
@@ -24,9 +27,11 @@ void application_entry_point() {
 
     LedPeriphery::reset();
     uavcanInitApplication(node_id);
-
+    CircuitStatusModule& status_module = CircuitStatusModule::get_instance();
+    PwmPeriphery::init(PwmPin::PWM_2);
     while(true) {
         LedPeriphery::toggle(LedColor::BLUE_COLOR);
+        status_module.spin_once();
         uavcanSpinOnce();
 
         WatchdogPeriphery::refresh();

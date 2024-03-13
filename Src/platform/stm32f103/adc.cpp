@@ -1,13 +1,13 @@
-/**
- * This program is free software under the GNU General Public License v3.
- * See <https://www.gnu.org/licenses/> for details.
- * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
- */
+// Copyright (C) 2023 Dmitry Ponomarev <ponomarevda96@gmail.com>
+// Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 
 #include "periphery/adc/adc.hpp"
 #include "main.h"
 
 extern ADC_HandleTypeDef hadc1;
+static uint32_t adc_current_avg = 0;
+static uint32_t adc_current_sum = 0;
+static uint32_t adc_dma_counter = 0;
 
 static inline uint16_t adc_dma_buffer[static_cast<uint8_t>(AdcChannel::ADC_NUMBER_OF_CNANNELS)];
 
@@ -29,8 +29,25 @@ uint16_t AdcPeriphery::get(AdcChannel channel) {
     if (!_is_adc_already_inited || channel >= AdcChannel::ADC_NUMBER_OF_CNANNELS) {
         return 0;
     }
-
+    if (channel == AdcChannel::ADC_CURRENT) {
+        return adc_current_avg;
+    }
     return adc_dma_buffer[static_cast<uint8_t>(channel)];
+}
+
+float AdcPeriphery::stm32Current(uint16_t curr) {
+    return curr *ADC_CURRENT_MULTIPLIER;
+}
+
+float AdcPeriphery::stm32Temperature(uint16_t temp) {
+    return stm32TemperatureParse(temp);
+}
+
+float AdcPeriphery::stm32Voltage(uint16_t volt) {
+    return volt/64.0;
+}
+float AdcPeriphery::stm32Voltage5V(uint16_t volt) {
+    return volt/640.0;
 }
 
 #ifdef HAL_ADC_MODULE_ENABLED
@@ -38,6 +55,17 @@ uint16_t AdcPeriphery::get(AdcChannel channel) {
  * @note We assume that hadc->Instance == ADC1 always!
  */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
+    adc_dma_counter++;
+
+    adc_current_sum += adc_dma_buffer[static_cast<uint8_t>(AdcChannel::ADC_CURRENT)];
+    if (adc_dma_counter > 4000) {
+
+        adc_current_avg = adc_current_sum / adc_dma_counter;
+        adc_current_sum = 0;
+
+        adc_dma_counter = 0;
+    }
+
     HAL_ADC_Start_DMA(&hadc1, (uint32_t*)(void*)&adc_dma_buffer, static_cast<uint8_t>(AdcChannel::ADC_NUMBER_OF_CNANNELS));
 }
 #endif

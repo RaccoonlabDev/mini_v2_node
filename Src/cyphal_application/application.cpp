@@ -46,7 +46,7 @@ void application_entry_point() {
 
         auto crnt_time_ms = HAL_GetTick();
         feedback.process(crnt_time_ms);
-        crct.process(crnt_time_ms);
+        // crct.process(crnt_time_ms);
 
         WatchdogPeriphery::refresh();
     }
