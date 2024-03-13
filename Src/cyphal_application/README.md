@@ -1,12 +1,17 @@
 The node has the following interface:
 
-| №  | Type | Message | Topic name  |
-| -- | ---- | ------- | ----------- |
-|   1 | pub | uavcan.si.sample.voltage.Scalar.1.0 | crct.5v | {'type': 'Port', 'note': 'Voltage 5V (after DC-DC).\nThe normal values are within [4.5, 5.5] Volts.\n', 'data_type': 'uavcan.si.sample.voltage.Scalar.1.0', 'enum_base': 'PARAM_PUB_CRCT_5V'}|
-|   2 | pub | uavcan.si.sample.voltage.Scalar.1.0 | crct.vin | {'type': 'Port', 'note': 'Voltage Vin (before DC-DC).\nIt make sense only when you power up the node from Molex 6-pin connector.\nThe normal values are within [5.5, 55] Volts.\n', 'data_type': 'uavcan.si.sample.voltage.Scalar.1.0', 'enum_base': 'PARAM_PUB_CRCT_VIN'}|
-|   3 | pub | uavcan.si.sample.temperature.Scalar.1.0 | crct.temperature | {'type': 'Port', 'note': 'STM32 internal temperature.\nIt it expected that the temperature is a little bit higher then your room environment.\n', 'data_type': 'uavcan.si.sample.temperature.Scalar.1.0', 'enum_base': 'PARAM_PUB_CRCT_TEMPERATURE'}|
-|   4 | sub | reg.udral.service.actuator.common.sp.Vector31.0.1 | setpoint | {'type': 'Port', 'data_type': 'reg.udral.service.actuator.common.sp.Vector31.0.1', 'enum_base': 'PARAM_SUB_SETPOINT'}|
-|   5 | pub | reg.udral.service.actuator.common.Feedback.0.1 | feedback | {'type': 'Port', 'data_type': 'reg.udral.service.actuator.common.Feedback.0.1', 'enum_base': 'PARAM_PUB_FEEDBACK_1'}|
+Cyphal Publishers:
+| №  | Data type and topic name  | Description |
+| -- | ------------------------- | ----------- |
+|  1 | [uavcan.si.sample.voltage.Scalar](https://github.com/OpenCyphal/public_regulated_data_types/blob/master/uavcan/si/sample/voltage/Scalar.1.0.dsdl) </br> crct.5v | Voltage 5V (after DC-DC).</br>The normal values are within [4.5, 5.5] Volts.</br>|
+|  2 | [uavcan.si.sample.voltage.Scalar](https://github.com/OpenCyphal/public_regulated_data_types/blob/master/uavcan/si/sample/voltage/Scalar.1.0.dsdl) </br> crct.vin | Voltage Vin (before DC-DC).</br>It make sense only when you power up the node from Molex 6-pin connector.</br>The normal values are within [5.5, 55] Volts.</br>|
+|  3 | [uavcan.si.sample.temperature.Scalar](https://github.com/OpenCyphal/public_regulated_data_types/blob/master/uavcan/si/sample/temperature/Scalar.1.0.dsdl) </br> crct.temperature | STM32 internal temperature.</br>It it expected that the temperature is a little bit higher then your room environment.</br>|
+|  4 | [reg.udral.service.actuator.common.Feedback](https://github.com/OpenCyphal/public_regulated_data_types/blob/master/reg/udral/service/actuator/common/Feedback.0.1.dsdl) </br> feedback | |
+
+Cyphal Subscribers:
+| №  | Data type and topic name  | Description |
+| -- | ------------------------- | ----------- |
+|  1 | [reg.udral.service.actuator.common.sp.Vector31](https://github.com/OpenCyphal/public_regulated_data_types/blob/master/reg/udral/service/actuator/common/sp/Vector31.0.1.dsdl) </br> setpoint | |
 
 The node has the following registers:
 
