@@ -28,7 +28,7 @@ void application_entry_point() {
     LedPeriphery::reset();
     uavcanInitApplication(node_id);
     CircuitStatusModule& status_module = CircuitStatusModule::get_instance();
-    PwmPeriphery::init(PwmPin::PWM_2);
+    
     while(true) {
         LedPeriphery::toggle(LedColor::BLUE_COLOR);
         status_module.spin_once();
