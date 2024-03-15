@@ -8,7 +8,7 @@
 
 #include "periphery/led/led.hpp"
 #include "uavcan/equipment/temperature/Temperature.h"
-#include "periphery/adc/adc.hpp"
+#include "periphery/adc/circuit_periphery.hpp"
 #include "uavcan/equipment/power/CircuitStatus.h"
 #include "logger.hpp"
 
@@ -33,7 +33,7 @@ private:
     static Logger logger;
 
     CircuitStatusModule(){};
-    AdcPeriphery adc;
+    CircuitPeriphery circuit_periphery;
 
     uint8_t circuit_status_transfer_id  = 0;
     uint8_t temperature_transfer_id     = 0;
