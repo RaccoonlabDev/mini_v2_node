@@ -35,21 +35,6 @@ uint16_t AdcPeriphery::get(AdcChannel channel) {
     return adc_dma_buffer[static_cast<uint8_t>(channel)];
 }
 
-float AdcPeriphery::stm32Current(uint16_t curr) {
-    return curr *ADC_CURRENT_MULTIPLIER;
-}
-
-float AdcPeriphery::stm32Temperature(uint16_t temp) {
-    return stm32TemperatureParse(temp);
-}
-
-float AdcPeriphery::stm32Voltage(uint16_t volt) {
-    return volt/64.0;
-}
-float AdcPeriphery::stm32Voltage5V(uint16_t volt) {
-    return volt/640.0;
-}
-
 #ifdef HAL_ADC_MODULE_ENABLED
 /**
  * @note We assume that hadc->Instance == ADC1 always!
