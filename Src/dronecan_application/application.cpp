@@ -10,7 +10,6 @@
 #include "params.hpp"
 #include "periphery/led/led.hpp"
 #include "periphery/iwdg/iwdg.hpp"
-#include "periphery/pwm/pwm.hpp"
 #include "modules/CircuitStatusModule.hpp"
 
 
