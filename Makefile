@@ -41,13 +41,13 @@ check_submodules:
 		echo "[INFO] Directory is fine"; \
 	fi
 upload:
-	./scripts/tools/scripts/stm32/flash.sh ${BUILD_OBJ_DIR}/example.bin
+	./scripts/tools/stm32/flash.sh ${BUILD_OBJ_DIR}/example.bin
 run:
-	./scripts/tools/scripts/can/vcan.sh slcan0
+	./scripts/tools/can/vcan.sh slcan0
 	./build/obj/example.out
 autogenerate_git_related_headers:
 	mkdir -p ${BUILD_DIR}/src
-	./scripts/tools/scripts/stm32/generate_software_version.sh ${BUILD_DIR}/src
+	./scripts/tools/stm32/generate_software_version.sh ${BUILD_DIR}/src
 clean:
 	-rm -fR ${BUILD_OBJ_DIR}/
 distclean:
