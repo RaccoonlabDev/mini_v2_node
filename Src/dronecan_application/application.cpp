@@ -37,5 +37,7 @@ void application_entry_point() {
         PwmPeriphery::set_duration(PwmPin::PWM_2, 1000);
 
         WatchdogPeriphery::refresh();
+        crct.process(crnt_time_ms);
+
     }
 }
