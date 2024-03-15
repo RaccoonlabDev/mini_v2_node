@@ -14,8 +14,8 @@
 #include "periphery/iwdg/iwdg.hpp"
 
 void init_persistent_storage() {
-    paramsInit(static_cast<uint8_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT), NUM_OF_STR_PARAMS);
-    paramsLoadFromFlash();
+    paramsInit(static_cast<uint8_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT), NUM_OF_STR_PARAMS, -1, 1);
+    paramsLoad();
 
     auto node_name_param_idx = static_cast<ParamIndex_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT);
     paramsSetStringValue(node_name_param_idx, 19, (const uint8_t*)"co.raccoonlab.mini");
@@ -46,7 +46,7 @@ void application_entry_point() {
 
         auto crnt_time_ms = HAL_GetTick();
         feedback.process(crnt_time_ms);
-        crct.process(crnt_time_ms);
+        // crct.process(crnt_time_ms);
 
         WatchdogPeriphery::refresh();
     }
