@@ -13,7 +13,9 @@ Logger CircuitStatusModule::logger = Logger("CircuitStatus");
 CircuitStatusModule& CircuitStatusModule::get_instance() {
     if (!instance_initialized) {
         instance_initialized=true;
-        instance.init();
+        if (instance.init() != 0) {
+            logger.log_error("ADC init");
+        }
     }
     return instance;
 }
