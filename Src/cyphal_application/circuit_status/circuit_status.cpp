@@ -6,7 +6,6 @@
 #include <algorithm>
 #include "cyphal.hpp"
 #include "params.hpp"
-#include "periphery/adc/adc.hpp"
 
 #include "uavcan/si/sample/electric_current/Scalar_1_0.h"
 #include "uavcan/si/sample/voltage/Scalar_1_0.h"
@@ -25,8 +24,9 @@
     static const uint16_t AVG_SLOPE = 5;    ///< avg_slope/(3.3/4096)
 #endif
 
-int8_t CircuitStatus::init() const {
-    return AdcPeriphery::init();
+int8_t CircuitStatus::init() {
+    periphery = CircuitPeriphery();
+    return periphery.init();
 }
 
 void CircuitStatus::process(uint32_t crnt_time_ms) {
@@ -54,18 +54,17 @@ void CircuitStatus::_update_parameters() {
 
 void CircuitStatus::_spin_once() {
     if (voltage_5v_pub.isEnabled()) {
-        float volt = AdcPeriphery::get(AdcChannel::ADC_5V) * ADC_RAW_TO_5V;
+        float volt = periphery.internal_volt_5v();
         voltage_5v_pub.publish(uavcan_si_sample_voltage_Scalar_1_0{0, volt});
     }
 
     if (voltage_vin_pub.isEnabled()) {
-        float volt = AdcPeriphery::get(AdcChannel::ADC_VIN) * ADC_RAW_TO_VIN;
+        float volt = periphery.internal_volt();
         voltage_vin_pub.publish(uavcan_si_sample_voltage_Scalar_1_0{0, volt});
     }
 
     if (temperature_pub.isEnabled()) {
-        uint16_t raw_temperature = AdcPeriphery::get(AdcChannel::ADC_TEMPERATURE);
-        float kelvin = AdcPeriphery::stm32Temperature(raw_temperature);
-        temperature_pub.publish(uavcan_si_sample_temperature_Scalar_1_0{0, kelvin});
+        uint16_t temp = periphery.internal_temp();
+        temperature_pub.publish(uavcan_si_sample_temperature_Scalar_1_0{0, temp});
     }
 }
