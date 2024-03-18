@@ -12,10 +12,11 @@ Logger CircuitStatusModule::logger = Logger("CircuitStatus");
 
 CircuitStatusModule& CircuitStatusModule::get_instance() {
     if (!instance_initialized) {
-        instance_initialized=true;
         if (instance.init() != 0) {
-            logger.log_error("ADC init");
-        }
+            logger.log_debug("ADC init error");
+        } else {
+            instance_initialized = true;
+        };
     }
     return instance;
 }
