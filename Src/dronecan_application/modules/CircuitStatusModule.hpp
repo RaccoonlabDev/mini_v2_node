@@ -23,9 +23,9 @@ public:
     float volt = 0;
     float curr = 0;
 
+    static bool instance_initialized;
 private:
     static CircuitStatusModule instance;
-    static bool instance_initialized;
 
     CircuitStatus_t circuit_status = {};
     Temperature_t temperature_status = {};
