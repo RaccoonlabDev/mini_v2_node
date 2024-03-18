@@ -17,6 +17,7 @@ extern "C" {
 class CircuitPeriphery{
 public:
     AdcPeriphery adc;
+    
     int8_t init() {
         int8_t adc_status = adc.init();
         return adc_status;
