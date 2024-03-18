@@ -45,7 +45,7 @@ private:
 
     int8_t publish_error = 0;
 
-    void init();
+    int8_t init();
     CircuitStatusModule(CircuitStatusModule &other) = delete;
     void operator=(const CircuitStatusModule &) = delete;
 };
