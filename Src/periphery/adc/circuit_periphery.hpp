@@ -33,8 +33,7 @@ public:
         return volt/640.0;
     };
     static int8_t init(){
-        int8_t adc_status = AdcPeriphery::init();
-        return adc_status;
+        return AdcPeriphery::init();
     };
 };
 
