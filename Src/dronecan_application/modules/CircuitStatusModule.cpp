@@ -18,15 +18,8 @@ CircuitStatusModule& CircuitStatusModule::get_instance() {
     return instance;
 }
 
-void CircuitStatusModule::init() {
-    int8_t adc_status = circuit_periphery.init();
-    if (adc_status != 0) {
-        logger.log_error("ADC init");
-    } else {
-        temp = circuit_periphery.internal_temp();
-        vol_raw = circuit_periphery.internal_volt();
-        cur_raw = circuit_periphery.internal_curr();
-    }
+int8_t CircuitStatusModule::init() {
+    return circuit_periphery.init();
 }
 
 void CircuitStatusModule::spin_once() {

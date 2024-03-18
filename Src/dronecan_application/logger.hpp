@@ -13,7 +13,6 @@
 
 class Logger {
 public:
-    // Logger();
     Logger(const char* source);
     /**
      * @brief Optionally init source and len fields if the source is provided
