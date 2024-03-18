@@ -16,27 +16,25 @@ extern "C" {
 
 class CircuitPeriphery{
 public:
-    AdcPeriphery adc;
-    
-    int8_t init() {
-        int8_t adc_status = adc.init();
-        return adc_status;
-    };
-    uint16_t internal_temp() {
-        uint16_t temp = adc.get(AdcChannel::ADC_TEMPERATURE);
+    static uint16_t internal_temp() {
+        uint16_t temp = AdcPeriphery::get(AdcChannel::ADC_TEMPERATURE);
         return stm32TemperatureParse(temp);
     };
-    float internal_curr() {
-        uint16_t curr = adc.get(AdcChannel::ADC_CURRENT);
+    static float internal_curr() {
+        uint16_t curr = AdcPeriphery::get(AdcChannel::ADC_CURRENT);
         return curr * ADC_CURRENT_MULTIPLIER;
     };
-    float internal_volt() {
-        uint16_t volt = adc.get(AdcChannel::ADC_VIN);
+    static float internal_volt() {
+        uint16_t volt = AdcPeriphery::get(AdcChannel::ADC_VIN);
         return volt/64.0;
     };
-    float internal_volt_5v() {
-        uint16_t volt = adc.get(AdcChannel::ADC_5V);
+    static float internal_volt_5v() {
+        uint16_t volt = AdcPeriphery::get(AdcChannel::ADC_5V);
         return volt/640.0;
+    };
+    static int8_t init(){
+        int8_t adc_status = AdcPeriphery::init();
+        return adc_status;
     };
 };
 

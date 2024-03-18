@@ -46,7 +46,6 @@ jobs:
         with:
           repository: PonomarevDA/dronecan_application
           path: 'Libs/Dronecan'
-          token: ${{ secrets.DRONECAN_APPLICATION_TOKEN }}
           fetch-depth: 0
       - name: Checkout Dronecan
         run: cd Libs/Dronecan && git checkout bb50fad # v0.3.1
