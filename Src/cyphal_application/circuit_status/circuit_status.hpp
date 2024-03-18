@@ -7,6 +7,7 @@
 
 #include "cyphal_publishers.hpp"
 #include "Udral/circuit_status.hpp"
+#include "periphery/adc/circuit_periphery.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,7 +24,7 @@ public:
      * @brief This function should be called once in the beginning of the application
      * @return >= 0 on success and < 0 on error
      */
-    int8_t init() const;
+    int8_t init();
 
     /**
      * @brief This function should be called periodically. It should automatically:
@@ -34,6 +35,7 @@ public:
     void process(uint32_t crnt_time_ms);
 
 private:
+    CircuitPeriphery periphery;
     void _spin_once();
     void _update_parameters();
 
