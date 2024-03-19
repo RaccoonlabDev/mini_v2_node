@@ -23,9 +23,11 @@ if(USE_PLATFORM_UBUNTU)
     set(CAN_PLATFORM socketcan)
     set(APP_PLATFORM ubuntu)
 else()
-    set(LIBPARAMS_PLATFORM stm32f103)
-    set(CAN_PLATFORM bxcan)
+    set(LIBPARAMS_PLATFORM stm32f103) # stm32f103, stm32g0b1
+    set(CAN_PLATFORM bxcan) # bxcan, fdcan
     set(APP_PLATFORM stm32f103)
+    set(TARGET_ARCHITECTURE cortex-m3) # cortex-m3, cortex-m0plus
+    set(CPU STM32F103xB) # STM32F103xB, STM32G0B1xx
 endif()
 
 include(${LIBPARAMS_PATH}/CMakeLists.txt)
@@ -40,18 +42,26 @@ else()
     set(CMAKE_CXX_STANDARD 20)
     set(stm32cubeMxProjectPath ${ROOT_DIR}/Libs/stm32-cube-project)
     FILE(GLOB coreSources       ${stm32cubeMxProjectPath}/Core/Src/*)
-    FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/STM32F1xx_HAL_Driver/Src/*.c*)
+    FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c)
+    FILE(GLOB startupFile       ${stm32cubeMxProjectPath}/*.s
+                                ${stm32cubeMxProjectPath}/Core/Startup/*.s
+    )
     set(stm32CubeMxGeneratedFiles
         ${coreSources}
         ${driversSources}
-        ${stm32cubeMxProjectPath}/startup_stm32f103xb.s
+        ${startupFile}
     )
     set(stm32CubeMxHeaders
         ${stm32cubeMxProjectPath}/Core/Inc
-        ${stm32cubeMxProjectPath}/Drivers/CMSIS/Device/ST/STM32F1xx/Include
         ${stm32cubeMxProjectPath}/Drivers/CMSIS/Include
+
+        ${stm32cubeMxProjectPath}/Drivers/CMSIS/Device/ST/STM32F1xx/Include
         ${stm32cubeMxProjectPath}/Drivers/STM32F1xx_HAL_Driver/Inc
         ${stm32cubeMxProjectPath}/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
+
+        ${stm32cubeMxProjectPath}/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        ${stm32cubeMxProjectPath}/Drivers/STM32G0xx_HAL_Driver/Inc
+        ${stm32cubeMxProjectPath}/Drivers/STM32G0xx_HAL_Driver/Inc/Legacy
     )
 endif()
 
@@ -101,10 +111,10 @@ if(USE_PLATFORM_UBUNTU)
 else()
     target_compile_definitions(${EXECUTABLE} PRIVATE
         -DUSE_HAL_DRIVER
-        -DSTM32F103xB
+        -D${CPU}
     )
     target_compile_options(${EXECUTABLE} PRIVATE
-        -mcpu=cortex-m3
+        -mcpu=${TARGET_ARCHITECTURE}
         -mthumb
         -fdata-sections
         -ffunction-sections
@@ -114,9 +124,10 @@ else()
         --specs=nosys.specs
     )
 
+    FILE(GLOB ldFile ${stm32cubeMxProjectPath}/*_FLASH.ld)
     target_link_options(${EXECUTABLE} PRIVATE
-        -T${stm32cubeMxProjectPath}/STM32F103T8UX_FLASH.ld
-        -mcpu=cortex-m3
+        -T${ldFile}
+        -mcpu=${TARGET_ARCHITECTURE}
         -mthumb
         --specs=nosys.specs
         -specs=nano.specs
