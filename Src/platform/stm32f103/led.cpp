@@ -7,14 +7,23 @@
 #include "periphery/led/led.hpp"
 #include "main.h"
 
+#ifndef INTERNAL_LED_RED_GPIO_Port
+    #define INTERNAL_LED_RED_GPIO_Port      INT_RGB_LED_RED_GPIO_Port
+    #define INTERNAL_LED_RED_Pin            INT_RGB_LED_RED_Pin
+    #define INTERNAL_LED_GREEN_GPIO_Port    INT_RGB_LED_GREEN_GPIO_Port
+    #define INTERNAL_LED_GREEN_Pin          INT_RGB_LED_GREEN_Pin
+    #define INTERNAL_LED_BLUE_GPIO_Port     INT_RGB_LED_BLUE_GPIO_Port
+    #define INTERNAL_LED_BLUE_Pin           INT_RGB_LED_BLUE_Pin
+#endif
+
 static void write_red(GPIO_PinState state) {
-    HAL_GPIO_WritePin(INT_RGB_LED_RED_GPIO_Port, INT_RGB_LED_RED_Pin, state);
+    HAL_GPIO_WritePin(INTERNAL_LED_RED_GPIO_Port, INTERNAL_LED_RED_Pin, state);
 }
 static void write_green(GPIO_PinState state) {
-    HAL_GPIO_WritePin(INT_RGB_LED_GREEN_GPIO_Port, INT_RGB_LED_GREEN_Pin, state);
+    HAL_GPIO_WritePin(INTERNAL_LED_GREEN_GPIO_Port, INTERNAL_LED_GREEN_Pin, state);
 }
 static void write_blue(GPIO_PinState state) {
-    HAL_GPIO_WritePin(INT_RGB_LED_BLUE_GPIO_Port, INT_RGB_LED_BLUE_Pin, state);
+    HAL_GPIO_WritePin(INTERNAL_LED_BLUE_GPIO_Port, INTERNAL_LED_BLUE_Pin, state);
 }
 
 void LedPeriphery::set(LedColor color) {
