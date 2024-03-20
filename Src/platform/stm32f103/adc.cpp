@@ -1,10 +1,15 @@
-// Copyright (C) 2023 Dmitry Ponomarev <ponomarevda96@gmail.com>
-// Distributed under the terms of the GPL v3 license, available in the file LICENSE.
+/***
+ * Copyright (C) 2024 Anastasiia Stepanova  <asiiapine96@gmail.com>
+ *  Distributed under the terms of the GPL v3 license, available in the file LICENSE.
+***/ 
 
 #include "periphery/adc/adc.hpp"
 #include "main.h"
 
 extern ADC_HandleTypeDef hadc1;
+static uint32_t adc_current_avg = 0;
+static uint32_t adc_current_sum = 0;
+static uint32_t adc_dma_counter = 0;
 static uint32_t adc_current_avg = 0;
 static uint32_t adc_current_sum = 0;
 static uint32_t adc_dma_counter = 0;
@@ -32,6 +37,9 @@ uint16_t AdcPeriphery::get(AdcChannel channel) {
     if (channel == AdcChannel::ADC_CURRENT) {
         return adc_current_avg;
     }
+    if (channel == AdcChannel::ADC_CURRENT) {
+        return adc_current_avg;
+    }
     return adc_dma_buffer[static_cast<uint8_t>(channel)];
 }
 
@@ -40,6 +48,17 @@ uint16_t AdcPeriphery::get(AdcChannel channel) {
  * @note We assume that hadc->Instance == ADC1 always!
  */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
+    adc_dma_counter++;
+
+    adc_current_sum += adc_dma_buffer[static_cast<uint8_t>(AdcChannel::ADC_CURRENT)];
+    if (adc_dma_counter > 4000) {
+
+        adc_current_avg = adc_current_sum / adc_dma_counter;
+        adc_current_sum = 0;
+
+        adc_dma_counter = 0;
+    }
+
     adc_dma_counter++;
 
     adc_current_sum += adc_dma_buffer[static_cast<uint8_t>(AdcChannel::ADC_CURRENT)];

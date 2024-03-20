@@ -16,19 +16,19 @@ extern "C" {
 
 class CircuitPeriphery{
 public:
-    static uint16_t internal_temp() {
+    static uint16_t temperature() {
         uint16_t temp = AdcPeriphery::get(AdcChannel::ADC_TEMPERATURE);
         return stm32TemperatureParse(temp);
     };
-    static float internal_curr() {
+    static float current() {
         uint16_t curr = AdcPeriphery::get(AdcChannel::ADC_CURRENT);
         return curr * ADC_CURRENT_MULTIPLIER;
     };
-    static float internal_volt() {
+    static float voltage_vin() {
         uint16_t volt = AdcPeriphery::get(AdcChannel::ADC_VIN);
         return volt/64.0;
     };
-    static float internal_volt_5v() {
+    static float voltage_5v() {
         uint16_t volt = AdcPeriphery::get(AdcChannel::ADC_5V);
         return volt/640.0;
     };

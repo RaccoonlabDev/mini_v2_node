@@ -1,5 +1,5 @@
 /***
- * Copyright (C) 2024 Anastasiia Stepanova  <asiiapine96@gmail.com>
+ * Copyright (C) 2024 Anastasiia Stepanova  <asiiapine@gmail.com>
  *  Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 ***/ 
 
@@ -18,14 +18,9 @@ public:
     static CircuitStatusModule &get_instance();
     void spin_once();
 
-    float temp = 0;
-    float v5_f = 0.0;
-    float volt = 0;
-    float curr = 0;
-
+    static bool instance_initialized;
 private:
     static CircuitStatusModule instance;
-    static bool instance_initialized;
 
     CircuitStatus_t circuit_status = {};
     Temperature_t temperature_status = {};
@@ -33,15 +28,9 @@ private:
     static Logger logger;
 
     CircuitStatusModule(){};
-    CircuitPeriphery circuit_periphery;
 
     uint8_t circuit_status_transfer_id  = 0;
     uint8_t temperature_transfer_id     = 0;
-
-    uint16_t v5_raw     = 0;
-    uint16_t cur_raw    = 0;
-    uint16_t vol_raw    = 0;
-    uint16_t tem_raw    = 0;
 
     int8_t publish_error = 0;
 

@@ -1,5 +1,5 @@
 /***
- * Copyright (C) 2024 Anastasiia Stepanova  <asiiapine96@gmail.com>
+ * Copyright (C) 2024 Anastasiia Stepanova  <asiiapine@gmail.com>
  *  Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 ***/ 
 
@@ -12,21 +12,24 @@ Logger CircuitStatusModule::logger = Logger("CircuitStatus");
 
 CircuitStatusModule& CircuitStatusModule::get_instance() {
     if (!instance_initialized) {
-        instance_initialized=true;
-        instance.init();
+        if (instance.init() != 0) {
+            logger.log_debug("ADC init error");
+        } else {
+            instance_initialized = true;
+        };
     }
     return instance;
 }
 
 int8_t CircuitStatusModule::init() {
-    return circuit_periphery.init();
+    return CircuitPeriphery::init();
 }
 
 void CircuitStatusModule::spin_once() {
     static uint32_t next_temp_pub_ms = 1000;
     static uint32_t next_status_pub_ms = 1000;
 
-    if (v5_f > 5.5 || circuit_status.voltage > 60.0) {
+    if (CircuitPeriphery::voltage_5v() > 5.5 || circuit_status.voltage > 60.0) {
         circuit_status.error_flags = ERROR_FLAG_OVERVOLTAGE;
     } else if (circuit_status.current > 1.05) {
         circuit_status.error_flags = ERROR_FLAG_OVERCURRENT;
@@ -35,22 +38,21 @@ void CircuitStatusModule::spin_once() {
     }
 
     if (HAL_GetTick() > next_temp_pub_ms) {
-        temp = circuit_periphery.internal_temp();
-        temperature_status.temperature = temp;
+        temperature_status.temperature = CircuitPeriphery::temperature();
         
         publish_error = dronecan_equipment_temperature_publish(&temperature_status, &temperature_transfer_id);
         temperature_transfer_id ++;
-        next_temp_pub_ms += 10;
+        next_temp_pub_ms += 1000;
     }
     
     if (HAL_GetTick() > next_status_pub_ms) {
 
-        circuit_status.voltage = circuit_periphery.internal_volt();
-        circuit_status.current = circuit_periphery.internal_curr();
+        circuit_status.voltage = CircuitPeriphery::voltage_vin();
+        circuit_status.current = CircuitPeriphery::current();
 
         publish_error = dronecan_equipment_circuit_status_publish(&circuit_status, &circuit_status_transfer_id);
         circuit_status_transfer_id ++;
-        next_status_pub_ms += 10;
+        next_status_pub_ms += 1000;
 
     }
     
