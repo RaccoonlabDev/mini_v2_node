@@ -19,18 +19,18 @@ generate_dsdl:
 	fi
 cyphal: check_submodules generate_dsdl clean autogenerate_git_related_headers
 	mkdir -p ${BUILD_OBJ_DIR}
-	cd ${BUILD_OBJ_DIR} && cmake ../.. && make
+	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=cyphal ../.. && make
 sitl_cyphal: check_submodules generate_dsdl clean autogenerate_git_related_headers
 	mkdir -p ${BUILD_OBJ_DIR}
-	cd ${BUILD_OBJ_DIR} && cmake -DUSE_PLATFORM_UBUNTU=1 ../.. && make
+	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=cyphal -DUSE_PLATFORM_UBUNTU=1 ../.. && make
 
 # Dronecan:
 dronecan: check_submodules clean autogenerate_git_related_headers
 	mkdir -p ${BUILD_OBJ_DIR}
-	cd ${BUILD_OBJ_DIR} && cmake -DUSE_DRONECAN=1 ../.. && make
+	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan ../.. && make
 sitl_dronecan: check_submodules clean autogenerate_git_related_headers
 	mkdir -p ${BUILD_OBJ_DIR}
-	cd ${BUILD_OBJ_DIR} && cmake -DUSE_DRONECAN=1 -DUSE_PLATFORM_UBUNTU=1 ../.. && make
+	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_UBUNTU=1 ../.. && make
 
 # Common:
 check_submodules:

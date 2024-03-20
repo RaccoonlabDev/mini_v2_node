@@ -11,10 +11,11 @@ endif()
 set(ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
 set(LIBPARAMS_PATH ${ROOT_DIR}/Libs/libparams)
 set(BUILD_SRC_DIR ${ROOT_DIR}/build/src)
-if(USE_DRONECAN)
-    set(APPLICATION_DIR ${ROOT_DIR}/Src/dronecan_application)
+
+if(CAN_PROTOCOL STREQUAL "dronecan" OR CAN_PROTOCOL STREQUAL "cyphal")
+    set(APPLICATION_DIR ${ROOT_DIR}/Src/${CAN_PROTOCOL}_application)
 else()
-    set(APPLICATION_DIR ${ROOT_DIR}/Src/cyphal_application)
+    message(SEND_ERROR "CAN_PROTOCOL is unknown.")
 endif()
 
 # platform
@@ -23,9 +24,25 @@ if(USE_PLATFORM_UBUNTU)
     set(CAN_PLATFORM socketcan)
     set(APP_PLATFORM ubuntu)
 else()
-    set(LIBPARAMS_PLATFORM stm32f103)
-    set(CAN_PLATFORM bxcan)
-    set(APP_PLATFORM stm32f103)
+    set(stm32cubeMxProjectPath ${ROOT_DIR}/Libs/stm32-cube-project)
+    FILE(GLOB ldFile ${stm32cubeMxProjectPath}/*_FLASH.ld)
+    get_filename_component(FILE_NAME ${ldFile} NAME_WE)
+
+    if("x${FILE_NAME}" MATCHES "^xSTM32F103.*")
+        set(LIBPARAMS_PLATFORM stm32f103)
+        set(CAN_PLATFORM bxcan)
+        set(APP_PLATFORM stm32f103)
+        set(TARGET_ARCHITECTURE cortex-m3)
+        set(CPU STM32F103xB)
+    elseif("x${FILE_NAME}" MATCHES "^xSTM32G0B1.*")
+        set(LIBPARAMS_PLATFORM stm32g0b1)
+        set(CAN_PLATFORM fdcan)
+        set(APP_PLATFORM stm32f103)
+        set(TARGET_ARCHITECTURE cortex-m0plus)
+        set(CPU STM32G0B1xx)
+    else()
+        message("Error: File name does not match any expected pattern.")
+    endif()
 endif()
 
 include(${LIBPARAMS_PATH}/CMakeLists.txt)
@@ -38,20 +55,27 @@ else()
     set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
     set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
     set(CMAKE_CXX_STANDARD 20)
-    set(stm32cubeMxProjectPath ${ROOT_DIR}/Libs/stm32-cube-project)
     FILE(GLOB coreSources       ${stm32cubeMxProjectPath}/Core/Src/*)
-    FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/STM32F1xx_HAL_Driver/Src/*.c*)
+    FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c)
+    FILE(GLOB startupFile       ${stm32cubeMxProjectPath}/*.s
+                                ${stm32cubeMxProjectPath}/Core/Startup/*.s
+    )
     set(stm32CubeMxGeneratedFiles
         ${coreSources}
         ${driversSources}
-        ${stm32cubeMxProjectPath}/startup_stm32f103xb.s
+        ${startupFile}
     )
     set(stm32CubeMxHeaders
         ${stm32cubeMxProjectPath}/Core/Inc
-        ${stm32cubeMxProjectPath}/Drivers/CMSIS/Device/ST/STM32F1xx/Include
         ${stm32cubeMxProjectPath}/Drivers/CMSIS/Include
+
+        ${stm32cubeMxProjectPath}/Drivers/CMSIS/Device/ST/STM32F1xx/Include
         ${stm32cubeMxProjectPath}/Drivers/STM32F1xx_HAL_Driver/Inc
         ${stm32cubeMxProjectPath}/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
+
+        ${stm32cubeMxProjectPath}/Drivers/CMSIS/Device/ST/STM32G0xx/Include
+        ${stm32cubeMxProjectPath}/Drivers/STM32G0xx_HAL_Driver/Inc
+        ${stm32cubeMxProjectPath}/Drivers/STM32G0xx_HAL_Driver/Inc/Legacy
     )
 endif()
 
@@ -101,10 +125,11 @@ if(USE_PLATFORM_UBUNTU)
 else()
     target_compile_definitions(${EXECUTABLE} PRIVATE
         -DUSE_HAL_DRIVER
-        -DSTM32F103xB
+        -D${CPU}
+        -DCYPHAL_NUM_OF_CAN_BUSES=1
     )
     target_compile_options(${EXECUTABLE} PRIVATE
-        -mcpu=cortex-m3
+        -mcpu=${TARGET_ARCHITECTURE}
         -mthumb
         -fdata-sections
         -ffunction-sections
@@ -115,8 +140,8 @@ else()
     )
 
     target_link_options(${EXECUTABLE} PRIVATE
-        -T${stm32cubeMxProjectPath}/STM32F103T8UX_FLASH.ld
-        -mcpu=cortex-m3
+        -T${ldFile}
+        -mcpu=${TARGET_ARCHITECTURE}
         -mthumb
         --specs=nosys.specs
         -specs=nano.specs
