@@ -26,11 +26,14 @@ void application_entry_point() {
     uavcanSetNodeName(node_name);
 
     LedPeriphery::reset();
+    
     uavcanInitApplication(node_id);
+
     PwmPeriphery::init(PwmPin::PWM_2);
     CircuitStatusModule& status_module = CircuitStatusModule::get_instance();
     LedColor color = LedColor::BLUE_COLOR;
-    if (!status_module.instance_initialized){
+    
+    if (!status_module.instance_initialized) {
         color = LedColor::RED_COLOR;
     }
     while(true) {

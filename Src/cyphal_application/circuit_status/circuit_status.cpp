@@ -64,7 +64,7 @@ void CircuitStatus::_spin_once() {
     }
 
     if (temperature_pub.isEnabled()) {
-        uint16_t temp = periphery.internal_temp();
+        auto temp = (float)periphery.internal_temp();
         temperature_pub.publish(uavcan_si_sample_temperature_Scalar_1_0{0, temp});
     }
 }
