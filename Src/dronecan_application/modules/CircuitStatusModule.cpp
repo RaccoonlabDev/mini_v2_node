@@ -47,7 +47,7 @@ void CircuitStatusModule::spin_once() {
     
     if (HAL_GetTick() > next_status_pub_ms) {
 
-        circuit_status.voltage = CircuitPeriphery::internal_volt();
+        circuit_status.voltage = CircuitPeriphery::voltage_vin();
         circuit_status.current = CircuitPeriphery::current();
 
         publish_error = dronecan_equipment_circuit_status_publish(&circuit_status, &circuit_status_transfer_id);

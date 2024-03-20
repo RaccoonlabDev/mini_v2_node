@@ -58,7 +58,7 @@ void CircuitStatus::_spin_once() {
     }
 
     if (voltage_vin_pub.isEnabled()) {
-        float volt = CircuitPeriphery::internal_volt();
+        float volt = CircuitPeriphery::voltage_vin();
         voltage_vin_pub.publish(uavcan_si_sample_voltage_Scalar_1_0{0, volt});
     }
 
