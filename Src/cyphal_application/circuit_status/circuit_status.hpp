@@ -35,7 +35,6 @@ public:
     void process(uint32_t crnt_time_ms);
 
 private:
-    CircuitPeriphery periphery;
     void _spin_once();
     void _update_parameters();
 

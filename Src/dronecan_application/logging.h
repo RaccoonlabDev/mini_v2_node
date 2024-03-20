@@ -1,3 +1,8 @@
+/***
+ * Copyright (C) 2024 Anastasiia Stepanova  <asiiapine96@gmail.com>
+ *  Distributed under the terms of the GPL v3 license, available in the file LICENSE.
+***/ 
+
 #ifndef SRC_LOGGING_H_
 #define SRC_LOGGING_H_
 

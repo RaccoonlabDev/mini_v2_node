@@ -25,8 +25,7 @@
 #endif
 
 int8_t CircuitStatus::init() {
-    periphery = CircuitPeriphery();
-    return periphery.init();
+    return CircuitPeriphery::init();
 }
 
 void CircuitStatus::process(uint32_t crnt_time_ms) {
@@ -54,17 +53,17 @@ void CircuitStatus::_update_parameters() {
 
 void CircuitStatus::_spin_once() {
     if (voltage_5v_pub.isEnabled()) {
-        float volt = periphery.internal_volt_5v();
+        float volt = CircuitPeriphery::internal_volt_5v();
         voltage_5v_pub.publish(uavcan_si_sample_voltage_Scalar_1_0{0, volt});
     }
 
     if (voltage_vin_pub.isEnabled()) {
-        float volt = periphery.internal_volt();
+        float volt = CircuitPeriphery::internal_volt();
         voltage_vin_pub.publish(uavcan_si_sample_voltage_Scalar_1_0{0, volt});
     }
 
     if (temperature_pub.isEnabled()) {
-        auto temp = (float)periphery.internal_temp();
+        auto temp = (float)CircuitPeriphery::internal_temp();
         temperature_pub.publish(uavcan_si_sample_temperature_Scalar_1_0{0, temp});
     }
 }
