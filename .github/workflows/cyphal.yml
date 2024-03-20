@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
@@ -19,13 +19,16 @@ jobs:
       - name: Install dependencies
         run: ./scripts/tools/install_for_ubuntu.sh --yes
 
-      - name: Archive .bin file
+      - name: Build Cyphal binary
+        run: make cyphal
+
+      - name: Upload .bin file
         uses: actions/upload-artifact@v3
         with:
           name: cyphal_firmware.bin
           path: build/obj/example.bin
 
-      - name: Archive .elf file
+      - name: Upload .elf file
         uses: actions/upload-artifact@v3
         with:
           name: cyphal_firmware.elf
@@ -35,7 +38,7 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
