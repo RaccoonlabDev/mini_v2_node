@@ -1,6 +1,8 @@
-/// This software is distributed under the terms of the MIT License.
-/// Copyright (c) 2022-2023 Dmitry Ponomarev.
-/// Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
+/**
+ * This program is free software under the GNU General Public License v3.
+ * See <https://www.gnu.org/licenses/> for details.
+ * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
+ */
 
 #ifndef SRC_CYPHAL_APPLICATION_FEEDBACK_HPP_
 #define SRC_CYPHAL_APPLICATION_FEEDBACK_HPP_

@@ -12,27 +12,30 @@ include(${ROOT_DIR}/Libs/Cyphal/CMakeLists.txt)
 
 set(applicationSourceCode
     ${CYPHAL_SRC}
-    ${ROOT_DIR}/Src/cyphal_application/circuit_status/circuit_status.cpp
-    ${ROOT_DIR}/Src/cyphal_application/setpoint/setpoint.cpp
-    ${ROOT_DIR}/Src/cyphal_application/feedback/feedback.cpp
-    ${ROOT_DIR}/Src/cyphal_application/application.cpp
     ${ROOT_DIR}/Libs/Cyphal/Udral/circuit_status.cpp
+
+    ${ROOT_DIR}/Src/cyphal_application/application.cpp
+    ${ROOT_DIR}/Src/cyphal_application/modules/circuit_status/circuit_status.cpp
+    ${ROOT_DIR}/Src/cyphal_application/modules/setpoint/setpoint.cpp
+    ${ROOT_DIR}/Src/cyphal_application/modules/feedback/feedback.cpp
 )
 set(applicationHeaders
+    ${ROOT_DIR}/Libs/Cyphal
     ${ROOT_DIR}/Libs/Cyphal/Cyphal
     ${ROOT_DIR}/Libs/Cyphal/Libs/libcanard/libcanard
     ${ROOT_DIR}/Libs/libparams/libparams
     ${ROOT_DIR}/Libs/Cyphal/Libs/o1heap/o1heap
     ${ROOT_DIR}/build/nunavut_out
+
     ${ROOT_DIR}/Src
     ${ROOT_DIR}/Src/cyphal_application
-    ${ROOT_DIR}/Libs/Cyphal
+    ${ROOT_DIR}/Src/cyphal_application/modules
 )
 
 set(LIBPARAMS_PARAMS
     ${ROOT_DIR}/Libs/Cyphal/Cyphal/params.yaml
     ${CMAKE_CURRENT_LIST_DIR}/params.yaml
-    ${CMAKE_CURRENT_LIST_DIR}/circuit_status/params.yaml
-    ${CMAKE_CURRENT_LIST_DIR}/setpoint/params.yaml
-    ${CMAKE_CURRENT_LIST_DIR}/feedback/params.yaml
+    ${CMAKE_CURRENT_LIST_DIR}/modules/circuit_status/params.yaml
+    ${CMAKE_CURRENT_LIST_DIR}/modules/setpoint/params.yaml
+    ${CMAKE_CURRENT_LIST_DIR}/modules/feedback/params.yaml
 )
