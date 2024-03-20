@@ -29,7 +29,7 @@ void CircuitStatusModule::spin_once() {
     static uint32_t next_temp_pub_ms = 1000;
     static uint32_t next_status_pub_ms = 1000;
 
-    if (CircuitPeriphery::internal_volt_5v() > 5.5 || circuit_status.voltage > 60.0) {
+    if (CircuitPeriphery::voltage_5v() > 5.5 || circuit_status.voltage > 60.0) {
         circuit_status.error_flags = ERROR_FLAG_OVERVOLTAGE;
     } else if (circuit_status.current > 1.05) {
         circuit_status.error_flags = ERROR_FLAG_OVERCURRENT;
@@ -38,7 +38,7 @@ void CircuitStatusModule::spin_once() {
     }
 
     if (HAL_GetTick() > next_temp_pub_ms) {
-        temperature_status.temperature = CircuitPeriphery::internal_temp();
+        temperature_status.temperature = CircuitPeriphery::temperature();
         
         publish_error = dronecan_equipment_temperature_publish(&temperature_status, &temperature_transfer_id);
         temperature_transfer_id ++;
@@ -48,7 +48,7 @@ void CircuitStatusModule::spin_once() {
     if (HAL_GetTick() > next_status_pub_ms) {
 
         circuit_status.voltage = CircuitPeriphery::internal_volt();
-        circuit_status.current = CircuitPeriphery::internal_curr();
+        circuit_status.current = CircuitPeriphery::current();
 
         publish_error = dronecan_equipment_circuit_status_publish(&circuit_status, &circuit_status_transfer_id);
         circuit_status_transfer_id ++;

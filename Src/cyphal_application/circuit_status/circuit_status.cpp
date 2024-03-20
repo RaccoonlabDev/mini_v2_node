@@ -53,7 +53,7 @@ void CircuitStatus::_update_parameters() {
 
 void CircuitStatus::_spin_once() {
     if (voltage_5v_pub.isEnabled()) {
-        float volt = CircuitPeriphery::internal_volt_5v();
+        float volt = CircuitPeriphery::voltage_5v();
         voltage_5v_pub.publish(uavcan_si_sample_voltage_Scalar_1_0{0, volt});
     }
 
@@ -63,7 +63,7 @@ void CircuitStatus::_spin_once() {
     }
 
     if (temperature_pub.isEnabled()) {
-        auto temp = (float)CircuitPeriphery::internal_temp();
+        auto temp = (float)CircuitPeriphery::temperature();
         temperature_pub.publish(uavcan_si_sample_temperature_Scalar_1_0{0, temp});
     }
 }
