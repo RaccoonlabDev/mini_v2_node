@@ -13,7 +13,7 @@
 
 SetpointSubscriber::SetpointSubscriber(cyphal::Cyphal* driver_) :
     CyphalSubscriber(driver_, 0) {
-};
+}
 
 int8_t SetpointSubscriber::init() {
     PwmPeriphery::init(PwmPin::PWM_1);
@@ -33,9 +33,9 @@ int8_t SetpointSubscriber::init() {
 
 void SetpointSubscriber::callback(const cyphal::CanardRxTransfer& transfer) {
     auto payload = static_cast<const uint8_t*>(transfer.payload);
-    size_t payload_len = transfer.payload_size;
+    size_t len = transfer.payload_size;
     reg_udral_service_actuator_common_sp_Vector31_0_1 msg;
-    if (reg_udral_service_actuator_common_sp_Vector31_0_1_deserialize_(&msg, payload, &payload_len) < 0) {
+    if (reg_udral_service_actuator_common_sp_Vector31_0_1_deserialize_(&msg, payload, &len) < 0) {
         return;
     }
 
