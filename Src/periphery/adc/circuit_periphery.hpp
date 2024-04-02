@@ -7,36 +7,40 @@
 #include <stdint.h>
 #include "periphery/temperature_sensor/temperature_sensor.hpp"
 #include "periphery/adc/adc.hpp"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define ADC_CURRENT_MULTIPLIER (10.0 / 4095)      // 10.0 Amper when ADC is 3.3V (4095)
-
-
 class CircuitPeriphery{
 public:
+    static int8_t init(){
+        return AdcPeriphery::init();
+    }
+
     static uint16_t temperature() {
         uint16_t temp = AdcPeriphery::get(AdcChannel::ADC_TEMPERATURE);
         return stm32TemperatureParse(temp);
-    };
+    }
+
     static float current() {
+        constexpr auto ADC_CURRENT_MULTIPLIER = 10.0 / 4095;  // 10.0 Amper when ADC is 3.3V (4095)
         uint16_t curr = AdcPeriphery::get(AdcChannel::ADC_CURRENT);
         return curr * ADC_CURRENT_MULTIPLIER;
-    };
-    static float voltage_vin() {
-        uint16_t volt = AdcPeriphery::get(AdcChannel::ADC_VIN);
-        return volt/64.0;
-    };
-    static float voltage_5v() {
-        uint16_t volt = AdcPeriphery::get(AdcChannel::ADC_5V);
-        return volt/640.0;
-    };
-    static int8_t init(){
-        return AdcPeriphery::init();
-    };
-};
+    }
 
+    static float voltage_vin() {
+        constexpr auto ADC_VIN_MULTIPLIER = 1.0 / 64.0;
+        uint16_t volt = AdcPeriphery::get(AdcChannel::ADC_VIN);
+        return volt * ADC_VIN_MULTIPLIER;
+    }
+
+    static float voltage_5v() {
+        constexpr auto ADC_5V_MULTIPLIER = 1.0 / 640.0;
+        uint16_t volt = AdcPeriphery::get(AdcChannel::ADC_5V);
+        return volt * ADC_5V_MULTIPLIER;
+    }
+};
 
 #ifdef __cplusplus
 }
