@@ -3,8 +3,8 @@
  *  Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 ***/ 
 
-#ifndef SRC_MODULE_CIRCUIT_STATUS_HPP_
-#define SRC_MODULE_CIRCUIT_STATUS_HPP_
+#ifndef SRC_MODULES_CIRCUIT_STATUS_HPP_
+#define SRC_MODULES_CIRCUIT_STATUS_HPP_
 
 #include "periphery/led/led.hpp"
 #include "uavcan/equipment/temperature/Temperature.h"
@@ -24,19 +24,17 @@ private:
 
     CircuitStatus_t circuit_status = {};
     Temperature_t temperature_status = {};
-    
+
     static Logger logger;
 
-    CircuitStatusModule(){};
+    CircuitStatusModule(){}
 
     uint8_t circuit_status_transfer_id  = 0;
     uint8_t temperature_transfer_id     = 0;
 
-    int8_t publish_error = 0;
-
     int8_t init();
-    CircuitStatusModule(CircuitStatusModule &other) = delete;
+    CircuitStatusModule(const CircuitStatusModule &other) = delete;
     void operator=(const CircuitStatusModule &) = delete;
 };
 
-#endif //SRC_MODULE_CIRCUIT_STATUS_HPP_
+#endif  // SRC_MODULES_CIRCUIT_STATUS_HPP_
