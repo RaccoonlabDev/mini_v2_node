@@ -24,19 +24,19 @@ public:
     }
 
     static float current() {
-        constexpr auto ADC_CURRENT_MULTIPLIER = 10.0 / 4095;  // 10.0 Amper when ADC is 3.3V (4095)
+        constexpr float ADC_CURRENT_MULTIPLIER = 10.0f / 4095.0f;  // 10.0 Amper when ADC is 3.3V
         uint16_t curr = AdcPeriphery::get(AdcChannel::ADC_CURRENT);
         return curr * ADC_CURRENT_MULTIPLIER;
     }
 
     static float voltage_vin() {
-        constexpr auto ADC_VIN_MULTIPLIER = 1.0 / 64.0;
+        constexpr float ADC_VIN_MULTIPLIER = 1.0f / 64.0f;
         uint16_t volt = AdcPeriphery::get(AdcChannel::ADC_VIN);
         return volt * ADC_VIN_MULTIPLIER;
     }
 
     static float voltage_5v() {
-        constexpr auto ADC_5V_MULTIPLIER = 1.0 / 640.0;
+        constexpr float ADC_5V_MULTIPLIER = 1.0f / 640.0f;
         uint16_t volt = AdcPeriphery::get(AdcChannel::ADC_5V);
         return volt * ADC_5V_MULTIPLIER;
     }

@@ -33,8 +33,8 @@ void FeedbackPublisher::publish_msg(uint32_t crnt_time_ms) {
 
     uint32_t pwm_ccr_reg_value = PwmPeriphery::get_duration(PwmPin::PWM_1);
     uint32_t pwm_duration = std::clamp(pwm_ccr_reg_value, (uint32_t)1000, (uint32_t)2000);
-    msg.demand_factor_pct = (pwm_duration - 1000) / 10;
-    setPortId(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_1_ID));
+    msg.demand_factor_pct = static_cast<int8_t>((pwm_duration - 1000) / 10);
+    setPortId(static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_1_ID)));
 
     uint8_t buffer[reg_udral_service_actuator_common_Feedback_0_1_EXTENT_BYTES_];
     size_t size = reg_udral_service_actuator_common_Feedback_0_1_EXTENT_BYTES_;

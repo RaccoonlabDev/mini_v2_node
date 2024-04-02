@@ -13,18 +13,6 @@
 #include "uavcan/si/sample/voltage/Scalar_1_0.h"
 #include "uavcan/si/sample/temperature/Scalar_1_0.h"
 
-#define ADC_RAW_TO_5V  (3.3f * 2.0f / 4095.0f)
-#define ADC_RAW_TO_VIN (3.3f * 19.0f / 4095.0f)
-
-#ifdef STM32G0B1xx
-    static const uint16_t TEMP_REF = 30;
-    static const uint16_t ADC_REF = 943;    ///< v_ref / 3.3 * 4095
-    static const uint16_t AVG_SLOPE = 3.1;  ///< avg_slope/(3.3/4096)
-#else  // STM32F103xB
-    static const uint16_t TEMP_REF = 25;
-    static const uint16_t ADC_REF = 1750;   ///< v_ref / 3.3 * 4095
-    static const uint16_t AVG_SLOPE = 5;    ///< avg_slope/(3.3/4096)
-#endif
 
 int8_t CircuitStatus::init() {
     return CircuitPeriphery::init();
