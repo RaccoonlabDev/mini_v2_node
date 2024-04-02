@@ -10,10 +10,8 @@
 extern "C" {
 #endif
 
-#define ADC_CURRENT_MULTIPLIER (10.0 / 4095)      // 10.0 Amper when ADC is 3.3V (4095)
-
 enum class AdcChannel : uint8_t {
-    ADC_VIN, 
+    ADC_VIN,
     ADC_5V,
     ADC_CURRENT,
     ADC_VERSION,
@@ -25,7 +23,6 @@ class AdcPeriphery {
 public:
     static int8_t init();
     static uint16_t get(AdcChannel channel);
-    
 private:
     static inline bool _is_adc_already_inited = false;
 };

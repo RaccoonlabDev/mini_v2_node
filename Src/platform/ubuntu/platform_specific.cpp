@@ -5,7 +5,7 @@
  */
 
 #include <string.h>
-#include <chrono>
+#include <chrono>  // NOLINT [build/c++11]
 #include <iostream>
 #include "main.h"
 #include "application.hpp"

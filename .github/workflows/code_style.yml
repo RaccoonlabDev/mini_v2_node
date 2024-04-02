@@ -19,3 +19,4 @@ jobs:
         run: |
           cpplint Src/cyphal_application/*pp Src/cyphal_application/modules/*/*pp
           cpplint Src/dronecan_application/*pp Src/dronecan_application/modules/*pp
+          cpplint Src/periphery/*/*pp Src/platform/*/*pp
