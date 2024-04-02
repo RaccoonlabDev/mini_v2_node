@@ -16,7 +16,7 @@
 
 
 void application_entry_point() {
-    paramsInit(static_cast<uint8_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT), NUM_OF_STR_PARAMS, -1, 1);
+    paramsInit((ParamIndex_t)IntParamsIndexes::INTEGER_PARAMS_AMOUNT, NUM_OF_STR_PARAMS, -1, 1);
     paramsLoad();
 
     auto node_id = paramsGetIntegerValue(IntParamsIndexes::PARAM_UAVCAN_NODE_ID);
@@ -27,12 +27,12 @@ void application_entry_point() {
     uavcanSetNodeName(node_name);
 
     LedPeriphery::reset();
-    
+
     uavcanInitApplication(node_id);
 
     CircuitStatusModule& status_module = CircuitStatusModule::get_instance();
     LedColor color = LedColor::BLUE_COLOR;
-    
+
     if (!status_module.instance_initialized) {
         color = LedColor::RED_COLOR;
     }
