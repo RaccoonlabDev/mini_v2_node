@@ -1,0 +1,20 @@
+name: code_style
+
+on:
+  push:
+    branches:
+    - '*'
+  pull_request:
+    branches:
+    - '*'
+
+jobs:
+  cpplint:
+    timeout-minutes: 1
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip3 install cpplint
+      - name: cpplint cyphal
+        run: |
+          cpplint Src/cyphal_application/*pp Src/cyphal_application/modules/*/*pp

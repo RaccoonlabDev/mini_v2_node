@@ -15,7 +15,7 @@ extern "C" {
 
 class FeedbackPublisher: public cyphal::CyphalPublisher {
 public:
-    explicit FeedbackPublisher(cyphal::Cyphal* driver_) : CyphalPublisher(driver_, 0) {};
+    explicit FeedbackPublisher(cyphal::Cyphal* driver_) : CyphalPublisher(driver_, 0) {}
     int8_t init();
     void process(uint32_t crnt_time_ms);
     void publish_msg(uint32_t crnt_time_ms);
