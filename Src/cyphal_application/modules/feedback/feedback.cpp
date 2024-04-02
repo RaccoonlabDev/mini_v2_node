@@ -37,9 +37,9 @@ void FeedbackPublisher::publish_msg(uint32_t crnt_time_ms) {
     setPortId(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_1_ID));
 
     uint8_t buffer[reg_udral_service_actuator_common_Feedback_0_1_EXTENT_BYTES_];
-    size_t buffer_size = reg_udral_service_actuator_common_Feedback_0_1_EXTENT_BYTES_;
-    int32_t result = reg_udral_service_actuator_common_Feedback_0_1_serialize_(&msg, buffer, &buffer_size);
-    if (NUNAVUT_SUCCESS == result) {
-        push(buffer_size, buffer);
+    size_t size = reg_udral_service_actuator_common_Feedback_0_1_EXTENT_BYTES_;
+    int32_t res = reg_udral_service_actuator_common_Feedback_0_1_serialize_(&msg, buffer, &size);
+    if (NUNAVUT_SUCCESS == res) {
+        push(size, buffer);
     }
 }
