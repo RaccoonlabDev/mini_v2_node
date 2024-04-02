@@ -6,19 +6,19 @@
 #ifndef SRC_LOGGER_HPP_
 #define SRC_LOGGER_HPP_
 
+#include <cstdio>
+#include "main.h"
 #include "uavcan/protocol/debug/LogMessage.h"
 #include "logging.h"
-#include "main.h"
-#include <cstdio> 
 
 class Logger {
 public:
-    Logger(const char* source);
+    explicit Logger(const char* source);
     /**
      * @brief Optionally init source and len fields if the source is provided
      * It can be a brief task/module name or something that can't be changed later.
      */
-    
+
     int8_t init(const char* source);
 
     /**
