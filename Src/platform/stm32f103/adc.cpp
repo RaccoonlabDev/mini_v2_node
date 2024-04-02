@@ -46,13 +46,15 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
 
     adc_current_sum += adc_dma_buffer[static_cast<uint8_t>(AdcChannel::ADC_CURRENT)];
     if (adc_dma_counter > 4000) {
-
         adc_current_avg = adc_current_sum / adc_dma_counter;
         adc_current_sum = 0;
 
         adc_dma_counter = 0;
     }
 
-    HAL_ADC_Start_DMA(&hadc1, (uint32_t*)(void*)&adc_dma_buffer, static_cast<uint8_t>(AdcChannel::ADC_NUMBER_OF_CNANNELS));
+    HAL_ADC_Start_DMA(&hadc1,
+                      (uint32_t*)(void*)&adc_dma_buffer,
+                      static_cast<uint8_t>(AdcChannel::ADC_NUMBER_OF_CNANNELS)
+    );
 }
 #endif

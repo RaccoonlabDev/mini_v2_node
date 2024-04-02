@@ -16,7 +16,7 @@ struct PwmPinInfo {
     volatile uint32_t& ccr;
 };
 
-const static PwmPinInfo info[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)] = {
+static const PwmPinInfo info[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)] = {
     {.htim = htim4,     .channel = TIM_CHANNEL_2,   .ccr = TIM4->CCR2},     // PB7
     {.htim = htim4,     .channel = TIM_CHANNEL_1,   .ccr = TIM4->CCR1},     // PB6
     {.htim = htim3,     .channel = TIM_CHANNEL_1,   .ccr = TIM3->CCR1},     // PB4

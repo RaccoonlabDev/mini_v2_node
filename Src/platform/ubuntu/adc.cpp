@@ -5,15 +5,14 @@
 
 #include "periphery/adc/adc.hpp"
 
-struct adcState
-{
-    uint16_t current;    
-    uint16_t v_in;    
-    uint16_t v_5v; 
+struct adcState {
+    uint16_t current;
+    uint16_t v_in;
+    uint16_t v_5v;
     uint16_t version;
-    uint16_t temperature;   
+    uint16_t temperature;
 };
-adcState state ={};
+adcState state = {};
 
 int8_t AdcPeriphery::init() {
     state.temperature = 3115;
