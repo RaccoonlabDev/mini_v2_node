@@ -41,6 +41,17 @@ public:
      * @return the duration of the PWM signal for a specific PWM pin in microseconds
      */
     static uint32_t get_duration(PwmPin pin);
+
+    /**
+     * @return the frequency of the PWM signal for a specific PWM pin in Hz
+     */
+    static uint32_t get_frequency(PwmPin pwm_pin);
+    
+    /**
+     * @return Set the frequency of the PWM signal for a specific PWM pin in Hz
+     */
+    static void set_frequency(PwmPin pwm_pin, uint32_t frequency_hz);
+
 };
 
 #ifdef __cplusplus
