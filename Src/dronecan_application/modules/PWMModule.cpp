@@ -23,10 +23,10 @@ PWMModule::PWMModule() {
 }
 
 PwmChannelInfo PWMModule::params[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)] = {
-    {.pin = PwmPin::PWM_1, .def = 0, .channel = 0},     // PWM1
-    {.pin = PwmPin::PWM_2, .def = 0, .channel = 0},     // PWM2
-    {.pin = PwmPin::PWM_3, .def = 0, .channel = 0},     // PWM3
-    {.pin = PwmPin::PWM_4, .def = 0, .channel = 0},     // PWM4
+    {.pin = PwmPin::PWM_1, .def = 0, .channel = 0, .cmd_end_time_ms = 0},     // PWM1
+    {.pin = PwmPin::PWM_2, .def = 0, .channel = 0, .cmd_end_time_ms = 0},     // PWM2
+    {.pin = PwmPin::PWM_3, .def = 0, .channel = 0, .cmd_end_time_ms = 0},     // PWM3
+    {.pin = PwmPin::PWM_4, .def = 0, .channel = 0, .cmd_end_time_ms = 0},     // PWM4
 };
 
 PwmChannelsParamsNames PWMModule::params_names[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)] = {
@@ -50,7 +50,7 @@ void PWMModule::init() {
 
         PwmPeriphery::init(params[i].pin);
     }
-    set_params();
+    apply_params();
 }
 
 void PWMModule::spin_once() {
@@ -58,22 +58,22 @@ void PWMModule::spin_once() {
 
     static uint32_t next_update_ms = 0;
     if (crnt_time_ms > next_update_ms) {
-        next_update_ms = crnt_time_ms + 100;
-        update_params();
-        set_params();
+        next_update_ms = crnt_time_ms + 1000;
+        instance.update_params();
+        instance.apply_params();
     }
 
-    for (int i =0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
+    char buffer [20];
+    for (int i = 0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
         auto pwm = params[i];
-        PwmPeriphery::set_duration(pwm.pin, (crnt_time_ms > pwm.cmd_end_time_ms)? pwm.duration : pwm.def);
+        PwmPeriphery::set_duration(pwm.pin, (crnt_time_ms < pwm.cmd_end_time_ms)? pwm.command_val : pwm.def);
     }
-
+    
     static uint32_t next_pub_ms = 100;
     if (verbose && crnt_time_ms > next_pub_ms && module_status == ModuleStatus::MODULE_OK) {
         publish_state();
         next_pub_ms = crnt_time_ms + 100;
     }
-    
 }
 
 void PWMModule::update_params() {
@@ -101,7 +101,8 @@ void PWMModule::update_params() {
     }
 
     bool params_error = false;
-    for (int i =0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
+    static uint32_t last_warn_pub_time_ms = 0;
+    for (int i = 0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
         uint8_t channel = paramsGetIntegerValue(params_names[i].ch);
         if (channel < max_channel)
             params[i].channel = channel;
@@ -113,21 +114,24 @@ void PWMModule::update_params() {
         auto min = paramsGetIntegerValue(params_names[i].min);
         auto max = paramsGetIntegerValue(params_names[i].max);
         auto def = paramsGetIntegerValue(params_names[i].def);
-        if (min > max || def < min || def > max) {
+        if (min <= max && def >= min && def <= max) {
             params[i].min = min;
             params[i].max = max;
             params[i].def = def;
-        } else params_error = true;
+        } else if (last_warn_pub_time_ms < HAL_GetTick()) {
+            params_error = true;
+        } 
     }
 
     if (params_error) {
+        last_warn_pub_time_ms = HAL_GetTick() + 10000;
         module_status = ModuleStatus::MODULE_WARN;
         logger.log_warn("check parameters");
     }
 
 }
 
-void PWMModule::set_params() {
+void PWMModule::apply_params() {
     uint16_t data_type_id = 0;
     uint64_t data_type_signature = 0;
 
@@ -183,9 +187,10 @@ void PWMModule::publish_raw_command() {
         auto pwm = params[i];
 
         auto value = PwmPeriphery::get_duration(pwm.pin);
-        float scaled_value = (value - pwm.min) * 8191.0 / ((float)(pwm.max - pwm.min));
+        float scaled_value = (value - pwm.min) * 8191.0 / (pwm.max - pwm.min);
         raw_cmd.raw_cmd[pwm.channel] = scaled_value;
     }
+
     if (dronecan_equipment_esc_raw_command_publish(
                                 &raw_cmd, &raw_transfer_id) == 0)
                                 raw_transfer_id++;
@@ -200,10 +205,11 @@ void PWMModule::raw_command_callback(CanardRxTransfer* transfer) {
 
         int8_t res = dronecan_equipment_esc_raw_command_channel_deserialize(transfer, pwm.channel, &command);
         if (res == 0) {
-            pwm.cmd_end_time_ms = HAL_GetTick() + ttl_cmd;
-            if (command.raw_cmd[pwm.channel] >= 0)
-                pwm.duration = pwm.min + (pwm.max - pwm.min) * command.raw_cmd[pwm.channel]/ 8191.0;
-            else pwm.duration = pwm.def;
+            if (command.raw_cmd[pwm.channel] >= 0) {
+                pwm.cmd_end_time_ms = HAL_GetTick() + ttl_cmd;
+                pwm.command_val = pwm.min + (pwm.max - pwm.min) * command.raw_cmd[pwm.channel]/ 8191.0;
+            }
+            else pwm.command_val = pwm.def;
         }
     }
 }
@@ -220,8 +226,8 @@ void PWMModule::array_command_callback(CanardRxTransfer* transfer) {
                 if (command.commands[i].actuator_id == pwm.channel) {
                     pwm.cmd_end_time_ms = HAL_GetTick() + ttl_cmd;
                     if (command.commands[i].command_value >= 0)
-                        pwm.duration = pwm.min + command.commands[i].command_value * (pwm.max - pwm.min);
-                    else pwm.duration = pwm.def;
+                        pwm.command_val = pwm.min + command.commands[i].command_value * (pwm.max - pwm.min);
+                    else pwm.command_val = pwm.def;
                 }
             }
         }

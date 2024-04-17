@@ -34,10 +34,10 @@ void application_entry_point() {
 
     while(true) {
         LedPeriphery::toggle(LedColor::BLUE_COLOR);
-        status_module.spin_once();
+        // status_module.spin_once();
         pwm_module.spin_once();
         uavcanSpinOnce();
-        PwmPeriphery::set_duration(PwmPin::PWM_2, 1000);
+        // PwmPeriphery::set_duration(PwmPin::PWM_2, 1000);
 
         WatchdogPeriphery::refresh();
 
