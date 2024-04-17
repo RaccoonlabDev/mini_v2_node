@@ -8,7 +8,7 @@ IS_SUBMODULE_INITIALIZED := $(shell find Libs/libparams -mindepth 1 | wc -l)
 
 # Cyphal
 NUNAVUT_OUT_DIR:=$(BUILD_DIR)/nunavut_out
-IS_DSDL_GENERATED := $(shell find ${NUNAVUT_OUT_DIR} -mindepth 1 | wc -l)
+IS_DSDL_GENERATED:=$(shell if [ -d ${NUNAVUT_OUT_DIR} ]; then find ${NUNAVUT_OUT_DIR} -mindepth 1 | wc -l; else echo 0; fi)
 generate_dsdl:
 	mkdir -p ${NUNAVUT_OUT_DIR}
 	@if [ "$(IS_DSDL_GENERATED)" -eq 0 ]; then \
@@ -17,37 +17,34 @@ generate_dsdl:
 	else \
 		echo "[INFO] Cyphal DSDL: already generated. Skip."; \
 	fi
-cyphal: check_submodules generate_dsdl clean autogenerate_git_related_headers
+cyphal: check_submodules generate_dsdl clean
 	mkdir -p ${BUILD_OBJ_DIR}
 	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=cyphal ../.. && make
-sitl_cyphal: check_submodules generate_dsdl clean autogenerate_git_related_headers
+sitl_cyphal: check_submodules generate_dsdl clean
 	mkdir -p ${BUILD_OBJ_DIR}
 	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=cyphal -DUSE_PLATFORM_UBUNTU=1 ../.. && make
 
 # Dronecan:
-dronecan: check_submodules clean autogenerate_git_related_headers
+dronecan: check_submodules clean
 	mkdir -p ${BUILD_OBJ_DIR}
 	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan ../.. && make
-sitl_dronecan: check_submodules clean autogenerate_git_related_headers
+sitl_dronecan: check_submodules clean
 	mkdir -p ${BUILD_OBJ_DIR}
 	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_UBUNTU=1 ../.. && make
 
 # Common:
 check_submodules:
 	@if [ "$(IS_SUBMODULE_INITIALIZED)" -eq 0 ]; then \
-		echo "[Error]: submodules are empty. Please type: 'git submodule update --init --recursive'"; \
+		echo "[ERROR]: submodules check has been failed. Please type: 'git submodule update --init --recursive'"; \
 		exit 1; \
 	else \
-		echo "[INFO] Directory is fine"; \
+		echo "[INFO] Makefile: submodules check has been passed!"; \
 	fi
 upload:
 	./scripts/tools/stm32/flash.sh ${BUILD_OBJ_DIR}/example.bin
 run:
 	./scripts/tools/can/vcan.sh slcan0
 	./build/obj/example.out
-autogenerate_git_related_headers:
-	mkdir -p ${BUILD_DIR}/src
-	./scripts/tools/stm32/generate_software_version.sh ${BUILD_DIR}/src
 clean:
 	-rm -fR ${BUILD_OBJ_DIR}/
 distclean:
