@@ -17,29 +17,32 @@ generate_dsdl:
 	else \
 		echo "[INFO] Cyphal DSDL: already generated. Skip."; \
 	fi
-cyphal: check_submodules generate_dsdl clean
+cyphal: checks generate_dsdl clean
 	mkdir -p ${BUILD_OBJ_DIR}
 	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=cyphal ../.. && make
-sitl_cyphal: check_submodules generate_dsdl clean
+sitl_cyphal: checks generate_dsdl clean
 	mkdir -p ${BUILD_OBJ_DIR}
 	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=cyphal -DUSE_PLATFORM_UBUNTU=1 ../.. && make
 
 # Dronecan:
-dronecan: check_submodules clean
+dronecan: checks clean
 	mkdir -p ${BUILD_OBJ_DIR}
 	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan ../.. && make
-sitl_dronecan: check_submodules clean
+sitl_dronecan: checks clean
 	mkdir -p ${BUILD_OBJ_DIR}
 	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_UBUNTU=1 ../.. && make
 
 # Common:
-check_submodules:
+checks:
 	@if [ "$(IS_SUBMODULE_INITIALIZED)" -eq 0 ]; then \
 		echo "[ERROR]: submodules check has been failed. Please type: 'git submodule update --init --recursive'"; \
 		exit 1; \
 	else \
 		echo "[INFO] Makefile: submodules check has been passed!"; \
 	fi
+
+	@pip show raccoonlab-tools >/dev/null || (echo "[ERROR]: raccoonlab-tools package is not installed. Please install it with 'pip install raccoonlab-tools'" && exit 1)
+
 upload:
 	./scripts/tools/stm32/flash.sh ${BUILD_OBJ_DIR}/example.bin
 run:
