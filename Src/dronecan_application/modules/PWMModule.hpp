@@ -23,7 +23,7 @@ struct PwmChannelInfo {
     uint32_t min;
     uint32_t max;
     uint32_t def;
-    uint8_t channel;
+    int16_t channel;
     uint16_t command_val;
     uint32_t cmd_end_time_ms;
 };
@@ -67,7 +67,7 @@ private:
     
     static ModuleStatus module_status;
 
-    static uint32_t pwm_freq;
+    static uint16_t pwm_freq;
     static uint8_t pwm_cmd_type;
 
     static uint16_t ttl_cmd;

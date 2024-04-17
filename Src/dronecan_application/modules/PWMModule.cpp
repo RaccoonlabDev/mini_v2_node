@@ -10,7 +10,7 @@ Logger PWMModule::logger = Logger("LightsModule");
 uint8_t PWMModule::node_id = 0;
 
 uint16_t PWMModule::ttl_cmd = 1000;
-uint32_t PWMModule::pwm_freq = 1000;
+uint16_t PWMModule::pwm_freq = 1000;
 uint8_t PWMModule::pwm_cmd_type = 0;
 
 ModuleStatus PWMModule::module_status = ModuleStatus::MODULE_OK;
@@ -23,10 +23,10 @@ PWMModule::PWMModule() {
 }
 
 PwmChannelInfo PWMModule::params[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)] = {
-    {.pin = PwmPin::PWM_1, .def = 0, .channel = 0, .cmd_end_time_ms = 0},     // PWM1
-    {.pin = PwmPin::PWM_2, .def = 0, .channel = 0, .cmd_end_time_ms = 0},     // PWM2
-    {.pin = PwmPin::PWM_3, .def = 0, .channel = 0, .cmd_end_time_ms = 0},     // PWM3
-    {.pin = PwmPin::PWM_4, .def = 0, .channel = 0, .cmd_end_time_ms = 0},     // PWM4
+    {.pin = PwmPin::PWM_1, .cmd_end_time_ms = 0},     // PWM1
+    {.pin = PwmPin::PWM_2, .cmd_end_time_ms = 0},     // PWM2
+    {.pin = PwmPin::PWM_3, .cmd_end_time_ms = 0},     // PWM3
+    {.pin = PwmPin::PWM_4, .cmd_end_time_ms = 0},     // PWM4
 };
 
 PwmChannelsParamsNames PWMModule::params_names[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)] = {
@@ -37,24 +37,24 @@ PwmChannelsParamsNames PWMModule::params_names[static_cast<uint8_t>(PwmPin::PWM_
 };
 
 PWMModule &PWMModule::get_instance() {
-    instance.update_params();
-    instance.init();
-
+    static bool instance_initialized = false;
+    if (!instance_initialized) {
+        instance_initialized = true;
+        instance.init();
+    }
     return instance;
 }
 
 void PWMModule::init() {
     logger.init("PWMModule");
-    update_params();
     for (int i =0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
 
         PwmPeriphery::init(params[i].pin);
     }
-    apply_params();
 }
 
 void PWMModule::spin_once() {
-    uint32_t crnt_time_ms = HAL_GetTick();
+    uint16_t crnt_time_ms = HAL_GetTick();
 
     static uint32_t next_update_ms = 0;
     if (crnt_time_ms > next_update_ms) {
@@ -63,7 +63,6 @@ void PWMModule::spin_once() {
         instance.apply_params();
     }
 
-    char buffer [20];
     for (int i = 0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
         auto pwm = params[i];
         PwmPeriphery::set_duration(pwm.pin, (crnt_time_ms < pwm.cmd_end_time_ms)? pwm.command_val : pwm.def);
@@ -72,7 +71,7 @@ void PWMModule::spin_once() {
     static uint32_t next_pub_ms = 100;
     if (verbose && crnt_time_ms > next_pub_ms && module_status == ModuleStatus::MODULE_OK) {
         publish_state();
-        next_pub_ms = crnt_time_ms + 100;
+        next_pub_ms = crnt_time_ms + 1000;
     }
 }
 
@@ -103,7 +102,7 @@ void PWMModule::update_params() {
     bool params_error = false;
     static uint32_t last_warn_pub_time_ms = 0;
     for (int i = 0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
-        uint8_t channel = paramsGetIntegerValue(params_names[i].ch);
+        auto channel = paramsGetIntegerValue(params_names[i].ch);
         if (channel < max_channel)
             params[i].channel = channel;
         else {
@@ -118,12 +117,11 @@ void PWMModule::update_params() {
             params[i].min = min;
             params[i].max = max;
             params[i].def = def;
-        } else if (last_warn_pub_time_ms < HAL_GetTick()) {
+        } else 
             params_error = true;
-        } 
     }
 
-    if (params_error) {
+    if (params_error && last_warn_pub_time_ms < HAL_GetTick()) {
         last_warn_pub_time_ms = HAL_GetTick() + 10000;
         module_status = ModuleStatus::MODULE_WARN;
         logger.log_warn("check parameters");
@@ -166,7 +164,7 @@ void PWMModule::publish_array_command() {
 
     for (int i =0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
         auto pwm = params[i];
-
+        if (pwm.channel < 0) continue;
         auto value = PwmPeriphery::get_duration(pwm.pin);
         float scaled_value = (value - pwm.min) / ((float)(pwm.max - pwm.min));
         array_cmd.commands[pwm.channel].actuator_id = pwm.channel;
@@ -183,9 +181,8 @@ void PWMModule::publish_raw_command() {
     RawCommand_t raw_cmd {};
 
     for (int i =0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
-
         auto pwm = params[i];
-
+        if (pwm.channel < 0) continue;
         auto value = PwmPeriphery::get_duration(pwm.pin);
         float scaled_value = (value - pwm.min) * 8191.0 / (pwm.max - pwm.min);
         raw_cmd.raw_cmd[pwm.channel] = scaled_value;
@@ -202,12 +199,12 @@ void PWMModule::raw_command_callback(CanardRxTransfer* transfer) {
 
     for (int i =0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
         auto pwm = params[i];
-
+        if (pwm.channel < 0) continue;
         int8_t res = dronecan_equipment_esc_raw_command_channel_deserialize(transfer, pwm.channel, &command);
         if (res == 0) {
             if (command.raw_cmd[pwm.channel] >= 0) {
                 pwm.cmd_end_time_ms = HAL_GetTick() + ttl_cmd;
-                pwm.command_val = pwm.min + (pwm.max - pwm.min) * command.raw_cmd[pwm.channel]/ 8191.0;
+                pwm.command_val = pwm.min + (pwm.max - pwm.min) * command.raw_cmd[pwm.channel] / 8191.0;
             }
             else pwm.command_val = pwm.def;
         }
@@ -221,7 +218,7 @@ void PWMModule::array_command_callback(CanardRxTransfer* transfer) {
     if (res == 0) {
         for (int i =0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
             auto pwm = params[i];
-
+            if (pwm.channel < 0) continue;
             for (uint8_t i = 0; i < sizeof(command); i++) {
                 if (command.commands[i].actuator_id == pwm.channel) {
                     pwm.cmd_end_time_ms = HAL_GetTick() + ttl_cmd;

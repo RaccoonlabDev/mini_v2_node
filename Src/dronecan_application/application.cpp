@@ -10,7 +10,7 @@
 #include "params.hpp"
 #include "periphery/led/led.hpp"
 #include "periphery/iwdg/iwdg.hpp"
-#include "periphery/pwm/pwm.hpp"
+// #include "periphery/pwm/pwm.hpp"
 #include "modules/CircuitStatusModule.hpp"
 #include "modules/PWMModule.hpp"
 
@@ -28,13 +28,13 @@ void application_entry_point() {
 
     LedPeriphery::reset();
     uavcanInitApplication(node_id);
-    PwmPeriphery::init(PwmPin::PWM_2);
+    // PwmPeriphery::init(PwmPin::PWM_2);
     CircuitStatusModule& status_module = CircuitStatusModule::get_instance();
     PWMModule& pwm_module = PWMModule::get_instance();
 
     while(true) {
         LedPeriphery::toggle(LedColor::BLUE_COLOR);
-        // status_module.spin_once();
+        status_module.spin_once();
         pwm_module.spin_once();
         uavcanSpinOnce();
         // PwmPeriphery::set_duration(PwmPin::PWM_2, 1000);
