@@ -23,7 +23,8 @@ The node has the following registers:
 |  19 | pwm.4_min               | PWM duration when setpoint is min (RawCommand is 0 or Command is 0.0) |
 |  20 | pwm.4_max               | PWM duration when setpoint is max (RawCommand is 8191 or Command is 1.0) |
 |  21 | pwm.4_def               | PWM duration when setpoint is negative or there is no setpoint at all. |
-|  22 | pwm.verbose             | Indicates the operational mode of the node. When set to 1, the command of type cmd_type will be transmitted. |
+|  22 | pwm.verbose             | Indicates the operational mode of the node. When set to 1, the command of corresponding Status type for cmd_type will be transmitted (esc.RawCommand - esc.Status, actuator.ArrayCommand - actuator.Status). |
+|  23 | pwm.dbg                 | Indicated the debug flag.  When set to 1, the frequency of the node pwm Status msg sending equals to 10 Hz, otherwise 1 Hz. |
 
 > This docs was automatically generated. Do not edit it manually.
 

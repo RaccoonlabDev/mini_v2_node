@@ -53,7 +53,6 @@ protected:
 
 private:
     static PWMModule instance;
-    bool verbose;
     void (*callback)(CanardRxTransfer*);
     void (*publish_state)();
 
@@ -71,7 +70,10 @@ private:
     static uint8_t pwm_cmd_type;
 
     static uint16_t ttl_cmd;
+    uint16_t status_pub_timeout_ms;
     static uint8_t node_id;
+    bool verbose;
+
     static bool publish_error;
     static Logger logger;
 

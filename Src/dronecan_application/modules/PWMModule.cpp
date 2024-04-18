@@ -67,10 +67,10 @@ void PWMModule::spin_once() {
         PwmPeriphery::set_duration(pwm.pin, (crnt_time_ms < pwm.cmd_end_time_ms)? pwm.command_val : pwm.def);
     }
     
-    static uint32_t next_pub_ms = 100;
+    static uint32_t next_pub_ms = status_pub_timeout_ms;
     if (verbose && crnt_time_ms > next_pub_ms && module_status == ModuleStatus::MODULE_OK) {
         publish_state();
-        next_pub_ms = crnt_time_ms + 1000;
+        next_pub_ms = crnt_time_ms + status_pub_timeout_ms;
     }
 }
 
@@ -84,6 +84,8 @@ void PWMModule::update_params() {
     verbose = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_VERBOSE);
     node_id = paramsGetIntegerValue(IntParamsIndexes::PARAM_UAVCAN_NODE_ID);
 
+    auto debug_flag = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_DEBUG);
+    status_pub_timeout_ms = (debug_flag == 0)? 1000 : 100;
     uint8_t max_channel = 0;
 
     switch (pwm_cmd_type) {

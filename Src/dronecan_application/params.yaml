@@ -190,8 +190,17 @@ pwm.4_def:
 
 pwm.verbose:
   type: Integer
-  note: Indicates the operational mode of the node. When set to 1, the command of type cmd_type will be transmitted. 
+  note: Indicates the operational mode of the node. When set to 1, the command of corresponding Status type for cmd_type will be transmitted (esc.RawCommand - esc.Status, actuator.ArrayCommand - actuator.Status).
   enum: PARAM_PWM_VERBOSE
+  flags: mutable
+  default: 0
+  min: 0
+  max: 1
+
+pwm.dbg:
+  type: Integer
+  note: Indicated the debug flag.  When set to 1, the frequency of the node pwm Status msg sending equals to 10 Hz, otherwise 1 Hz.
+  enum: PARAM_PWM_DEBUG
   flags: mutable
   default: 0
   min: 0
