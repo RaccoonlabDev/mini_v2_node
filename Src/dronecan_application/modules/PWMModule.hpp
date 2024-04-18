@@ -8,6 +8,7 @@
 #include "periphery/pwm/pwm.hpp"
 #include "uavcan/equipment/indication/LightsCommand.h"
 #include "uavcan/equipment/esc/RawCommand.h"
+#include "uavcan/equipment/esc/Status.h"
 #include "uavcan/equipment/actuator/ArrayCommand.h"
 // #include "uavcan/equipment/hardpoint/Command.h"
 
@@ -61,6 +62,7 @@ private:
     static void array_command_callback(CanardRxTransfer* transfer);
     // static void hardpoint_command_callback(CanardRxTransfer* transfer);
 
+    static void publish_esc_status();
     static void publish_raw_command();
     static void publish_array_command();
     // static void publish_hardpoint_command(PwmPin pwm_pin);
