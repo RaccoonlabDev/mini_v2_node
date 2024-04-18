@@ -46,7 +46,7 @@ public:
      * @return the frequency of the PWM signal for a specific PWM pin in Hz
      */
     static uint32_t get_frequency(PwmPin pwm_pin);
-    
+
     /**
      * @return Set the frequency of the PWM signal for a specific PWM pin in Hz
      */

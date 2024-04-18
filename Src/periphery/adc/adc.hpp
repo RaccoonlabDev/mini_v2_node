@@ -6,7 +6,6 @@
 
 #include <stdint.h>
 #include "periphery/temperature_sensor/temperature_sensor.hpp"
-#include "periphery/temperature_sensor/temperature_sensor.hpp"
 #ifdef __cplusplus
 extern "C" {
 #endif

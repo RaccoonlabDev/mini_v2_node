@@ -31,11 +31,13 @@ void application_entry_point() {
     uavcanInitApplication(node_id);
 
     CircuitStatusModule& status_module = CircuitStatusModule::get_instance();
+    PWMModule& pwm_module = PWMModule::get_instance();
     LedColor color = LedColor::BLUE_COLOR;
 
     if (!status_module.instance_initialized) {
         color = LedColor::RED_COLOR;
     }
+
     while(true) {
         LedPeriphery::toggle(color);
         status_module.spin_once();

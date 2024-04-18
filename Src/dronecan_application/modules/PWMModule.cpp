@@ -66,7 +66,7 @@ void PWMModule::spin_once() {
         auto pwm = params[i];
         PwmPeriphery::set_duration(pwm.pin, (crnt_time_ms < pwm.cmd_end_time_ms)? pwm.command_val : pwm.def);
     }
-    
+
     static uint32_t next_pub_ms = status_pub_timeout_ms;
     if (verbose && crnt_time_ms > next_pub_ms && module_status == ModuleStatus::MODULE_OK) {
         publish_state();
@@ -118,8 +118,7 @@ void PWMModule::update_params() {
             params[i].min = min;
             params[i].max = max;
             params[i].def = def;
-        } else 
-            params_error = true;
+        } else params_error = true;
     }
 
     if (params_error && last_warn_pub_time_ms < HAL_GetTick()) {
@@ -151,7 +150,7 @@ void PWMModule::apply_params() {
                 publish_state = publish_esc_status;
                 // publish_state = publish_actuator_status;
                 break;
-            
+
             default:
                 return;
         }

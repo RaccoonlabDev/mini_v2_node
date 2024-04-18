@@ -63,7 +63,7 @@ private:
     static void publish_actuator_status();
     static void publish_raw_command();
     static void publish_array_command();
-    
+
     static ModuleStatus module_status;
 
     static uint16_t pwm_freq;

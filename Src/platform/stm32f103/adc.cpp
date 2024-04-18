@@ -10,9 +10,6 @@ extern ADC_HandleTypeDef hadc1;
 static uint32_t adc_current_avg = 0;
 static uint32_t adc_current_sum = 0;
 static uint32_t adc_dma_counter = 0;
-static uint32_t adc_current_avg = 0;
-static uint32_t adc_current_sum = 0;
-static uint32_t adc_dma_counter = 0;
 
 static inline uint16_t adc_dma_buffer[static_cast<uint8_t>(AdcChannel::ADC_NUMBER_OF_CNANNELS)];
 
@@ -33,9 +30,6 @@ int8_t AdcPeriphery::init() {
 uint16_t AdcPeriphery::get(AdcChannel channel) {
     if (!_is_adc_already_inited || channel >= AdcChannel::ADC_NUMBER_OF_CNANNELS) {
         return 0;
-    }
-    if (channel == AdcChannel::ADC_CURRENT) {
-        return adc_current_avg;
     }
     if (channel == AdcChannel::ADC_CURRENT) {
         return adc_current_avg;
