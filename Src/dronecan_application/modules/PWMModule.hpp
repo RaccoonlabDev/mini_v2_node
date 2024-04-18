@@ -10,7 +10,7 @@
 #include "uavcan/equipment/esc/RawCommand.h"
 #include "uavcan/equipment/esc/Status.h"
 #include "uavcan/equipment/actuator/ArrayCommand.h"
-// #include "uavcan/equipment/hardpoint/Command.h"
+// #include "uavcan/equipment/actuator/Status.h"
 
 enum class ModuleStatus: uint8_t {
     MODULE_OK        = 0,   // The module is functioning properly
@@ -57,15 +57,13 @@ private:
     void (*callback)(CanardRxTransfer*);
     void (*publish_state)();
 
-    // static void lights_command_callback(CanardRxTransfer* transfer);
     static void raw_command_callback(CanardRxTransfer* transfer);
     static void array_command_callback(CanardRxTransfer* transfer);
-    // static void hardpoint_command_callback(CanardRxTransfer* transfer);
 
     static void publish_esc_status();
+    static void publish_actuator_status();
     static void publish_raw_command();
     static void publish_array_command();
-    // static void publish_hardpoint_command(PwmPin pwm_pin);
     
     static ModuleStatus module_status;
 
