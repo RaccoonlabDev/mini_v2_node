@@ -10,9 +10,8 @@
 #include "params.hpp"
 #include "periphery/led/led.hpp"
 #include "periphery/iwdg/iwdg.hpp"
-// #include "periphery/pwm/pwm.hpp"
-#include "modules/CircuitStatusModule.hpp"
 #include "modules/PWMModule.hpp"
+#include "modules/CircuitStatusModule.hpp"
 
 
 void application_entry_point() {
@@ -43,7 +42,6 @@ void application_entry_point() {
         status_module.spin_once();
         pwm_module.spin_once();
         uavcanSpinOnce();
-        // PwmPeriphery::set_duration(PwmPin::PWM_2, 1000);
 
         WatchdogPeriphery::refresh();
 
