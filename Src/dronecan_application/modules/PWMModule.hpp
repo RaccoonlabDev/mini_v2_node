@@ -38,15 +38,11 @@ struct PwmChannelsParamsNames {
 
 class PWMModule {
 public:
-
+    void spin_once();
     static PWMModule &get_instance();
     static PwmChannelInfo params[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)];
     static PwmChannelsParamsNames params_names[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)];
-    void init();
-    void spin_once();
-    void update_params();
-    void update_pwm();
-    void apply_params();
+    static ModuleStatus module_status;
 
 protected:
     PWMModule();
@@ -56,6 +52,11 @@ private:
     void (*callback)(CanardRxTransfer*);
     void (*publish_state)();
 
+    void init();
+    void update_params();
+    void update_pwm();
+    void apply_params();
+
     static void raw_command_callback(CanardRxTransfer* transfer);
     static void array_command_callback(CanardRxTransfer* transfer);
 
@@ -63,8 +64,6 @@ private:
     static void publish_actuator_status();
     static void publish_raw_command();
     static void publish_array_command();
-
-    static ModuleStatus module_status;
 
     static uint16_t pwm_freq;
     static uint8_t pwm_cmd_type;

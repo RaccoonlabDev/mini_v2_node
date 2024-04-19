@@ -41,9 +41,9 @@ void application_entry_point() {
         LedPeriphery::toggle(color);
         status_module.spin_once();
         pwm_module.spin_once();
+        uavcanSetNodeHealth((NodeStatusHealth_t) pwm_module.module_status);
         uavcanSpinOnce();
 
         WatchdogPeriphery::refresh();
-
     }
 }
