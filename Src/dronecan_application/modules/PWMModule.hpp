@@ -77,7 +77,7 @@ private:
     static Logger logger;
 
     PWMModule& operator = (const PWMModule&) = delete;
-    PWMModule(PWMModule &other) = delete;
+    PWMModule(PWMModule *other) = delete;
 };
 
-#endif //SRC_MODULE_PWMMODULE_HPP_
+#endif  //SRC_MODULE_PWMMODULE_HPP_

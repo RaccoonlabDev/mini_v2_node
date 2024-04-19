@@ -64,13 +64,13 @@ void PWMModule::spin_once() {
 
     for (int i = 0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
         auto pwm = params[i];
-        PwmPeriphery::set_duration(pwm.pin, 
-            (crnt_time_ms < pwm.cmd_end_time_ms)? 
+        PwmPeriphery::set_duration(pwm.pin,
+            (crnt_time_ms < pwm.cmd_end_time_ms)?
             pwm.command_val : pwm.def);
     }
 
     static uint32_t next_pub_ms = status_pub_timeout_ms;
-    if (verbose && crnt_time_ms > next_pub_ms 
+    if (verbose && crnt_time_ms > next_pub_ms
         && module_status == ModuleStatus::MODULE_OK) {
         publish_state();
         next_pub_ms = crnt_time_ms + status_pub_timeout_ms;
@@ -109,8 +109,7 @@ void PWMModule::update_params() {
         auto channel = paramsGetIntegerValue(params_names[i].ch);
         if (channel < max_channel) {
             params[i].channel = channel;
-        }
-        else {
+        } else {
             params[i].channel = max_channel;
             params_error = true;
         }
@@ -212,13 +211,13 @@ void PWMModule::raw_command_callback(CanardRxTransfer* transfer) {
         if (pwm.channel < 0) {
             continue;
         }
-        int8_t res = 
+        int8_t res =
             dronecan_equipment_esc_raw_command_channel_deserialize(
                                 transfer, pwm.channel, &command);
         if (res == 0) {
             if (command.raw_cmd[pwm.channel] >= 0) {
                 pwm.cmd_end_time_ms = HAL_GetTick() + ttl_cmd;
-                pwm.command_val = pwm.min + 
+                pwm.command_val = pwm.min +
                     (pwm.max - pwm.min) * command.raw_cmd[pwm.channel]
                     / 8191.0;
             } else {
@@ -231,7 +230,7 @@ void PWMModule::raw_command_callback(CanardRxTransfer* transfer) {
 void PWMModule::array_command_callback(CanardRxTransfer* transfer) {
     if (module_status != ModuleStatus::MODULE_OK) return;
     ArrayCommand_t command;
-    int8_t res = 
+    int8_t res =
         dronecan_equipment_actuator_arraycommand_deserialize(transfer, &command);
     if (res == 0) {
         for (int i =0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
@@ -242,10 +241,9 @@ void PWMModule::array_command_callback(CanardRxTransfer* transfer) {
             for (uint8_t i = 0; i < sizeof(command); i++) {
                 if (command.commads[i].actuator_id == pwm.channel) {
                     pwm.cmd_end_time_ms = HAL_GetTick() + ttl_cmd;
-                    if (command.commads[i].command_value >= 0)  {
-
-                        pwm.command_val = pwm.min + 
-                            command.commads[i].command_value * 
+                    if (command.commads[i].command_value >= 0) {
+                        pwm.command_val = pwm.min +
+                            command.commads[i].command_value *
                             (pwm.max - pwm.min);
                     } else {
                         pwm.command_val = pwm.def;
