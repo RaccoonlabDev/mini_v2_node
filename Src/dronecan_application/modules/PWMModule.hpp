@@ -1,6 +1,7 @@
 #ifndef SRC_MODULE_PWMMODULE_HPP_
 #define SRC_MODULE_PWMMODULE_HPP_
 
+#include <algorithm>
 #include "dronecan.h"
 #include "params.hpp"
 
@@ -21,12 +22,14 @@ enum class ModuleStatus: uint8_t {
 
 struct PwmChannelInfo {
     PwmPin pin;
-    uint32_t min;
-    uint32_t max;
-    uint32_t def;
+    uint16_t min;
+    uint16_t max;
+    uint16_t def;
     int16_t channel;
     uint16_t command_val;
     uint32_t cmd_end_time_ms;
+    uint32_t next_status_pub_ms;
+    uint8_t fb;
 };
 
 struct PwmChannelsParamsNames {
@@ -34,6 +37,7 @@ struct PwmChannelsParamsNames {
     IntegerParamValue_t max;
     IntegerParamValue_t def;
     IntegerParamValue_t ch;
+    IntegerParamValue_t fb;
 };
 
 class PWMModule {
@@ -57,6 +61,8 @@ private:
     void update_pwm();
     void apply_params();
 
+    static float get_pwm_scaled_value(PwmPin pin, int16_t offset, float scale);
+
     static void raw_command_callback(CanardRxTransfer* transfer);
     static void array_command_callback(CanardRxTransfer* transfer);
 
@@ -68,16 +74,18 @@ private:
     static uint16_t pwm_freq;
     static uint8_t pwm_cmd_type;
 
+    static float cmnd_min;
+    static float cmnd_max;
+
     static uint16_t ttl_cmd;
     uint16_t status_pub_timeout_ms;
-    static uint8_t node_id;
     bool verbose;
 
     static bool publish_error;
     static Logger logger;
 
     PWMModule& operator = (const PWMModule&) = delete;
-    PWMModule(PWMModule *other) = delete;
+    explicit PWMModule(PWMModule *other) = delete;
 };
 
-#endif  //SRC_MODULE_PWMMODULE_HPP_
+#endif  // SRC_MODULE_PWMMODULE_HPP_

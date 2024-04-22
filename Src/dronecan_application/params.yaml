@@ -16,7 +16,7 @@ system.name:
 
 pwm.cmd_ttl_ms:
   type: Integer
-  note: TTL of LightCommands [ms].
+  note: TTL of specified by pwm.cmd_type commands [ms].
   enum: PARAM_PWM_CMD_TTL_MS
   flags: mutable
   default: 500
@@ -52,7 +52,7 @@ pwm.1_ch:
 
 pwm.1_min:
   type: Integer
-  note: PWM duration when setpoint is min (RawCommand is 0 or Command is 0.0)
+  note: PWM duration when setpoint is min (RawCommand is 0 or Command is -1.0)
   enum: PARAM_PWM_1_MIN
   flags: mutable
   default: 0
@@ -77,6 +77,14 @@ pwm.1_def:
   min: 0
   max: 1000
 
+pwm.1_feedback:
+  type: Integer
+  note: Indicates the operational mode of the node. 0 means disabled. When set to 1, the command of corresponding Status type for cmd_type will be transmitted (esc.RawCommand - esc.Status, actuator.ArrayCommand - actuator.Status) with frequency 1 Hz. When set to 2 - 10 Hz. 
+  enum: PARAM_PWM_1_FB
+  flags: mutable
+  default: 0
+  min: 0
+  max: 2
 
 pwm.2_ch:
   type: Integer
@@ -89,7 +97,7 @@ pwm.2_ch:
 
 pwm.2_min:
   type: Integer
-  note: PWM duration when setpoint is min (RawCommand is 0 or Command is 0.0)
+  note: PWM duration when setpoint is min (RawCommand is 0 or Command is -1.0)
   enum: PARAM_PWM_2_MIN
   flags: mutable
   default: 0
@@ -114,6 +122,14 @@ pwm.2_def:
   min: 0
   max: 1000
 
+pwm.2_feedback:
+  type: Integer
+  note: Indicates the operational mode of the node. 0 means disabled. When set to 1, the command of corresponding Status type for cmd_type will be transmitted (esc.RawCommand - esc.Status, actuator.ArrayCommand - actuator.Status) with frequency 1 Hz. When set to 2 - 10 Hz. 
+  enum: PARAM_PWM_2_FB
+  flags: mutable
+  default: 0
+  min: 0
+  max: 2
 
 pwm.3_ch:
   type: Integer
@@ -126,7 +142,7 @@ pwm.3_ch:
 
 pwm.3_min:
   type: Integer
-  note: PWM duration when setpoint is min (RawCommand is 0 or Command is 0.0)
+  note: PWM duration when setpoint is min (RawCommand is 0 or Command is -1.0)
   enum: PARAM_PWM_3_MIN
   flags: mutable
   default: 0
@@ -151,6 +167,14 @@ pwm.3_def:
   min: 0
   max: 1000
 
+pwm.3_feedback:
+  type: Integer
+  note: Indicates the operational mode of the node. 0 means disabled. When set to 1, the command of corresponding Status type for cmd_type will be transmitted (esc.RawCommand - esc.Status, actuator.ArrayCommand - actuator.Status) with frequency 1 Hz. When set to 2 - 10 Hz. 
+  enum: PARAM_PWM_3_FB
+  flags: mutable
+  default: 0
+  min: 0
+  max: 2
 
 pwm.4_ch:
   type: Integer
@@ -163,7 +187,7 @@ pwm.4_ch:
 
 pwm.4_min:
   type: Integer
-  note: PWM duration when setpoint is min (RawCommand is 0 or Command is 0.0)
+  note: PWM duration when setpoint is min (RawCommand is 0 or Command is -1.0)
   enum: PARAM_PWM_4_MIN
   flags: mutable
   default: 0
@@ -188,20 +212,11 @@ pwm.4_def:
   min: 0
   max: 1000
 
-pwm.verbose:
+pwm.4_feedback:
   type: Integer
-  note: Indicates the operational mode of the node. When set to 1, the command of corresponding Status type for cmd_type will be transmitted (esc.RawCommand - esc.Status, actuator.ArrayCommand - actuator.Status).
-  enum: PARAM_PWM_VERBOSE
+  note: Indicates the operational mode of the node. 0 means disabled. When set to 1, the command of corresponding Status type for cmd_type will be transmitted (esc.RawCommand - esc.Status, actuator.ArrayCommand - actuator.Status) with frequency 1 Hz. When set to 2 - 10 Hz. 
+  enum: PARAM_PWM_4_FB
   flags: mutable
   default: 0
   min: 0
-  max: 1
-
-pwm.dbg:
-  type: Integer
-  note: Indicated the debug flag.  When set to 1, the frequency of the node pwm Status msg sending equals to 10 Hz, otherwise 1 Hz.
-  enum: PARAM_PWM_DEBUG
-  flags: mutable
-  default: 0
-  min: 0
-  max: 1
+  max: 2
