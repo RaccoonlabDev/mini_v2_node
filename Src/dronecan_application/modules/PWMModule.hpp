@@ -2,6 +2,7 @@
 #define SRC_MODULE_PWMMODULE_HPP_
 
 #include <algorithm>
+#include "../algorithms.hpp"
 #include "dronecan.h"
 #include "params.hpp"
 
@@ -61,8 +62,6 @@ private:
     void update_pwm();
     void apply_params();
 
-    static float get_pwm_scaled_value(PwmPin pin, int16_t offset, float scale);
-
     static void raw_command_callback(CanardRxTransfer* transfer);
     static void array_command_callback(CanardRxTransfer* transfer);
 
@@ -73,9 +72,6 @@ private:
 
     static uint16_t pwm_freq;
     static uint8_t pwm_cmd_type;
-
-    static float cmnd_min;
-    static float cmnd_max;
 
     static uint16_t ttl_cmd;
     uint16_t status_pub_timeout_ms;

@@ -16,9 +16,6 @@ ModuleStatus PWMModule::module_status = ModuleStatus::MODULE_OK;
 
 PWMModule PWMModule::instance = PWMModule();
 
-float PWMModule::cmnd_min = 0;
-float PWMModule::cmnd_max = 0;
-
 PWMModule::PWMModule() {
     update_params();
     init();
@@ -76,7 +73,8 @@ void PWMModule::spin_once() {
     status_pub_timeout_ms = 1;
     static uint32_t next_pub_ms = status_pub_timeout_ms;
 
-    if (module_status == ModuleStatus::MODULE_OK && crnt_time_ms > next_pub_ms) {
+    if (module_status == ModuleStatus::MODULE_OK &&
+        crnt_time_ms > next_pub_ms) {
         publish_state();
         next_pub_ms = crnt_time_ms + status_pub_timeout_ms;
     }
@@ -119,12 +117,12 @@ void PWMModule::update_params() {
         auto min = paramsGetIntegerValue(params_names[i].min);
         auto max = paramsGetIntegerValue(params_names[i].max);
         auto def = paramsGetIntegerValue(params_names[i].def);
-        if (min <= max && def >= min && def <= max) {
-            params[i].min = min;
-            params[i].max = max;
-            params[i].def = def;
-        } else {
+        params[i].def = def;
+        if (min == max) {
             params_error = true;
+        } else {
+            params[i].min = max;
+            params[i].max = min;
         }
     }
 
@@ -151,8 +149,6 @@ void PWMModule::apply_params() {
                 data_type_signature = UAVCAN_EQUIPMENT_ESC_RAWCOMMAND_SIGNATURE;
                 data_type_id = UAVCAN_EQUIPMENT_ESC_RAWCOMMAND_ID;
                 publish_state = publish_esc_status;
-                cmnd_min = 0.0f;
-                cmnd_max = 8191.0f;
                 break;
 
             case 1:
@@ -161,9 +157,7 @@ void PWMModule::apply_params() {
                     UAVCAN_EQUIPMENT_ACTUATOR_ARRAY_COMMAND_SIGNATURE;
                 data_type_id = UAVCAN_EQUIPMENT_ACTUATOR_ARRAY_COMMAND_ID;
                 publish_state = publish_esc_status;
-                cmnd_min = -1.0f;
-                cmnd_max = 1.0f;
-                // publish_state = publish_actuator_status;
+                publish_state = publish_actuator_status;
                 break;
 
             default:
@@ -179,15 +173,18 @@ void PWMModule::publish_esc_status() {
     static uint8_t transfer_id = 0;
     EscStatus_t msg{};
     auto crnt_time_ms = HAL_GetTick();
-    static uint32_t next_status_pub_ms[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)];
+    static uint32_t
+        next_status_pub_ms[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)];
     for (int i = 0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
         auto pwm = params[i];
-        if (pwm.channel < 0 || pwm.fb == 0 || next_status_pub_ms[i] > crnt_time_ms) {
+        if (pwm.channel < 0 || pwm.fb == 0 ||
+            next_status_pub_ms[i] > crnt_time_ms) {
             continue;
         }
         msg = {};
-        float scaled_value = get_pwm_scaled_value(pwm.pin, -pwm.min, 100.0f / (pwm.max - pwm.min));
         msg.esc_index = pwm.channel;
+        auto pwm_val = PwmPeriphery::get_duration(pwm.pin);
+        auto scaled_value = mapPwmToPct(pwm_val, pwm.min, pwm.max);
         msg.power_rating_pct = (uint8_t)(scaled_value);
         if (dronecan_equipment_esc_status_publish(&msg, &transfer_id) == 0) {
             transfer_id++;
@@ -196,34 +193,30 @@ void PWMModule::publish_esc_status() {
     }
 }
 
-float PWMModule::get_pwm_scaled_value(PwmPin pin, int16_t offset, float scale) {
-    float pwm_val = (float)(PwmPeriphery::get_duration(pin));
-    float scaled_val = (pwm_val + offset) * scale;
-    auto val = std::clamp(scaled_val, 0.f, 100.f);
-    return val;
-}
-
 // void PWMModule::publish_actuator_status() {
 //     static uint8_t transfer_id = 0;
 //     ActuatorStatus_t msg {};
 
 //     for (int i =0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
 //         auto pwm = params[i];
-//         if (pwm.channel < 0) continue;
-//         auto value = PwmPeriphery::get_duration(pwm.pin);
-//         float scaled_value = (value - pwm.min) * 100.0f / (pwm.max -
-//         pwm.min); msg.actuator_id = pwm.channel; msg.power_rating_pct =
-//         (uint8_t) scaled_value; if
-//         (dronecan_equipment_actuator_status_publish(
-//                                     &msg, &transfer_id) == 0)
-//                                     transfer_id++;
+//         if (pwm.channel < 0) {
+//             continue;
+//         }
+//         msg.actuator_id = pwm.channel;
+//         auto pwm_val = PwmPeriphery::get_duration(pwm.pin);
+//         auto scaled_value = mapPwmToPct(pwm_val, pwm.min, pwm.max);
+//         msg.power_rating_pct = (uint8_t) scaled_value;
+//         if (dronecan_equipment_actuator_status_publish(&msg, &transfer_id) == 0) {
+//             transfer_id++;
+//         }
 //     }
 // }
 
 void PWMModule::raw_command_callback(CanardRxTransfer* transfer) {
     if (module_status != ModuleStatus::MODULE_OK) return;
     RawCommand_t command;
-    int8_t ch_num = dronecan_equipment_esc_raw_command_deserialize(transfer, &command);
+    int8_t ch_num =
+        dronecan_equipment_esc_raw_command_deserialize(transfer, &command);
     if (ch_num <= 0) {
         return;
     }
@@ -234,9 +227,8 @@ void PWMModule::raw_command_callback(CanardRxTransfer* transfer) {
         }
         if (command.raw_cmd[pwm->channel] >= 0) {
             pwm->cmd_end_time_ms = HAL_GetTick() + ttl_cmd;
-            pwm->command_val = pwm->min + (uint16_t)((pwm->max - pwm->min) *
-                                            command.raw_cmd[pwm->channel] /
-                                            8191.0f);
+            pwm->command_val = mapRawCommandToPwm(command.raw_cmd[pwm->channel],
+                                                  pwm->min, pwm->max, pwm->def);
         } else {
             pwm->command_val = pwm->def;
         }
@@ -246,7 +238,8 @@ void PWMModule::raw_command_callback(CanardRxTransfer* transfer) {
 void PWMModule::array_command_callback(CanardRxTransfer* transfer) {
     if (module_status != ModuleStatus::MODULE_OK) return;
     ArrayCommand_t command;
-    int8_t ch_num = dronecan_equipment_actuator_arraycommand_deserialize(transfer, &command);
+    int8_t ch_num = dronecan_equipment_actuator_arraycommand_deserialize(
+        transfer, &command);
     if (ch_num <= 0) {
         return;
     }
@@ -255,13 +248,13 @@ void PWMModule::array_command_callback(CanardRxTransfer* transfer) {
         if (pwm->channel < 0) {
             continue;
         }
-        auto mean = pwm->min + pwm->max/2;
         for (uint8_t j = 0; j < ch_num; j++) {
             if (command.commads[j].actuator_id != pwm->channel) {
                 continue;
             }
             pwm->cmd_end_time_ms = HAL_GetTick() + ttl_cmd;
-            pwm->command_val = mean + command.commads[j].command_value * (pwm->max - pwm->min) / 2;
+            pwm->command_val = mapActuatorCommandToPwm(command.commads[j].command_value,
+                                                         pwm->min, pwm->max, pwm->def);
         }
     }
 }

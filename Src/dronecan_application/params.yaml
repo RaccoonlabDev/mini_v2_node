@@ -27,7 +27,7 @@ pwm.frequency:
   type: Integer
   note: PWM frequency [Hz].
   enum: PARAM_PWM_FREQUENCY
-  flags: immutable
+  flags: mutable
   default: 100
   min: 50
   max: 400
@@ -57,7 +57,7 @@ pwm.1_min:
   flags: mutable
   default: 0
   min: 0
-  max: 1000
+  max: 2000
 
 pwm.1_max:
   type: Integer
@@ -66,7 +66,7 @@ pwm.1_max:
   flags: mutable
   default: 0
   min: 0
-  max: 1000
+  max: 20000
 
 pwm.1_def:
   type: Integer
@@ -75,7 +75,7 @@ pwm.1_def:
   flags: mutable
   default: 0
   min: 0
-  max: 1000
+  max: 2000
 
 pwm.1_feedback:
   type: Integer
@@ -102,7 +102,7 @@ pwm.2_min:
   flags: mutable
   default: 0
   min: 0
-  max: 1000
+  max: 2000
 
 pwm.2_max:
   type: Integer
@@ -111,7 +111,7 @@ pwm.2_max:
   flags: mutable
   default: 0
   min: 0
-  max: 1000
+  max: 2000
 
 pwm.2_def:
   type: Integer
@@ -120,7 +120,7 @@ pwm.2_def:
   flags: mutable
   default: 0
   min: 0
-  max: 1000
+  max: 2000
 
 pwm.2_feedback:
   type: Integer
@@ -147,7 +147,7 @@ pwm.3_min:
   flags: mutable
   default: 0
   min: 0
-  max: 1000
+  max: 2000
 
 pwm.3_max:
   type: Integer
@@ -156,7 +156,7 @@ pwm.3_max:
   flags: mutable
   default: 0
   min: 0
-  max: 1000
+  max: 2000
 
 pwm.3_def:
   type: Integer
@@ -165,7 +165,7 @@ pwm.3_def:
   flags: mutable
   default: 0
   min: 0
-  max: 1000
+  max: 2000
 
 pwm.3_feedback:
   type: Integer
@@ -192,7 +192,7 @@ pwm.4_min:
   flags: mutable
   default: 0
   min: 0
-  max: 1000
+  max: 2000
 
 pwm.4_max:
   type: Integer
@@ -201,7 +201,7 @@ pwm.4_max:
   flags: mutable
   default: 0
   min: 0
-  max: 1000
+  max: 2000
 
 pwm.4_def:
   type: Integer
@@ -210,7 +210,7 @@ pwm.4_def:
   flags: mutable
   default: 0
   min: 0
-  max: 1000
+  max: 2000
 
 pwm.4_feedback:
   type: Integer
