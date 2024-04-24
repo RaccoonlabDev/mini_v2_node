@@ -28,8 +28,8 @@ static void write_blue(GPIO_PinState state) {
 
 void LedPeriphery::set(LedColor color) {
     write_red(color == LedColor::RED_COLOR ? GPIO_PIN_RESET : GPIO_PIN_SET);
-    write_green(color == LedColor::BLUE_COLOR ? GPIO_PIN_RESET : GPIO_PIN_SET);
-    write_blue(color == LedColor::GREEN_COLOR ? GPIO_PIN_RESET : GPIO_PIN_SET);
+    write_green(color == LedColor::GREEN_COLOR ? GPIO_PIN_RESET : GPIO_PIN_SET);
+    write_blue(color == LedColor::BLUE_COLOR ? GPIO_PIN_RESET : GPIO_PIN_SET);
 }
 
 void LedPeriphery::reset() {
