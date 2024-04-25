@@ -157,7 +157,7 @@ void PWMModule::apply_params() {
                     UAVCAN_EQUIPMENT_ACTUATOR_ARRAY_COMMAND_SIGNATURE;
                 data_type_id = UAVCAN_EQUIPMENT_ACTUATOR_ARRAY_COMMAND_ID;
                 publish_state = publish_esc_status;
-                publish_state = publish_actuator_status;
+                // publish_state = publish_actuator_status;
                 break;
 
             default:
