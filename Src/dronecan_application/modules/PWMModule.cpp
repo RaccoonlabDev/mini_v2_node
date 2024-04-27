@@ -156,8 +156,7 @@ void PWMModule::apply_params() {
                 data_type_signature =
                     UAVCAN_EQUIPMENT_ACTUATOR_ARRAY_COMMAND_SIGNATURE;
                 data_type_id = UAVCAN_EQUIPMENT_ACTUATOR_ARRAY_COMMAND_ID;
-                publish_state = publish_esc_status;
-                // publish_state = publish_actuator_status;
+                publish_state = publish_actuator_status;
                 break;
 
             default:
@@ -193,24 +192,24 @@ void PWMModule::publish_esc_status() {
     }
 }
 
-// void PWMModule::publish_actuator_status() {
-//     static uint8_t transfer_id = 0;
-//     ActuatorStatus_t msg {};
+void PWMModule::publish_actuator_status() {
+    static uint8_t transfer_id = 0;
+    ActuatorStatus_t msg {};
 
-//     for (int i =0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
-//         auto pwm = params[i];
-//         if (pwm.channel < 0) {
-//             continue;
-//         }
-//         msg.actuator_id = pwm.channel;
-//         auto pwm_val = PwmPeriphery::get_duration(pwm.pin);
-//         auto scaled_value = mapPwmToPct(pwm_val, pwm.min, pwm.max);
-//         msg.power_rating_pct = (uint8_t) scaled_value;
-//         if (dronecan_equipment_actuator_status_publish(&msg, &transfer_id) == 0) {
-//             transfer_id++;
-//         }
-//     }
-// }
+    for (int i =0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
+        auto pwm = params[i];
+        if (pwm.channel < 0) {
+            continue;
+        }
+        msg.actuator_id = pwm.channel;
+        auto pwm_val = PwmPeriphery::get_duration(pwm.pin);
+        auto scaled_value = mapPwmToPct(pwm_val, pwm.min, pwm.max);
+        msg.power_rating_pct = (uint8_t) scaled_value;
+        if (dronecan_equipment_actuator_status_publish(&msg, &transfer_id) == 0) {
+            transfer_id++;
+        }
+    }
+}
 
 void PWMModule::raw_command_callback(CanardRxTransfer* transfer) {
     if (module_status != ModuleStatus::MODULE_OK) return;
