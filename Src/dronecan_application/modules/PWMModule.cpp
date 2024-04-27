@@ -76,7 +76,7 @@ void PWMModule::spin_once() {
     }
 
     status_pub_timeout_ms = 1;
-    static uint32_t next_pub_ms = status_pub_timeout_ms;
+    static uint32_t next_pub_ms = 5000;
 
     if (module_status == ModuleStatus::MODULE_OK &&
         crnt_time_ms > next_pub_ms) {
@@ -137,7 +137,6 @@ void PWMModule::update_params() {
 }
 
 void PWMModule::apply_params() {
-
     for (int i = 0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
         if (PwmPeriphery::get_frequency(params[i].pin) != pwm_freq) {
             PwmPeriphery::set_frequency(params[i].pin, pwm_freq);
@@ -184,10 +183,13 @@ void PWMModule::publish_esc_status() {
 void PWMModule::publish_actuator_status() {
     static uint8_t transfer_id = 0;
     ActuatorStatus_t msg {};
-
+    auto crnt_time_ms = HAL_GetTick();
+    static uint32_t
+        next_status_pub_ms[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)];
     for (int i =0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
         auto pwm = params[i];
-        if (pwm.channel < 0) {
+        if (pwm.channel < 0 || pwm.fb == 0 ||
+            next_status_pub_ms[i] > crnt_time_ms) {
             continue;
         }
         msg.actuator_id = pwm.channel;
@@ -197,6 +199,7 @@ void PWMModule::publish_actuator_status() {
         if (dronecan_equipment_actuator_status_publish(&msg, &transfer_id) == 0) {
             transfer_id++;
         }
+        next_status_pub_ms[i] = crnt_time_ms + ((pwm.fb > 1) ? 100 : 1000);
     }
 }
 
