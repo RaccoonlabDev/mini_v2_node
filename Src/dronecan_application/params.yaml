@@ -66,7 +66,7 @@ pwm.1_max:
   flags: mutable
   default: 2000
   min: 1000
-  max: 20000
+  max: 2000
 
 pwm.1_def:
   type: Integer
