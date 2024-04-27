@@ -50,6 +50,11 @@ void PWMModule::init() {
     for (int i = 0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
         PwmPeriphery::init(params[i].pin);
     }
+    uavcanSubscribe(UAVCAN_EQUIPMENT_ESC_RAWCOMMAND_SIGNATURE, UAVCAN_EQUIPMENT_ESC_RAWCOMMAND_ID,
+                                                                            raw_command_callback);
+    uavcanSubscribe(UAVCAN_EQUIPMENT_ACTUATOR_ARRAY_COMMAND_SIGNATURE,
+                                                        UAVCAN_EQUIPMENT_ACTUATOR_ARRAY_COMMAND_ID,
+                                                        array_command_callback);
 }
 
 void PWMModule::spin_once() {
@@ -90,19 +95,19 @@ void PWMModule::update_params() {
     status_pub_timeout_ms = 100;
     uint8_t max_channel = 0;
 
+    bool params_error = false;
     switch (pwm_cmd_type) {
         case 0:
             max_channel = NUMBER_OF_RAW_CMD_CHANNELS - 1;
             break;
         case 1:
-            max_channel = 15;
+            max_channel = 255;
             break;
         default:
-            max_channel = 255;
+            params_error = true;
             break;
     }
 
-    bool params_error = false;
     static uint32_t last_warn_pub_time_ms = 0;
     for (int i = 0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
         params[i].fb = paramsGetIntegerValue(params_names[i].fb);
@@ -118,12 +123,8 @@ void PWMModule::update_params() {
         auto max = paramsGetIntegerValue(params_names[i].max);
         auto def = paramsGetIntegerValue(params_names[i].def);
         params[i].def = def;
-        if (min == max) {
-            params_error = true;
-        } else {
-            params[i].min = max;
-            params[i].max = min;
-        }
+        params[i].min = min;
+        params[i].max = max;
     }
 
     if (params_error) {
@@ -136,8 +137,6 @@ void PWMModule::update_params() {
 }
 
 void PWMModule::apply_params() {
-    uint16_t data_type_id = 0;
-    uint64_t data_type_signature = 0;
 
     for (int i = 0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
         if (PwmPeriphery::get_frequency(params[i].pin) != pwm_freq) {
@@ -145,26 +144,16 @@ void PWMModule::apply_params() {
         }
         switch (pwm_cmd_type) {
             case 0:
-                callback = raw_command_callback;
-                data_type_signature = UAVCAN_EQUIPMENT_ESC_RAWCOMMAND_SIGNATURE;
-                data_type_id = UAVCAN_EQUIPMENT_ESC_RAWCOMMAND_ID;
                 publish_state = publish_esc_status;
                 break;
 
             case 1:
-                callback = array_command_callback;
-                data_type_signature =
-                    UAVCAN_EQUIPMENT_ACTUATOR_ARRAY_COMMAND_SIGNATURE;
-                data_type_id = UAVCAN_EQUIPMENT_ACTUATOR_ARRAY_COMMAND_ID;
                 publish_state = publish_actuator_status;
                 break;
 
             default:
                 return;
         }
-    }
-    if (module_status == ModuleStatus::MODULE_OK) {
-        uavcanSubscribe(data_type_signature, data_type_id, callback);
     }
 }
 
@@ -212,7 +201,7 @@ void PWMModule::publish_actuator_status() {
 }
 
 void PWMModule::raw_command_callback(CanardRxTransfer* transfer) {
-    if (module_status != ModuleStatus::MODULE_OK) return;
+    if (module_status != ModuleStatus::MODULE_OK || pwm_cmd_type != 0) return;
     RawCommand_t command;
     int8_t ch_num =
         dronecan_equipment_esc_raw_command_deserialize(transfer, &command);
@@ -235,7 +224,7 @@ void PWMModule::raw_command_callback(CanardRxTransfer* transfer) {
 }
 
 void PWMModule::array_command_callback(CanardRxTransfer* transfer) {
-    if (module_status != ModuleStatus::MODULE_OK) return;
+    if (module_status != ModuleStatus::MODULE_OK || pwm_cmd_type != 1) return;
     ArrayCommand_t command;
     int8_t ch_num = dronecan_equipment_actuator_arraycommand_deserialize(
         transfer, &command);

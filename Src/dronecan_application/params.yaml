@@ -28,7 +28,7 @@ pwm.frequency:
   note: PWM frequency [Hz].
   enum: PARAM_PWM_FREQUENCY
   flags: mutable
-  default: 100
+  default: 50
   min: 50
   max: 400
 
@@ -55,8 +55,8 @@ pwm.1_min:
   note: PWM duration when setpoint is min (RawCommand is 0 or Command is -1.0)
   enum: PARAM_PWM_1_MIN
   flags: mutable
-  default: 0
-  min: 0
+  default: 1000
+  min: 1000
   max: 2000
 
 pwm.1_max:
@@ -64,8 +64,8 @@ pwm.1_max:
   note: PWM duration when setpoint is max (RawCommand is 8191 or Command is 1.0)
   enum: PARAM_PWM_1_MAX
   flags: mutable
-  default: 0
-  min: 0
+  default: 2000
+  min: 1000
   max: 20000
 
 pwm.1_def:
@@ -73,8 +73,8 @@ pwm.1_def:
   note: PWM duration when setpoint is negative or there is no setpoint at all.
   enum: PARAM_PWM_1_DEF
   flags: mutable
-  default: 0
-  min: 0
+  default: 1000
+  min: 1000
   max: 2000
 
 pwm.1_feedback:
@@ -100,8 +100,8 @@ pwm.2_min:
   note: PWM duration when setpoint is min (RawCommand is 0 or Command is -1.0)
   enum: PARAM_PWM_2_MIN
   flags: mutable
-  default: 0
-  min: 0
+  default: 1000
+  min: 1000
   max: 2000
 
 pwm.2_max:
@@ -109,8 +109,8 @@ pwm.2_max:
   note: PWM duration when setpoint is max (RawCommand is 8191 or Command is 1.0)
   enum: PARAM_PWM_2_MAX
   flags: mutable
-  default: 0
-  min: 0
+  default: 2000
+  min: 1000
   max: 2000
 
 pwm.2_def:
@@ -118,8 +118,8 @@ pwm.2_def:
   note: PWM duration when setpoint is negative or there is no setpoint at all.
   enum: PARAM_PWM_2_DEF
   flags: mutable
-  default: 0
-  min: 0
+  default: 1000
+  min: 1000
   max: 2000
 
 pwm.2_feedback:
@@ -145,8 +145,8 @@ pwm.3_min:
   note: PWM duration when setpoint is min (RawCommand is 0 or Command is -1.0)
   enum: PARAM_PWM_3_MIN
   flags: mutable
-  default: 0
-  min: 0
+  default: 1000
+  min: 1000
   max: 2000
 
 pwm.3_max:
@@ -154,8 +154,8 @@ pwm.3_max:
   note: PWM duration when setpoint is max (RawCommand is 8191 or Command is 1.0)
   enum: PARAM_PWM_3_MAX
   flags: mutable
-  default: 0
-  min: 0
+  default: 2000
+  min: 1000
   max: 2000
 
 pwm.3_def:
@@ -163,8 +163,8 @@ pwm.3_def:
   note: PWM duration when setpoint is negative or there is no setpoint at all.
   enum: PARAM_PWM_3_DEF
   flags: mutable
-  default: 0
-  min: 0
+  default: 1000
+  min: 1000
   max: 2000
 
 pwm.3_feedback:
@@ -190,8 +190,8 @@ pwm.4_min:
   note: PWM duration when setpoint is min (RawCommand is 0 or Command is -1.0)
   enum: PARAM_PWM_4_MIN
   flags: mutable
-  default: 0
-  min: 0
+  default: 1000
+  min: 1000
   max: 2000
 
 pwm.4_max:
@@ -199,8 +199,8 @@ pwm.4_max:
   note: PWM duration when setpoint is max (RawCommand is 8191 or Command is 1.0)
   enum: PARAM_PWM_4_MAX
   flags: mutable
-  default: 0
-  min: 0
+  default: 2000
+  min: 1000
   max: 2000
 
 pwm.4_def:
@@ -208,8 +208,8 @@ pwm.4_def:
   note: PWM duration when setpoint is negative or there is no setpoint at all.
   enum: PARAM_PWM_4_DEF
   flags: mutable
-  default: 0
-  min: 0
+  default: 1000
+  min: 1000
   max: 2000
 
 pwm.4_feedback:
