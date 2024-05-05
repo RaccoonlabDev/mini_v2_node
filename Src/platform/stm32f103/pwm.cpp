@@ -49,3 +49,25 @@ uint32_t PwmPeriphery::get_duration(PwmPin pwm_pin) {
     auto& pwm_pin_info = info[static_cast<uint8_t>(pwm_pin)];
     return pwm_pin_info.ccr;
 }
+
+void PwmPeriphery::set_frequency(PwmPin pwm_pin, uint32_t frequency_hz) {
+    if (pwm_pin > PwmPin::PWM_AMOUNT) {
+        return;
+    }
+
+    auto& pwm_pin_info = info[static_cast<uint8_t>(pwm_pin)];
+    volatile uint32_t* arr_reg = &(pwm_pin_info.htim.Instance->ARR);
+    uint16_t period_us = 1000000 / frequency_hz;
+    *arr_reg = period_us;
+}
+
+uint32_t PwmPeriphery::get_frequency(PwmPin pwm_pin) {
+    if (pwm_pin > PwmPin::PWM_AMOUNT) {
+        return -1;
+    }
+
+    auto& pwm_pin_info = info[static_cast<uint8_t>(pwm_pin)];
+    volatile uint32_t* arr_reg = &(pwm_pin_info.htim.Instance->ARR);
+    uint32_t frequency = 1000000 / *arr_reg;
+    return frequency;
+}

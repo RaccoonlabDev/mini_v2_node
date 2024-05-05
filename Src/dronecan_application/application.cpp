@@ -10,6 +10,7 @@
 #include "params.hpp"
 #include "periphery/led/led.hpp"
 #include "periphery/iwdg/iwdg.hpp"
+#include "modules/PWMModule.hpp"
 #include "modules/CircuitStatusModule.hpp"
 
 
@@ -29,14 +30,18 @@ void application_entry_point() {
     uavcanInitApplication(node_id);
 
     CircuitStatusModule& status_module = CircuitStatusModule::get_instance();
+    PWMModule& pwm_module = PWMModule::get_instance();
     LedColor color = LedColor::BLUE_COLOR;
 
     if (!status_module.instance_initialized) {
         color = LedColor::RED_COLOR;
     }
+
     while(true) {
         LedPeriphery::toggle(color);
         status_module.spin_once();
+        pwm_module.spin_once();
+        uavcanSetNodeHealth((NodeStatusHealth_t) pwm_module.module_status);
         uavcanSpinOnce();
 
         WatchdogPeriphery::refresh();
