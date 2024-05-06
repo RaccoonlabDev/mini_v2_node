@@ -45,7 +45,7 @@ class PWMModule {
 public:
     void spin_once();
     static PWMModule &get_instance();
-    static PwmChannelInfo params[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)];
+    static std::array<PwmChannelInfo, static_cast<uint8_t>(PwmPin::PWM_AMOUNT)> params;
     static PwmChannelsParamsNames params_names[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)];
     static ModuleStatus module_status;
 

@@ -21,12 +21,12 @@ PWMModule::PWMModule() {
     init();
 }
 
-PwmChannelInfo PWMModule::params[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)] = {
+std::array<PwmChannelInfo, static_cast<uint8_t>(PwmPin::PWM_AMOUNT)> PWMModule::params = {{
     {.pin = PwmPin::PWM_1},  // PWM1
     {.pin = PwmPin::PWM_2},  // PWM2
     {.pin = PwmPin::PWM_3},  // PWM3
     {.pin = PwmPin::PWM_4},  // PWM4
-};
+}};
 
 PwmChannelsParamsNames
     PWMModule::params_names[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)] = {
