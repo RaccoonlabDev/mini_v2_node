@@ -21,6 +21,14 @@ enum class ModuleStatus: uint8_t {
     MODULE_CRITICAL  = 3,   // The module suffered a fatal malfunction
 };
 
+enum class CommandType: uint8_t {
+    RAW_COMMAND        = 0,
+    ARRAY_COMMAND      = 1,
+    HARDPOINT_COMMAND  = 2,
+
+    NUMBER_OF_COMMANDS,
+};
+
 struct PwmChannelInfo {
     PwmPin pin;
     uint16_t min;
@@ -64,14 +72,16 @@ private:
 
     static void raw_command_callback(CanardRxTransfer* transfer);
     static void array_command_callback(CanardRxTransfer* transfer);
+    static void hardpoint_callback(CanardRxTransfer* transfer);
 
     static void publish_esc_status();
     static void publish_actuator_status();
     static void publish_raw_command();
     static void publish_array_command();
+    static void publish_hardpoint_status();
 
     static uint16_t pwm_freq;
-    static uint8_t pwm_cmd_type;
+    static CommandType pwm_cmd_type;
 
     static uint16_t ttl_cmd;
     uint16_t status_pub_timeout_ms;

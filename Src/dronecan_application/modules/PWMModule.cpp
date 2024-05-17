@@ -1,4 +1,6 @@
 #include "PWMModule.hpp"
+#include "uavcan/equipment/hardpoint/Command.h"
+#include "uavcan/equipment/hardpoint/Status.h"
 
 #define CHANNEL(channel) IntParamsIndexes::PARAM_PWM_##channel##_CH
 #define MIN(channel) IntParamsIndexes::PARAM_PWM_##channel##_MIN
@@ -6,11 +8,14 @@
 #define DEF(channel) IntParamsIndexes::PARAM_PWM_##channel##_DEF
 #define FB(channel) IntParamsIndexes::PARAM_PWM_##channel##_FB
 
+static constexpr uint16_t CMD_RELEASE_OR_MIN = 0;
+static constexpr uint16_t CMD_HOLD_OR_MAX = 1;
+
 Logger PWMModule::logger = Logger("PWMModule");
 
 uint16_t PWMModule::ttl_cmd = 0;
 uint16_t PWMModule::pwm_freq = 1000;
-uint8_t PWMModule::pwm_cmd_type = 0;
+CommandType PWMModule::pwm_cmd_type = CommandType::RAW_COMMAND;
 
 ModuleStatus PWMModule::module_status = ModuleStatus::MODULE_OK;
 
@@ -50,11 +55,10 @@ void PWMModule::init() {
     for (int i = 0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
         PwmPeriphery::init(params[i].pin);
     }
-    uavcanSubscribe(UAVCAN_EQUIPMENT_ESC_RAWCOMMAND_SIGNATURE, UAVCAN_EQUIPMENT_ESC_RAWCOMMAND_ID,
-                                                                            raw_command_callback);
-    uavcanSubscribe(UAVCAN_EQUIPMENT_ACTUATOR_ARRAY_COMMAND_SIGNATURE,
-                                                        UAVCAN_EQUIPMENT_ACTUATOR_ARRAY_COMMAND_ID,
-                                                        array_command_callback);
+
+    uavcanSubscribe(UAVCAN_EQUIPMENT_ESC_RAWCOMMAND,            raw_command_callback);
+    uavcanSubscribe(UAVCAN_EQUIPMENT_ACTUATOR_ARRAY_COMMAND,    array_command_callback);
+    uavcanSubscribe(UAVCAN_EQUIPMENT_HARDPOINT_COMMAND,         hardpoint_callback);
 }
 
 void PWMModule::spin_once() {
@@ -89,7 +93,7 @@ void PWMModule::update_params() {
     module_status = ModuleStatus::MODULE_OK;
 
     pwm_freq = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_FREQUENCY);
-    pwm_cmd_type = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_CMD_TYPE);
+    pwm_cmd_type = (CommandType)paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_CMD_TYPE);
 
     ttl_cmd = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_CMD_TTL_MS);
     status_pub_timeout_ms = 100;
@@ -97,10 +101,13 @@ void PWMModule::update_params() {
 
     bool params_error = false;
     switch (pwm_cmd_type) {
-        case 0:
+        case CommandType::RAW_COMMAND:
             max_channel = NUMBER_OF_RAW_CMD_CHANNELS - 1;
             break;
-        case 1:
+        case CommandType::ARRAY_COMMAND:
+            max_channel = 255;
+            break;
+        case CommandType::HARDPOINT_COMMAND:
             max_channel = 255;
             break;
         default:
@@ -141,18 +148,20 @@ void PWMModule::apply_params() {
         if (PwmPeriphery::get_frequency(params[i].pin) != pwm_freq) {
             PwmPeriphery::set_frequency(params[i].pin, pwm_freq);
         }
-        switch (pwm_cmd_type) {
-            case 0:
-                publish_state = publish_esc_status;
-                break;
+    }
 
-            case 1:
-                publish_state = publish_actuator_status;
-                break;
-
-            default:
-                return;
-        }
+    switch (pwm_cmd_type) {
+        case CommandType::RAW_COMMAND:
+            publish_state = publish_esc_status;
+            break;
+        case CommandType::ARRAY_COMMAND:
+            publish_state = publish_actuator_status;
+            break;
+        case CommandType::HARDPOINT_COMMAND:
+            publish_state = publish_hardpoint_status;
+            break;
+        default:
+            break;
     }
 }
 
@@ -203,8 +212,34 @@ void PWMModule::publish_actuator_status() {
     }
 }
 
+void PWMModule::publish_hardpoint_status() {
+    static uint32_t next_status_pub_ms{0};
+    static uint8_t transfer_id{0};
+
+    auto crnt_time_ms = HAL_GetTick();
+    if (next_status_pub_ms > crnt_time_ms) {
+        return;
+    }
+    next_status_pub_ms = crnt_time_ms + 1000;
+
+    for (auto& pwm : params) {
+        if (pwm.channel < 0) {
+            continue;
+        }
+
+        HardpointStatus msg{};
+        msg.hardpoint_id = pwm.channel;
+        auto pwm_duration_us = PwmPeriphery::get_duration(pwm.pin);
+        msg.status = (pwm_duration_us == pwm.min) ? CMD_RELEASE_OR_MIN : CMD_HOLD_OR_MAX;
+
+        if (dronecan_equipment_hardpoint_status_publish(&msg, &transfer_id) == 0) {
+            transfer_id++;
+        }
+    }
+}
+
 void PWMModule::raw_command_callback(CanardRxTransfer* transfer) {
-    if (module_status != ModuleStatus::MODULE_OK || pwm_cmd_type != 0) {
+    if (module_status != ModuleStatus::MODULE_OK || pwm_cmd_type != CommandType::RAW_COMMAND) {
         return;
     }
 
@@ -220,7 +255,10 @@ void PWMModule::raw_command_callback(CanardRxTransfer* transfer) {
 }
 
 void PWMModule::array_command_callback(CanardRxTransfer* transfer) {
-    if (module_status != ModuleStatus::MODULE_OK || pwm_cmd_type != 1) return;
+    if (module_status != ModuleStatus::MODULE_OK || pwm_cmd_type != CommandType::ARRAY_COMMAND) {
+        return;
+    }
+
     ArrayCommand_t command;
     int8_t ch_num = dronecan_equipment_actuator_arraycommand_deserialize(
         transfer, &command);
@@ -240,5 +278,26 @@ void PWMModule::array_command_callback(CanardRxTransfer* transfer) {
             pwm->command_val = mapActuatorCommandToPwm(command.commads[j].command_value,
                                                          pwm->min, pwm->max, pwm->def);
         }
+    }
+}
+
+void PWMModule::hardpoint_callback(CanardRxTransfer* transfer) {
+    if (module_status != ModuleStatus::MODULE_OK ||
+            pwm_cmd_type != CommandType::HARDPOINT_COMMAND) {
+        return;
+    }
+
+    HardpointCommand cmd;
+    if (!dronecan_equipment_hardpoint_command_deserialize(transfer, &cmd)) {
+        return;
+    }
+
+    for (auto& pwm : params) {
+        if (cmd.hardpoint_id != pwm.channel) {
+            continue;
+        }
+
+        pwm.cmd_end_time_ms = HAL_GetTick() + ttl_cmd;
+        pwm.command_val = (cmd.command == CMD_HOLD_OR_MAX) ? pwm.max : pwm.min;
     }
 }
