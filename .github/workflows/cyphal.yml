@@ -17,7 +17,9 @@ jobs:
           fetch-depth: 0
 
       - name: Install dependencies
-        run: ./scripts/tools/install_for_ubuntu.sh --yes
+        run: |
+          pip install -r requirements.txt
+          ./scripts/tools/install_for_ubuntu.sh --yes
 
       - name: Build Cyphal binary
         run: make cyphal
@@ -45,8 +47,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          ./scripts/tools/install_for_ubuntu.sh --yes
+          pip install -r requirements.txt
           pip install pytest
+          ./scripts/tools/install_for_ubuntu.sh --yes
       - run: make sitl_cyphal
       - run: |
           export REG_DATA_TYPE_PATH="$PWD/Libs/Cyphal/Libs/public_regulated_data_types/uavcan $PWD/Libs/Cyphal/Libs/public_regulated_data_types/reg"
