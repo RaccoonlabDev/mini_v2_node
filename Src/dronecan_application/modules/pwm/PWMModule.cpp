@@ -6,6 +6,7 @@
  */
 
 #include "PWMModule.hpp"
+#include <limits>
 #include "uavcan/equipment/hardpoint/Command.h"
 #include "uavcan/equipment/hardpoint/Status.h"
 #include "uavcan/equipment/indication/LightsCommand.h"
@@ -25,8 +26,8 @@ static constexpr uint16_t CMD_HOLD_OR_MAX = 1;
 
 Logger PWMModule::logger = Logger("PWMModule");
 
-uint16_t PWMModule::ttl_cmd = 0;
-uint16_t PWMModule::pwm_freq = 1000;
+uint16_t PWMModule::ttl_cmd = 500;
+uint16_t PWMModule::pwm_freq = 50;
 CommandType PWMModule::pwm_cmd_type = CommandType::RAW_COMMAND;
 
 ModuleStatus PWMModule::module_status = ModuleStatus::MODULE_OK;
@@ -288,7 +289,8 @@ void PWMModule::hardpoint_callback(CanardRxTransfer* transfer) {
             continue;
         }
 
-        pwm.cmd_end_time_ms = HAL_GetTick() + ttl_cmd;
+        // TTL has no effect on Hardpoint
+        pwm.cmd_end_time_ms = std::numeric_limits<decltype(pwm.cmd_end_time_ms)>::max();
         pwm.command_val = (cmd.command == CMD_HOLD_OR_MAX) ? pwm.max : pwm.min;
     }
 }
