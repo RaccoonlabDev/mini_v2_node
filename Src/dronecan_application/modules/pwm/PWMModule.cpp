@@ -56,8 +56,8 @@ PWMModule& PWMModule::get_instance() {
 
 void PWMModule::init() {
     logger.init("PWMModule");
-    for (int i = 0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
-        PwmPeriphery::init(params[i].pin);
+    for (auto param : params) {
+        PwmPeriphery::init(param.pin);
     }
 
     uavcanSubscribe(UAVCAN_EQUIPMENT_ESC_RAWCOMMAND,            raw_command_callback);
@@ -75,8 +75,7 @@ void PWMModule::spin_once() {
         instance.apply_params();
     }
 
-    for (int i = 0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
-        auto pwm = params[i];
+    for (auto& pwm : params) {
         if (crnt_time_ms > pwm.cmd_end_time_ms) {
             pwm.command_val = pwm.def;
         }
@@ -169,21 +168,18 @@ void PWMModule::publish_esc_status() {
     static uint8_t transfer_id = 0;
     EscStatus_t msg{};
     auto crnt_time_ms = HAL_GetTick();
-    static uint32_t next_status_pub_ms[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)];
-    for (int i = 0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
-        auto pwm = params[i];
-        if (pwm.channel < 0 || pwm.fb == 0 ||
-            next_status_pub_ms[i] > crnt_time_ms) {
+    for (auto& pwm : params) {
+        if (pwm.channel < 0 || pwm.fb == 0 || pwm.next_status_pub_ms > crnt_time_ms) {
             continue;
         }
-        msg = {};
+
         msg.esc_index = pwm.channel;
         auto pwm_val = PwmPeriphery::get_duration(pwm.pin);
         auto scaled_value = mapPwmToPct(pwm_val, pwm.min, pwm.max);
         msg.power_rating_pct = (uint8_t)(scaled_value);
         if (dronecan_equipment_esc_status_publish(&msg, &transfer_id) == 0) {
             transfer_id++;
-            next_status_pub_ms[i] = crnt_time_ms + ((pwm.fb > 1) ? 100 : 1000);
+            pwm.next_status_pub_ms = crnt_time_ms + ((pwm.fb > 1) ? 100 : 1000);
         }
     }
 }
@@ -192,13 +188,11 @@ void PWMModule::publish_actuator_status() {
     static uint8_t transfer_id = 0;
     ActuatorStatus_t msg {};
     auto crnt_time_ms = HAL_GetTick();
-    static uint32_t next_status_pub_ms[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)];
-    for (int i =0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
-        auto pwm = params[i];
-        if (pwm.channel < 0 || pwm.fb == 0 ||
-            next_status_pub_ms[i] > crnt_time_ms) {
+    for (auto& pwm : params) {
+        if (pwm.channel < 0 || pwm.fb == 0 || pwm.next_status_pub_ms > crnt_time_ms) {
             continue;
         }
+
         msg.actuator_id = pwm.channel;
         auto pwm_val = PwmPeriphery::get_duration(pwm.pin);
         auto scaled_value = mapPwmToPct(pwm_val, pwm.min, pwm.max);
@@ -206,7 +200,7 @@ void PWMModule::publish_actuator_status() {
         if (dronecan_equipment_actuator_status_publish(&msg, &transfer_id) == 0) {
             transfer_id++;
         }
-        next_status_pub_ms[i] = crnt_time_ms + ((pwm.fb > 1) ? 100 : 1000);
+        pwm.next_status_pub_ms = crnt_time_ms + ((pwm.fb > 1) ? 100 : 1000);
     }
 }
 

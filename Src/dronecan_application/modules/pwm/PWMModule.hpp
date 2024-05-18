@@ -24,9 +24,9 @@ enum class ModuleStatus: uint8_t {
 };
 
 enum class CommandType: uint8_t {
-    RAW_COMMAND        = 0,
-    ARRAY_COMMAND      = 1,
-    HARDPOINT_COMMAND  = 2,
+    RAW_COMMAND,
+    ARRAY_COMMAND,
+    HARDPOINT_COMMAND,
 
     NUMBER_OF_COMMANDS,
 };
