@@ -39,18 +39,11 @@ PWMModule::PWMModule() {
 }
 
 std::array<PwmChannelInfo, static_cast<uint8_t>(PwmPin::PWM_AMOUNT)> PWMModule::params = {{
-    {.pin = PwmPin::PWM_1},  // PWM1
-    {.pin = PwmPin::PWM_2},  // PWM2
-    {.pin = PwmPin::PWM_3},  // PWM3
-    {.pin = PwmPin::PWM_4},  // PWM4
+    {{.min = MIN(1), .max = MAX(1), .def = DEF(1), .ch = CHANNEL(1), .fb = FB(1)}, PwmPin::PWM_1},
+    {{.min = MIN(2), .max = MAX(2), .def = DEF(2), .ch = CHANNEL(2), .fb = FB(2)}, PwmPin::PWM_2},
+    {{.min = MIN(3), .max = MAX(3), .def = DEF(3), .ch = CHANNEL(3), .fb = FB(3)}, PwmPin::PWM_3},
+    {{.min = MIN(4), .max = MAX(4), .def = DEF(4), .ch = CHANNEL(4), .fb = FB(4)}, PwmPin::PWM_4},
 }};
-
-PwmChannelsParamsNames PWMModule::params_names[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)] = {
-    {.min = MIN(1), .max = MAX(1), .def = DEF(1), .ch = CHANNEL(1), .fb = FB(1)},  // PWM1
-    {.min = MIN(2), .max = MAX(2), .def = DEF(2), .ch = CHANNEL(2), .fb = FB(2)},  // PWM2
-    {.min = MIN(3), .max = MAX(3), .def = DEF(3), .ch = CHANNEL(3), .fb = FB(3)},  // PWM3
-    {.min = MIN(4), .max = MAX(4), .def = DEF(4), .ch = CHANNEL(4), .fb = FB(4)},  // PWM4
-};
 
 PWMModule& PWMModule::get_instance() {
     static bool instance_initialized = false;
@@ -127,8 +120,8 @@ void PWMModule::update_params() {
 
     static uint32_t last_warn_pub_time_ms = 0;
     for (int i = 0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
-        params[i].fb = paramsGetIntegerValue(params_names[i].fb);
-        auto channel = paramsGetIntegerValue(params_names[i].ch);
+        params[i].fb = paramsGetIntegerValue(params[i].names.fb);
+        auto channel = paramsGetIntegerValue(params[i].names.ch);
         if (channel < max_channel) {
             params[i].channel = channel;
         } else {
@@ -136,9 +129,9 @@ void PWMModule::update_params() {
             params_error = true;
         }
 
-        params[i].def = paramsGetIntegerValue(params_names[i].def);
-        params[i].min = paramsGetIntegerValue(params_names[i].min);
-        params[i].max = paramsGetIntegerValue(params_names[i].max);
+        params[i].def = paramsGetIntegerValue(params[i].names.def);
+        params[i].min = paramsGetIntegerValue(params[i].names.min);
+        params[i].max = paramsGetIntegerValue(params[i].names.max);
     }
 
     if (params_error) {
