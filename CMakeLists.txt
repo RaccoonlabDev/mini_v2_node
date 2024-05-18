@@ -101,7 +101,7 @@ target_include_directories(${EXECUTABLE} PRIVATE
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}
 )
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-volatile")
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Werror -Wno-volatile")
 
 execute_process(
     COMMAND ${LIBPARAMS_PATH}/scripts/generate_params.py --out-dir ${BUILD_SRC_DIR} -f ${LIBPARAMS_PARAMS}
