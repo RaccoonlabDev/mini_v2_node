@@ -31,7 +31,16 @@ enum class CommandType: uint8_t {
     NUMBER_OF_COMMANDS,
 };
 
+struct PwmChannelsParamsNames {
+    uint8_t min;
+    uint8_t max;
+    uint8_t def;
+    uint8_t ch;
+    uint8_t fb;
+};
+
 struct PwmChannelInfo {
+    const PwmChannelsParamsNames names;
     PwmPin pin;
     uint16_t min;
     uint16_t max;
@@ -43,20 +52,11 @@ struct PwmChannelInfo {
     uint8_t fb;
 };
 
-struct PwmChannelsParamsNames {
-    IntegerParamValue_t min;
-    IntegerParamValue_t max;
-    IntegerParamValue_t def;
-    IntegerParamValue_t ch;
-    IntegerParamValue_t fb;
-};
-
 class PWMModule {
 public:
     void spin_once();
     static PWMModule &get_instance();
     static std::array<PwmChannelInfo, static_cast<uint8_t>(PwmPin::PWM_AMOUNT)> params;
-    static PwmChannelsParamsNames params_names[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)];
     static ModuleStatus module_status;
 
 protected:
