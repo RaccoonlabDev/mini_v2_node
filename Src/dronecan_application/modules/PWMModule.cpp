@@ -1,3 +1,10 @@
+/**
+ * This program is free software under the GNU General Public License v3.
+ * See <https://www.gnu.org/licenses/> for details.
+ * Author: Anastasiia Stepanova <asiiapine@gmail.com>
+ * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
+ */
+
 #include "PWMModule.hpp"
 #include "uavcan/equipment/hardpoint/Command.h"
 #include "uavcan/equipment/hardpoint/Status.h"
