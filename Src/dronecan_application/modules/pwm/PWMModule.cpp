@@ -292,7 +292,7 @@ void PWMModule::hardpoint_callback(CanardRxTransfer* transfer) {
     }
 
     HardpointCommand cmd;
-    if (!dronecan_equipment_hardpoint_command_deserialize(transfer, &cmd)) {
+    if (dronecan_equipment_hardpoint_command_deserialize(transfer, &cmd) < 0) {
         return;
     }
 
