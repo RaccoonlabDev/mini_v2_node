@@ -1,3 +1,10 @@
+/**
+ * This program is free software under the GNU General Public License v3.
+ * See <https://www.gnu.org/licenses/> for details.
+ * Author: Anastasiia Stepanova <asiiapine@gmail.com>
+ * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
+ */
+
 #ifndef SRC_MODULE_PWMMODULE_HPP_
 #define SRC_MODULE_PWMMODULE_HPP_
 
