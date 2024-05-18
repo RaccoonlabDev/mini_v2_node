@@ -27,7 +27,7 @@ private:
 
     static Logger logger;
 
-    CircuitStatusModule(){}
+    CircuitStatusModule() = default;
 
     uint8_t circuit_status_transfer_id  = 0;
     uint8_t temperature_transfer_id     = 0;
