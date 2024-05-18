@@ -3,8 +3,8 @@
  *  Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 ***/ 
 
-#ifndef SRC_MODULES_CIRCUIT_STATUS_HPP_
-#define SRC_MODULES_CIRCUIT_STATUS_HPP_
+#ifndef SRC_MODULES_CIRCUIT_STATUS_CIRCUIT_STATUS_HPP_
+#define SRC_MODULES_CIRCUIT_STATUS_CIRCUIT_STATUS_HPP_
 
 #include "periphery/led/led.hpp"
 #include "uavcan/equipment/temperature/Temperature.h"
@@ -37,4 +37,4 @@ private:
     void operator=(const CircuitStatusModule &) = delete;
 };
 
-#endif  // SRC_MODULES_CIRCUIT_STATUS_HPP_
+#endif  // SRC_MODULES_CIRCUIT_STATUS_CIRCUIT_STATUS_HPP_
