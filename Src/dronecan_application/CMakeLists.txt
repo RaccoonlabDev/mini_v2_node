@@ -5,7 +5,7 @@ cmake_path(GET CMAKE_CURRENT_LIST_DIR PARENT_PATH SRC_DIR)
 cmake_path(GET SRC_DIR PARENT_PATH ROOT_DIR)
 
 add_definitions(-DAPP_VERSION_MAJOR=0)
-add_definitions(-DAPP_VERSION_MINOR=2)
+add_definitions(-DAPP_VERSION_MINOR=4)
 add_definitions(-DHW_VERSION_MAJOR=2)
 add_definitions(-DHW_VERSION_MINOR=1)
 add_definitions(-DFLASH_DRIVER_STORAGE_FILE="${CMAKE_CURRENT_LIST_DIR}/default_params.yml")
