@@ -16,7 +16,7 @@ extern "C" {
 /**
  * @note PWM pinout related to RaccoonLab Mini v2 node
  */
-enum class PwmPin {
+enum class PwmPin : uint8_t {
     PWM_1,      // PB7
     PWM_2,      // PB6
     PWM_3,      // PB4
