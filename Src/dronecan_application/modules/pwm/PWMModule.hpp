@@ -5,21 +5,16 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#ifndef SRC_MODULE_PWMMODULE_HPP_
-#define SRC_MODULE_PWMMODULE_HPP_
+#ifndef SRC_MODULES_PWM_PWMMODULE_HPP_
+#define SRC_MODULES_PWM_PWMMODULE_HPP_
 
 #include <algorithm>
-#include "../algorithms.hpp"
+#include "algorithms.hpp"
 #include "dronecan.h"
 #include "params.hpp"
-
-#include "../logger.hpp"
+#include "logger.hpp"
 #include "periphery/pwm/pwm.hpp"
-#include "uavcan/equipment/indication/LightsCommand.h"
-#include "uavcan/equipment/esc/RawCommand.h"
-#include "uavcan/equipment/esc/Status.h"
-#include "uavcan/equipment/actuator/ArrayCommand.h"
-#include "uavcan/equipment/actuator/Status.h"
+
 
 enum class ModuleStatus: uint8_t {
     MODULE_OK        = 0,   // The module is functioning properly
@@ -101,4 +96,4 @@ private:
     explicit PWMModule(PWMModule *other) = delete;
 };
 
-#endif  // SRC_MODULE_PWMMODULE_HPP_
+#endif  // SRC_MODULES_PWM_PWMMODULE_HPP_

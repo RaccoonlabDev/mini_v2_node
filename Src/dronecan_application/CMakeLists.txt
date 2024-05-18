@@ -16,8 +16,8 @@ set(applicationSourceCode
     ${libparamsSrc}
     ${DRONECAN_SOURCES}
     ${ROOT_DIR}/Src/dronecan_application/application.cpp
-    ${ROOT_DIR}/Src/dronecan_application/modules/CircuitStatusModule.cpp
-    ${ROOT_DIR}/Src/dronecan_application/modules/PWMModule.cpp
+    ${ROOT_DIR}/Src/dronecan_application/modules/circuit_status/CircuitStatusModule.cpp
+    ${ROOT_DIR}/Src/dronecan_application/modules/pwm/PWMModule.cpp
     ${ROOT_DIR}/Src/dronecan_application/logger.cpp
     ${ROOT_DIR}/Src/dronecan_application/algorithms.cpp
 
@@ -31,4 +31,5 @@ set(applicationHeaders
 
 set(LIBPARAMS_PARAMS
     ${CMAKE_CURRENT_LIST_DIR}/params.yaml
+    ${CMAKE_CURRENT_LIST_DIR}/modules/pwm/params.yaml
 )

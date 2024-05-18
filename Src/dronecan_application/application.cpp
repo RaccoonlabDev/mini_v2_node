@@ -10,8 +10,8 @@
 #include "params.hpp"
 #include "periphery/led/led.hpp"
 #include "periphery/iwdg/iwdg.hpp"
-#include "modules/PWMModule.hpp"
-#include "modules/CircuitStatusModule.hpp"
+#include "modules/pwm/PWMModule.hpp"
+#include "modules/circuit_status/CircuitStatusModule.hpp"
 
 
 void application_entry_point() {

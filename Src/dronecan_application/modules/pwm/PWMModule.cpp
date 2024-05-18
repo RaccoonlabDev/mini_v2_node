@@ -8,6 +8,11 @@
 #include "PWMModule.hpp"
 #include "uavcan/equipment/hardpoint/Command.h"
 #include "uavcan/equipment/hardpoint/Status.h"
+#include "uavcan/equipment/indication/LightsCommand.h"
+#include "uavcan/equipment/esc/RawCommand.h"
+#include "uavcan/equipment/esc/Status.h"
+#include "uavcan/equipment/actuator/ArrayCommand.h"
+#include "uavcan/equipment/actuator/Status.h"
 
 #define CHANNEL(channel) IntParamsIndexes::PARAM_PWM_##channel##_CH
 #define MIN(channel) IntParamsIndexes::PARAM_PWM_##channel##_MIN
@@ -40,12 +45,11 @@ std::array<PwmChannelInfo, static_cast<uint8_t>(PwmPin::PWM_AMOUNT)> PWMModule::
     {.pin = PwmPin::PWM_4},  // PWM4
 }};
 
-PwmChannelsParamsNames
-    PWMModule::params_names[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)] = {
-        {.min = MIN(1), .max = MAX(1), .def = DEF(1), .ch = CHANNEL(1), .fb = FB(1)},  // PWM1
-        {.min = MIN(2), .max = MAX(2), .def = DEF(2), .ch = CHANNEL(2), .fb = FB(2)},  // PWM2
-        {.min = MIN(3), .max = MAX(3), .def = DEF(3), .ch = CHANNEL(3), .fb = FB(3)},  // PWM3
-        {.min = MIN(4), .max = MAX(4), .def = DEF(4), .ch = CHANNEL(4), .fb = FB(4)},  // PWM4
+PwmChannelsParamsNames PWMModule::params_names[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)] = {
+    {.min = MIN(1), .max = MAX(1), .def = DEF(1), .ch = CHANNEL(1), .fb = FB(1)},  // PWM1
+    {.min = MIN(2), .max = MAX(2), .def = DEF(2), .ch = CHANNEL(2), .fb = FB(2)},  // PWM2
+    {.min = MIN(3), .max = MAX(3), .def = DEF(3), .ch = CHANNEL(3), .fb = FB(3)},  // PWM3
+    {.min = MIN(4), .max = MAX(4), .def = DEF(4), .ch = CHANNEL(4), .fb = FB(4)},  // PWM4
 };
 
 PWMModule& PWMModule::get_instance() {
@@ -89,8 +93,7 @@ void PWMModule::spin_once() {
     status_pub_timeout_ms = 1;
     static uint32_t next_pub_ms = 5000;
 
-    if (module_status == ModuleStatus::MODULE_OK &&
-        crnt_time_ms > next_pub_ms) {
+    if (module_status == ModuleStatus::MODULE_OK && crnt_time_ms > next_pub_ms) {
         publish_state();
         next_pub_ms = crnt_time_ms + status_pub_timeout_ms;
     }
@@ -133,12 +136,9 @@ void PWMModule::update_params() {
             params_error = true;
         }
 
-        auto min = paramsGetIntegerValue(params_names[i].min);
-        auto max = paramsGetIntegerValue(params_names[i].max);
-        auto def = paramsGetIntegerValue(params_names[i].def);
-        params[i].def = def;
-        params[i].min = min;
-        params[i].max = max;
+        params[i].def = paramsGetIntegerValue(params_names[i].def);
+        params[i].min = paramsGetIntegerValue(params_names[i].min);
+        params[i].max = paramsGetIntegerValue(params_names[i].max);
     }
 
     if (params_error) {
@@ -176,8 +176,7 @@ void PWMModule::publish_esc_status() {
     static uint8_t transfer_id = 0;
     EscStatus_t msg{};
     auto crnt_time_ms = HAL_GetTick();
-    static uint32_t
-        next_status_pub_ms[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)];
+    static uint32_t next_status_pub_ms[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)];
     for (int i = 0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
         auto pwm = params[i];
         if (pwm.channel < 0 || pwm.fb == 0 ||
@@ -200,8 +199,7 @@ void PWMModule::publish_actuator_status() {
     static uint8_t transfer_id = 0;
     ActuatorStatus_t msg {};
     auto crnt_time_ms = HAL_GetTick();
-    static uint32_t
-        next_status_pub_ms[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)];
+    static uint32_t next_status_pub_ms[static_cast<uint8_t>(PwmPin::PWM_AMOUNT)];
     for (int i =0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
         auto pwm = params[i];
         if (pwm.channel < 0 || pwm.fb == 0 ||
@@ -267,8 +265,7 @@ void PWMModule::array_command_callback(CanardRxTransfer* transfer) {
     }
 
     ArrayCommand_t command;
-    int8_t ch_num = dronecan_equipment_actuator_arraycommand_deserialize(
-        transfer, &command);
+    int8_t ch_num = dronecan_equipment_actuator_arraycommand_deserialize(transfer, &command);
     if (ch_num <= 0) {
         return;
     }
