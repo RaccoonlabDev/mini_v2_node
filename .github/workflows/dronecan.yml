@@ -27,13 +27,13 @@ jobs:
       - name: Upload .bin file
         uses: actions/upload-artifact@v3
         with:
-          name: cyphal_firmware.bin
+          name: dronecan_firmware.bin
           path: build/obj/example.bin
 
       - name: Upload .elf file
         uses: actions/upload-artifact@v3
         with:
-          name: cyphal_firmware.elf
+          name: dronecan_firmware.elf
           path: build/obj/example.elf
 
   sitl:
