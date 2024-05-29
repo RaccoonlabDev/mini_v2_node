@@ -35,6 +35,7 @@ void Logger::publish() {
 
 #if NDEBUG
 void Logger::log_debug(const char* text) {
+    (void)text;
     // Do nothing if _DEBUG is not defined
 }
 #else

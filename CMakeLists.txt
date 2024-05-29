@@ -101,7 +101,7 @@ target_include_directories(${EXECUTABLE} PRIVATE
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}
 )
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Werror -Wno-volatile")
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-volatile")
 
 execute_process(
     COMMAND ${LIBPARAMS_PATH}/scripts/generate_params.py --out-dir ${BUILD_SRC_DIR} -f ${LIBPARAMS_PARAMS}
@@ -151,7 +151,6 @@ else()
         -ffunction-sections
         -lc -lm -lnosys
         -specs=nano.specs
-        -Wall
         --specs=nosys.specs
     )
 
@@ -180,3 +179,17 @@ else()
         COMMAND arm-none-eabi-objcopy -I binary -O elf32-little ${EXECUTABLE} ${PROJECT_NAME}.elf
     )
 endif()
+
+target_compile_options(${EXECUTABLE} PRIVATE
+    -Wall
+    -Wextra
+    -Wfloat-equal
+    -Werror
+    -Wundef
+    -Wshadow
+    -Wpointer-arith
+    -Wunreachable-code
+    -Wstrict-overflow=5
+    -Wwrite-strings
+    -Wswitch-default
+)

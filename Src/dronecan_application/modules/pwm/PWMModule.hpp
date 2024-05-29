@@ -42,14 +42,14 @@ struct PwmChannelsParamsNames {
 struct PwmChannelInfo {
     const PwmChannelsParamsNames names;
     PwmPin pin;
-    uint16_t min;
-    uint16_t max;
-    uint16_t def;
-    int16_t channel;
-    uint16_t command_val;
-    uint32_t cmd_end_time_ms;
-    uint32_t next_status_pub_ms;
-    uint8_t fb;
+    uint16_t min{0};
+    uint16_t max{0};
+    uint16_t def{0};
+    int16_t channel{-1};
+    uint16_t command_val{0};
+    uint32_t cmd_end_time_ms{0};
+    uint32_t next_status_pub_ms{0};
+    uint8_t fb{0};
 };
 
 class PWMModule {

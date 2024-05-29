@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 
-__attribute__((noreturn)) void application_entry_point();
+__attribute__((noreturn)) void application_entry_point(void);
 
 #ifdef __cplusplus
 }
