@@ -6,7 +6,7 @@
  */
 
 #include "algorithms.hpp"
-
+#include <math.h>
 
 static const RawCommand RAW_COMMAND_MIN = 0;
 static const RawCommand RAW_COMMAND_MAX = 8191;
@@ -60,7 +60,7 @@ float mapFloat(float value, float in_min, float in_max, float out_min, float out
         output = out_min;
     } else if (value >= in_max && in_min <= in_max) {
         output = out_max;
-    } else if (out_min == out_max) {
+    } else if (fabs(out_min - out_max) < 0.001) {
         output = out_min;
     } else {
         output = out_min + (value - in_min) / (in_max - in_min) * (out_max - out_min);

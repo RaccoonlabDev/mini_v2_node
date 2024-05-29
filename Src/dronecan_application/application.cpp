@@ -14,7 +14,7 @@
 #include "modules/circuit_status/CircuitStatusModule.hpp"
 
 
-void application_entry_point() {
+__attribute__((noreturn)) void application_entry_point() {
     paramsInit((ParamIndex_t)IntParamsIndexes::INTEGER_PARAMS_AMOUNT, NUM_OF_STR_PARAMS, -1, 1);
     paramsLoad();
 
