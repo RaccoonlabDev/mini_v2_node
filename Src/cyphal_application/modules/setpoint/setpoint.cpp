@@ -11,16 +11,8 @@
 #include "params.hpp"
 #include "periphery/pwm/pwm.hpp"
 
-SetpointSubscriber::SetpointSubscriber(cyphal::Cyphal* driver_) :
-    CyphalSubscriber(driver_, 0) {
-}
 
 int8_t SetpointSubscriber::init() {
-    PwmPeriphery::init(PwmPin::PWM_1);
-    PwmPeriphery::init(PwmPin::PWM_2);
-    PwmPeriphery::init(PwmPin::PWM_3);
-    PwmPeriphery::init(PwmPin::PWM_4);
-
     port_id = static_cast<uint16_t>(paramsGetIntegerValue(IntParamsIndexes::PARAM_SUB_SETPOINT_ID));
     if (driver->subscribe(this,
                 reg_udral_service_actuator_common_sp_Vector31_0_1_EXTENT_BYTES_,
@@ -42,4 +34,17 @@ void SetpointSubscriber::callback(const cyphal::CanardRxTransfer& transfer) {
     float setpoint_clamped = std::clamp(msg.value[0], 0.0f, 1.0f);
     auto pwm_duration = static_cast<uint32_t>(setpoint_clamped * 1000.0 + 1000);
     PwmPeriphery::set_duration(PwmPin::PWM_1, pwm_duration);
+}
+
+void SetpointModule::init() {
+    PwmPeriphery::init(PwmPin::PWM_1);
+    PwmPeriphery::init(PwmPin::PWM_2);
+    PwmPeriphery::init(PwmPin::PWM_3);
+    PwmPeriphery::init(PwmPin::PWM_4);
+
+    health = (sub.init() < 0) ? ModuleStatus::FATAL_MALFANCTION : ModuleStatus::OK;
+}
+
+void SetpointModule::spin_once() {
+    // handle ttl here
 }

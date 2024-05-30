@@ -7,18 +7,32 @@
 #ifndef SRC_CYPHAL_APPLICATION_SETPOINT_SETPOINT_HPP_
 #define SRC_CYPHAL_APPLICATION_SETPOINT_SETPOINT_HPP_
 
+#include "module.hpp"
+#include "cyphal.hpp"
+#include "cyphal_subscribers.hpp"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "cyphal_subscribers.hpp"
-
 class SetpointSubscriber: public cyphal::CyphalSubscriber {
 public:
-    explicit SetpointSubscriber(cyphal::Cyphal* driver);
+    SetpointSubscriber() : CyphalSubscriber(cyphal::Cyphal::get_instance(), 65535) {}
     int8_t init();
 private:
     void callback(const cyphal::CanardRxTransfer& transfer) override;
+};
+
+class SetpointModule : public BaseModule {
+public:
+    SetpointModule() : BaseModule(50) {}
+    void init() override;
+
+protected:
+    void spin_once() override;
+
+private:
+    SetpointSubscriber sub;
 };
 
 #ifdef __cplusplus
