@@ -29,26 +29,39 @@ __attribute__((noreturn)) void application_entry_point() {
     cyphal::NodeGetInfoSubscriber::setHardwareVersion(2, 1);
 
     cyphal::Cyphal cyphal;
-    int init_res = cyphal.init();
+    cyphal.init();
 
     SetpointModule setpoint;
-    setpoint.init();
-
     FeedbackModule feedback;
-    feedback.init();
-
     CircuitStatus crct;
-    crct.init();
+
+    std::array<BaseModule*, 3> modules = { &setpoint, &feedback, &crct };
+
+    for (auto module : modules) {
+        module->init();
+    }
 
     while (true) {
-        auto led_color = (init_res >= 0) ? LedColor::BLUE_COLOR : LedColor::RED_COLOR;
-        LedPeriphery::toggle(led_color);
+        auto health = ModuleStatus::OK;
+        auto mode = ModuleMode::OPEARTIONAL;
 
         cyphal.process();
+        for (auto module : modules) {
+            module->process();
 
-        feedback.process();
-        crct.process();
+            if (module->get_health() > health) {
+                health = module->get_health();
+            }
 
+            if (module->get_mode() > mode) {
+                mode = module->get_mode();
+            }
+        }
+
+        auto led_color = (health == ModuleStatus::OK) ? LedColor::BLUE_COLOR : LedColor::RED_COLOR;
+        cyphal.setNodeHealth(uavcan_node_Health_1_0{static_cast<uint8_t>(health)});
+        cyphal.setNodeMode(uavcan_node_Mode_1_0{static_cast<uint8_t>(mode)});
+        LedPeriphery::toggle(led_color);
         WatchdogPeriphery::refresh();
     }
 }
