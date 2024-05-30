@@ -25,9 +25,9 @@ enum class ModuleMode: uint8_t {
 
 class BaseModule {
 public:
-    BaseModule(float frequency);
+    explicit BaseModule(float frequency);
 
-    virtual void init() = 0;
+    virtual void init();
 
     ModuleStatus get_health() const;
 
@@ -38,6 +38,8 @@ public:
 protected:
     virtual void update_params() {};
     virtual void spin_once() = 0;
+
+    static uint32_t period_ms_from_frequency(float frequency);
 
     ModuleStatus health{ModuleStatus::OK};
     ModuleMode mode{ModuleMode::INITIALIZATION};
