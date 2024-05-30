@@ -14,21 +14,11 @@
 #include "uavcan/si/sample/temperature/Scalar_1_0.h"
 
 
-int8_t CircuitStatus::init() {
-    return CircuitPeriphery::init();
+void CircuitStatus::init() {
+    health = (CircuitPeriphery::init() < 0) ? ModuleStatus::FATAL_MALFANCTION : ModuleStatus::OK;
 }
 
-void CircuitStatus::process(uint32_t crnt_time_ms) {
-    if (_prev_pub_ts_ms + 500 > crnt_time_ms) {
-        return;
-    }
-    _prev_pub_ts_ms = crnt_time_ms;
-
-    _update_parameters();
-    _spin_once();
-}
-
-void CircuitStatus::_update_parameters() {
+void CircuitStatus::update_params() {
     uint16_t port_id;
 
     port_id = static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_CRCT_5V_ID));
@@ -41,7 +31,7 @@ void CircuitStatus::_update_parameters() {
     temperature_pub.setPortId(port_id);
 }
 
-void CircuitStatus::_spin_once() {
+void CircuitStatus::spin_once() {
     if (voltage_5v_pub.isEnabled()) {
         float volt = CircuitPeriphery::voltage_5v();
         voltage_5v_pub.publish(uavcan_si_sample_voltage_Scalar_1_0{0, volt});

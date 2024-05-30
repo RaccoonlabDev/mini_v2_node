@@ -38,7 +38,7 @@ __attribute__((noreturn)) void application_entry_point() {
     init_res |= feedback.init();
 
     CircuitStatus crct;
-    init_res |= crct.init();
+    crct.init();
 
     while (true) {
         auto led_color = (init_res >= 0) ? LedColor::BLUE_COLOR : LedColor::RED_COLOR;
@@ -48,7 +48,7 @@ __attribute__((noreturn)) void application_entry_point() {
 
         auto crnt_time_ms = HAL_GetTick();
         feedback.process(crnt_time_ms);
-        crct.process(crnt_time_ms);
+        crct.process();
 
         WatchdogPeriphery::refresh();
     }
