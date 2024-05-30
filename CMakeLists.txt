@@ -85,6 +85,7 @@ add_executable(${EXECUTABLE}
     ${stm32CubeMxGeneratedFiles}
     ${applicationSourceCode}
     ${BUILD_SRC_DIR}/params.cpp
+    ${ROOT_DIR}/Src/common/module.cpp
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/adc.cpp
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/pwm.cpp
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/iwdg.cpp
@@ -98,6 +99,7 @@ target_include_directories(${EXECUTABLE} PRIVATE
     ${BUILD_SRC_DIR}
     ${stm32CubeMxHeaders}
     ${applicationHeaders}
+    ${ROOT_DIR}/Src/common
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}
 )
 
