@@ -6,8 +6,11 @@
 
 #include "module.hpp"
 
-BaseModule::BaseModule(float frequency) {
-    period_ms = (frequency > 0.001f) ? static_cast<uint32_t>(1000.0f / frequency) : 1000;
+BaseModule::BaseModule(float frequency) : period_ms(period_ms_from_frequency(frequency)) {
+}
+
+void BaseModule::init() {
+    mode = ModuleMode::OPEARTIONAL;
 }
 
 ModuleStatus BaseModule::get_health() const {
@@ -27,4 +30,8 @@ void BaseModule::process() {
     next_spin_time_ms = crnt_time_ms + period_ms;
     update_params();
     spin_once();
+}
+
+uint32_t BaseModule::period_ms_from_frequency(float frequency) {
+    return (frequency > 0.001f) ? static_cast<uint32_t>(1000.0f / frequency) : 1000;
 }

@@ -34,8 +34,8 @@ __attribute__((noreturn)) void application_entry_point() {
     SetpointSubscriber setpoint(&cyphal);
     init_res |= setpoint.init();
 
-    FeedbackPublisher feedback(&cyphal);
-    init_res |= feedback.init();
+    FeedbackModule feedback;
+    feedback.init();
 
     CircuitStatus crct;
     crct.init();
@@ -46,8 +46,7 @@ __attribute__((noreturn)) void application_entry_point() {
 
         cyphal.process();
 
-        auto crnt_time_ms = HAL_GetTick();
-        feedback.process(crnt_time_ms);
+        feedback.process();
         crct.process();
 
         WatchdogPeriphery::refresh();

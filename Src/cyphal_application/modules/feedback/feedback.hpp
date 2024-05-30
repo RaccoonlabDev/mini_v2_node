@@ -7,20 +7,33 @@
 #ifndef SRC_CYPHAL_APPLICATION_FEEDBACK_HPP_
 #define SRC_CYPHAL_APPLICATION_FEEDBACK_HPP_
 
+#include "cyphal.hpp"
 #include "cyphal_publishers.hpp"
+#include "reg/udral/service/actuator/common/Feedback_0_1.h"
+#include "module.hpp"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-class FeedbackPublisher: public cyphal::CyphalPublisher {
-public:
-    explicit FeedbackPublisher(cyphal::Cyphal* driver_) : CyphalPublisher(driver_, 0) {}
+struct FeedbackPublisher: public cyphal::CyphalPublisher {
+    FeedbackPublisher() : CyphalPublisher(cyphal::Cyphal::get_instance(), 65535) {}
     int8_t init();
-    void process(uint32_t crnt_time_ms);
-    void publish_msg(uint32_t crnt_time_ms);
+    void publish();
+
+    reg_udral_service_actuator_common_Feedback_0_1 msg;
+};
+
+class FeedbackModule : public BaseModule {
+public:
+    FeedbackModule() : BaseModule(1) {}
+
+protected:
+    void update_params() override;
+    void spin_once() override;
+
 private:
-    uint32_t _prev_pub_ts_ms = 0;
+    FeedbackPublisher pub;
 };
 
 #ifdef __cplusplus
