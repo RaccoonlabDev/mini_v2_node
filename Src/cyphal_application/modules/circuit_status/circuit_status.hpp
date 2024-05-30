@@ -10,36 +10,22 @@
 #include "cyphal_publishers.hpp"
 #include "Udral/circuit_status.hpp"
 #include "periphery/adc/circuit_periphery.hpp"
+#include "module.hpp"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-class CircuitStatus {
+class CircuitStatus : public BaseModule {
 public:
-    /**
-     * @brief The constructor must be called only after initialization of Cyphal instance!
-     */
-    CircuitStatus() = default;
+    CircuitStatus() : BaseModule(2) {}
+    void init() override;
 
-    /**
-     * @brief This function should be called once in the beginning of the application
-     * @return >= 0 on success and < 0 on error
-     */
-    int8_t init();
-
-    /**
-     * @brief This function should be called periodically. It should automatically:
-     * - udpate parameters,
-     * - estimate public and internal states
-     * - publish everyting to CAN 
-     */
-    void process(uint32_t crnt_time_ms);
+protected:
+    void update_params() override;
+    void spin_once() override;
 
 private:
-    void _spin_once();
-    void _update_parameters();
-
     RaccoonLab::CircuitStatusVoltagePublisher voltage_5v_pub{
         cyphal::Cyphal::get_instance(), 65535};
 
@@ -48,8 +34,6 @@ private:
 
     RaccoonLab::CircuitStatusTemperaturePublisher temperature_pub{
         cyphal::Cyphal::get_instance(), 65535};
-
-    uint32_t _prev_pub_ts_ms = 0;
 };
 
 #ifdef __cplusplus
