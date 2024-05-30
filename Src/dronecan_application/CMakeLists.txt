@@ -15,7 +15,6 @@ set(applicationSourceCode
     ${ROOT_DIR}/Src/dronecan_application/modules/circuit_status/CircuitStatusModule.cpp
     ${ROOT_DIR}/Src/dronecan_application/modules/pwm/PWMModule.cpp
     ${ROOT_DIR}/Src/dronecan_application/logger.cpp
-    ${ROOT_DIR}/Src/dronecan_application/algorithms.cpp
 
 )
 set(applicationHeaders
