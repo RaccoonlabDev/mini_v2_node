@@ -4,7 +4,6 @@
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BUILD_DIR:=$(ROOT_DIR)/build
 BUILD_OBJ_DIR:=$(BUILD_DIR)/obj
-IS_SUBMODULE_INITIALIZED := $(shell find Libs/libparams -mindepth 1 | wc -l)
 
 # Cyphal
 NUNAVUT_OUT_DIR:=$(BUILD_DIR)/nunavut_out
@@ -34,14 +33,7 @@ sitl_dronecan: checks clean
 
 # Common:
 checks:
-	@if [ "$(IS_SUBMODULE_INITIALIZED)" -eq 0 ]; then \
-		echo "[ERROR]: submodules check has been failed. Please type: 'git submodule update --init --recursive'"; \
-		exit 1; \
-	else \
-		echo "[INFO] Makefile: submodules check has been passed!"; \
-	fi
-
-	@pip show raccoonlab-tools >/dev/null || (echo "[ERROR]: raccoonlab-tools package is not installed. Please install it with 'pip install raccoonlab-tools'" && exit 1)
+	@python scripts/prebuild_check.py || (echo "Requirements verification failed. Stopping build." && exit 1)
 
 upload:
 	./scripts/tools/stm32/flash.sh ${BUILD_OBJ_DIR}/example.bin
