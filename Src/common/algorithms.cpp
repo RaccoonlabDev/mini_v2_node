@@ -7,37 +7,32 @@
 
 #include "algorithms.hpp"
 #include <math.h>
-
-static const RawCommand RAW_COMMAND_MIN = 0;
-static const RawCommand RAW_COMMAND_MAX = 8191;
+#include <algorithm>
 
 
-static const ActuatorCommandValue ACT_COMMAND_MIN = -1.0f;
-static const ActuatorCommandValue ACT_COMMAND_MAX = 1.0f;
-
-PwmDurationUs mapRawCommandToPwm(RawCommand command,
-                                 PwmDurationUs min_pwm,
-                                 PwmDurationUs max_pwm,
-                                 PwmDurationUs def_pwm) {
+PwmDurationUs mapInt16CommandToPwm(int16_t command,
+                                   PwmDurationUs min_pwm,
+                                   PwmDurationUs max_pwm,
+                                   PwmDurationUs def_pwm) {
     PwmDurationUs pwm;
-    if (command < RAW_COMMAND_MIN || command > RAW_COMMAND_MAX) {
+    if (command < 0 || command > 8191) {
         pwm = def_pwm;
     } else {
-        pwm = (PwmDurationUs)mapFloat(command, RAW_COMMAND_MIN, RAW_COMMAND_MAX, min_pwm, max_pwm);
+        pwm = (PwmDurationUs)mapFloat((float)command, 0.0f, 8191.0f, min_pwm, max_pwm);
     }
     return pwm;
 }
 
 
-PwmDurationUs mapActuatorCommandToPwm(ActuatorCommandValue command,
-                                 PwmDurationUs min_pwm,
-                                 PwmDurationUs max_pwm,
-                                 PwmDurationUs def_pwm) {
+PwmDurationUs mapFloatCommandToPwm(float command,
+                                   PwmDurationUs min_pwm,
+                                   PwmDurationUs max_pwm,
+                                   PwmDurationUs def_pwm) {
     PwmDurationUs pwm;
-    if (command < ACT_COMMAND_MIN || command > ACT_COMMAND_MAX) {
+    if (command < -1.0f || command > +1.0f) {
         pwm = def_pwm;
     } else {
-        pwm = (PwmDurationUs)mapFloat(command, ACT_COMMAND_MIN, ACT_COMMAND_MAX, min_pwm, max_pwm);
+        pwm = (PwmDurationUs)mapFloat(command, -1.0f, +1.0f, min_pwm, max_pwm);
     }
     return pwm;
 }

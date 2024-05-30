@@ -85,6 +85,7 @@ add_executable(${EXECUTABLE}
     ${stm32CubeMxGeneratedFiles}
     ${applicationSourceCode}
     ${BUILD_SRC_DIR}/params.cpp
+    ${ROOT_DIR}/Src/common/algorithms.cpp
     ${ROOT_DIR}/Src/common/module.cpp
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/adc.cpp
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/pwm.cpp

@@ -243,7 +243,7 @@ void PWMModule::raw_command_callback(CanardRxTransfer* transfer) {
         }
 
         pwm.cmd_end_time_ms = HAL_GetTick() + ttl_cmd;
-        pwm.command_val = mapRawCommandToPwm(cmd, pwm.min, pwm.max, pwm.def);
+        pwm.command_val = mapInt16CommandToPwm(cmd, pwm.min, pwm.max, pwm.def);
     }
 }
 
@@ -267,8 +267,8 @@ void PWMModule::array_command_callback(CanardRxTransfer* transfer) {
                 continue;
             }
             pwm->cmd_end_time_ms = HAL_GetTick() + ttl_cmd;
-            pwm->command_val = mapActuatorCommandToPwm(command.commads[j].command_value,
-                                                         pwm->min, pwm->max, pwm->def);
+            pwm->command_val = mapFloatCommandToPwm(command.commads[j].command_value,
+                                                    pwm->min, pwm->max, pwm->def);
         }
     }
 }
