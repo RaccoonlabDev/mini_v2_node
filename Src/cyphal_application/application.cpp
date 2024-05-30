@@ -31,8 +31,8 @@ __attribute__((noreturn)) void application_entry_point() {
     cyphal::Cyphal cyphal;
     int init_res = cyphal.init();
 
-    SetpointSubscriber setpoint(&cyphal);
-    init_res |= setpoint.init();
+    SetpointModule setpoint;
+    setpoint.init();
 
     FeedbackModule feedback;
     feedback.init();
