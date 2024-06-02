@@ -35,15 +35,15 @@ __attribute__((noreturn)) void application_entry_point() {
     FeedbackModule feedback;
     CircuitStatus crct;
 
-    std::array<BaseModule*, 3> modules = { &setpoint, &feedback, &crct };
+    std::array<Module*, 3> modules = { &setpoint, &feedback, &crct };
 
     for (auto module : modules) {
         module->init();
     }
 
     while (true) {
-        auto health = ModuleStatus::OK;
-        auto mode = ModuleMode::OPEARTIONAL;
+        auto health = Module::Status::OK;
+        auto mode = Module::Mode::OPEARTIONAL;
 
         cyphal.process();
         for (auto module : modules) {
@@ -58,10 +58,10 @@ __attribute__((noreturn)) void application_entry_point() {
             }
         }
 
-        auto led_color = (health == ModuleStatus::OK) ? LedColor::BLUE_COLOR : LedColor::RED_COLOR;
+        auto color = (health == Module::Status::OK) ? LedColor::BLUE_COLOR : LedColor::RED_COLOR;
         cyphal.setNodeHealth(uavcan_node_Health_1_0{static_cast<uint8_t>(health)});
         cyphal.setNodeMode(uavcan_node_Mode_1_0{static_cast<uint8_t>(mode)});
-        LedPeriphery::toggle(led_color);
+        LedPeriphery::toggle(color);
         WatchdogPeriphery::refresh();
     }
 }

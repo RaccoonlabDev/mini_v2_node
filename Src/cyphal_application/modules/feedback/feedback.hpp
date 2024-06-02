@@ -24,9 +24,9 @@ struct FeedbackPublisher: public cyphal::CyphalPublisher {
     reg_udral_service_actuator_common_Feedback_0_1 msg;
 };
 
-class FeedbackModule : public BaseModule {
+class FeedbackModule : public Module {
 public:
-    FeedbackModule() : BaseModule(1) {}
+    FeedbackModule() : Module(1) {}
 
 protected:
     void update_params() override;
