@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Dmitry Ponomarev <ponomarevda96@gmail.com>
+ * Copyright (C) 2022-2024 Dmitry Ponomarev <ponomarevda96@gmail.com>
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -37,6 +37,16 @@ PwmDurationUs mapFloatCommandToPwm(float command,
     return pwm;
 }
 
+float mapFloat(float value, float in_min, float in_max, float out_min, float out_max) {
+    if (std::fabs(in_min - in_max) < 1e-6f) {
+        return out_min;
+    }
+
+    float output = out_min + (value - in_min) / (in_max - in_min) * (out_max - out_min);
+
+    return std::clamp(output, std::min(out_min, out_max), std::max(out_min, out_max));
+}
+
 float mapPwmToPct(uint16_t pwm_val, int16_t pwm_min, int16_t pwm_max) {
     auto max = pwm_max;
     auto min = pwm_min;
@@ -47,23 +57,4 @@ float mapPwmToPct(uint16_t pwm_val, int16_t pwm_min, int16_t pwm_max) {
     auto scaled_val = (pwm_val - min) * 100.0f / (max - min);
     auto val = std::clamp(scaled_val, 0.f, 100.f);
     return val;
-}
-
-float mapFloat(float value, float in_min, float in_max, float out_min, float out_max) {
-    float output;
-    if (value <= in_min && in_min <= in_max) {
-        output = out_min;
-    } else if (value >= in_max && in_min <= in_max) {
-        output = out_max;
-    } else if (fabs(out_min - out_max) < 0.001) {
-        output = out_min;
-    } else {
-        output = out_min + (value - in_min) / (in_max - in_min) * (out_max - out_min);
-        if (out_min <= out_max) {
-            output = std::clamp(output, out_min, out_max);
-        } else {
-            output = std::clamp(output, out_max, out_min);
-        }
-    }
-    return output;
 }
