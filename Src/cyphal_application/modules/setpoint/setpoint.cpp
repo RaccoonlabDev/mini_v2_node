@@ -42,7 +42,7 @@ void SetpointModule::init() {
     PwmPeriphery::init(PwmPin::PWM_3);
     PwmPeriphery::init(PwmPin::PWM_4);
 
-    health = (sub.init() < 0) ? ModuleStatus::FATAL_MALFANCTION : ModuleStatus::OK;
+    health = (sub.init() < 0) ? Status::FATAL_MALFANCTION : Status::OK;
 }
 
 void SetpointModule::spin_once() {

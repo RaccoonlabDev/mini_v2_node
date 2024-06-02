@@ -23,9 +23,9 @@ private:
     void callback(const cyphal::CanardRxTransfer& transfer) override;
 };
 
-class SetpointModule : public BaseModule {
+class SetpointModule : public Module {
 public:
-    SetpointModule() : BaseModule(50) {}
+    SetpointModule() : Module(50) {}
     void init() override;
 
 protected:

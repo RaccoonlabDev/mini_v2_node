@@ -6,22 +6,22 @@
 
 #include "module.hpp"
 
-BaseModule::BaseModule(float frequency) : period_ms(period_ms_from_frequency(frequency)) {
+Module::Module(float frequency) : period_ms(period_ms_from_frequency(frequency)) {
 }
 
-void BaseModule::init() {
-    mode = ModuleMode::OPEARTIONAL;
+void Module::init() {
+    mode = Mode::OPEARTIONAL;
 }
 
-ModuleStatus BaseModule::get_health() const {
+Module::Status Module::get_health() const {
     return health;
 }
 
-ModuleMode BaseModule::get_mode() const {
+Module::Mode Module::get_mode() const {
     return mode;
 }
 
-void BaseModule::process() {
+void Module::process() {
     uint32_t crnt_time_ms = HAL_GetTick();
     if (crnt_time_ms < next_spin_time_ms) {
         return;
@@ -32,6 +32,6 @@ void BaseModule::process() {
     spin_once();
 }
 
-uint32_t BaseModule::period_ms_from_frequency(float frequency) {
+uint32_t Module::period_ms_from_frequency(float frequency) {
     return (frequency > 0.001f) ? static_cast<uint32_t>(1000.0f / frequency) : 1000;
 }

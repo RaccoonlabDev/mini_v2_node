@@ -10,28 +10,29 @@
 #include <cstdint>
 #include "main.h"
 
-enum class ModuleStatus: uint8_t {
-    OK                  = 0,    // ok          nominal
-    MINOR_FAILURE       = 1,    // warning     advisory
-    MAJOR_FAILURE       = 2,    // error       caution
-    FATAL_MALFANCTION   = 3,    // critical    warning
-};
 
-enum class ModuleMode: uint8_t {
-    OPEARTIONAL         = 0,    // after successful initialization
-    INITIALIZATION      = 1,    // after startup
-    MAINTENANCE         = 2,    // calibration, self-test
-};
-
-class BaseModule {
+class Module {
 public:
-    explicit BaseModule(float frequency);
+    enum class Status: uint8_t {
+        OK                  = 0,    // ok          nominal
+        MINOR_FAILURE       = 1,    // warning     advisory
+        MAJOR_FAILURE       = 2,    // error       caution
+        FATAL_MALFANCTION   = 3,    // critical    warning
+    };
+
+    enum class Mode: uint8_t {
+        OPEARTIONAL         = 0,    // after successful initialization
+        INITIALIZATION      = 1,    // after startup
+        MAINTENANCE         = 2,    // calibration, self-test
+    };
+
+    explicit Module(float frequency);
 
     virtual void init();
 
-    ModuleStatus get_health() const;
+    Status get_health() const;
 
-    ModuleMode get_mode() const;
+    Mode get_mode() const;
 
     void process();
 
@@ -41,8 +42,8 @@ protected:
 
     static uint32_t period_ms_from_frequency(float frequency);
 
-    ModuleStatus health{ModuleStatus::OK};
-    ModuleMode mode{ModuleMode::INITIALIZATION};
+    Status health{Status::OK};
+    Mode mode{Mode::INITIALIZATION};
 
     uint32_t period_ms;
     uint32_t next_spin_time_ms{0};

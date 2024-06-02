@@ -16,9 +16,9 @@
 extern "C" {
 #endif
 
-class CircuitStatus : public BaseModule {
+class CircuitStatus : public Module {
 public:
-    CircuitStatus() : BaseModule(2) {}
+    CircuitStatus() : Module(2) {}
     void init() override;
 
 protected:
