@@ -43,6 +43,7 @@ void SetpointModule::init() {
     PwmPeriphery::init(PwmPin::PWM_4);
 
     health = (sub.init() < 0) ? Status::FATAL_MALFANCTION : Status::OK;
+    mode = Mode::OPEARTIONAL;
 }
 
 void SetpointModule::spin_once() {

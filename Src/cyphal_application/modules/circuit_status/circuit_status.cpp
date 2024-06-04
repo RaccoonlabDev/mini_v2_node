@@ -16,6 +16,7 @@
 
 void CircuitStatus::init() {
     health = (CircuitPeriphery::init() < 0) ? Status::FATAL_MALFANCTION : Status::OK;
+    mode = Mode::OPEARTIONAL;
 }
 
 void CircuitStatus::update_params() {
