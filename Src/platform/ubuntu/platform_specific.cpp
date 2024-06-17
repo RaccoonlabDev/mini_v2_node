@@ -5,7 +5,9 @@
  */
 
 #include <string.h>
+#include <unistd.h>
 #include <chrono>  // NOLINT [build/c++11]
+#include <cstdlib>
 #include <iostream>
 #include "main.h"
 #include "application.hpp"
@@ -23,7 +25,24 @@ void uavcanReadUniqueID(uint8_t out_uid[4]) {
 }
 
 void uavcanRestartNode() {
-    // do nothing
+    std::cout << "Restarting application..." << std::endl;
+
+    // Get the current executable path
+    char path[1024];
+    ssize_t count = readlink("/proc/self/exe", path, sizeof(path));
+    if (count == -1) {
+        std::cerr << "Error getting executable path." << std::endl;
+        exit(1);
+    }
+
+    path[count] = '\0';
+
+    // Execute a new instance of the current application
+    execl(path, path, (char *)NULL);
+
+    // If execl returns, an error occurred
+    std::cerr << "Error restarting application." << std::endl;
+    exit(1);
 }
 
 uint32_t uavcanGetTimeMs() {
