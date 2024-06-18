@@ -14,14 +14,8 @@
 #include "params.hpp"
 #include "logger.hpp"
 #include "periphery/pwm/pwm.hpp"
+#include "common/module.hpp"
 
-
-enum class ModuleStatus: uint8_t {
-    MODULE_OK        = 0,   // The module is functioning properly
-    MODULE_WARN      = 1,   // The module encountered a minor failure
-    MODULE_ERROR     = 2,   // The module encountered a major failure
-    MODULE_CRITICAL  = 3,   // The module suffered a fatal malfunction
-};
 
 enum class CommandType: uint8_t {
     RAW_COMMAND,
@@ -52,23 +46,21 @@ struct PwmChannelInfo {
     uint8_t fb{0};
 };
 
-class PWMModule {
+class PWMModule : public Module {
 public:
-    void spin_once();
-    static PWMModule &get_instance();
-    static std::array<PwmChannelInfo, static_cast<uint8_t>(PwmPin::PWM_AMOUNT)> params;
-    static ModuleStatus module_status;
+    PWMModule() : Module(2) {}
+    void init() override;
 
 protected:
-    PWMModule();
+    void update_params() override;
+    void spin_once() override;
+
+    static std::array<PwmChannelInfo, static_cast<uint8_t>(PwmPin::PWM_AMOUNT)> params;
 
 private:
-    static PWMModule instance;
     void (*callback)(CanardRxTransfer*);
     void (*publish_state)();
 
-    void init();
-    void update_params();
     void update_pwm();
     void apply_params();
 
@@ -91,9 +83,6 @@ private:
 
     static bool publish_error;
     static Logger logger;
-
-    PWMModule& operator = (const PWMModule&) = delete;
-    explicit PWMModule(PWMModule *other) = delete;
 };
 
 #endif  // SRC_MODULES_PWM_PWMMODULE_HPP_

@@ -29,19 +29,34 @@ __attribute__((noreturn)) void application_entry_point() {
 
     uavcanInitApplication(node_id);
 
-    CircuitStatusModule& status_module = CircuitStatusModule::get_instance();
-    PWMModule& pwm_module = PWMModule::get_instance();
-    LedColor color = LedColor::BLUE_COLOR;
 
-    if (!status_module.instance_initialized) {
-        color = LedColor::RED_COLOR;
+    CircuitStatus circuit_status;
+    PWMModule pwm_module;
+
+    std::array<Module*, 2> modules = { &circuit_status, &pwm_module };
+
+    for (auto module : modules) {
+        module->init();
     }
-
     while(true) {
+        auto health = Module::Status::OK;
+        auto mode = Module::Mode::OPEARTIONAL;
+        for (auto module : modules) {
+            module->process();
+
+            if (module->get_health() > health) {
+                health = module->get_health();
+            }
+
+            if (module->get_mode() > mode) {
+                mode = module->get_mode();
+            }
+        }
+
+        auto color = (health == Module::Status::OK) ? LedColor::BLUE_COLOR : LedColor::RED_COLOR;
         LedPeriphery::toggle(color);
-        status_module.spin_once();
-        pwm_module.spin_once();
-        uavcanSetNodeHealth((NodeStatusHealth_t) pwm_module.module_status);
+        uavcanSetNodeHealth((NodeStatusHealth_t)(health));
+        uavcanSetNodeStatusMode((NodeStatusMode_t)(mode));
         uavcanSpinOnce();
 
         WatchdogPeriphery::refresh();

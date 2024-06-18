@@ -6,26 +6,15 @@
 #include "CircuitStatusModule.hpp"
 
 
-CircuitStatusModule CircuitStatusModule::instance = CircuitStatusModule();
-bool CircuitStatusModule::instance_initialized = false;
-Logger CircuitStatusModule::logger = Logger("CircuitStatus");
+bool CircuitStatus::instance_initialized = false;
+Logger CircuitStatus::logger = Logger("CircuitStatus");
 
-CircuitStatusModule& CircuitStatusModule::get_instance() {
-    if (!instance_initialized) {
-        if (instance.init() != 0) {
-            logger.log_debug("ADC init error");
-        } else {
-            instance_initialized = true;
-        }
-    }
-    return instance;
+void CircuitStatus::init() {
+    CircuitPeriphery::init();
+    mode = Module::Mode::OPEARTIONAL;
 }
 
-int8_t CircuitStatusModule::init() {
-    return CircuitPeriphery::init();
-}
-
-void CircuitStatusModule::spin_once() {
+void CircuitStatus::spin_once() {
     static uint32_t next_temp_pub_ms = 1000;
     static uint32_t next_status_pub_ms = 1000;
 
@@ -50,6 +39,10 @@ void CircuitStatusModule::spin_once() {
         dronecan_equipment_circuit_status_publish(&circuit_status, &circuit_status_transfer_id);
         circuit_status_transfer_id++;
         next_status_pub_ms += 1000;
+    }
+
+    if (circuit_status.error_flags != ERROR_FLAG_CLEAR) {
+        health = Status::MINOR_FAILURE;
     }
 
     circuit_status.error_flags = ERROR_FLAG_CLEAR;

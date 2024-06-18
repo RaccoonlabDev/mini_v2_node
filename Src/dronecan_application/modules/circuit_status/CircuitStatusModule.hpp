@@ -10,31 +10,27 @@
 #include "uavcan/equipment/temperature/Temperature.h"
 #include "periphery/adc/circuit_periphery.hpp"
 #include "uavcan/equipment/power/CircuitStatus.h"
+#include "common/module.hpp"
 #include "logger.hpp"
 
-
-class CircuitStatusModule {
+class CircuitStatus : public Module {
 public:
-    static CircuitStatusModule &get_instance();
-    void spin_once();
+    CircuitStatus() : Module(2) {}
+    void init() override;
+
+protected:
+    void spin_once() override;
 
     static bool instance_initialized;
-private:
-    static CircuitStatusModule instance;
 
+private:
     CircuitStatus_t circuit_status = {};
     Temperature_t temperature_status = {};
 
     static Logger logger;
 
-    CircuitStatusModule() = default;
-
     uint8_t circuit_status_transfer_id  = 0;
     uint8_t temperature_transfer_id     = 0;
-
-    int8_t init();
-    CircuitStatusModule(const CircuitStatusModule &other) = delete;
-    void operator=(const CircuitStatusModule &) = delete;
 };
 
 #endif  // SRC_MODULES_CIRCUIT_STATUS_CIRCUIT_STATUS_HPP_
