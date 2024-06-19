@@ -48,8 +48,9 @@ struct PwmChannelInfo {
 
 class PWMModule : public Module {
 public:
-    PWMModule() : Module(2) {}
     void init() override;
+
+    inline PWMModule() : Module(50) {}
 
 protected:
     void update_params() override;
@@ -58,8 +59,8 @@ protected:
     static std::array<PwmChannelInfo, static_cast<uint8_t>(PwmPin::PWM_AMOUNT)> params;
 
 private:
-    void (*callback)(CanardRxTransfer*);
-    void (*publish_state)();
+    void (*callback)(CanardRxTransfer*) = {};
+    void (*publish_state)() = {};
 
     void update_pwm();
     void apply_params();
@@ -78,8 +79,8 @@ private:
     static CommandType pwm_cmd_type;
 
     static uint16_t ttl_cmd;
-    uint16_t status_pub_timeout_ms;
-    bool verbose;
+    uint16_t status_pub_timeout_ms = 0;
+    bool verbose = false;
 
     static bool publish_error;
     static Logger logger;

@@ -56,13 +56,6 @@ void PWMModule::init() {
 void PWMModule::spin_once() {
     uint32_t crnt_time_ms = HAL_GetTick();
 
-    static uint32_t next_update_ms = 0;
-    if (crnt_time_ms > next_update_ms) {
-        next_update_ms = crnt_time_ms + 1000;
-        update_params();
-        apply_params();
-    }
-
     mode = Module::Mode::OPEARTIONAL;
     for (auto& pwm : params) {
         if (crnt_time_ms > pwm.cmd_end_time_ms) {
@@ -105,7 +98,9 @@ void PWMModule::update_params() {
             params_error = true;
             break;
     }
-
+    if (health != Status::OK&& HAL_GetTick() %1000 == 0) {
+        logger.log_info("102");
+    }
     static uint32_t last_warn_pub_time_ms = 0;
     for (int i = 0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
         params[i].fb = paramsGetIntegerValue(params[i].names.fb);
@@ -129,11 +124,14 @@ void PWMModule::update_params() {
             logger.log_debug("check parameters");
         }
     }
+    if (health != Status::OK && HAL_GetTick() %1000 == 0) {
+        logger.log_info("128");
+    }
+    apply_params();
+    mode = Mode::OPEARTIONAL;
 }
 
 void PWMModule::apply_params() {
-    mode = Mode::MAINTENANCE;
-
     for (int i = 0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
         if (PwmPeriphery::get_frequency(params[i].pin) != pwm_freq) {
             PwmPeriphery::set_frequency(params[i].pin, pwm_freq);

@@ -21,8 +21,6 @@ public:
 protected:
     void spin_once() override;
 
-    static bool instance_initialized;
-
 private:
     CircuitStatus_t circuit_status = {};
     Temperature_t temperature_status = {};

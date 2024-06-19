@@ -6,7 +6,6 @@
 #include "CircuitStatusModule.hpp"
 
 
-bool CircuitStatus::instance_initialized = false;
 Logger CircuitStatus::logger = Logger("CircuitStatus");
 
 void CircuitStatus::init() {
