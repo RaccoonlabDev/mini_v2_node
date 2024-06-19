@@ -6,35 +6,40 @@
 
 #include "application.hpp"
 #include "dronecan.h"
+#include "logger.hpp"
 #include "main.h"
-#include "params.hpp"
-#include "periphery/led/led.hpp"
-#include "periphery/iwdg/iwdg.hpp"
 #include "modules/CircuitStatusModule.hpp"
-
+#include "params.hpp"
+#include "periphery/iwdg/iwdg.hpp"
+#include "periphery/led/led.hpp"
+#include "periphery/sht3x/sht3x.hpp"
 
 void application_entry_point() {
-    paramsInit((ParamIndex_t)IntParamsIndexes::INTEGER_PARAMS_AMOUNT, NUM_OF_STR_PARAMS, -1, 1);
+    paramsInit((ParamIndex_t)IntParamsIndexes::INTEGER_PARAMS_AMOUNT,
+               NUM_OF_STR_PARAMS, -1, 1);
     paramsLoad();
 
-    auto node_id = paramsGetIntegerValue(IntParamsIndexes::PARAM_UAVCAN_NODE_ID);
+    auto node_id =
+        paramsGetIntegerValue(IntParamsIndexes::PARAM_UAVCAN_NODE_ID);
 
     const auto node_name = "co.raccoonlab.mini";
-    auto node_name_param_idx = static_cast<ParamIndex_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT);
-    paramsSetStringValue(node_name_param_idx, 19, (const uint8_t*)node_name);
+    auto node_name_param_idx =
+        static_cast<ParamIndex_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT);
+    paramsSetStringValue(node_name_param_idx, 19, (const uint8_t *)node_name);
     uavcanSetNodeName(node_name);
 
     LedPeriphery::reset();
 
     uavcanInitApplication(node_id);
 
-    CircuitStatusModule& status_module = CircuitStatusModule::get_instance();
+    CircuitStatusModule &status_module = CircuitStatusModule::get_instance();
     LedColor color = LedColor::BLUE_COLOR;
 
     if (!status_module.instance_initialized) {
         color = LedColor::RED_COLOR;
     }
-    while(true) {
+
+    while (true) {
         LedPeriphery::toggle(color);
         status_module.spin_once();
         uavcanSpinOnce();

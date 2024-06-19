@@ -91,6 +91,8 @@ add_executable(${EXECUTABLE}
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/led.cpp
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/temperature_sensor.cpp
     ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/platform_specific.cpp
+    ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/i2c.cpp
+    ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/sht3x.cpp
 
 )
 

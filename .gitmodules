@@ -12,4 +12,4 @@
 	url = git@github.com:PonomarevDA/tools.git
 [submodule "Libs/stm32-cube-project"]
 	path = Libs/stm32-cube-project
-	url = https://github.com/RaccoonLabHardware/mini-v2-software.git
+	url = git@github.com:throw-away-rin/stm32-cube-project-sht30.git
