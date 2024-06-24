@@ -107,17 +107,11 @@ target_include_directories(${EXECUTABLE} PRIVATE
 
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-volatile")
 
-execute_process(
-    COMMAND ${LIBPARAMS_PATH}/scripts/generate_params.py --out-dir ${BUILD_SRC_DIR} -f ${LIBPARAMS_PARAMS}
-)
-
-execute_process(
-    COMMAND ${LIBPARAMS_PATH}/scripts/generate_docs.py ${LIBPARAMS_PARAMS}
-    WORKING_DIRECTORY ${APPLICATION_DIR}
-)
-
+# Prebuild
+include(${CMAKE_DIR}/params.cmake)
 include(${CMAKE_DIR}/git.cmake)
 
+# Hardware version is not supported at the momemnt, let's hardcode it for a while
 add_definitions(-DHW_VERSION_MAJOR=2)
 add_definitions(-DHW_VERSION_MINOR=1)
 
