@@ -9,6 +9,7 @@ endif()
 
 # Pathes
 set(ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
+set(SRC_DIR ${ROOT_DIR}/Src)
 set(CMAKE_DIR ${ROOT_DIR}/cmake)
 set(LIBPARAMS_PATH ${ROOT_DIR}/Libs/libparams)
 set(BUILD_SRC_DIR ${ROOT_DIR}/build/src)
@@ -60,17 +61,6 @@ add_definitions(-DHW_VERSION_MAJOR=2)
 add_definitions(-DHW_VERSION_MINOR=1)
 
 set(CMAKE_CXX_STANDARD 20)
-
-if(USE_PLATFORM_UBUNTU)
-else()
-    set(TOOLCHAIN_PREFIX arm-none-eabi-)
-    set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc)
-    set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
-    set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
-    set(CMAKE_OBJCOPY ${TOOLCHAIN_PREFIX}objcopy)
-    set(CMAKE_SIZE ${TOOLCHAIN_PREFIX}size)
-endif()
-
 
 include(${ROOT_DIR}/Src/platform/${APP_PLATFORM}/CMakeLists.txt)
 set(EXECUTABLE ${PROJECT_NAME}.out)
