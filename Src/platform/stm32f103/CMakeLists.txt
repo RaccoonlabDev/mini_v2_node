@@ -1,6 +1,10 @@
 # Copyright (C) 2023-2024 Dmitry Ponomarev <ponomarevda96@gmail.com>
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 
+# Include the toolchain file
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/Toolchain-arm-none-eabi.cmake)
+
+# Collect source files
 FILE(GLOB coreSources       ${stm32cubeMxProjectPath}/Core/Src/*)
 FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c)
 FILE(GLOB startupFile       ${stm32cubeMxProjectPath}/*.s
