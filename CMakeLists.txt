@@ -67,6 +67,8 @@ else()
     set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc)
     set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
     set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
+    set(CMAKE_OBJCOPY ${TOOLCHAIN_PREFIX}objcopy)
+    set(CMAKE_SIZE ${TOOLCHAIN_PREFIX}size)
 endif()
 
 
@@ -87,6 +89,21 @@ target_include_directories(${EXECUTABLE} PRIVATE
     ${ROOT_DIR}/Src/common
     ${PLATFORM_HEADERS}
 )
+
+target_compile_options(${EXECUTABLE} PRIVATE
+    -Wall
+    -Wextra
+    -Wfloat-equal
+    -Werror
+    -Wundef
+    -Wshadow
+    -Wpointer-arith
+    -Wunreachable-code
+    -Wstrict-overflow=5
+    -Wwrite-strings
+    -Wswitch-default
+)
+
 
 if(USE_PLATFORM_UBUNTU)
 else()
@@ -118,29 +135,12 @@ else()
         -Wl,--gc-sections
     )
 
+    # Post-build
     add_custom_command(TARGET ${EXECUTABLE}
         POST_BUILD
-        COMMAND arm-none-eabi-size ${EXECUTABLE}
-    )
-
-    add_custom_command(TARGET ${EXECUTABLE}
-        POST_BUILD
-        COMMAND arm-none-eabi-objcopy -O ihex ${EXECUTABLE} ${PROJECT_NAME}.hex
-        COMMAND arm-none-eabi-objcopy -O binary ${EXECUTABLE} ${PROJECT_NAME}.bin
-        COMMAND arm-none-eabi-objcopy -I binary -O elf32-little ${EXECUTABLE} ${PROJECT_NAME}.elf
+        COMMAND ${CMAKE_SIZE} ${EXECUTABLE}
+        COMMAND ${CMAKE_OBJCOPY} -O ihex ${EXECUTABLE} ${PROJECT_NAME}.hex
+        COMMAND ${CMAKE_OBJCOPY} -O binary ${EXECUTABLE} ${PROJECT_NAME}.bin
+        COMMAND ${CMAKE_OBJCOPY} -I binary -O elf32-little ${EXECUTABLE} ${PROJECT_NAME}.elf
     )
 endif()
-
-target_compile_options(${EXECUTABLE} PRIVATE
-    -Wall
-    -Wextra
-    -Wfloat-equal
-    -Werror
-    -Wundef
-    -Wshadow
-    -Wpointer-arith
-    -Wunreachable-code
-    -Wstrict-overflow=5
-    -Wwrite-strings
-    -Wswitch-default
-)
