@@ -9,6 +9,7 @@ endif()
 
 # Pathes
 set(ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
+set(CMAKE_DIR ${ROOT_DIR}/cmake)
 set(LIBPARAMS_PATH ${ROOT_DIR}/Libs/libparams)
 set(BUILD_SRC_DIR ${ROOT_DIR}/build/src)
 
@@ -115,30 +116,10 @@ execute_process(
     WORKING_DIRECTORY ${APPLICATION_DIR}
 )
 
-execute_process(
-    COMMAND git rev-parse --short=16 HEAD
-    COMMAND_ERROR_IS_FATAL ANY
-    OUTPUT_VARIABLE GIT_HASH_SHORT
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-execute_process(
-    COMMAND rl-git-info --major
-    COMMAND_ERROR_IS_FATAL ANY
-    OUTPUT_VARIABLE APP_VERSION_MAJOR
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-execute_process(
-    COMMAND rl-git-info --minor
-    COMMAND_ERROR_IS_FATAL ANY
-    OUTPUT_VARIABLE APP_VERSION_MINOR
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-add_definitions(-DAPP_VERSION_MAJOR=${APP_VERSION_MAJOR})
-add_definitions(-DAPP_VERSION_MINOR=${APP_VERSION_MINOR})
+include(${CMAKE_DIR}/git.cmake)
+
 add_definitions(-DHW_VERSION_MAJOR=2)
 add_definitions(-DHW_VERSION_MINOR=1)
-set(GIT_HASH "0x${GIT_HASH_SHORT}")
-add_definitions(-DGIT_HASH=${GIT_HASH})
 
 if(USE_PLATFORM_UBUNTU)
 else()
