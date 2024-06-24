@@ -54,7 +54,10 @@ endif()
 include(${LIBPARAMS_PATH}/CMakeLists.txt)
 include(${APPLICATION_DIR}/CMakeLists.txt)
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-volatile")
+# Enable warnings
+set(WARNING_FLAGS "-Wall -Wextra -Wfloat-equal -Werror -Wundef -Wshadow -Wpointer-arith -Wunreachable-code -Wstrict-overflow=5 -Wwrite-strings -Wswitch-default")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WARNING_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNING_FLAGS} -Wno-volatile")
 
 # Prebuild
 include(${CMAKE_DIR}/params.cmake)
