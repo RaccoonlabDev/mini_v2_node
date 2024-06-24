@@ -3,6 +3,9 @@
 cmake_minimum_required(VERSION 3.15.3)
 project(example CXX C ASM)
 
+# Define options
+option(USE_PLATFORM_UBUNTU "Build for SITL (Software In The Loop)" OFF)
+
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
@@ -13,6 +16,7 @@ set(SRC_DIR ${ROOT_DIR}/Src)
 set(CMAKE_DIR ${ROOT_DIR}/cmake)
 set(LIBPARAMS_PATH ${ROOT_DIR}/Libs/libparams)
 set(BUILD_SRC_DIR ${ROOT_DIR}/build/src)
+set(BUILD_OBJ_DIR ${ROOT_DIR}/build/obj)
 
 if(CAN_PROTOCOL STREQUAL "dronecan" OR CAN_PROTOCOL STREQUAL "cyphal")
     set(APPLICATION_DIR ${ROOT_DIR}/Src/${CAN_PROTOCOL}_application)
@@ -62,75 +66,4 @@ add_definitions(-DHW_VERSION_MINOR=1)
 
 set(CMAKE_CXX_STANDARD 20)
 
-include(${ROOT_DIR}/Src/platform/${APP_PLATFORM}/CMakeLists.txt)
-set(EXECUTABLE ${PROJECT_NAME}.out)
-add_executable(${EXECUTABLE}
-    ${libparams}
-    ${APPLICATION_SOURCES}
-    ${BUILD_SRC_DIR}/params.cpp
-    ${ROOT_DIR}/Src/common/algorithms.cpp
-    ${ROOT_DIR}/Src/common/module.cpp
-    ${PLATFORM_SOURCES}
-)
-
-target_include_directories(${EXECUTABLE} PRIVATE
-    ${BUILD_SRC_DIR}
-    ${APPLICATION_HEADERS}
-    ${ROOT_DIR}/Src/common
-    ${PLATFORM_HEADERS}
-)
-
-target_compile_options(${EXECUTABLE} PRIVATE
-    -Wall
-    -Wextra
-    -Wfloat-equal
-    -Werror
-    -Wundef
-    -Wshadow
-    -Wpointer-arith
-    -Wunreachable-code
-    -Wstrict-overflow=5
-    -Wwrite-strings
-    -Wswitch-default
-)
-
-
-if(USE_PLATFORM_UBUNTU)
-else()
-    target_compile_definitions(${EXECUTABLE} PRIVATE
-        -DUSE_HAL_DRIVER
-        -D${CPU}
-        -DCYPHAL_NUM_OF_CAN_BUSES=1
-    )
-    target_compile_options(${EXECUTABLE} PRIVATE
-        -mcpu=${TARGET_ARCHITECTURE}
-        -mthumb
-        -fdata-sections
-        -ffunction-sections
-        -lc -lm -lnosys
-        -specs=nano.specs
-        --specs=nosys.specs
-    )
-
-    target_link_options(${EXECUTABLE} PRIVATE
-        -T${ldFile}
-        -mcpu=${TARGET_ARCHITECTURE}
-        -mthumb
-        --specs=nosys.specs
-        -specs=nano.specs
-        -lc
-        -lm
-        -lnosys
-        -Wl,-Map=${PROJECT_NAME}.map,--cref
-        -Wl,--gc-sections
-    )
-
-    # Post-build
-    add_custom_command(TARGET ${EXECUTABLE}
-        POST_BUILD
-        COMMAND ${CMAKE_SIZE} ${EXECUTABLE}
-        COMMAND ${CMAKE_OBJCOPY} -O ihex ${EXECUTABLE} ${PROJECT_NAME}.hex
-        COMMAND ${CMAKE_OBJCOPY} -O binary ${EXECUTABLE} ${PROJECT_NAME}.bin
-        COMMAND ${CMAKE_OBJCOPY} -I binary -O elf32-little ${EXECUTABLE} ${PROJECT_NAME}.elf
-    )
-endif()
+add_subdirectory(${ROOT_DIR}/Src/platform/${APP_PLATFORM})
