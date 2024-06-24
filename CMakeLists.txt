@@ -49,34 +49,6 @@ endif()
 include(${LIBPARAMS_PATH}/CMakeLists.txt)
 include(${APPLICATION_DIR}/CMakeLists.txt)
 
-if(USE_PLATFORM_UBUNTU)
-else()
-    set(TOOLCHAIN_PREFIX arm-none-eabi-)
-    set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc)
-    set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
-    set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
-    set(CMAKE_CXX_STANDARD 20)
-endif()
-
-
-include(${ROOT_DIR}/Src/platform/${APP_PLATFORM}/CMakeLists.txt)
-set(EXECUTABLE ${PROJECT_NAME}.out)
-add_executable(${EXECUTABLE}
-    ${libparams}
-    ${applicationSourceCode}
-    ${BUILD_SRC_DIR}/params.cpp
-    ${ROOT_DIR}/Src/common/algorithms.cpp
-    ${ROOT_DIR}/Src/common/module.cpp
-    ${PLATFORM_SOURCES}
-)
-
-target_include_directories(${EXECUTABLE} PRIVATE
-    ${BUILD_SRC_DIR}
-    ${applicationHeaders}
-    ${ROOT_DIR}/Src/common
-    ${PLATFORM_HEADERS}
-)
-
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-volatile")
 
 # Prebuild
@@ -86,6 +58,35 @@ include(${CMAKE_DIR}/git.cmake)
 # Hardware version is not supported at the momemnt, let's hardcode it for a while
 add_definitions(-DHW_VERSION_MAJOR=2)
 add_definitions(-DHW_VERSION_MINOR=1)
+
+set(CMAKE_CXX_STANDARD 20)
+
+if(USE_PLATFORM_UBUNTU)
+else()
+    set(TOOLCHAIN_PREFIX arm-none-eabi-)
+    set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc)
+    set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
+    set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
+endif()
+
+
+include(${ROOT_DIR}/Src/platform/${APP_PLATFORM}/CMakeLists.txt)
+set(EXECUTABLE ${PROJECT_NAME}.out)
+add_executable(${EXECUTABLE}
+    ${libparams}
+    ${APPLICATION_SOURCES}
+    ${BUILD_SRC_DIR}/params.cpp
+    ${ROOT_DIR}/Src/common/algorithms.cpp
+    ${ROOT_DIR}/Src/common/module.cpp
+    ${PLATFORM_SOURCES}
+)
+
+target_include_directories(${EXECUTABLE} PRIVATE
+    ${BUILD_SRC_DIR}
+    ${APPLICATION_HEADERS}
+    ${ROOT_DIR}/Src/common
+    ${PLATFORM_HEADERS}
+)
 
 if(USE_PLATFORM_UBUNTU)
 else()

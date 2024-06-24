@@ -10,7 +10,7 @@ add_definitions(-DBXCAN_MAX_IFACE_INDEX=0)
 set(libparamsPath ${ROOT_DIR}/Libs/libparams)
 include(${ROOT_DIR}/Libs/Cyphal/CMakeLists.txt)
 
-set(applicationSourceCode
+set(APPLICATION_SOURCES
     ${CYPHAL_SRC}
     ${ROOT_DIR}/Libs/Cyphal/Udral/circuit_status.cpp
 
@@ -19,7 +19,7 @@ set(applicationSourceCode
     ${ROOT_DIR}/Src/cyphal_application/modules/setpoint/setpoint.cpp
     ${ROOT_DIR}/Src/cyphal_application/modules/feedback/feedback.cpp
 )
-set(applicationHeaders
+set(APPLICATION_HEADERS
     ${ROOT_DIR}/Libs/Cyphal
     ${ROOT_DIR}/Libs/Cyphal/Cyphal
     ${ROOT_DIR}/Libs/Cyphal/Libs/libcanard/libcanard
