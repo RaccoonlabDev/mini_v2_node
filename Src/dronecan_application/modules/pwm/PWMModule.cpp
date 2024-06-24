@@ -30,14 +30,6 @@ uint16_t PWMModule::ttl_cmd = 500;
 uint16_t PWMModule::pwm_freq = 50;
 CommandType PWMModule::pwm_cmd_type = CommandType::RAW_COMMAND;
 
-ModuleStatus PWMModule::module_status = ModuleStatus::MODULE_OK;
-
-PWMModule PWMModule::instance = PWMModule();
-
-PWMModule::PWMModule() {
-    update_params();
-    init();
-}
 
 std::array<PwmChannelInfo, static_cast<uint8_t>(PwmPin::PWM_AMOUNT)> PWMModule::params = {{
     {{.min = MIN(1), .max = MAX(1), .def = DEF(1), .ch = CHANNEL(1), .fb = FB(1)}, PwmPin::PWM_1},
@@ -46,16 +38,11 @@ std::array<PwmChannelInfo, static_cast<uint8_t>(PwmPin::PWM_AMOUNT)> PWMModule::
     {{.min = MIN(4), .max = MAX(4), .def = DEF(4), .ch = CHANNEL(4), .fb = FB(4)}, PwmPin::PWM_4},
 }};
 
-PWMModule& PWMModule::get_instance() {
-    static bool instance_initialized = false;
-    if (!instance_initialized) {
-        instance_initialized = true;
-        instance.init();
-    }
-    return instance;
-}
-
 void PWMModule::init() {
+    mode = Module::Mode::INITIALIZATION;
+
+    update_params();
+
     logger.init("PWMModule");
     for (auto param : params) {
         PwmPeriphery::init(param.pin);
@@ -69,13 +56,7 @@ void PWMModule::init() {
 void PWMModule::spin_once() {
     uint32_t crnt_time_ms = HAL_GetTick();
 
-    static uint32_t next_update_ms = 0;
-    if (crnt_time_ms > next_update_ms) {
-        next_update_ms = crnt_time_ms + 1000;
-        instance.update_params();
-        instance.apply_params();
-    }
-
+    mode = Module::Mode::OPEARTIONAL;
     for (auto& pwm : params) {
         if (crnt_time_ms > pwm.cmd_end_time_ms) {
             pwm.command_val = pwm.def;
@@ -86,15 +67,15 @@ void PWMModule::spin_once() {
     status_pub_timeout_ms = 1;
     static uint32_t next_pub_ms = 5000;
 
-    if (module_status == ModuleStatus::MODULE_OK && crnt_time_ms > next_pub_ms) {
+    if (health == Status::OK && crnt_time_ms > next_pub_ms) {
         publish_state();
         next_pub_ms = crnt_time_ms + status_pub_timeout_ms;
     }
 }
 
 void PWMModule::update_params() {
-    module_status = ModuleStatus::MODULE_OK;
-
+    health = Status::OK;
+    mode = Mode::MAINTENANCE;
     pwm_freq = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_FREQUENCY);
     pwm_cmd_type = (CommandType)paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_CMD_TYPE);
 
@@ -117,7 +98,9 @@ void PWMModule::update_params() {
             params_error = true;
             break;
     }
-
+    if (health != Status::OK&& HAL_GetTick() %1000 == 0) {
+        logger.log_info("102");
+    }
     static uint32_t last_warn_pub_time_ms = 0;
     for (int i = 0; i < static_cast<uint8_t>(PwmPin::PWM_AMOUNT); i++) {
         params[i].fb = paramsGetIntegerValue(params[i].names.fb);
@@ -135,12 +118,17 @@ void PWMModule::update_params() {
     }
 
     if (params_error) {
-        module_status = ModuleStatus::MODULE_WARN;
+        health = Status::MINOR_FAILURE;
         if (last_warn_pub_time_ms < HAL_GetTick()) {
             last_warn_pub_time_ms = HAL_GetTick() + 10000;
             logger.log_debug("check parameters");
         }
     }
+    if (health != Status::OK && HAL_GetTick() %1000 == 0) {
+        logger.log_info("128");
+    }
+    apply_params();
+    mode = Mode::OPEARTIONAL;
 }
 
 void PWMModule::apply_params() {
@@ -232,7 +220,7 @@ void PWMModule::publish_hardpoint_status() {
 }
 
 void PWMModule::raw_command_callback(CanardRxTransfer* transfer) {
-    if (module_status != ModuleStatus::MODULE_OK || pwm_cmd_type != CommandType::RAW_COMMAND) {
+    if (pwm_cmd_type != CommandType::RAW_COMMAND) {
         return;
     }
 
@@ -248,7 +236,7 @@ void PWMModule::raw_command_callback(CanardRxTransfer* transfer) {
 }
 
 void PWMModule::array_command_callback(CanardRxTransfer* transfer) {
-    if (module_status != ModuleStatus::MODULE_OK || pwm_cmd_type != CommandType::ARRAY_COMMAND) {
+    if (pwm_cmd_type != CommandType::ARRAY_COMMAND) {
         return;
     }
 
@@ -274,8 +262,7 @@ void PWMModule::array_command_callback(CanardRxTransfer* transfer) {
 }
 
 void PWMModule::hardpoint_callback(CanardRxTransfer* transfer) {
-    if (module_status != ModuleStatus::MODULE_OK ||
-            pwm_cmd_type != CommandType::HARDPOINT_COMMAND) {
+    if (pwm_cmd_type != CommandType::HARDPOINT_COMMAND) {
         return;
     }
 
