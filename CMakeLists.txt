@@ -56,53 +56,25 @@ else()
     set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
     set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
     set(CMAKE_CXX_STANDARD 20)
-    FILE(GLOB coreSources       ${stm32cubeMxProjectPath}/Core/Src/*)
-    FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c)
-    FILE(GLOB startupFile       ${stm32cubeMxProjectPath}/*.s
-                                ${stm32cubeMxProjectPath}/Core/Startup/*.s
-    )
-    set(stm32CubeMxGeneratedFiles
-        ${coreSources}
-        ${driversSources}
-        ${startupFile}
-    )
-    set(stm32CubeMxHeaders
-        ${stm32cubeMxProjectPath}/Core/Inc
-        ${stm32cubeMxProjectPath}/Drivers/CMSIS/Include
-
-        ${stm32cubeMxProjectPath}/Drivers/CMSIS/Device/ST/STM32F1xx/Include
-        ${stm32cubeMxProjectPath}/Drivers/STM32F1xx_HAL_Driver/Inc
-        ${stm32cubeMxProjectPath}/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
-
-        ${stm32cubeMxProjectPath}/Drivers/CMSIS/Device/ST/STM32G0xx/Include
-        ${stm32cubeMxProjectPath}/Drivers/STM32G0xx_HAL_Driver/Inc
-        ${stm32cubeMxProjectPath}/Drivers/STM32G0xx_HAL_Driver/Inc/Legacy
-    )
 endif()
 
+
+include(${ROOT_DIR}/Src/platform/${APP_PLATFORM}/CMakeLists.txt)
 set(EXECUTABLE ${PROJECT_NAME}.out)
 add_executable(${EXECUTABLE}
     ${libparams}
-    ${stm32CubeMxGeneratedFiles}
     ${applicationSourceCode}
     ${BUILD_SRC_DIR}/params.cpp
     ${ROOT_DIR}/Src/common/algorithms.cpp
     ${ROOT_DIR}/Src/common/module.cpp
-    ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/adc.cpp
-    ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/pwm.cpp
-    ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/iwdg.cpp
-    ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/led.cpp
-    ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/temperature_sensor.cpp
-    ${ROOT_DIR}/Src/platform/${APP_PLATFORM}/platform_specific.cpp
-
+    ${PLATFORM_SOURCES}
 )
 
 target_include_directories(${EXECUTABLE} PRIVATE
     ${BUILD_SRC_DIR}
-    ${stm32CubeMxHeaders}
     ${applicationHeaders}
     ${ROOT_DIR}/Src/common
-    ${ROOT_DIR}/Src/platform/${APP_PLATFORM}
+    ${PLATFORM_HEADERS}
 )
 
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-volatile")
