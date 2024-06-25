@@ -29,7 +29,7 @@ void uavcanRestartNode() {
 
     // Get the current executable path
     char path[1024];
-    ssize_t count = readlink("/proc/self/exe", path, sizeof(path));
+    ssize_t count = readlink("/proc/self/exe", path, sizeof(path) - 1);
     if (count == -1) {
         std::cerr << "Error getting executable path." << std::endl;
         exit(1);
