@@ -18,7 +18,7 @@ generate_dsdl:
 	fi
 cyphal: checks generate_dsdl clean
 	mkdir -p ${BUILD_OBJ_DIR}
-	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=cyphal ../.. && make
+	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=cyphal -DUSE_PLATFORM_NODE_V2=ON ../.. && make
 sitl_cyphal: checks generate_dsdl clean
 	mkdir -p ${BUILD_OBJ_DIR}
 	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=cyphal -DUSE_PLATFORM_UBUNTU=ON ../.. && make
@@ -26,7 +26,7 @@ sitl_cyphal: checks generate_dsdl clean
 # Dronecan:
 dronecan: checks clean
 	mkdir -p ${BUILD_OBJ_DIR}
-	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan ../.. && make
+	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_NODE_V2=ON ../.. && make
 sitl_dronecan: checks clean
 	mkdir -p ${BUILD_OBJ_DIR}
 	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_UBUNTU=ON ../.. && make
