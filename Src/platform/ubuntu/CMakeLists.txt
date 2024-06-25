@@ -3,7 +3,6 @@
 
 set(EXECUTABLE ${PROJECT_NAME}.out)
 add_executable(${EXECUTABLE}
-    ${libparams}
     ${APPLICATION_SOURCES}
     ${BUILD_SRC_DIR}/params.cpp
     ${ROOT_DIR}/Src/common/algorithms.cpp
