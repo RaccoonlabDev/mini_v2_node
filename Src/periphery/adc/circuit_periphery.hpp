@@ -5,6 +5,7 @@
 #define SRC_DRIVER_CIRCUIT_PERIPHERY_HPP_
 
 #include <stdint.h>
+#include <limits>
 #include "periphery/temperature_sensor/temperature_sensor.hpp"
 #include "periphery/adc/adc.hpp"
 
@@ -23,8 +24,19 @@ public:
         return stm32TemperatureParse(temp);
     }
 
+    /**
+     * @return The current in Amperes if the hardware supports it, otherwise NaN.
+     */
     static float current() {
-        constexpr float ADC_CURRENT_MULTIPLIER = 10.0f / 4095.0f;  // 10.0 Amper when ADC is 3.3V
+        if (auto hw_version = hardware_version(); hw_version < 2403 || hw_version > 2450) {
+            return std::numeric_limits<float>::quiet_NaN();
+        }
+
+        // Current sensor: INA169NA/3K, R = 33K ohm
+        // Calibration coefficient was measured experimentally
+        constexpr float MAX_SENSOR_CURRENT = 10.0f;
+        constexpr float CALIBRATION_COEF = 0.6666667f;
+        constexpr float ADC_CURRENT_MULTIPLIER = MAX_SENSOR_CURRENT * CALIBRATION_COEF / 4095.0f;
         uint16_t curr = AdcPeriphery::get(AdcChannel::ADC_CURRENT);
         return curr * ADC_CURRENT_MULTIPLIER;
     }
@@ -39,6 +51,10 @@ public:
         constexpr float ADC_5V_MULTIPLIER = 1.0f / 640.0f;
         uint16_t volt = AdcPeriphery::get(AdcChannel::ADC_5V);
         return volt * ADC_5V_MULTIPLIER;
+    }
+
+    static uint16_t hardware_version() {
+        return AdcPeriphery::get(AdcChannel::ADC_VERSION);
     }
 };
 
