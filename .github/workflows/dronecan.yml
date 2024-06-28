@@ -50,12 +50,8 @@ jobs:
           choco install -y gcc-arm-embedded make 7zip cmake
           python -m pip install -r requirements.txt
 
-      - name: Build
-        run: |
-          mkdir build/obj
-          cd build/obj
-          cmake -DCMAKE_SYSTEM_NAME=Generic -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_NODE_V2=ON ../.. -G "Unix Makefiles"
-          make
+      - name: Build DroneCAN binary
+        run: make dronecan
 
   sitl:
     runs-on: ubuntu-22.04

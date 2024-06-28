@@ -1,7 +1,6 @@
 # Copyright (C) 2023-2024 Dmitry Ponomarev <ponomarevda96@gmail.com>
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 cmake_minimum_required(VERSION 3.15.3)
-project(example CXX C ASM)
 
 # Pathes
 set(ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
@@ -45,10 +44,6 @@ include(${LIBPARAMS_PATH}/CMakeLists.txt)
 include(${APPLICATION_DIR}/CMakeLists.txt)
 
 # Set compile options
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-endif()
-
 set(WARNING_FLAGS "-Wall -Wextra -Wfloat-equal -Werror -Wundef -Wshadow -Wpointer-arith -Wunreachable-code -Wstrict-overflow=5 -Wwrite-strings -Wswitch-default")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WARNING_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNING_FLAGS} -Wno-volatile")
@@ -62,5 +57,11 @@ include(${CMAKE_DIR}/git.cmake)
 add_definitions(-DHW_VERSION_MAJOR=2)
 add_definitions(-DHW_VERSION_MINOR=1)
 
+# Project
+project(example CXX C ASM)
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
 
 add_subdirectory(${ROOT_DIR}/Src/platform/${APP_PLATFORM})
