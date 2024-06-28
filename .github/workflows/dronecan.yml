@@ -36,6 +36,27 @@ jobs:
           name: dronecan_firmware.elf
           path: build/obj/example.elf
 
+  stm32f103_windows:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install Dependencies
+        run: |
+          choco install -y gcc-arm-embedded make 7zip cmake
+          python -m pip install -r requirements.txt
+
+      - name: Build
+        run: |
+          mkdir build/obj
+          cd build/obj
+          cmake -DCMAKE_SYSTEM_NAME=Generic -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_NODE_V2=ON ../.. -G "Unix Makefiles"
+          make
+
   sitl:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
