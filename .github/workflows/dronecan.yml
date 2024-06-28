@@ -10,7 +10,7 @@ jobs:
   stm32f103:
     strategy:
       matrix:
-        os: [ubuntu-22.04]
+        os: [ubuntu-22.04, windows-latest]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     steps:
@@ -21,8 +21,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
-          sudo apt-get install -y gcc-arm-none-eabi
+          python -m pip install -r requirements.txt
+          if [ "${{ runner.os }}" == "Linux" ]; then
+            sudo apt-get install -y gcc-arm-none-eabi
+          elif [ "${{ runner.os }}" == "Windows" ]; then
+            choco install -y gcc-arm-embedded make cmake
+          fi
+        shell: bash
 
       - name: Build DroneCAN binary
         run: make dronecan
@@ -33,30 +38,6 @@ jobs:
         with:
           name: dronecan_firmware.bin
           path: build/obj/example.bin
-
-      - name: Upload .elf file
-        if: matrix.os == 'ubuntu-22.04'
-        uses: actions/upload-artifact@v3
-        with:
-          name: dronecan_firmware.elf
-          path: build/obj/example.elf
-
-  stm32f103_windows:
-    runs-on: windows-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          fetch-depth: 0
-
-      - name: Install Dependencies
-        run: |
-          choco install -y gcc-arm-embedded make 7zip cmake
-          python -m pip install -r requirements.txt
-
-      - name: Build DroneCAN binary
-        run: make dronecan
 
   sitl:
     runs-on: ubuntu-22.04
