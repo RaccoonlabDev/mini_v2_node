@@ -8,7 +8,10 @@ on:
     - '*'
 jobs:
   stm32f103:
-    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -18,23 +21,23 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
-          sudo apt-get install -y gcc-arm-none-eabi
+          python -m pip install -r requirements.txt
+          if [ "${{ runner.os }}" == "Linux" ]; then
+            sudo apt-get install -y gcc-arm-none-eabi
+          elif [ "${{ runner.os }}" == "Windows" ]; then
+            choco install -y gcc-arm-embedded make cmake
+          fi
+        shell: bash
 
       - name: Build Cyphal binary
         run: make cyphal
 
       - name: Upload .bin file
+        if: matrix.os == 'ubuntu-22.04'
         uses: actions/upload-artifact@v3
         with:
           name: cyphal_firmware.bin
           path: build/obj/example.bin
-
-      - name: Upload .elf file
-        uses: actions/upload-artifact@v3
-        with:
-          name: cyphal_firmware.elf
-          path: build/obj/example.elf
 
   sitl:
     runs-on: ubuntu-22.04
