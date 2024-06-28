@@ -8,7 +8,10 @@ on:
     - '*'
 jobs:
   stm32f103:
-    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -19,18 +22,20 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          ./scripts/tools/install_for_ubuntu.sh --yes
+          sudo apt-get install -y gcc-arm-none-eabi
 
       - name: Build DroneCAN binary
         run: make dronecan
 
       - name: Upload .bin file
+        if: matrix.os == 'ubuntu-22.04'
         uses: actions/upload-artifact@v3
         with:
           name: dronecan_firmware.bin
           path: build/obj/example.bin
 
       - name: Upload .elf file
+        if: matrix.os == 'ubuntu-22.04'
         uses: actions/upload-artifact@v3
         with:
           name: dronecan_firmware.elf
@@ -65,7 +70,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          ./scripts/tools/install_for_ubuntu.sh --yes
+          sudo apt-get install -y gcc-arm-none-eabi linux-modules-extra-$(uname -r)
 
       - name: Build SITL DroneCAN
         run: make sitl_dronecan
