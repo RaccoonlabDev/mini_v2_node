@@ -19,7 +19,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          ./scripts/tools/install_for_ubuntu.sh --yes
+          sudo apt-get install -y gcc-arm-none-eabi
 
       - name: Build Cyphal binary
         run: make cyphal
@@ -49,7 +49,8 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install pytest
-          ./scripts/tools/install_for_ubuntu.sh --yes
+          sudo apt-get install -y gcc-arm-none-eabi linux-modules-extra-$(uname -r)
+
       - run: make sitl_cyphal
       - run: |
           export REG_DATA_TYPE_PATH="$PWD/Libs/Cyphal/Libs/public_regulated_data_types/uavcan $PWD/Libs/Cyphal/Libs/public_regulated_data_types/reg"
