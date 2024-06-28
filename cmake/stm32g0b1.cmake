@@ -3,3 +3,4 @@
 
 set(TARGET_ARCHITECTURE cortex-m0plus)
 set(CPU STM32G0B1xx)
+include(${CMAKE_CURRENT_LIST_DIR}/Toolchain-arm-none-eabi.cmake)
