@@ -5,6 +5,25 @@
  */
 
 #include "periphery/i2c/i2c.hpp"
+
+#include "i2c.h"
 #include "main.h"
+#include "stm32f1xx_hal.h"
 
 // Add implementation here
+
+int8_t I2CPeriphery::transmit(uint16_t id, uint8_t tx[], uint8_t len) {
+    if (HAL_I2C_Master_Transmit(&hi2c1, id, tx, len, I2C_TIMEOUT) != HAL_OK) {
+        return -1;
+    }
+
+    return len - hi2c1.XferSize;
+}
+
+int8_t I2CPeriphery::receive(uint16_t id, uint8_t *rx, uint8_t len) {
+    if (HAL_I2C_Master_Receive(&hi2c1, id, rx, len, I2C_TIMEOUT) != HAL_OK) {
+        return -1;
+    }
+
+    return len - hi2c1.XferSize;
+}
