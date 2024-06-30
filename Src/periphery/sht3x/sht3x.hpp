@@ -35,7 +35,7 @@ class SHT3XPeriphery {
      * @param command SHT3XCommand
      * @return True on success, false otherwise.
      */
-    static bool sendCommand(SHT3XHandle &handle, SHT3XCommand command);
+    static bool sendCommand(const SHT3XHandle &handle, SHT3XCommand command);
     /**
      * Takes a single temperature and humidity measurement.
      * @param handle Handle to the SHT3x device.
@@ -44,8 +44,8 @@ class SHT3XPeriphery {
      * @param humidity Pointer to the storage location for the sampled humidity.
      * @return True on success, false otherwise.
      */
-    static bool readTemperatureHumidity(SHT3XHandle &handle, float &temperature,
-                                        float &humidity);
+    static bool readTemperatureHumidity(const SHT3XHandle &handle, float *temperature,
+                                        float *humidity);
 };
 
-#endif // SRC_PERIPHERY_SHT3X_SHT3X_HPP_
+#endif  // SRC_PERIPHERY_SHT3X_SHT3X_HPP_

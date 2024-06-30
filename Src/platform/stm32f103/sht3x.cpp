@@ -24,7 +24,7 @@ static uint8_t calculate_crc(const uint8_t *data, size_t length) {
     return crc;
 }
 
-bool SHT3XPeriphery::sendCommand(SHT3XHandle &handle, SHT3XCommand command) {
+bool SHT3XPeriphery::sendCommand(const SHT3XHandle &handle, SHT3XCommand command) {
     uint8_t command_buffer[2] = {(uint8_t)((uint16_t)command >> 8u),
                                  (uint8_t)((uint16_t)command & 0xffu)};
 
@@ -32,9 +32,9 @@ bool SHT3XPeriphery::sendCommand(SHT3XHandle &handle, SHT3XCommand command) {
                                   sizeof(command_buffer));
 }
 
-bool SHT3XPeriphery::readTemperatureHumidity(SHT3XHandle &handle,
-                                             float &temperature,
-                                             float &humidity) {
+bool SHT3XPeriphery::readTemperatureHumidity(const SHT3XHandle &handle,
+                                             float *temperature,
+                                             float *humidity) {
     sendCommand(handle, SHT3XCommand::SHT3X_COMMAND_MEASURE_HIGHREP_STRETCH);
     HAL_Delay(1);
 
@@ -54,8 +54,8 @@ bool SHT3XPeriphery::readTemperatureHumidity(SHT3XHandle &handle,
     uint16_t temperature_raw = uint8_to_uint16(buffer[0], buffer[1]);
     uint16_t humidity_raw = uint8_to_uint16(buffer[3], buffer[4]);
 
-    temperature = -45.0f + 175.0f * (float)temperature_raw / 65535.0f;
-    humidity = 100.0f * (float)humidity_raw / 65535.0f;
+    *temperature = -45.0f + 175.0f * (float)temperature_raw / 65535.0f;
+    *humidity = 100.0f * (float)humidity_raw / 65535.0f;
 
     return true;
 }

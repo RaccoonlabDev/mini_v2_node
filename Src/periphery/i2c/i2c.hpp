@@ -26,4 +26,4 @@ class I2CPeriphery {
     static int8_t receive(uint16_t id, uint8_t *rx, uint8_t len);
 };
 
-#endif // SRC_PERIPHERY_I2C_I2C_HPP_
+#endif  // SRC_PERIPHERY_I2C_I2C_HPP_
