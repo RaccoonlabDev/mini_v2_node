@@ -15,6 +15,7 @@ add_executable(${EXECUTABLE}
     ${CMAKE_CURRENT_LIST_DIR}/temperature_sensor.cpp
     ${CMAKE_CURRENT_LIST_DIR}/platform_specific.cpp
 )
+target_link_libraries(${EXECUTABLE} libparams)
 
 target_include_directories(${EXECUTABLE} PRIVATE
     ${BUILD_SRC_DIR}

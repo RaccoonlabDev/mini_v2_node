@@ -23,7 +23,6 @@ set(APPLICATION_HEADERS
     ${ROOT_DIR}/Libs/Cyphal
     ${ROOT_DIR}/Libs/Cyphal/Cyphal
     ${ROOT_DIR}/Libs/Cyphal/Libs/libcanard/libcanard
-    ${ROOT_DIR}/Libs/libparams/libparams
     ${ROOT_DIR}/Libs/Cyphal/Libs/o1heap/o1heap
     ${ROOT_DIR}/build/nunavut_out
 

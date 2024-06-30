@@ -40,7 +40,6 @@ else()
     message(SEND_ERROR "CAN_PROTOCOL is unknown.")
 endif()
 
-include(${LIBPARAMS_PATH}/CMakeLists.txt)
 include(${APPLICATION_DIR}/CMakeLists.txt)
 
 # Set compile options
@@ -64,4 +63,5 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
+add_subdirectory(${LIBPARAMS_PATH} ${CMAKE_BINARY_DIR}/libparams)
 add_subdirectory(${ROOT_DIR}/Src/platform/${APP_PLATFORM})

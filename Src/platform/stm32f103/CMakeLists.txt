@@ -19,6 +19,7 @@ add_executable(${EXECUTABLE}
     ${driversSources}
     ${startupFile}
 )
+target_link_libraries(${EXECUTABLE} libparams)
 
 target_include_directories(${EXECUTABLE} PRIVATE
     ${BUILD_SRC_DIR}

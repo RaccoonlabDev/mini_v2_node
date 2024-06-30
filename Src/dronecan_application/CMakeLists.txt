@@ -9,7 +9,6 @@ add_definitions(-DFLASH_DRIVER_STORAGE_FILE="${CMAKE_CURRENT_LIST_DIR}/default_p
 include(${ROOT_DIR}/Libs/Dronecan/CMakeLists.txt)
 
 set(APPLICATION_SOURCES
-    ${libparamsSrc}
     ${DRONECAN_SOURCES}
     ${ROOT_DIR}/Src/dronecan_application/application.cpp
     ${ROOT_DIR}/Src/dronecan_application/modules/circuit_status/CircuitStatusModule.cpp
@@ -18,7 +17,6 @@ set(APPLICATION_SOURCES
 
 )
 set(APPLICATION_HEADERS
-    ${libparamsHeaders}
     ${DRONECAN_HEADERS}
     ${ROOT_DIR}/Src
     ${ROOT_DIR}/Src/dronecan_application
