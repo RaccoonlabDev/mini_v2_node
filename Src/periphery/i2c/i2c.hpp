@@ -7,17 +7,23 @@
 #ifndef SRC_PERIPHERY_I2C_I2C_HPP_
 #define SRC_PERIPHERY_I2C_I2C_HPP_
 
+#include <cstdint>
+
+#ifndef I2C_TIMEOUT
+#define I2C_TIMEOUT 30
+#endif
+
 class I2CPeriphery {
-public:
+  public:
     /**
      * @return Number of transmited bytes on success, otherwise < 0
      */
-    static int8_t transmit(uint8_t id, const uint8_t tx[], uint8_t len);
+    static int8_t transmit(uint16_t id, uint8_t tx[], uint8_t len);
 
     /**
      * @return Number of received bytes on success, otherwise < 0
      */
-    static int8_t receive(uint8_t id, uint8_t *rx, uint8_t len);
+    static int8_t receive(uint16_t id, uint8_t *rx, uint8_t len);
 };
 
-#endif  // SRC_PERIPHERY_I2C_I2C_HPP_
+#endif // SRC_PERIPHERY_I2C_I2C_HPP_
