@@ -13,6 +13,8 @@ jobs:
         include:
           - os: ubuntu-22.04
             platform: v2
+          - os: ubuntu-22.04
+            platform: v3
           - os: windows-latest
             platform: v2
     runs-on: ${{ matrix.os }}
