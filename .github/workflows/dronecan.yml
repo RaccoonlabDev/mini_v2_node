@@ -10,7 +10,11 @@ jobs:
   stm32f103:
     strategy:
       matrix:
-        os: [ubuntu-22.04, windows-latest]
+        include:
+          - os: ubuntu-22.04
+            platform: v2
+          - os: windows-latest
+            platform: v2
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     steps:
@@ -30,10 +34,10 @@ jobs:
         shell: bash
 
       - name: Build DroneCAN binary
-        run: make dronecan
+        run: make dronecan_${{ matrix.platform }}
 
       - name: Upload .bin file
-        if: matrix.os == 'ubuntu-22.04'
+        if: matrix.os == 'ubuntu-22.04' && matrix.platform == 'v2'
         uses: actions/upload-artifact@v3
         with:
           name: dronecan_firmware.bin
