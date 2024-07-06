@@ -14,6 +14,7 @@
 #include "uavcan/equipment/esc/Status.h"
 #include "uavcan/equipment/actuator/ArrayCommand.h"
 #include "uavcan/equipment/actuator/Status.h"
+#include "periphery/adc/circuit_periphery.hpp"
 
 #define CHANNEL(channel) IntParamsIndexes::PARAM_PWM_##channel##_CH
 #define MIN(channel) IntParamsIndexes::PARAM_PWM_##channel##_MIN
@@ -182,14 +183,25 @@ void PWMModule::publish_actuator_status() {
             continue;
         }
 
+        auto percent = (uint8_t)mapPwmToPct(PwmPeriphery::get_duration(pwm.pin), pwm.min, pwm.max);
+
         msg.actuator_id = pwm.channel;
-        auto pwm_val = PwmPeriphery::get_duration(pwm.pin);
-        auto scaled_value = mapPwmToPct(pwm_val, pwm.min, pwm.max);
-        msg.power_rating_pct = (uint8_t) scaled_value;
+        msg.power_rating_pct = percent;
+
+        // The following fields are not used in PX4 anyway
+        // Let's fill them with something useful for logging for a while
+        msg.force = CircuitPeriphery::current();
+        msg.speed = CircuitPeriphery::temperature();
+        msg.position = CircuitPeriphery::voltage_5v();
+
         if (dronecan_equipment_actuator_status_publish(&msg, &transfer_id) == 0) {
             transfer_id++;
         }
-        pwm.next_status_pub_ms = crnt_time_ms + ((pwm.fb > 1) ? 100 : 1000);
+
+        // We don't want to publish this message often, probably 1 Hz is fine
+        // We want to record the maximum current, the highest temperature and the lowest voltage
+        // As a temporary solution, let's publish with 2 Hz
+        pwm.next_status_pub_ms = crnt_time_ms + 500;
     }
 }
 
