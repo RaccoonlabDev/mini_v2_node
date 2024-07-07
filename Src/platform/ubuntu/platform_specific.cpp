@@ -25,20 +25,22 @@ void uavcanReadUniqueID(uint8_t out_uid[4]) {
 }
 
 void uavcanRestartNode() {
+    constexpr const char* EXECUTABLE_SYMBOLIC_LINK = "/proc/self/exe";
+    constexpr const int MAX_PATH_LENGTH = 1024;
+
     std::cout << "Restarting application..." << std::endl;
 
     // Get the current executable path
-    char path[1024];
-    ssize_t count = readlink("/proc/self/exe", path, sizeof(path) - 1);
-    if (count == -1) {
+    char executable_path[MAX_PATH_LENGTH];
+    auto count = readlink(EXECUTABLE_SYMBOLIC_LINK, executable_path, sizeof(executable_path) - 1);
+    if (count == -1 || count >= MAX_PATH_LENGTH) {
         std::cerr << "Error getting executable path." << std::endl;
         exit(1);
     }
-
-    path[count] = '\0';
+    executable_path[count] = '\0';
 
     // Execute a new instance of the current application
-    execl(path, path, (char *)NULL);
+    execl(executable_path, executable_path, nullptr);
 
     // If execl returns, an error occurred
     std::cerr << "Error restarting application." << std::endl;
