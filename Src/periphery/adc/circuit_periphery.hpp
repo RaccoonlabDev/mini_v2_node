@@ -6,12 +6,22 @@
 
 #include <stdint.h>
 #include <limits>
+#include <utility>
 #include "periphery/temperature_sensor/temperature_sensor.hpp"
 #include "periphery/adc/adc.hpp"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+enum class BoardType : uint8_t {
+    KIRPI_NO_CURRENT,
+    KIRPI_WITH_CURRENT,
+    MINI_V2_1_1,
+    MINI_V3_0_0,
+
+    BOARDS_AMOUNT,
+};
 
 class CircuitPeriphery{
 public:
@@ -56,6 +66,9 @@ public:
     static uint16_t hardware_version() {
         return AdcPeriphery::get(AdcChannel::ADC_VERSION);
     }
+
+    static BoardType detect_board_type();
+    static std::pair<const char*, uint8_t> get_board_name();
 };
 
 #ifdef __cplusplus

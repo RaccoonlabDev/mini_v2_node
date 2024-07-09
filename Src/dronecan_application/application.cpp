@@ -10,25 +10,35 @@
 #include "params.hpp"
 #include "periphery/led/led.hpp"
 #include "periphery/iwdg/iwdg.hpp"
+#include "periphery/adc/circuit_periphery.hpp"
 #include "modules/pwm/PWMModule.hpp"
 #include "modules/circuit_status/CircuitStatusModule.hpp"
 
+static uint8_t init_periphery() {
+    LedPeriphery::reset();
+    CircuitPeriphery::init();
 
-__attribute__((noreturn)) void application_entry_point() {
     paramsInit((ParamIndex_t)IntParamsIndexes::INTEGER_PARAMS_AMOUNT, NUM_OF_STR_PARAMS, -1, 1);
     paramsLoad();
 
-    auto node_id = paramsGetIntegerValue(IntParamsIndexes::PARAM_UAVCAN_NODE_ID);
-
-    const auto node_name = "co.raccoonlab.mini";
     auto node_name_param_idx = static_cast<ParamIndex_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT);
-    paramsSetStringValue(node_name_param_idx, 19, (const uint8_t*)node_name);
-    uavcanSetNodeName(node_name);
+    auto name = (const char*)paramsGetStringValue(node_name_param_idx);
 
-    LedPeriphery::reset();
+    if (name[0] < 'a' || name[9] > 'z') {
+        const auto& [board_name, name_length] = CircuitPeriphery::get_board_name();
+        paramsSetStringValue(node_name_param_idx, name_length, (const uint8_t*)board_name);
+        uavcanSetNodeName(board_name);
+    } else {
+        uavcanSetNodeName(name);
+    }
+
+    return paramsGetIntegerValue(IntParamsIndexes::PARAM_UAVCAN_NODE_ID);
+}
+
+__attribute__((noreturn)) void application_entry_point() {
+    auto node_id = init_periphery();
 
     uavcanInitApplication(node_id);
-
 
     CircuitStatus circuit_status;
     PWMModule pwm_module;

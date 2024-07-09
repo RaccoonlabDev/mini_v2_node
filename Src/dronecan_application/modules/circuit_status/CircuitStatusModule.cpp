@@ -7,7 +7,6 @@
 #include "periphery/adc/circuit_periphery.hpp"
 
 void CircuitStatus::init() {
-    CircuitPeriphery::init();
     mode = Module::Mode::OPEARTIONAL;
 }
 

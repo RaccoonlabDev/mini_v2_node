@@ -8,6 +8,7 @@ add_executable(${EXECUTABLE}
     ${ROOT_DIR}/Src/common/algorithms.cpp
     ${ROOT_DIR}/Src/common/module.cpp
 
+    ${ROOT_DIR}/Src/periphery/adc/circuit_periphery.cpp
     ${CMAKE_CURRENT_LIST_DIR}/adc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/pwm.cpp
     ${CMAKE_CURRENT_LIST_DIR}/iwdg.cpp
