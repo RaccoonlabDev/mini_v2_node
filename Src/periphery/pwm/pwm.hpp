@@ -13,6 +13,8 @@
 extern "C" {
 #endif
 
+namespace Peripheral {
+
 /**
  * @note PWM pinout related to RaccoonLab Mini v2 node
  */
@@ -25,7 +27,7 @@ enum class PwmPin : uint8_t {
 };
 
 
-class PwmPeriphery {
+class Pwm {
 public:
     /**
      * @return 0 on success, otherwise < 0
@@ -52,6 +54,8 @@ public:
      */
     static void set_frequency(PwmPin pwm_pin, uint32_t frequency_hz);
 };
+
+}  // namespace Peripheral
 
 #ifdef __cplusplus
 }
