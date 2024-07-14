@@ -1,5 +1,5 @@
-#ifndef SRC_PERIPHERY_SHT3X_SHT3X_HPP_
-#define SRC_PERIPHERY_SHT3X_SHT3X_HPP_
+#ifndef SRC_DRIVERS_SHT3X_SHT3X_HPP_
+#define SRC_DRIVERS_SHT3X_SHT3X_HPP_
 
 #include <cstdint>
 
@@ -48,4 +48,4 @@ class SHT3XPeriphery {
                                         float *humidity);
 };
 
-#endif  // SRC_PERIPHERY_SHT3X_SHT3X_HPP_
+#endif  // SRC_DRIVERS_SHT3X_SHT3X_HPP_
