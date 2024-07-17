@@ -36,8 +36,6 @@ sitl_dronecan: checks clean
 	mkdir -p ${BUILD_OBJ_DIR}
 	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_UBUNTU=ON -G "Unix Makefiles" ../.. && make
 dronecan_v3: checks clean
-	#  --branch dc90159
-	if [ ! -d "build/ioc-v3" ]; then git clone --depth 1 https://github.com/RaccoonLabHardware/v3-software-template.git build/ioc-v3; fi
 	mkdir -p ${BUILD_OBJ_DIR}
 	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_NODE_V3=ON -G "Unix Makefiles" ../.. && make
 

@@ -13,3 +13,6 @@
 [submodule "Libs/stm32-cube-project"]
 	path = Libs/stm32-cube-project
 	url = https://github.com/RaccoonLabHardware/mini-v2-software.git
+[submodule "Libs/mini-v3-ioc"]
+	path = Libs/mini-v3-ioc
+	url = git@github.com:RaccoonLabHardware/mini-v3-ioc.git
