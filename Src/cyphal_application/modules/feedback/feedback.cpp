@@ -29,7 +29,7 @@ void FeedbackModule::spin_once() {
     pub.msg.heartbeat.health.value = uavcan_node_Health_1_0_NOMINAL;
     pub.msg.heartbeat.readiness.value = reg_udral_service_common_Readiness_0_1_ENGAGED;
 
-    uint32_t pwm_ccr_reg_value = Peripheral::Pwm::get_duration(Peripheral::PwmPin::PWM_1);
+    uint32_t pwm_ccr_reg_value = HAL::Pwm::get_duration(HAL::PwmPin::PWM_1);
     uint32_t pwm_duration = std::clamp(pwm_ccr_reg_value, (uint32_t)1000, (uint32_t)2000);
     pub.msg.demand_factor_pct = static_cast<int8_t>((pwm_duration - 1000) / 10);
 

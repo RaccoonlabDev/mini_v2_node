@@ -9,11 +9,7 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-namespace Peripheral {
+namespace HAL {
 
 /**
  * @note PWM pinout related to RaccoonLab Mini v2 node
@@ -55,10 +51,6 @@ public:
     static void set_frequency(PwmPin pwm_pin, uint32_t frequency_hz);
 };
 
-}  // namespace Peripheral
-
-#ifdef __cplusplus
-}
-#endif
+}  // namespace HAL
 
 #endif  // SRC_APPLICATION_PERIPHERY_PWM_HPP_

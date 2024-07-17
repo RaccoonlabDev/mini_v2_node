@@ -35,7 +35,7 @@ struct PwmChannelsParamsNames {
 
 struct PwmChannelInfo {
     const PwmChannelsParamsNames names;
-    Peripheral::PwmPin pin;
+    HAL::PwmPin pin;
     uint16_t min{0};
     uint16_t max{0};
     uint16_t def{0};
@@ -56,7 +56,7 @@ protected:
     void update_params() override;
     void spin_once() override;
 
-    static std::array<PwmChannelInfo, static_cast<uint8_t>(Peripheral::PwmPin::PWM_AMOUNT)> params;
+    static std::array<PwmChannelInfo, static_cast<uint8_t>(HAL::PwmPin::PWM_AMOUNT)> params;
 
 private:
     void (*callback)(CanardRxTransfer*) = {};

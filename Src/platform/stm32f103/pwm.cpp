@@ -10,7 +10,7 @@
 extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim4;
 
-namespace Peripheral {
+namespace HAL {
 
 struct PwmPinInfo {
     TIM_HandleTypeDef& htim;
@@ -72,4 +72,4 @@ uint32_t Pwm::get_frequency(PwmPin pwm_pin) {
     return frequency;
 }
 
-}  // namespace Peripheral
+}  // namespace HAL
