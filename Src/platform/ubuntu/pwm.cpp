@@ -6,7 +6,7 @@
 
 #include "periphery/pwm/pwm.hpp"
 
-namespace Peripheral {
+namespace HAL {
 
 uint32_t pwm[(int)PwmPin::PWM_AMOUNT];
 uint32_t pwm_freq[(int)PwmPin::PWM_AMOUNT];
@@ -32,4 +32,4 @@ uint32_t Pwm::get_frequency(PwmPin pwm_pin) {
     return pwm_freq[(int)pwm_pin];
 }
 
-}  // namespace Peripheral
+}  // namespace HAL

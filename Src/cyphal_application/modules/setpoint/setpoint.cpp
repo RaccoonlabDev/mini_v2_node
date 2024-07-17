@@ -33,14 +33,14 @@ void SetpointSubscriber::callback(const cyphal::CanardRxTransfer& transfer) {
 
     float setpoint_clamped = std::clamp(msg.value[0], 0.0f, 1.0f);
     auto pwm_duration = static_cast<uint32_t>(setpoint_clamped * 1000.0 + 1000);
-    Peripheral::Pwm::set_duration(Peripheral::PwmPin::PWM_1, pwm_duration);
+    HAL::Pwm::set_duration(HAL::PwmPin::PWM_1, pwm_duration);
 }
 
 void SetpointModule::init() {
-    Peripheral::Pwm::init(Peripheral::PwmPin::PWM_1);
-    Peripheral::Pwm::init(Peripheral::PwmPin::PWM_2);
-    Peripheral::Pwm::init(Peripheral::PwmPin::PWM_3);
-    Peripheral::Pwm::init(Peripheral::PwmPin::PWM_4);
+    HAL::Pwm::init(HAL::PwmPin::PWM_1);
+    HAL::Pwm::init(HAL::PwmPin::PWM_2);
+    HAL::Pwm::init(HAL::PwmPin::PWM_3);
+    HAL::Pwm::init(HAL::PwmPin::PWM_4);
 
     health = (sub.init() < 0) ? Status::FATAL_MALFANCTION : Status::OK;
     mode = Mode::OPEARTIONAL;

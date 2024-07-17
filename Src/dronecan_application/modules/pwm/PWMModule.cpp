@@ -16,7 +16,7 @@
 #include "uavcan/equipment/actuator/Status.h"
 #include "periphery/adc/circuit_periphery.hpp"
 
-#define CHANNEL(channel) IntParamsIndexes::PARAM_PWM_##channel##_CH
+#define CH(channel) IntParamsIndexes::PARAM_PWM_##channel##_CH
 #define MIN(channel) IntParamsIndexes::PARAM_PWM_##channel##_MIN
 #define MAX(channel) IntParamsIndexes::PARAM_PWM_##channel##_MAX
 #define DEF(channel) IntParamsIndexes::PARAM_PWM_##channel##_DEF
@@ -32,11 +32,11 @@ uint16_t PWMModule::pwm_freq = 50;
 CommandType PWMModule::pwm_cmd_type = CommandType::RAW_COMMAND;
 
 
-std::array<PwmChannelInfo, static_cast<uint8_t>(Peripheral::PwmPin::PWM_AMOUNT)> PWMModule::params = {{
-    {{.min = MIN(1), .max = MAX(1), .def = DEF(1), .ch = CHANNEL(1), .fb = FB(1)}, Peripheral::PwmPin::PWM_1},
-    {{.min = MIN(2), .max = MAX(2), .def = DEF(2), .ch = CHANNEL(2), .fb = FB(2)}, Peripheral::PwmPin::PWM_2},
-    {{.min = MIN(3), .max = MAX(3), .def = DEF(3), .ch = CHANNEL(3), .fb = FB(3)}, Peripheral::PwmPin::PWM_3},
-    {{.min = MIN(4), .max = MAX(4), .def = DEF(4), .ch = CHANNEL(4), .fb = FB(4)}, Peripheral::PwmPin::PWM_4},
+std::array<PwmChannelInfo, static_cast<uint8_t>(HAL::PwmPin::PWM_AMOUNT)> PWMModule::params = {{
+    {{.min = MIN(1), .max = MAX(1), .def = DEF(1), .ch = CH(1), .fb = FB(1)}, HAL::PwmPin::PWM_1},
+    {{.min = MIN(2), .max = MAX(2), .def = DEF(2), .ch = CH(2), .fb = FB(2)}, HAL::PwmPin::PWM_2},
+    {{.min = MIN(3), .max = MAX(3), .def = DEF(3), .ch = CH(3), .fb = FB(3)}, HAL::PwmPin::PWM_3},
+    {{.min = MIN(4), .max = MAX(4), .def = DEF(4), .ch = CH(4), .fb = FB(4)}, HAL::PwmPin::PWM_4},
 }};
 
 void PWMModule::init() {
@@ -46,7 +46,7 @@ void PWMModule::init() {
 
     logger.init("PWMModule");
     for (auto param : params) {
-        Peripheral::Pwm::init(param.pin);
+        HAL::Pwm::init(param.pin);
     }
 
     uavcanSubscribe(UAVCAN_EQUIPMENT_ESC_RAWCOMMAND,            raw_command_callback);
@@ -62,7 +62,7 @@ void PWMModule::spin_once() {
         if (crnt_time_ms > pwm.cmd_end_time_ms) {
             pwm.command_val = pwm.def;
         }
-        Peripheral::Pwm::set_duration(pwm.pin, pwm.command_val);
+        HAL::Pwm::set_duration(pwm.pin, pwm.command_val);
     }
 
     status_pub_timeout_ms = 1;
@@ -103,7 +103,7 @@ void PWMModule::update_params() {
         logger.log_info("102");
     }
     static uint32_t last_warn_pub_time_ms = 0;
-    for (int i = 0; i < static_cast<uint8_t>(Peripheral::PwmPin::PWM_AMOUNT); i++) {
+    for (int i = 0; i < static_cast<uint8_t>(HAL::PwmPin::PWM_AMOUNT); i++) {
         params[i].fb = paramsGetIntegerValue(params[i].names.fb);
         auto channel = paramsGetIntegerValue(params[i].names.ch);
         if (channel < max_channel) {
@@ -133,9 +133,9 @@ void PWMModule::update_params() {
 }
 
 void PWMModule::apply_params() {
-    for (int i = 0; i < static_cast<uint8_t>(Peripheral::PwmPin::PWM_AMOUNT); i++) {
-        if (Peripheral::Pwm::get_frequency(params[i].pin) != pwm_freq) {
-            Peripheral::Pwm::set_frequency(params[i].pin, pwm_freq);
+    for (int i = 0; i < static_cast<uint8_t>(HAL::PwmPin::PWM_AMOUNT); i++) {
+        if (HAL::Pwm::get_frequency(params[i].pin) != pwm_freq) {
+            HAL::Pwm::set_frequency(params[i].pin, pwm_freq);
         }
     }
 
@@ -164,7 +164,7 @@ void PWMModule::publish_esc_status() {
         }
 
         msg.esc_index = pwm.channel;
-        auto pwm_val = Peripheral::Pwm::get_duration(pwm.pin);
+        auto pwm_val = HAL::Pwm::get_duration(pwm.pin);
         auto scaled_value = mapPwmToPct(pwm_val, pwm.min, pwm.max);
         msg.power_rating_pct = (uint8_t)(scaled_value);
         if (dronecan_equipment_esc_status_publish(&msg, &transfer_id) == 0) {
@@ -183,7 +183,7 @@ void PWMModule::publish_actuator_status() {
             continue;
         }
 
-        auto percent = (uint8_t)mapPwmToPct(Peripheral::Pwm::get_duration(pwm.pin), pwm.min, pwm.max);
+        auto percent = (uint8_t)mapPwmToPct(HAL::Pwm::get_duration(pwm.pin), pwm.min, pwm.max);
 
         msg.actuator_id = pwm.channel;
         msg.power_rating_pct = percent;
@@ -222,7 +222,7 @@ void PWMModule::publish_hardpoint_status() {
 
         HardpointStatus msg{};
         msg.hardpoint_id = pwm.channel;
-        auto pwm_duration_us = Peripheral::Pwm::get_duration(pwm.pin);
+        auto pwm_duration_us = HAL::Pwm::get_duration(pwm.pin);
         msg.status = (pwm_duration_us == pwm.min) ? CMD_RELEASE_OR_MIN : CMD_HOLD_OR_MAX;
 
         if (dronecan_equipment_hardpoint_status_publish(&msg, &transfer_id) == 0) {
@@ -257,7 +257,7 @@ void PWMModule::array_command_callback(CanardRxTransfer* transfer) {
     if (ch_num <= 0) {
         return;
     }
-    for (int i = 0; i < static_cast<uint8_t>(Peripheral::PwmPin::PWM_AMOUNT); i++) {
+    for (int i = 0; i < static_cast<uint8_t>(HAL::PwmPin::PWM_AMOUNT); i++) {
         auto pwm = &params[i];
         if (pwm->channel < 0) {
             continue;
