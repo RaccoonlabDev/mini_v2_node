@@ -49,7 +49,7 @@ void PWMModule::init() {
         HAL::Pwm::init(param.pin);
     }
 
-    uavcanSubscribe(UAVCAN_EQUIPMENT_ESC_RAWCOMMAND,            raw_command_callback);
+    raw_command_sub.init(raw_command_cb);
     uavcanSubscribe(UAVCAN_EQUIPMENT_ACTUATOR_ARRAY_COMMAND,    array_command_callback);
     uavcanSubscribe(UAVCAN_EQUIPMENT_HARDPOINT_COMMAND,         hardpoint_callback);
 }
@@ -155,36 +155,33 @@ void PWMModule::apply_params() {
 }
 
 void PWMModule::publish_esc_status() {
-    static uint8_t transfer_id = 0;
-    EscStatus_t msg{};
-    auto crnt_time_ms = HAL_GetTick();
     for (auto& pwm : params) {
+        auto crnt_time_ms = HAL_GetTick();
         if (pwm.channel < 0 || pwm.fb == 0 || pwm.next_status_pub_ms > crnt_time_ms) {
             continue;
         }
 
+        auto& msg = esc_status_pub.msg;
         msg.esc_index = pwm.channel;
         auto pwm_val = HAL::Pwm::get_duration(pwm.pin);
         auto scaled_value = mapPwmToPct(pwm_val, pwm.min, pwm.max);
         msg.power_rating_pct = (uint8_t)(scaled_value);
-        if (dronecan_equipment_esc_status_publish(&msg, &transfer_id) == 0) {
-            transfer_id++;
-            pwm.next_status_pub_ms = crnt_time_ms + ((pwm.fb > 1) ? 100 : 1000);
-        }
+        esc_status_pub.publish();
+
+        pwm.next_status_pub_ms = crnt_time_ms + ((pwm.fb > 1) ? 100 : 1000);
     }
 }
 
 void PWMModule::publish_actuator_status() {
-    static uint8_t transfer_id = 0;
-    ActuatorStatus_t msg {};
-    auto crnt_time_ms = HAL_GetTick();
     for (auto& pwm : params) {
+        auto crnt_time_ms = HAL_GetTick();
         if (pwm.channel < 0 || pwm.fb == 0 || pwm.next_status_pub_ms > crnt_time_ms) {
             continue;
         }
 
         auto percent = (uint8_t)mapPwmToPct(HAL::Pwm::get_duration(pwm.pin), pwm.min, pwm.max);
 
+        auto& msg = actuator_status_pub.msg;
         msg.actuator_id = pwm.channel;
         msg.power_rating_pct = percent;
 
@@ -194,9 +191,7 @@ void PWMModule::publish_actuator_status() {
         msg.speed = CircuitPeriphery::temperature();
         msg.position = CircuitPeriphery::voltage_5v();
 
-        if (dronecan_equipment_actuator_status_publish(&msg, &transfer_id) == 0) {
-            transfer_id++;
-        }
+        actuator_status_pub.publish();
 
         // We don't want to publish this message often, probably 1 Hz is fine
         // We want to record the maximum current, the highest temperature and the lowest voltage
@@ -207,7 +202,6 @@ void PWMModule::publish_actuator_status() {
 
 void PWMModule::publish_hardpoint_status() {
     static uint32_t next_status_pub_ms{0};
-    static uint8_t transfer_id{0};
 
     auto crnt_time_ms = HAL_GetTick();
     if (next_status_pub_ms > crnt_time_ms) {
@@ -220,30 +214,27 @@ void PWMModule::publish_hardpoint_status() {
             continue;
         }
 
-        HardpointStatus msg{};
+        auto& msg = hardpoint_status_pub.msg;
         msg.hardpoint_id = pwm.channel;
         auto pwm_duration_us = HAL::Pwm::get_duration(pwm.pin);
         msg.status = (pwm_duration_us == pwm.min) ? CMD_RELEASE_OR_MIN : CMD_HOLD_OR_MAX;
 
-        if (dronecan_equipment_hardpoint_status_publish(&msg, &transfer_id) == 0) {
-            transfer_id++;
-        }
+        hardpoint_status_pub.publish();
     }
 }
 
-void PWMModule::raw_command_callback(CanardRxTransfer* transfer) {
+void PWMModule::raw_command_cb(const RawCommand_t& msg) {
     if (pwm_cmd_type != CommandType::RAW_COMMAND) {
         return;
     }
 
     for (auto& pwm : params) {
-        int16_t cmd;
-        if (!dronecan_equipment_esc_raw_command_channel_deserialize(transfer, pwm.channel, &cmd)) {
+        if (pwm.channel >= msg.size) {
             continue;
         }
 
         pwm.cmd_end_time_ms = HAL_GetTick() + ttl_cmd;
-        pwm.command_val = mapInt16CommandToPwm(cmd, pwm.min, pwm.max, pwm.def);
+        pwm.command_val = mapInt16CommandToPwm(msg.raw_cmd[pwm.channel], pwm.min, pwm.max, pwm.def);
     }
 }
 
