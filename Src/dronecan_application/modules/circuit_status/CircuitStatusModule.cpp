@@ -11,10 +11,10 @@ void CircuitStatus::init() {
 }
 
 void CircuitStatus::spin_once() {
-    temperature_status.temperature = CircuitPeriphery::temperature();
-    dronecan_equipment_temperature_publish(&temperature_status, &temperature_transfer_id);
-    temperature_transfer_id++;
+    dev_temperature_pub.msg.temperature = CircuitPeriphery::temperature();
+    dev_temperature_pub.publish();
 
+    auto& circuit_status = circuit_status_pub.msg;
     circuit_status.voltage = CircuitPeriphery::voltage_vin();
     circuit_status.current = CircuitPeriphery::current();
     circuit_status.error_flags = ERROR_FLAG_CLEAR;
@@ -23,8 +23,7 @@ void CircuitStatus::spin_once() {
     } else if (circuit_status.current > 1.05) {
         circuit_status.error_flags = ERROR_FLAG_OVERCURRENT;
     }
-    dronecan_equipment_circuit_status_publish(&circuit_status, &circuit_status_transfer_id);
-    circuit_status_transfer_id++;
+    circuit_status_pub.publish();
 
     if (circuit_status.error_flags != ERROR_FLAG_CLEAR) {
         health = Status::MINOR_FAILURE;

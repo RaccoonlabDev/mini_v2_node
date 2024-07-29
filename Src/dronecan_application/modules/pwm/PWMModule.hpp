@@ -15,6 +15,8 @@
 #include "logger.hpp"
 #include "periphery/pwm/pwm.hpp"
 #include "common/module.hpp"
+#include "publisher.hpp"
+#include "subscriber.hpp"
 
 
 enum class CommandType: uint8_t {
@@ -65,7 +67,7 @@ private:
     void update_pwm();
     void apply_params();
 
-    static void raw_command_callback(CanardRxTransfer* transfer);
+    static void raw_command_cb(const RawCommand_t& msg);
     static void array_command_callback(CanardRxTransfer* transfer);
     static void hardpoint_callback(CanardRxTransfer* transfer);
 
@@ -74,6 +76,12 @@ private:
     static void publish_raw_command();
     static void publish_array_command();
     static void publish_hardpoint_status();
+
+    static inline DronecanSubscriber<RawCommand_t> raw_command_sub;
+
+    static inline DronecanPublisher<ActuatorStatus_t> actuator_status_pub;
+    static inline DronecanPublisher<EscStatus_t> esc_status_pub;
+    static inline DronecanPublisher<HardpointStatus> hardpoint_status_pub;
 
     static uint16_t pwm_freq;
     static CommandType pwm_cmd_type;
