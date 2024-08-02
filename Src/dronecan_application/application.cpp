@@ -13,14 +13,9 @@
 #include "periphery/adc/circuit_periphery.hpp"
 #include "modules/pwm/PWMModule.hpp"
 #include "modules/circuit_status/CircuitStatusModule.hpp"
+#include "common.hpp"
 
-static uint8_t init_periphery() {
-    LedPeriphery::reset();
-    CircuitPeriphery::init();
-
-    paramsInit((ParamIndex_t)IntParamsIndexes::INTEGER_PARAMS_AMOUNT, NUM_OF_STR_PARAMS, -1, 1);
-    paramsLoad();
-
+static void get_node_info() {
     auto node_name_param_idx = static_cast<ParamIndex_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT);
     auto name = (const char*)paramsGetStringValue(node_name_param_idx);
 
@@ -31,12 +26,13 @@ static uint8_t init_periphery() {
     } else {
         uavcanSetNodeName(name);
     }
-
-    return paramsGetIntegerValue(IntParamsIndexes::PARAM_UAVCAN_NODE_ID);
 }
 
 __attribute__((noreturn)) void application_entry_point() {
-    auto node_id = init_periphery();
+    init_board_periphery();
+
+    auto node_id = get_node_id();
+    get_node_info();
 
     uavcanInitApplication(node_id);
 
