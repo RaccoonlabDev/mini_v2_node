@@ -13,6 +13,7 @@
 #include "periphery/iwdg/iwdg.hpp"
 
 static const std::array<std::pair<uint16_t, uint16_t>, (int)BoardType::BOARDS_AMOUNT> hw_info = {{
+    {436, 460},
     {2290, 2339},
     {2403, 2450},
     {3839, 3856},
@@ -20,10 +21,11 @@ static const std::array<std::pair<uint16_t, uint16_t>, (int)BoardType::BOARDS_AM
 }};
 
 static const std::array<std::pair<const char*, uint16_t>, (int)BoardType::BOARDS_AMOUNT> names = {{
+    {"co.rl.aspd.v3", 14},
     {"arl.kirpi.v2.2.0", 17},
     {"arl.kirpi.v2.3.0", 17},
-    {"co.raccoonlab.mini", 19},
-    {"co.raccoonlab.mini.v3", 22},
+    {"co.rl.mini.v2", 14},
+    {"co.rl.mini.v3", 14},
 }};
 
 BoardType CircuitPeriphery::detect_board_type() {
