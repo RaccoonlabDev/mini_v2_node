@@ -15,6 +15,7 @@ extern "C" {
 #endif
 
 enum class BoardType : uint8_t {
+    ASPD_V3,
     KIRPI_NO_CURRENT,
     KIRPI_WITH_CURRENT,
     MINI_V2_1_1,
