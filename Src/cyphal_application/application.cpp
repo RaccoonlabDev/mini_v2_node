@@ -14,22 +14,22 @@
 #include "circuit_status/circuit_status.hpp"
 #include "periphery/led/led.hpp"
 #include "periphery/iwdg/iwdg.hpp"
+#include "common.hpp"
 
-void init_persistent_storage() {
-    paramsInit((ParamIndex_t)IntParamsIndexes::INTEGER_PARAMS_AMOUNT, NUM_OF_STR_PARAMS, -1, 1);
-    paramsLoad();
-
+static void get_node_info() {
     auto node_name_param_idx = static_cast<ParamIndex_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT);
     paramsSetStringValue(node_name_param_idx, 19, (const uint8_t*)"co.raccoonlab.mini");
 }
 
 __attribute__((noreturn)) void application_entry_point() {
-    LedPeriphery::reset();
-    init_persistent_storage();
+    init_board_periphery();
+
+    auto node_id = get_node_id();
+    get_node_info();
     cyphal::NodeGetInfoSubscriber::setHardwareVersion(2, 1);
 
     cyphal::Cyphal cyphal;
-    cyphal.init();
+    cyphal.init(node_id);
 
     SetpointModule setpoint;
     FeedbackModule feedback;

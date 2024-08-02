@@ -6,6 +6,7 @@ add_executable(${EXECUTABLE}
     ${APPLICATION_SOURCES}
     ${BUILD_SRC_DIR}/params.cpp
     ${ROOT_DIR}/Src/common/algorithms.cpp
+    ${ROOT_DIR}/Src/common/common.cpp
     ${ROOT_DIR}/Src/common/module.cpp
 
     ${ROOT_DIR}/Src/periphery/adc/circuit_periphery.cpp

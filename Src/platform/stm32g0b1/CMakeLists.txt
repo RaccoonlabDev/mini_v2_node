@@ -12,6 +12,7 @@ add_executable(${EXECUTABLE}
     ${BUILD_SRC_DIR}/params.cpp
     ${ROOT_DIR}/Src/common/algorithms.cpp
     ${ROOT_DIR}/Src/common/module.cpp
+    ${ROOT_DIR}/Src/common/common.cpp
 
     ${ROOT_DIR}/Src/periphery/adc/circuit_periphery.cpp
     ${PLATFORM_DIR}/stm32f103/adc.cpp
