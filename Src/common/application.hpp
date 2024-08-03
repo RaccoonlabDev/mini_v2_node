@@ -4,8 +4,8 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#ifndef SRC_APPLICATION_HPP_
-#define SRC_APPLICATION_HPP_
+#ifndef SRC_COMMON_APPLICATION_HPP_
+#define SRC_COMMON_APPLICATION_HPP_
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,4 +17,4 @@ __attribute__((noreturn)) void application_entry_point(void);
 }
 #endif
 
-#endif  // SRC_APPLICATION_HPP_
+#endif  // SRC_COMMON_APPLICATION_HPP_
