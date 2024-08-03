@@ -28,7 +28,7 @@ bool SHT3XPeriphery::sendCommand(const SHT3XHandle &handle, SHT3XCommand command
     uint8_t command_buffer[2] = {(uint8_t)((uint16_t)command >> 8u),
                                  (uint8_t)((uint16_t)command & 0xffu)};
 
-    return I2CPeriphery::transmit(handle.device_address << 1u, command_buffer,
+    return HAL::I2C::transmit(handle.device_address << 1u, command_buffer,
                                   sizeof(command_buffer));
 }
 
@@ -40,7 +40,7 @@ bool SHT3XPeriphery::readTemperatureHumidity(const SHT3XHandle &handle,
 
     uint8_t buffer[6];
 
-    if (!I2CPeriphery::receive(handle.device_address << 1u, buffer,
+    if (!HAL::I2C::receive(handle.device_address << 1u, buffer,
                                sizeof(buffer))) {
         return false;
     }

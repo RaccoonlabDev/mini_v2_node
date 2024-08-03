@@ -9,11 +9,9 @@
 
 #include <cstdint>
 
-#ifndef I2C_TIMEOUT
-#define I2C_TIMEOUT 30
-#endif
+namespace HAL {
 
-class I2CPeriphery {
+class I2C {
   public:
     /**
      * @return Number of transmited bytes on success, otherwise < 0
@@ -25,5 +23,7 @@ class I2CPeriphery {
      */
     static int8_t receive(uint16_t id, uint8_t *rx, uint8_t len);
 };
+
+}  // namespace HAL
 
 #endif  // SRC_PERIPHERY_I2C_I2C_HPP_
