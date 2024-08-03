@@ -5,6 +5,7 @@
  */
 
 #include "module.hpp"
+#include "modules/modules.hpp"
 
 Module::Module(float frequency) : period_ms(period_ms_from_frequency(frequency)) {
 }
@@ -33,5 +34,46 @@ void Module::process() {
 }
 
 uint32_t Module::period_ms_from_frequency(float frequency) {
-    return (frequency > 0.001f) ? static_cast<uint32_t>(1000.0f / frequency) : 1000;
+    return (frequency > 0.001f) ? static_cast<uint32_t>(1000.0f / frequency) : 0;
+}
+
+Module::Status Module::get_global_status() {
+    const auto& modules = get_application_modules();
+    auto global_status = Module::Status::OK;
+
+    for (auto app_module : modules) {
+        if (app_module->get_health() > global_status) {
+            global_status = app_module->get_health();
+        }
+    }
+
+    return global_status;
+}
+
+Module::Mode Module::get_global_mode() {
+    const auto& modules = get_application_modules();
+    auto global_mode = Module::Mode::OPEARTIONAL;
+
+    for (auto app_module : modules) {
+        if (app_module->get_mode() > global_mode) {
+            global_mode = app_module->get_mode();
+        }
+    }
+
+    return global_mode;
+}
+
+uint8_t Module::get_vssc() {
+    const auto& modules = get_application_modules();
+    uint8_t vssc = 0;
+
+    uint8_t module_idx = 0;
+    for (auto app_module : modules) {
+        if (app_module->get_health() > Status::OK || app_module->get_mode() > Mode::OPEARTIONAL) {
+            vssc += 1 << module_idx;
+        }
+        module_idx++;
+    }
+
+    return vssc;
 }

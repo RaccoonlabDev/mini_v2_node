@@ -36,6 +36,10 @@ public:
 
     void process();
 
+    static Status get_global_status();
+    static Mode get_global_mode();
+    static uint8_t get_vssc();
+
 protected:
     virtual void update_params() {};
     virtual void spin_once() = 0;

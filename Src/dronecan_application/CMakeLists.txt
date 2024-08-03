@@ -11,9 +11,12 @@ include(${ROOT_DIR}/Libs/Dronecan/CMakeLists.txt)
 set(APPLICATION_SOURCES
     ${libparamsSrc}
     ${DRONECAN_SOURCES}
-    ${ROOT_DIR}/Src/dronecan_application/application.cpp
+
     ${ROOT_DIR}/Src/dronecan_application/modules/circuit_status/CircuitStatusModule.cpp
+    ${ROOT_DIR}/Src/dronecan_application/modules/dronecan/dronecan_module.cpp
     ${ROOT_DIR}/Src/dronecan_application/modules/pwm/PWMModule.cpp
+    ${ROOT_DIR}/Src/dronecan_application/modules/modules.cpp
+
     ${ROOT_DIR}/Src/dronecan_application/logger.cpp
 
 )
@@ -25,6 +28,6 @@ set(APPLICATION_HEADERS
 )
 
 set(LIBPARAMS_PARAMS
-    ${CMAKE_CURRENT_LIST_DIR}/params.yaml
+    ${CMAKE_CURRENT_LIST_DIR}/modules/dronecan/params.yaml
     ${CMAKE_CURRENT_LIST_DIR}/modules/pwm/params.yaml
 )

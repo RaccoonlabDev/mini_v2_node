@@ -4,13 +4,12 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#ifndef SRC_COMMON_COMMON_HPP_
-#define SRC_COMMON_COMMON_HPP_
+#ifndef SRC_MODULES_HPP_
+#define SRC_MODULES_HPP_
 
-#include <cstdint>
+#include <array>
+#include "module.hpp"
 
-int8_t init_board_periphery();
+std::array<Module*, 4>& get_application_modules();
 
-uint8_t get_node_id();
-
-#endif  // SRC_COMMON_COMMON_HPP_
+#endif  // SRC_MODULES_HPP_
