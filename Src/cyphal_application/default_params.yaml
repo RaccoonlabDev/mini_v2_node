@@ -1,0 +1,15 @@
+uavcan.node.id                  : 50
+example.integer                 : 42
+uavcan.pub.crct.5v.id           : 65535
+uavcan.pub.crct.vin.id          : 65535
+uavcan.pub.crct.temperature.id  : 65535
+uavcan.sub.setpoint.id          : 65535
+uavcan.pub.feedback.id          : 65535
+system.name                     : ""
+uavcan.node.description         : ""
+example.string                  : "default_string_value"
+uavcan.pub.crct.5v.type         : "uavcan.si.sample.voltage.Scalar.1.0"
+uavcan.pub.crct.vin.type        : "uavcan.si.sample.voltage.Scalar.1.0"
+uavcan.pub.crct.temperature.type: "uavcan.si.sample.temperature.Scalar.1.0"
+uavcan.sub.setpoint.type        : "reg.udral.service.actuator.common.sp.Vector31.0.1"
+uavcan.pub.feedback.type        : "reg.udral.service.actuator.common.Feedback.0.1"

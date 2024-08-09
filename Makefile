@@ -48,6 +48,17 @@ upload:
 run:
 	./scripts/tools/can/vcan.sh slcan0
 	./build/obj/example.out
+
+LIBPARAMS_GENERATE_DEFAULT_PARAMS:=${ROOT_DIR}/Libs/libparams/scripts/generate_default_params.py
+generate_default_parameters:
+	mkdir -p ${BUILD_OBJ_DIR}
+
+	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_NODE_V2=ON -G "Unix Makefiles" ../.. && make
+	${LIBPARAMS_GENERATE_DEFAULT_PARAMS} --out-dir Src/dronecan_application --out-file-name default_params -f build/src/params.cpp
+
+	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=cyphal -DUSE_PLATFORM_NODE_V2=ON -G "Unix Makefiles" ../.. && make
+	${LIBPARAMS_GENERATE_DEFAULT_PARAMS} --out-dir Src/cyphal_application --out-file-name default_params -f build/src/params.cpp
+
 clean:
 	-rm -fR ${BUILD_OBJ_DIR}/
 distclean:

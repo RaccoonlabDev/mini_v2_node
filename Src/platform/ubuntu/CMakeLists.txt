@@ -18,6 +18,20 @@ add_executable(${EXECUTABLE}
     ${CMAKE_CURRENT_LIST_DIR}/platform_specific.cpp
 )
 
+# libparams specific
+set(LIBPARAMS_PARAMS_INIT_NAME init_params)
+set(LIBPARAMS_PARAMS_TEMP_NAME temp_params)
+add_definitions(-DLIBPARAMS_PARAMS_DIR="${BUILD_SRC_DIR}")
+execute_process(
+    COMMAND ${ROOT_DIR}/Libs/libparams/scripts/generate_default_params.py --out-dir ${BUILD_SRC_DIR} -f ${BUILD_SRC_DIR}/params.cpp
+    --out-file-name ${LIBPARAMS_PARAMS_INIT_NAME}
+    RESULT_VARIABLE ret
+)
+if(NOT ret EQUAL 0)
+    message( FATAL_ERROR "Default Params Generator has been failed. Abort.")
+endif()
+
+
 target_include_directories(${EXECUTABLE} PRIVATE
     ${BUILD_SRC_DIR}
     ${APPLICATION_HEADERS}
