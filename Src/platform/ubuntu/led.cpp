@@ -6,11 +6,19 @@
 
 #include "periphery/led/led.hpp"
 
-void LedPeriphery::reset() {
+namespace Board {
+
+void Led::set(Led::Color color) {
+    (void)color;
+}
+
+void Led::reset() {
     // not nothing
 }
 
-void LedPeriphery::blink(LedColor first, LedColor second) {
+void Led::blink(Led::Color first, Led::Color second) {
     (void)first;
     (void)second;
 }
+
+}  // namespace Board
