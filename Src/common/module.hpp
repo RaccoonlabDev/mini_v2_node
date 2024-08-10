@@ -81,7 +81,7 @@ protected:
 
 class ModuleManager {
 public:
-    static void register_module(Module* module);
+    static void register_module(Module* app_module);
     static void init();
     static void process();
 
@@ -90,7 +90,7 @@ public:
     static uint8_t get_vssc();
 
 private:
-    static inline constexpr uint8_t MAX_MODULES_AMOUNT{10};
+    static constexpr uint8_t MAX_MODULES_AMOUNT{10};
     static inline std::array<Module*, MAX_MODULES_AMOUNT> modules;
     static inline std::span<Module*> active_modules;
     static inline uint8_t modules_amount{0};

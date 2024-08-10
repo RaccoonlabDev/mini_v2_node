@@ -5,6 +5,7 @@
  */
 
 #include "periphery/led/led.hpp"
+#include <cstddef>
 #include "main.h"
 
 namespace Board {
@@ -32,9 +33,11 @@ static void write_blue(bool enabled) {
 }
 
 void Led::set(Color color) {
-    bool red = static_cast<uint8_t>(color) & (1 << 2);
-    bool green = static_cast<uint8_t>(color) & (1 << 1);
-    bool blue = static_cast<uint8_t>(color) & (1 << 0);
+    auto color_byte = std::byte(static_cast<uint8_t>(color));
+
+    auto red = static_cast<bool>(color_byte & std::byte{1 << 2});
+    auto green = static_cast<bool>(color_byte & std::byte{1 << 1});
+    auto blue = static_cast<bool>(color_byte & std::byte{1 << 0});
 
     write_red(red);
     write_green(green);
