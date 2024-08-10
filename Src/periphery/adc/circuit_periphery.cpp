@@ -15,6 +15,7 @@
 static const std::array<std::pair<uint16_t, uint16_t>, (int)BoardType::BOARDS_AMOUNT> hw_info = {{
     {59, 69},
     {436, 460},
+    {623, 653},
     {2290, 2339},
     {2403, 2450},
     {3839, 3856},
@@ -24,6 +25,7 @@ static const std::array<std::pair<uint16_t, uint16_t>, (int)BoardType::BOARDS_AM
 static const std::array<std::pair<const char*, uint16_t>, (int)BoardType::BOARDS_AMOUNT> names = {{
     {"co.rl.power.v3.1.0", 18},
     {"co.rl.aspd.v3", 14},
+    {"co.rl.range.v3.1.0", 18},
     {"arl.kirpi.v2.2.0", 17},
     {"arl.kirpi.v2.3.0", 17},
     {"co.rl.mini.v2", 14},

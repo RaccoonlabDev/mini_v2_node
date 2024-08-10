@@ -17,6 +17,7 @@ extern "C" {
 enum class BoardType : uint8_t {
     POWER_V3_1_0,
     ASPD_V3,
+    RANGE_V3_1_0,
     KIRPI_NO_CURRENT,
     KIRPI_WITH_CURRENT,
     MINI_V2_1_1,
