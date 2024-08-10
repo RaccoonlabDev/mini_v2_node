@@ -1,16 +1,8 @@
-Describe the solver problem.
-
-Describe the solution:
-- Add...
-- Fix...
-- Refactor...
+This PR adds/fixes/refactors ...
 
 ### Firmware image size difference
 
-<!--
-At the moment we don't automatically evaluate the firmware size difference.
-Please, evaluate it manually.
--->
+<!-- We don't automatically evaluate the firmware size difference yet. Please, do it manually. -->
 
 - dronecan_v2: ? -> ? (+?)
 - dronecan_v3: ? -> ? (+?)
