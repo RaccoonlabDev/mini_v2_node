@@ -1,6 +1,7 @@
 # Copyright (C) 2023 Dmitry Ponomarev <ponomarevda96@gmail.com>
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 
+set(APPLICATION_DIR ${CMAKE_CURRENT_LIST_DIR})
 cmake_path(GET CMAKE_CURRENT_LIST_DIR PARENT_PATH SRC_DIR)
 cmake_path(GET SRC_DIR PARENT_PATH ROOT_DIR)
 
@@ -14,7 +15,6 @@ set(APPLICATION_SOURCES
     ${CYPHAL_SRC}
     ${ROOT_DIR}/Libs/Cyphal/Udral/circuit_status.cpp
 
-    ${ROOT_DIR}/Src/cyphal_application/modules/circuit_status/circuit_status.cpp
     ${ROOT_DIR}/Src/cyphal_application/modules/cyphal/cyphal_module.cpp
     ${ROOT_DIR}/Src/cyphal_application/modules/setpoint/setpoint.cpp
     ${ROOT_DIR}/Src/cyphal_application/modules/feedback/feedback.cpp
@@ -36,7 +36,8 @@ set(APPLICATION_HEADERS
 set(LIBPARAMS_PARAMS
     ${ROOT_DIR}/Libs/Cyphal/Cyphal/params.yaml
     ${CMAKE_CURRENT_LIST_DIR}/modules/cyphal/params.yaml
-    ${CMAKE_CURRENT_LIST_DIR}/modules/circuit_status/params.yaml
     ${CMAKE_CURRENT_LIST_DIR}/modules/setpoint/params.yaml
     ${CMAKE_CURRENT_LIST_DIR}/modules/feedback/params.yaml
 )
+
+include(${APPLICATION_DIR}/modules/circuit_status/CMakeLists.txt)
