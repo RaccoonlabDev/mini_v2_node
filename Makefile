@@ -12,7 +12,7 @@ generate_dsdl:
 	mkdir -p ${NUNAVUT_OUT_DIR}
 	@if [ "$(IS_DSDL_GENERATED)" -eq 0 ]; then \
 		echo "[INFO] Cyphal DSDL: generate to ${NUNAVUT_OUT_DIR}"; \
-		./Libs/Cyphal/scripts/nnvg_generate_c_headers.sh ${NUNAVUT_OUT_DIR}; \
+		./Libs/Cyphal/scripts/nnvg_generate_c_headers.sh ${NUNAVUT_OUT_DIR} > /dev/null 2>&1; \
 	else \
 		echo "[INFO] Cyphal DSDL: already generated. Skip."; \
 	fi
