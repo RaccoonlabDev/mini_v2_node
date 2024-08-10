@@ -15,9 +15,6 @@ set(APPLICATION_SOURCES
     ${CYPHAL_SRC}
     ${ROOT_DIR}/Libs/Cyphal/Udral/circuit_status.cpp
 
-    ${ROOT_DIR}/Src/cyphal_application/modules/cyphal/cyphal_module.cpp
-    ${ROOT_DIR}/Src/cyphal_application/modules/setpoint/setpoint.cpp
-    ${ROOT_DIR}/Src/cyphal_application/modules/feedback/feedback.cpp
     ${ROOT_DIR}/Src/cyphal_application/modules/modules.cpp
 )
 set(APPLICATION_HEADERS
@@ -33,11 +30,7 @@ set(APPLICATION_HEADERS
     ${ROOT_DIR}/Src/cyphal_application/modules
 )
 
-set(LIBPARAMS_PARAMS
-    ${ROOT_DIR}/Libs/Cyphal/Cyphal/params.yaml
-    ${CMAKE_CURRENT_LIST_DIR}/modules/cyphal/params.yaml
-    ${CMAKE_CURRENT_LIST_DIR}/modules/setpoint/params.yaml
-    ${CMAKE_CURRENT_LIST_DIR}/modules/feedback/params.yaml
-)
-
+include(${APPLICATION_DIR}/modules/cyphal/CMakeLists.txt)
 include(${APPLICATION_DIR}/modules/circuit_status/CMakeLists.txt)
+include(${APPLICATION_DIR}/modules/feedback/CMakeLists.txt)
+include(${APPLICATION_DIR}/modules/setpoint/CMakeLists.txt)
