@@ -1,6 +1,7 @@
 # Copyright (C) 2023 Dmitry Ponomarev <ponomarevda96@gmail.com>
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 
+set(APPLICATION_DIR ${CMAKE_CURRENT_LIST_DIR})
 cmake_path(GET CMAKE_CURRENT_LIST_DIR PARENT_PATH SRC_DIR)
 cmake_path(GET SRC_DIR PARENT_PATH ROOT_DIR)
 
@@ -12,9 +13,6 @@ set(APPLICATION_SOURCES
     ${libparamsSrc}
     ${DRONECAN_SOURCES}
 
-    ${ROOT_DIR}/Src/dronecan_application/modules/circuit_status/CircuitStatusModule.cpp
-    ${ROOT_DIR}/Src/dronecan_application/modules/dronecan/dronecan_module.cpp
-    ${ROOT_DIR}/Src/dronecan_application/modules/pwm/PWMModule.cpp
     ${ROOT_DIR}/Src/dronecan_application/modules/modules.cpp
 
     ${ROOT_DIR}/Src/dronecan_application/logger.cpp
@@ -27,7 +25,6 @@ set(APPLICATION_HEADERS
     ${ROOT_DIR}/Src/dronecan_application
 )
 
-set(LIBPARAMS_PARAMS
-    ${CMAKE_CURRENT_LIST_DIR}/modules/dronecan/params.yaml
-    ${CMAKE_CURRENT_LIST_DIR}/modules/pwm/params.yaml
-)
+include(${APPLICATION_DIR}/modules/dronecan/CMakeLists.txt)
+include(${APPLICATION_DIR}/modules/circuit_status/CMakeLists.txt)
+include(${APPLICATION_DIR}/modules/pwm/CMakeLists.txt)
