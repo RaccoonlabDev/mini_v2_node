@@ -7,6 +7,8 @@
 #include "periphery/led/led.hpp"
 #include "main.h"
 
+namespace Board {
+
 #ifndef INTERNAL_LED_RED_GPIO_Port
     #define INTERNAL_LED_RED_GPIO_Port      INT_RGB_LED_RED_GPIO_Port
     #define INTERNAL_LED_RED_Pin            INT_RGB_LED_RED_Pin
@@ -16,34 +18,40 @@
     #define INTERNAL_LED_BLUE_Pin           INT_RGB_LED_BLUE_Pin
 #endif
 
-static void write_red(GPIO_PinState state) {
+static void write_red(bool enabled) {
+    GPIO_PinState state = enabled ? GPIO_PIN_RESET : GPIO_PIN_SET;
     HAL_GPIO_WritePin(INTERNAL_LED_RED_GPIO_Port, INTERNAL_LED_RED_Pin, state);
 }
-static void write_green(GPIO_PinState state) {
+static void write_green(bool enabled) {
+    GPIO_PinState state = enabled ? GPIO_PIN_RESET : GPIO_PIN_SET;
     HAL_GPIO_WritePin(INTERNAL_LED_GREEN_GPIO_Port, INTERNAL_LED_GREEN_Pin, state);
 }
-static void write_blue(GPIO_PinState state) {
+static void write_blue(bool enabled) {
+    GPIO_PinState state = enabled ? GPIO_PIN_RESET : GPIO_PIN_SET;
     HAL_GPIO_WritePin(INTERNAL_LED_BLUE_GPIO_Port, INTERNAL_LED_BLUE_Pin, state);
 }
 
-void LedPeriphery::set(LedColor color) {
-    write_red(color == LedColor::RED_COLOR ? GPIO_PIN_RESET : GPIO_PIN_SET);
-    write_green(color == LedColor::GREEN_COLOR ? GPIO_PIN_RESET : GPIO_PIN_SET);
-    write_blue(color == LedColor::BLUE_COLOR ? GPIO_PIN_RESET : GPIO_PIN_SET);
+void Led::set(Color color) {
+    bool red = static_cast<uint8_t>(color) & (1 << 2);
+    bool green = static_cast<uint8_t>(color) & (1 << 1);
+    bool blue = static_cast<uint8_t>(color) & (1 << 0);
+
+    write_red(red);
+    write_green(green);
+    write_blue(blue);
 }
 
-void LedPeriphery::reset() {
-    write_red(GPIO_PIN_SET);
-    write_green(GPIO_PIN_SET);
-    write_blue(GPIO_PIN_SET);
+void Led::reset() {
+    write_red(false);
+    write_green(false);
+    write_blue(false);
 }
 
-void LedPeriphery::toggle(LedColor color) {
+void Led::blink(Color first, Color second) {
     auto crnt_time_ms = HAL_GetTick();
-
-    if (crnt_time_ms % 1000 > 500) {
-        set(color);
-    } else {
-        reset();
-    }
+    auto color = (crnt_time_ms % 1000 > 500) ? first : second;
+    set(color);
 }
+
+
+}  // namespace Board

@@ -10,6 +10,7 @@ void LedPeriphery::reset() {
     // not nothing
 }
 
-void LedPeriphery::toggle(LedColor led_color) {
-    (void)led_color;
+void LedPeriphery::blink(LedColor first, LedColor second) {
+    (void)first;
+    (void)second;
 }

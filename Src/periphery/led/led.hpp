@@ -9,23 +9,33 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace Board {
 
-enum class LedColor {
-    RED_COLOR,
-    GREEN_COLOR,
-    BLUE_COLOR,
-    COLORS_AMOUNT,
-};
-
-class LedPeriphery {
+class Led {
 public:
+    enum class SimpleColor {
+        RED_COLOR,
+        GREEN_COLOR,
+        BLUE_COLOR,
+        COLORS_AMOUNT,
+    };
+
+    enum class Color : uint8_t {
+        BLACK,
+        BLUE,
+        GREEN,
+        CYAN,
+        RED,
+        MAGENTA,
+        YELLOW,
+        WHITE,
+        COLORS_AMOUNT,
+    };
+
     /**
      * @brief Set the specific RGB LED color 
      */
-    static void set(LedColor color);
+    static void set(Color color);
 
     /**
      * @brief Turn off the RGB LED
@@ -33,16 +43,12 @@ public:
     static void reset();
 
     /**
-     * @brief Toggle the state of an RGB LED by alternating between setting
-     * the LED to a specific color and turning it off.
-     * @note If the current time is within the first set the given color,
-     * otherwise turn off the RGB LED
+     * @brief Blink LED with 50% duty cycle
      */
-    static void toggle(LedColor led_color);
+    static void blink(Color first, Color second);
 };
 
-#ifdef __cplusplus
-}
-#endif
+}  // namespace Board
+
 
 #endif  // SRC_APPLICATION_PERIPHERY_LED_LED_HPP_
