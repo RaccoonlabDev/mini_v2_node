@@ -11,6 +11,7 @@ add_executable(${EXECUTABLE}
 
     ${ROOT_DIR}/Src/periphery/adc/circuit_periphery.cpp
     ${CMAKE_CURRENT_LIST_DIR}/adc.cpp
+    ${ROOT_DIR}/Src/platform/stm32/pwm/pwm.cpp
     ${CMAKE_CURRENT_LIST_DIR}/pwm.cpp
     ${CMAKE_CURRENT_LIST_DIR}/iwdg.cpp
     ${CMAKE_CURRENT_LIST_DIR}/led.cpp
