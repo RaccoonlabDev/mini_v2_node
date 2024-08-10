@@ -41,6 +41,9 @@ else()
 endif()
 
 include(${LIBPARAMS_PATH}/CMakeLists.txt)
+add_definitions(-DFLASH_DRIVER_STORAGE_FILE="${APPLICATION_DIR}/default_params.yml")
+list(APPEND APPLICATION_SOURCES ${APPLICATION_DIR}/modules/modules.cpp)
+list(APPEND APPLICATION_HEADERS ${ROOT_DIR}/Src ${APPLICATION_DIR})
 include(${APPLICATION_DIR}/CMakeLists.txt)
 
 # Set compile options
