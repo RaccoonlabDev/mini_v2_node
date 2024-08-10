@@ -35,7 +35,7 @@ endif()
 
 # Option 2. Choose the protocol
 if(CAN_PROTOCOL STREQUAL "dronecan" OR CAN_PROTOCOL STREQUAL "cyphal")
-    set(APPLICATION_DIR ${ROOT_DIR}/Src/${CAN_PROTOCOL}_application)
+    set(APPLICATION_DIR ${ROOT_DIR}/Src/applications/${CAN_PROTOCOL})
 else()
     message(SEND_ERROR "CAN_PROTOCOL is unknown.")
 endif()
