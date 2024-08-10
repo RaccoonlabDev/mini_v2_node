@@ -38,9 +38,9 @@ uint32_t Module::period_ms_from_frequency(float frequency) {
     return (frequency > 0.001f) ? static_cast<uint32_t>(1000.0f / frequency) : 0;
 }
 
-void ModuleManager::register_module(Module* module) {
+void ModuleManager::register_module(Module* app_module) {
     if (modules_amount < MAX_MODULES_AMOUNT) {
-        modules[modules_amount] = module;
+        modules[modules_amount] = app_module;
         modules_amount++;
         active_modules = std::span<Module*>(modules.data(), modules_amount);
     }
