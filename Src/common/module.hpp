@@ -96,4 +96,19 @@ private:
     static inline uint8_t modules_amount{0};
 };
 
+/**
+ * @brief Register module
+ * This macro defines a static instance of a Module child with a unique name in an anonymous
+ * namespace. It ensures that each module instance is unique within its translation unit,
+ * preventing naming collisions.
+ * Once a module is registered, his pointer is added to ModuleManager where it is automatically
+ * handled.
+ */
+#define UNIQUE_NAME_CONCATENATE(x, y) x##y
+#define UNIQUE_NAME(x) UNIQUE_NAME_CONCATENATE(x, __COUNTER__)
+#define REGISTER_MODULE(ModuleClass) \
+namespace { \
+    static ModuleClass UNIQUE_NAME(moduleInstance); \
+}
+
 #endif  // SRC_COMMON_MODULE_HPP_

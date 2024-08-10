@@ -10,7 +10,7 @@
 #include "dronecan.h"
 #include "periphery/adc/circuit_periphery.hpp"
 
-static DronecanModule dronecan_module;
+REGISTER_MODULE(DronecanModule)
 
 DronecanModule::DronecanModule() : Module(0) {
 }

@@ -6,7 +6,7 @@
 #include "CircuitStatusModule.hpp"
 #include "periphery/adc/circuit_periphery.hpp"
 
-static CircuitStatus circuit_status_module;
+REGISTER_MODULE(CircuitStatus)
 
 void CircuitStatus::init() {
     mode = Module::Mode::OPERATIONAL;

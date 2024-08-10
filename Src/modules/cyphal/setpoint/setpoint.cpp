@@ -11,7 +11,7 @@
 #include "params.hpp"
 #include "periphery/pwm/pwm.hpp"
 
-static SetpointModule setpoint;
+REGISTER_MODULE(SetpointModule)
 
 int8_t SetpointSubscriber::init() {
     port_id = static_cast<uint16_t>(paramsGetIntegerValue(IntParamsIndexes::PARAM_SUB_SETPOINT_ID));

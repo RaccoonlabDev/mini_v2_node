@@ -10,7 +10,7 @@
 #include "params.hpp"
 #include "periphery/adc/circuit_periphery.hpp"
 
-static CyphalModule cyphal_module;
+REGISTER_MODULE(CyphalModule)
 
 CyphalModule::CyphalModule() : Module(0) {
 }
