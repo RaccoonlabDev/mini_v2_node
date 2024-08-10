@@ -10,6 +10,8 @@
 #include "params.hpp"
 #include "periphery/adc/circuit_periphery.hpp"
 
+static CyphalModule cyphal_module;
+
 CyphalModule::CyphalModule() : Module(0) {
 }
 
@@ -25,12 +27,12 @@ void CyphalModule::init() {
     cyphal::NodeGetInfoSubscriber::setHardwareVersion(2, 1);
 
     health = Status::OK;
-    mode = Mode::OPEARTIONAL;
+    mode = Mode::OPERATIONAL;
 }
 
 void CyphalModule::spin_once() {
-    cyphal.setNodeHealth(uavcan_node_Health_1_0{(uint8_t)(Module::get_global_status())});
-    cyphal.setNodeMode(uavcan_node_Mode_1_0{(uint8_t)(Module::get_global_mode())});
-    cyphal.setVSSC(Module::get_vssc());
+    cyphal.setNodeHealth(uavcan_node_Health_1_0{(uint8_t)(ModuleManager::get_global_status())});
+    cyphal.setNodeMode(uavcan_node_Mode_1_0{(uint8_t)(ModuleManager::get_global_mode())});
+    cyphal.setVSSC(ModuleManager::get_vssc());
     cyphal.process();
 }

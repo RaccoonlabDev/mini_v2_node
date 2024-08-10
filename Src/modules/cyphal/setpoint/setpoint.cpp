@@ -11,6 +11,7 @@
 #include "params.hpp"
 #include "periphery/pwm/pwm.hpp"
 
+static SetpointModule setpoint;
 
 int8_t SetpointSubscriber::init() {
     port_id = static_cast<uint16_t>(paramsGetIntegerValue(IntParamsIndexes::PARAM_SUB_SETPOINT_ID));
@@ -43,7 +44,7 @@ void SetpointModule::init() {
     HAL::Pwm::init(HAL::PwmPin::PWM_4);
 
     health = (sub.init() < 0) ? Status::FATAL_MALFANCTION : Status::OK;
-    mode = Mode::OPEARTIONAL;
+    mode = Mode::OPERATIONAL;
 }
 
 void SetpointModule::spin_once() {
