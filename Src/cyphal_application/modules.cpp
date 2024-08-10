@@ -4,10 +4,10 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#include "cyphal/cyphal_module.hpp"
-#include "setpoint/setpoint.hpp"
-#include "feedback/feedback.hpp"
-#include "circuit_status/circuit_status.hpp"
+#include "modules/cyphal_module/cyphal_module.hpp"
+#include "modules/setpoint/setpoint.hpp"
+#include "modules/feedback/feedback.hpp"
+#include "modules/circuit_status/circuit_status.hpp"
 
 static CyphalModule cyphal_module;
 static SetpointModule setpoint;

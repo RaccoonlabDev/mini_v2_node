@@ -10,7 +10,7 @@
 #include "periphery/led/led.hpp"
 #include "params.hpp"
 #include "module.hpp"
-#include "modules/modules.hpp"
+#include "modules.hpp"
 #include "main.h"
 
 #include "periphery/led/led.hpp"
