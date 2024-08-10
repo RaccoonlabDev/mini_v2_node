@@ -5,7 +5,7 @@
  */
 
 #include "modules.hpp"
-#include "modules/dronecan/dronecan_module.hpp"
+#include "modules/dronecan_module/dronecan_module.hpp"
 #include "modules/pwm/PWMModule.hpp"
 #include "modules/circuit_status/CircuitStatusModule.hpp"
 

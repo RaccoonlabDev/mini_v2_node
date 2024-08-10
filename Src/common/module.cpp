@@ -5,7 +5,7 @@
  */
 
 #include "module.hpp"
-#include "modules/modules.hpp"
+#include "modules.hpp"
 
 Module::Module(float frequency) : period_ms(period_ms_from_frequency(frequency)) {
 }
