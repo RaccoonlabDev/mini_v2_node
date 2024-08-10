@@ -23,9 +23,9 @@ void DronecanModule::init() {
 
     int param_node_id_value = paramsGetIntegerValue(IntParamsIndexes::PARAM_UAVCAN_NODE_ID);
     auto node_id = std::clamp(param_node_id_value, 1, 126);
-    uavcanInitApplication(node_id);
+    int8_t res = uavcanInitApplication(node_id);
 
-    health = Status::OK;
+    health = (res >= 0) ? Status::OK : Status::FATAL_MALFANCTION;
     mode = Mode::OPERATIONAL;
 }
 

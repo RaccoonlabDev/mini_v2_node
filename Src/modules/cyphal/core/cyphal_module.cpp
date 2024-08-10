@@ -22,11 +22,12 @@ void CyphalModule::init() {
 
     int param_node_id_value = paramsGetIntegerValue(IntParamsIndexes::PARAM_UAVCAN_NODE_ID);
     auto node_id = std::clamp(param_node_id_value, 1, 126);
-    cyphal.init(node_id);
+
+    int8_t res = cyphal.init(node_id);
 
     cyphal::NodeGetInfoSubscriber::setHardwareVersion(2, 1);
 
-    health = Status::OK;
+    health = (res >= 0) ? Status::OK : Status::FATAL_MALFANCTION;
     mode = Mode::OPERATIONAL;
 }
 
