@@ -32,6 +32,7 @@ uint16_t PWMModule::ttl_cmd = 500;
 uint16_t PWMModule::pwm_freq = 50;
 CommandType PWMModule::pwm_cmd_type = CommandType::RAW_COMMAND;
 
+static PWMModule pwm_module;
 
 std::array<PwmChannelInfo, static_cast<uint8_t>(HAL::PwmPin::PWM_AMOUNT)> PWMModule::params = {{
     {{.min = MIN(1), .max = MAX(1), .def = DEF(1), .ch = CH(1), .fb = FB(1)}, HAL::PwmPin::PWM_1},
@@ -58,7 +59,7 @@ void PWMModule::init() {
 void PWMModule::spin_once() {
     uint32_t crnt_time_ms = HAL_GetTick();
 
-    mode = Module::Mode::OPEARTIONAL;
+    mode = Module::Mode::OPERATIONAL;
     for (auto& pwm : params) {
         if (crnt_time_ms > pwm.cmd_end_time_ms) {
             pwm.command_val = pwm.def;
@@ -130,7 +131,7 @@ void PWMModule::update_params() {
         logger.log_info("128");
     }
     apply_params();
-    mode = Mode::OPEARTIONAL;
+    mode = Mode::OPERATIONAL;
 }
 
 void PWMModule::apply_params() {

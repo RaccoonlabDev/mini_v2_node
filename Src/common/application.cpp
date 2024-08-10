@@ -10,7 +10,6 @@
 #include "periphery/led/led.hpp"
 #include "params.hpp"
 #include "module.hpp"
-#include "modules.hpp"
 #include "main.h"
 
 #include "periphery/led/led.hpp"
@@ -30,19 +29,13 @@ static int8_t init_board_periphery() {
 __attribute__((noreturn)) void application_entry_point() {
     init_board_periphery();
 
-    auto& modules = get_application_modules();
-
-    for (auto app_module : modules) {
-        app_module->init();
-    }
+    ModuleManager::init();
 
     while (true) {
-        for (auto app_module : modules) {
-            app_module->process();
-        }
+        ModuleManager::process();
 
-        auto global_status = Module::get_global_status();
-        auto global_mode = Module::get_global_mode();
+        auto global_status = ModuleManager::get_global_status();
+        auto global_mode = ModuleManager::get_global_mode();
 
         LedColor color;
         if (global_status >= Module::Status::MAJOR_FAILURE) {

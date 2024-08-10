@@ -6,8 +6,10 @@
 #include "CircuitStatusModule.hpp"
 #include "periphery/adc/circuit_periphery.hpp"
 
+static CircuitStatus circuit_status_module;
+
 void CircuitStatus::init() {
-    mode = Module::Mode::OPEARTIONAL;
+    mode = Module::Mode::OPERATIONAL;
 }
 
 void CircuitStatus::spin_once() {

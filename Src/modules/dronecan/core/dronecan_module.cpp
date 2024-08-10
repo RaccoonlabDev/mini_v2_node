@@ -10,6 +10,8 @@
 #include "dronecan.h"
 #include "periphery/adc/circuit_periphery.hpp"
 
+static DronecanModule dronecan_module;
+
 DronecanModule::DronecanModule() : Module(0) {
 }
 
@@ -24,12 +26,12 @@ void DronecanModule::init() {
     uavcanInitApplication(node_id);
 
     health = Status::OK;
-    mode = Mode::OPEARTIONAL;
+    mode = Mode::OPERATIONAL;
 }
 
 void DronecanModule::spin_once() {
-    uavcanSetNodeHealth(static_cast<NodeStatusHealth_t>(Module::get_global_status()));
-    uavcanSetNodeStatusMode(static_cast<NodeStatusMode_t>(Module::get_global_mode()));
-    uavcanSetVendorSpecificStatusCode(Module::get_vssc());
+    uavcanSetNodeHealth(static_cast<NodeStatusHealth_t>(ModuleManager::get_global_status()));
+    uavcanSetNodeStatusMode(static_cast<NodeStatusMode_t>(ModuleManager::get_global_mode()));
+    uavcanSetVendorSpecificStatusCode(ModuleManager::get_vssc());
     uavcanSpinOnce();
 }

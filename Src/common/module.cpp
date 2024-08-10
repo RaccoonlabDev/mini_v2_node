@@ -5,13 +5,14 @@
  */
 
 #include "module.hpp"
-#include "modules.hpp"
+#include <span>
 
 Module::Module(float frequency) : period_ms(period_ms_from_frequency(frequency)) {
+    ModuleManager::register_module(this);
 }
 
 void Module::init() {
-    mode = Mode::OPEARTIONAL;
+    mode = Mode::OPERATIONAL;
 }
 
 Module::Status Module::get_health() const {
@@ -37,11 +38,30 @@ uint32_t Module::period_ms_from_frequency(float frequency) {
     return (frequency > 0.001f) ? static_cast<uint32_t>(1000.0f / frequency) : 0;
 }
 
-Module::Status Module::get_global_status() {
-    const auto& modules = get_application_modules();
+void ModuleManager::register_module(Module* module) {
+    if (modules_amount < MAX_MODULES_AMOUNT) {
+        modules[modules_amount] = module;
+        modules_amount++;
+        active_modules = std::span<Module*>(modules.data(), modules_amount);
+    }
+};
+
+void ModuleManager::init() {
+    for (auto app_module : active_modules) {
+        app_module->init();
+    }
+};
+
+void ModuleManager::process() {
+    for (auto app_module : active_modules) {
+        app_module->process();
+    }
+};
+
+Module::Status ModuleManager::get_global_status() {
     auto global_status = Module::Status::OK;
 
-    for (auto app_module : modules) {
+    for (auto app_module : active_modules) {
         if (app_module->get_health() > global_status) {
             global_status = app_module->get_health();
         }
@@ -50,11 +70,10 @@ Module::Status Module::get_global_status() {
     return global_status;
 }
 
-Module::Mode Module::get_global_mode() {
-    const auto& modules = get_application_modules();
-    auto global_mode = Module::Mode::OPEARTIONAL;
+Module::Mode ModuleManager::get_global_mode() {
+    auto global_mode = Module::Mode::OPERATIONAL;
 
-    for (auto app_module : modules) {
+    for (auto app_module : active_modules) {
         if (app_module->get_mode() > global_mode) {
             global_mode = app_module->get_mode();
         }
@@ -63,13 +82,14 @@ Module::Mode Module::get_global_mode() {
     return global_mode;
 }
 
-uint8_t Module::get_vssc() {
-    const auto& modules = get_application_modules();
+uint8_t ModuleManager::get_vssc() {
     uint8_t vssc = 0;
 
     uint8_t module_idx = 0;
-    for (auto app_module : modules) {
-        if (app_module->get_health() > Status::OK || app_module->get_mode() > Mode::OPEARTIONAL) {
+    for (auto app_module : active_modules) {
+        auto is_health_bad = app_module->get_health() > Module::Status::OK;
+        auto is_mode_not_operational = app_module->get_mode() > Module::Mode::OPERATIONAL;
+        if (is_health_bad || is_mode_not_operational) {
             vssc += 1 << module_idx;
         }
         module_idx++;
