@@ -15,15 +15,50 @@
 #include "periphery/led/led.hpp"
 #include "periphery/iwdg/iwdg.hpp"
 
-
 static int8_t init_board_periphery() {
-    LedPeriphery::reset();
+    Board::Led::reset();
     CircuitPeriphery::init();
 
-    paramsInit((ParamIndex_t)IntParamsIndexes::INTEGER_PARAMS_AMOUNT, NUM_OF_STR_PARAMS, -1, 1);
+    auto libparams_integers_amount = (ParamIndex_t)IntParamsIndexes::INTEGER_PARAMS_AMOUNT;
+    auto libparams_strings_amount = NUM_OF_STR_PARAMS;
+    paramsInit(libparams_integers_amount, libparams_strings_amount, -1, 1);
     paramsLoad();
 
     return 0;
+}
+
+/**
+ * @brief Since v2 hardware version all boards have an internal RGB LED and comply with the
+ * RaccoonLab LED indication standard.
+ * The LED meaning is as close to the PX4 LED Meanings and Ardupilot LED meanings as possible and
+ * is dedicated to help you to understand a board state or a possible problem.
+ *
+ * General-purpose states:
+ * 1. [Blinking Blue/Red]   Initialization
+ * 2. [Blinking Red/Blue]   Maintenance
+ * 3. [Blinking Blue]       Good
+ * 4. [Blinking yellow]     Warning
+ * 5. [Blinking red]        Error
+ * @note https://docs.raccoonlab.co/guide/intro/leds.html
+ */
+static void blink_board_led() {
+    auto status = ModuleManager::get_global_status();
+    auto mode = ModuleManager::get_global_mode();
+
+    std::pair<Board::Led::Color, Board::Led::Color> colors;
+    if (mode == Module::Mode::INITIALIZATION) {
+        colors = {Board::Led::Color::RED, Board::Led::Color::BLUE};
+    } else if (mode == Module::Mode::MAINTENANCE) {
+        colors = {Board::Led::Color::RED, Board::Led::Color::BLUE};
+    } else if (status >= Module::Status::MAJOR_FAILURE) {
+        colors = {Board::Led::Color::RED, Board::Led::Color::BLACK};
+    } else if (status >= Module::Status::MINOR_FAILURE) {
+        colors = {Board::Led::Color::YELLOW, Board::Led::Color::BLACK};
+    } else {
+        colors = {Board::Led::Color::BLUE, Board::Led::Color::BLACK};
+    }
+
+    Board::Led::blink(colors.first, colors.second);
 }
 
 __attribute__((noreturn)) void application_entry_point() {
@@ -33,22 +68,7 @@ __attribute__((noreturn)) void application_entry_point() {
 
     while (true) {
         ModuleManager::process();
-
-        auto global_status = ModuleManager::get_global_status();
-        auto global_mode = ModuleManager::get_global_mode();
-
-        LedColor color;
-        if (global_status >= Module::Status::MAJOR_FAILURE) {
-            color = LedColor::RED_COLOR;
-        } else if (global_status >= Module::Status::MINOR_FAILURE) {
-            color = LedColor::RED_COLOR;  // should be orange
-        } else if (global_mode >= Module::Mode::INITIALIZATION) {
-            color = LedColor::RED_COLOR;  // should be blue-red
-        } else {
-            color = LedColor::BLUE_COLOR;
-        }
-        LedPeriphery::toggle(color);
-
+        blink_board_led();
         WatchdogPeriphery::refresh();
     }
 }
