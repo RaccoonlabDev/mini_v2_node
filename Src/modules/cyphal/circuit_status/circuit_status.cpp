@@ -13,7 +13,7 @@
 #include "uavcan/si/sample/voltage/Scalar_1_0.h"
 #include "uavcan/si/sample/temperature/Scalar_1_0.h"
 
-static CircuitStatus crct;
+REGISTER_MODULE(CircuitStatus)
 
 void CircuitStatus::init() {
     health = Status::OK;

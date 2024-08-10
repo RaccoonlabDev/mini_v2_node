@@ -10,7 +10,7 @@
 #include "params.hpp"
 #include "periphery/pwm/pwm.hpp"
 
-static FeedbackModule feedback;
+REGISTER_MODULE(FeedbackModule)
 
 void FeedbackPublisher::publish() {
     uint8_t buffer[reg_udral_service_actuator_common_Feedback_0_1_EXTENT_BYTES_];

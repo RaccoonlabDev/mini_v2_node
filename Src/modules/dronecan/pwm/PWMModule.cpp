@@ -32,7 +32,7 @@ uint16_t PWMModule::ttl_cmd = 500;
 uint16_t PWMModule::pwm_freq = 50;
 CommandType PWMModule::pwm_cmd_type = CommandType::RAW_COMMAND;
 
-static PWMModule pwm_module;
+REGISTER_MODULE(PWMModule)
 
 std::array<PwmChannelInfo, static_cast<uint8_t>(HAL::PwmPin::PWM_AMOUNT)> PWMModule::params = {{
     {{.min = MIN(1), .max = MAX(1), .def = DEF(1), .ch = CH(1), .fb = FB(1)}, HAL::PwmPin::PWM_1},
