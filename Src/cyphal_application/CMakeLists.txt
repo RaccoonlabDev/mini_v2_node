@@ -3,8 +3,9 @@
 
 set(APPLICATION_DIR ${CMAKE_CURRENT_LIST_DIR})
 cmake_path(GET CMAKE_CURRENT_LIST_DIR PARENT_PATH SRC_DIR)
+set(MODULES_DIR ${SRC_DIR}/modules)
 
-include(${SRC_DIR}/modules/cyphal_module/CMakeLists.txt)
-include(${APPLICATION_DIR}/modules/circuit_status/CMakeLists.txt)
-include(${APPLICATION_DIR}/modules/feedback/CMakeLists.txt)
-include(${APPLICATION_DIR}/modules/setpoint/CMakeLists.txt)
+include(${MODULES_DIR}/cyphal/core/CMakeLists.txt)
+include(${MODULES_DIR}/cyphal/circuit_status/CMakeLists.txt)
+include(${MODULES_DIR}/cyphal/feedback/CMakeLists.txt)
+include(${MODULES_DIR}/cyphal/setpoint/CMakeLists.txt)

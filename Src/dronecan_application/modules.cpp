@@ -5,9 +5,9 @@
  */
 
 #include "modules.hpp"
-#include "modules/dronecan_module/dronecan_module.hpp"
-#include "modules/pwm/PWMModule.hpp"
-#include "modules/circuit_status/CircuitStatusModule.hpp"
+#include "modules/dronecan/core/dronecan_module.hpp"
+#include "modules/dronecan/pwm/PWMModule.hpp"
+#include "modules/dronecan/circuit_status/CircuitStatusModule.hpp"
 
 static DronecanModule dronecan_module;
 static CircuitStatus circuit_status;
