@@ -5,6 +5,7 @@
  */
 
 #include "periphery/spi/spi.hpp"
+#include <array>
 #include <cstring>
 #include "main.h"
 
@@ -39,6 +40,13 @@ int8_t SPI::read_register(std::byte reg_address, std::byte* reg_value) {
 
     auto tx_byte = reg_address | SPI_READ;
     return HAL::SPI::transaction(&tx_byte, &reg_value[-1], 2);
+}
+
+int8_t SPI::write_register(std::byte reg_address, std::byte reg_value) {
+    HAL_Delay(10);
+    std::array<std::byte, 2> tx_buffer = {reg_address, reg_value};
+    std::array<std::byte, 2> rx_buffer = {std::byte{0}, std::byte{0}};
+    return HAL::SPI::transaction(tx_buffer.data(), rx_buffer.data(), tx_buffer.size());
 }
 
 int8_t SPI::transaction(std::byte* tx, std::byte* rx, uint8_t size) {

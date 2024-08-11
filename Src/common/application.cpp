@@ -37,8 +37,9 @@ static int8_t init_board_periphery() {
  * 1. [Blinking Blue/Red]   Initialization
  * 2. [Blinking Red/Blue]   Maintenance
  * 3. [Blinking Blue]       Good
- * 4. [Blinking yellow]     Warning
- * 5. [Blinking red]        Error
+ * 4. [Blinking yellow]     Minor failure
+ * 5. [Blinking magenta]    Major failure
+ * 6. [Blinking red]        Fatal malfanction
  * @note https://docs.raccoonlab.co/guide/intro/leds.html
  */
 static void blink_board_led() {
@@ -50,8 +51,10 @@ static void blink_board_led() {
         colors = {Board::Led::Color::RED, Board::Led::Color::BLUE};
     } else if (mode == Module::Mode::MAINTENANCE) {
         colors = {Board::Led::Color::RED, Board::Led::Color::BLUE};
-    } else if (status >= Module::Status::MAJOR_FAILURE) {
+    } else if (status >= Module::Status::FATAL_MALFANCTION) {
         colors = {Board::Led::Color::RED, Board::Led::Color::BLACK};
+    } else if (status >= Module::Status::MAJOR_FAILURE) {
+        colors = {Board::Led::Color::MAGENTA, Board::Led::Color::BLACK};
     } else if (status >= Module::Status::MINOR_FAILURE) {
         colors = {Board::Led::Color::YELLOW, Board::Led::Color::BLACK};
     } else {

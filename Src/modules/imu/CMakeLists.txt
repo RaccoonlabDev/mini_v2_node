@@ -8,4 +8,8 @@ list(APPEND APPLICATION_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/imu.cpp
 )
 
+list(APPEND LIBPARAMS_PARAMS
+    ${CMAKE_CURRENT_LIST_DIR}/params.yaml
+)
+
 include(${SRC_DIR}/drivers/mpu9250/CMakeLists.txt)

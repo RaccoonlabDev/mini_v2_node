@@ -23,11 +23,14 @@ public:
 
 protected:
     void spin_once() override;
+    void update_params() override;
 
 private:
     DronecanPublisher<AhrsRawImu> pub;
     DronecanPublisher<MagneticFieldStrength2> mag;
     Mpu9250 imu;
+    bool initialized{false};
+    bool enabled{false};
 
     static constexpr float raw_gyro_to_rad_per_second(int16_t raw_gyro) {
         return raw_gyro * std::numbers::pi_v<float> / 131.0f / 180.0f;
