@@ -18,6 +18,7 @@ add_executable(${EXECUTABLE}
     ${ROOT_DIR}/Src/platform/stm32/pwm/pwm.cpp
     ${PLATFORM_DIR}/stm32f103/adc.cpp
     ${PLATFORM_DIR}/stm32g0b1/pwm.cpp
+    ${PLATFORM_DIR}/stm32g0b1/spi.cpp
     ${PLATFORM_DIR}/stm32f103/iwdg.cpp
     ${PLATFORM_DIR}/stm32f103/led.cpp
     ${PLATFORM_DIR}/stm32f103/temperature_sensor.cpp
