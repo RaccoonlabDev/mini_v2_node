@@ -27,6 +27,7 @@ The node has the following registers:
 |  23 | pwm.4_max               | PWM duration when setpoint is max (RawCommand is 8191 or Command is 1.0) |
 |  24 | pwm.4_def               | PWM duration when setpoint is negative or there is no setpoint at all. |
 |  25 | pwm.4_feedback          | Indicates the operational mode of the node. 0 means disabled. When set to 1, the command of corresponding Status type for cmd_type will be transmitted (esc.RawCommand - esc.Status, actuator.ArrayCommand - actuator.Status) with frequency 1 Hz. When set to 2 - 10 Hz. |
+|  26 | imu.enable              | Enable or disable IMU publisher. |
 
 > This docs was automatically generated. Do not edit it manually.
 

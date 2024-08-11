@@ -5,23 +5,29 @@
  */
 
 #include "imu.hpp"
+#include "params.hpp"
 
 REGISTER_MODULE(ImuModule)
 
 void ImuModule::init() {
-    auto res = imu.initialize();
-    health = res ? Module::Status::OK : Module::Status::FATAL_MALFANCTION;
+    initialized = imu.initialize();
     mode = Module::Mode::OPERATIONAL;
 }
 
+void ImuModule::update_params() {
+    enabled = static_cast<bool>(paramsGetIntegerValue(PARAM_IMU_ENABLE));
+    health = (!enabled || initialized) ? Module::Status::OK : Module::Status::MAJOR_FAILURE;
+}
+
 void ImuModule::spin_once() {
-    if (health == Module::Status::FATAL_MALFANCTION) {
+    if (!enabled || !initialized) {
         return;
     }
 
     std::array<int16_t, 3> mag_raw;
-    imu.read_magnetometer(&mag_raw);
-    mag.publish();  // publish anyway
+    if (imu.read_magnetometer(&mag_raw) >= 0) {
+        mag.publish();
+    }
 
     bool updated{false};
 

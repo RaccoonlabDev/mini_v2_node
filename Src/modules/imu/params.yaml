@@ -1,0 +1,8 @@
+imu.enable:
+  type: Integer
+  note: Enable or disable IMU publisher.
+  enum: PARAM_IMU_ENABLE
+  flags: mutable
+  default: 0
+  min: 0
+  max: 1
