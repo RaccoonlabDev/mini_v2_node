@@ -8,3 +8,7 @@ cmake_path(GET APPLICATIONS_DIR PARENT_PATH SRC_DIR)
 include(${SRC_DIR}/modules/dronecan/core/CMakeLists.txt)
 include(${SRC_DIR}/modules/dronecan/circuit_status/CMakeLists.txt)
 include(${SRC_DIR}/modules/dronecan/pwm/CMakeLists.txt)
+
+if(USE_PLATFORM_NODE_V3)
+    include(${SRC_DIR}/modules/imu/CMakeLists.txt)
+endif()
