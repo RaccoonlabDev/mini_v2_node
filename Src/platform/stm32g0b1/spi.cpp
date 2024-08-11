@@ -8,8 +8,8 @@
 #include <cstring>
 #include "main.h"
 
-static constexpr uint32_t MEASUREMENT_DELAY = 10;
-static constexpr uint8_t SPI_READ = 0x80;
+static constexpr uint32_t TRANSMIT_DELAY = 10;
+static constexpr std::byte SPI_READ{0x80};
 
 extern SPI_HandleTypeDef hspi2;
 SPI_HandleTypeDef* hspi = &hspi2;
@@ -23,32 +23,37 @@ static void spi_set_nss(bool nss_state) {
 #endif
 }
 
-int8_t SPI::read_registers(uint8_t reg_address, uint8_t* reg_values, uint8_t size) {
+int8_t SPI::read_registers(std::byte reg_address, std::byte* reg_values, uint8_t size) {
     if (reg_values == nullptr) {
         return -1;
     }
 
-    uint8_t tx_byte = reg_address | SPI_READ;
+    auto tx_byte = reg_address | SPI_READ;
     return HAL::SPI::transaction(&tx_byte, &reg_values[-1], size + 1);
 }
 
-int8_t SPI::read_register(uint8_t reg_address, uint8_t* reg_value) {
+int8_t SPI::read_register(std::byte reg_address, std::byte* reg_value) {
     if (reg_value == nullptr) {
         return -1;
     }
 
-    uint8_t tx_byte = reg_address | SPI_READ;
+    auto tx_byte = reg_address | SPI_READ;
     return HAL::SPI::transaction(&tx_byte, &reg_value[-1], 2);
 }
 
-int8_t SPI::transaction(uint8_t* tx, uint8_t* rx, uint8_t size) {
+int8_t SPI::transaction(std::byte* tx, std::byte* rx, uint8_t size) {
     if (tx == nullptr || rx == nullptr) {
         return -1;
     }
 
     spi_set_nss(false);
     memset(rx, 0x00, size);
-    HAL_StatusTypeDef status = HAL_SPI_TransmitReceive(hspi, tx, rx, size, MEASUREMENT_DELAY);
+    auto status = HAL_SPI_TransmitReceive(hspi,
+                                          reinterpret_cast<uint8_t*>(tx),
+                                          reinterpret_cast<uint8_t*>(rx),
+                                          size,
+                                          TRANSMIT_DELAY
+    );
     spi_set_nss(true);
 
     return (status == HAL_OK) ? 0 : -status;

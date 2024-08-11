@@ -8,6 +8,7 @@
 #define SRC_PERIPHERY_SPI_SPI_HPP_
 
 #include <cstdint>
+#include <cstddef>
 
 namespace HAL {
 
@@ -20,7 +21,7 @@ public:
      * @return 0 on success, negative error otherwise
      * @note The function automatically adds SPI_READ flag
      */
-    static int8_t read_register(uint8_t reg_address, uint8_t* reg_value);
+    static int8_t read_register(std::byte reg_address, std::byte* reg_value);
 
     /**
      * @brief Read multiple registers
@@ -30,13 +31,13 @@ public:
      * @return 0 on success, negative error otherwise
      * @note The function automatically adds SPI_READ flag
      */
-    static int8_t read_registers(uint8_t reg_address, uint8_t* reg_values, uint8_t size);
+    static int8_t read_registers(std::byte reg_address, std::byte* reg_values, uint8_t size);
 
     /**
-     * @brief This function automayically controls the NSS pin
+     * @brief This function automatically controls the NSS pin
      * @return 0 on success, negative error otherwise
      */
-    static int8_t transaction(uint8_t* tx, uint8_t* rx, uint8_t size);
+    static int8_t transaction(std::byte* tx, std::byte* rx, uint8_t size);
 };
 
 }  // namespace HAL
