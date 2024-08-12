@@ -7,13 +7,12 @@
 #include "application.hpp"
 #include <array>
 #include "periphery/adc/circuit_periphery.hpp"
+#include "periphery/iwdg/iwdg.hpp"
 #include "periphery/led/led.hpp"
 #include "params.hpp"
 #include "module.hpp"
 #include "main.h"
 
-#include "periphery/led/led.hpp"
-#include "periphery/iwdg/iwdg.hpp"
 
 static int8_t init_board_periphery() {
     Board::Led::reset();
@@ -22,6 +21,7 @@ static int8_t init_board_periphery() {
     auto libparams_integers_amount = (ParamIndex_t)IntParamsIndexes::INTEGER_PARAMS_AMOUNT;
     auto libparams_strings_amount = NUM_OF_STR_PARAMS;
     paramsInit(libparams_integers_amount, libparams_strings_amount, -1, 1);
+    paramsInitRedundantPage();
     paramsLoad();
 
     return 0;
