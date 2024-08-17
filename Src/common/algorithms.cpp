@@ -58,3 +58,9 @@ float mapPwmToPct(uint16_t pwm_val, int16_t pwm_min, int16_t pwm_max) {
     auto val = std::clamp(scaled_val, 0.f, 100.f);
     return val;
 }
+
+void movingAverage(float* prev_avg, float crnt_val, uint16_t size) {
+    if (prev_avg != nullptr && size != 0) {
+        *prev_avg = (*prev_avg * (size - 1) + crnt_val) / size;
+    }
+}

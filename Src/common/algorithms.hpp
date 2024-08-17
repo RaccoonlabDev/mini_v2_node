@@ -61,6 +61,8 @@ float mapFloat(float value,
  */
 float mapPwmToPct(uint16_t pwm_val, int16_t pwm_min, int16_t pwm_max);
 
+void movingAverage(float* prev_avg, float crnt_val, uint16_t size);
+
 #ifdef __cplusplus
 }
 #endif
