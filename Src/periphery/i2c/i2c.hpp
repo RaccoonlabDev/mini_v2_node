@@ -12,16 +12,37 @@
 namespace HAL {
 
 class I2C {
-  public:
+public:
     /**
-     * @return Number of transmited bytes on success, otherwise < 0
+     * @brief Reinitialize I2C
+     * @return 0 on success, otherwise negative error code
+     */
+    static int8_t init();
+
+    /**
+     * @return 0 on success, otherwise negative error code
+     */
+    static int8_t is_device_ready(uint16_t address, uint8_t trials = 100);
+
+    /**
+     * @return Number of transmited bytes on success, otherwise negative error code
      */
     static int8_t transmit(uint16_t id, uint8_t tx[], uint8_t len);
 
     /**
-     * @return Number of received bytes on success, otherwise < 0
+     * @return Number of received bytes on success, otherwise negative error code
      */
     static int8_t receive(uint16_t id, uint8_t *rx, uint8_t len);
+
+    /**
+     * @return Register value [0, 255] on success, otherwise negative error code
+     */
+    static int32_t read_register_1_byte(uint16_t device_id, uint8_t reg_address);
+
+    /**
+     * @return Register value [0, 65335] on success, otherwise negative error code
+     */
+    static int32_t read_register_2_bytes(uint16_t device_id, uint8_t reg_address);
 };
 
 }  // namespace HAL
