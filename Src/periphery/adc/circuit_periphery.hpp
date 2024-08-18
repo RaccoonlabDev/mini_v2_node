@@ -70,6 +70,26 @@ public:
         return AdcPeriphery::get(AdcChannel::ADC_VERSION);
     }
 
+    static bool overvoltage() {
+        return voltage_5v() > 5.5 || voltage_vin() > 60.0;
+    }
+
+    static bool undervoltage() {
+        return voltage_5v() < 4.2 || voltage_vin() < 4.5;
+    }
+
+    static bool overcurrent() {
+        return current() > 60.0;
+    }
+
+    static bool overheat() {
+        return temperature() > (273.5f + 80.0f);
+    }
+
+    static bool is_failure() {
+        return overvoltage() || undervoltage() || overcurrent() || overheat();
+    }
+
     static BoardType detect_board_type();
     static std::pair<const char*, uint8_t> get_board_name();
 };

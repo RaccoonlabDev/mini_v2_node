@@ -13,14 +13,13 @@
 #include "uavcan/si/sample/voltage/Scalar_1_0.h"
 #include "uavcan/si/sample/temperature/Scalar_1_0.h"
 
-REGISTER_MODULE(CircuitStatus)
+REGISTER_MODULE(CyphalCircuitStatus)
 
-void CircuitStatus::init() {
-    health = Status::OK;
+void CyphalCircuitStatus::init() {
     mode = Mode::OPERATIONAL;
 }
 
-void CircuitStatus::update_params() {
+void CyphalCircuitStatus::update_params() {
     uint16_t port_id;
 
     port_id = static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_CRCT_5V_ID));
@@ -33,7 +32,7 @@ void CircuitStatus::update_params() {
     temperature_pub.setPortId(port_id);
 }
 
-void CircuitStatus::spin_once() {
+void CyphalCircuitStatus::spin_once() {
     if (voltage_5v_pub.isEnabled()) {
         float volt = CircuitPeriphery::voltage_5v();
         voltage_5v_pub.publish(uavcan_si_sample_voltage_Scalar_1_0{0, volt});
@@ -48,4 +47,6 @@ void CircuitStatus::spin_once() {
         auto temp = (float)CircuitPeriphery::temperature();
         temperature_pub.publish(uavcan_si_sample_temperature_Scalar_1_0{0, temp});
     }
+
+    health = CircuitPeriphery::is_failure() ? Status::MINOR_FAILURE : Status::OK;
 }
