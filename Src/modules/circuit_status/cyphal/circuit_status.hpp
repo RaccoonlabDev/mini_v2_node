@@ -16,9 +16,9 @@
 extern "C" {
 #endif
 
-class CircuitStatus : public Module {
+class CyphalCircuitStatus : public Module {
 public:
-    CircuitStatus() : Module(2, Protocol::CYPHAL) {}
+    CyphalCircuitStatus() : Module(2, Protocol::CYPHAL) {}
     void init() override;
 
 protected:

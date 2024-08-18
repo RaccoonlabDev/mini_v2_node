@@ -2,5 +2,5 @@
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 
 list(APPEND APPLICATION_SOURCES
-    ${CMAKE_CURRENT_LIST_DIR}/CircuitStatusModule.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/circuit_status.cpp
 )
