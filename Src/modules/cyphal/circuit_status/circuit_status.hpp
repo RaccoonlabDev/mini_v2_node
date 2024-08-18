@@ -18,7 +18,7 @@ extern "C" {
 
 class CircuitStatus : public Module {
 public:
-    CircuitStatus() : Module(2) {}
+    CircuitStatus() : Module(2, Protocol::CYPHAL) {}
     void init() override;
 
 protected:

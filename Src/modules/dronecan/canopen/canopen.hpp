@@ -16,7 +16,7 @@ extern "C" {
 
 class CanopenModule : public Module {
 public:
-    CanopenModule() : Module(10.0) {}
+    CanopenModule() : Module(10.0, Protocol::DRONECAN) {}
     void init() override;
 
 protected:
