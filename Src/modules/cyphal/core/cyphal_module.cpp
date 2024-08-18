@@ -12,7 +12,7 @@
 
 REGISTER_MODULE(CyphalModule)
 
-CyphalModule::CyphalModule() : Module(0) {
+CyphalModule::CyphalModule() : Module(0, Protocol::CYPHAL) {
 }
 
 void CyphalModule::init() {

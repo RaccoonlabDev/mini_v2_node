@@ -25,7 +25,7 @@ private:
 
 class SetpointModule : public Module {
 public:
-    SetpointModule() : Module(50) {}
+    SetpointModule() : Module(50, Protocol::CYPHAL) {}
     void init() override;
 
 protected:

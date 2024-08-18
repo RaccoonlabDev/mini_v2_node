@@ -11,7 +11,7 @@
 
 class CircuitStatus : public Module {
 public:
-    CircuitStatus() : Module(2.0f) {}
+    CircuitStatus() : Module(2.0f, Protocol::DRONECAN) {}
     void init() override;
 
 protected:

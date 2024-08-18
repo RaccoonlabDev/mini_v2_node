@@ -20,8 +20,3 @@ list(APPEND APPLICATION_HEADERS
     ${ROOT_DIR}/Libs/Cyphal/Libs/o1heap/o1heap
     ${ROOT_DIR}/build/nunavut_out
 )
-
-list(APPEND LIBPARAMS_PARAMS
-    ${ROOT_DIR}/Libs/Cyphal/Cyphal/params.yaml
-    ${CMAKE_CURRENT_LIST_DIR}/params.yaml
-)

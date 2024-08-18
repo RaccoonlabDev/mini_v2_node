@@ -28,13 +28,20 @@ public:
         MAINTENANCE         = 2,    // Calibration, self-test
     };
 
+    enum class Protocol: uint8_t {
+        UNKNOWN             = 0,    // Nor Cyphal or DroneCAN
+        CYPHAL              = 1,    // Only Cyphal
+        DRONECAN            = 2,    // Only DroneCAN
+        CYPHAL_AND_DRONECAN = 3,    // Both Cyphal and DroneCAN
+    };
+
     /**
      * @brief The constructor is responsible only for allocating resources and registering
      * the object with a manager or ModuleManager. It doesn't perform any heavyweight operations
      * or initialization that might depend on peripheral or communication protocols.
      * @param[in] frequency is how many times per second the module should be spinned
      */
-    explicit Module(float frequency);
+    explicit Module(float frequency, Protocol proto = Protocol::UNKNOWN);
 
     /**
      * @brief The function performs more complex initialization tasks. For instance, init might
@@ -56,6 +63,7 @@ public:
      */
     Status get_health() const;
     Mode get_mode() const;
+    Protocol get_protocol() const;
 
 protected:
     /**
@@ -73,6 +81,7 @@ protected:
 
     Status health{Status::OK};
     Mode mode{Mode::INITIALIZATION};
+    Protocol protocol;
 
     uint32_t period_ms;
     uint32_t next_spin_time_ms{0};
@@ -82,7 +91,7 @@ protected:
 class ModuleManager {
 public:
     static void register_module(Module* app_module);
-    static void init();
+    static void init(Module::Protocol proto);
     static void process();
 
     static Module::Status get_global_status();
@@ -94,6 +103,7 @@ private:
     static inline std::array<Module*, MAX_MODULES_AMOUNT> modules;
     static inline std::span<Module*> active_modules;
     static inline uint8_t modules_amount{0};
+    static inline Module::Protocol protocol;
 };
 
 /**

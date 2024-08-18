@@ -34,11 +34,15 @@ else()
 endif()
 
 # Option 2. Choose the protocol
-if(CAN_PROTOCOL STREQUAL "dronecan" OR CAN_PROTOCOL STREQUAL "cyphal")
+if(CAN_PROTOCOL STREQUAL "dronecan" OR CAN_PROTOCOL STREQUAL "cyphal" OR CAN_PROTOCOL STREQUAL "both")
     set(APPLICATION_DIR ${ROOT_DIR}/Src/applications/${CAN_PROTOCOL})
 else()
     message(SEND_ERROR "CAN_PROTOCOL is unknown.")
 endif()
+
+list(APPEND LIBPARAMS_PARAMS
+    ${ROOT_DIR}/Src/common/params.yaml
+)
 
 include(${LIBPARAMS_PATH}/CMakeLists.txt)
 add_definitions(-DFLASH_DRIVER_STORAGE_FILE="${APPLICATION_DIR}/default_params.yml")

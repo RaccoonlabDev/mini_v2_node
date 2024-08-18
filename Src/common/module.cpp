@@ -7,7 +7,8 @@
 #include "module.hpp"
 #include <span>
 
-Module::Module(float frequency) : period_ms(period_ms_from_frequency(frequency)) {
+Module::Module(float frequency, Protocol proto) : protocol(proto),
+                                                  period_ms(period_ms_from_frequency(frequency)) {
     ModuleManager::register_module(this);
 }
 
@@ -21,6 +22,10 @@ Module::Status Module::get_health() const {
 
 Module::Mode Module::get_mode() const {
     return mode;
+}
+
+Module::Protocol Module::get_protocol() const {
+    return protocol;
 }
 
 void Module::process() {
@@ -46,15 +51,20 @@ void ModuleManager::register_module(Module* app_module) {
     }
 };
 
-void ModuleManager::init() {
+void ModuleManager::init(Module::Protocol proto) {
+    protocol = proto;
     for (auto app_module : active_modules) {
-        app_module->init();
+        if (app_module->get_protocol() == protocol) {
+            app_module->init();
+        }
     }
 };
 
 void ModuleManager::process() {
     for (auto app_module : active_modules) {
-        app_module->process();
+        if (app_module->get_protocol() == protocol) {
+            app_module->process();
+        }
     }
 };
 
@@ -62,7 +72,7 @@ Module::Status ModuleManager::get_global_status() {
     auto global_status = Module::Status::OK;
 
     for (auto app_module : active_modules) {
-        if (app_module->get_health() > global_status) {
+        if (app_module->get_protocol() == protocol && app_module->get_health() > global_status) {
             global_status = app_module->get_health();
         }
     }
@@ -74,7 +84,7 @@ Module::Mode ModuleManager::get_global_mode() {
     auto global_mode = Module::Mode::OPERATIONAL;
 
     for (auto app_module : active_modules) {
-        if (app_module->get_mode() > global_mode) {
+        if (app_module->get_protocol() == protocol && app_module->get_mode() > global_mode) {
             global_mode = app_module->get_mode();
         }
     }
@@ -87,6 +97,10 @@ uint8_t ModuleManager::get_vssc() {
 
     uint8_t module_idx = 0;
     for (auto app_module : active_modules) {
+        if (app_module->get_protocol() != protocol) {
+            continue;
+        }
+
         auto is_health_bad = app_module->get_health() > Module::Status::OK;
         auto is_mode_not_operational = app_module->get_mode() > Module::Mode::OPERATIONAL;
         if (is_health_bad || is_mode_not_operational) {

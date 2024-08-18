@@ -12,7 +12,7 @@
 
 REGISTER_MODULE(DronecanModule)
 
-DronecanModule::DronecanModule() : Module(0) {
+DronecanModule::DronecanModule() : Module(0, Protocol::DRONECAN) {
 }
 
 void DronecanModule::init() {

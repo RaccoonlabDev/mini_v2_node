@@ -13,3 +13,12 @@ system.name:
   enum: PARAM_SYSTEM_NAME
   flags: mutable
   default: "co.raccoonlab.mini"
+
+system.protocol:
+  type: Integer
+  note: Auto, Cyphal/CAN or DroneCAN
+  enum: PARAM_SYSTEM_PROTOCOL
+  flags: mutable
+  default: 0
+  min: 0
+  max: 2

@@ -26,7 +26,7 @@ struct FeedbackPublisher: public cyphal::CyphalPublisher {
 
 class FeedbackModule : public Module {
 public:
-    FeedbackModule() : Module(1) {}
+    FeedbackModule() : Module(1, Protocol::CYPHAL) {}
 
 protected:
     void update_params() override;
