@@ -39,6 +39,11 @@ dronecan_v3: checks clean
 	mkdir -p ${BUILD_OBJ_DIR}
 	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_NODE_V3=ON -G "Unix Makefiles" ../.. && make
 
+# Cyphal & DroneCAN
+v3: checks generate_dsdl clean
+	mkdir -p ${BUILD_OBJ_DIR}
+	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=both -DUSE_PLATFORM_NODE_V3=ON -G "Unix Makefiles" ../.. && make
+
 # Common:
 checks:
 	@python scripts/prebuild_check.py || (echo "Requirements verification failed. Stopping build." && exit 1)
