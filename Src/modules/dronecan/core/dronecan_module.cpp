@@ -26,7 +26,7 @@ void DronecanModule::init() {
     int8_t res = uavcanInitApplication(node_id);
 
     health = (res >= 0) ? Status::OK : Status::FATAL_MALFANCTION;
-    mode = Mode::OPERATIONAL;
+    mode = Mode::STANDY;
 }
 
 void DronecanModule::spin_once() {

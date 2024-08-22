@@ -11,7 +11,7 @@ REGISTER_MODULE(ImuModule)
 
 void ImuModule::init() {
     initialized = imu.initialize();
-    mode = Module::Mode::OPERATIONAL;
+    mode = Module::Mode::STANDY;
 }
 
 void ImuModule::update_params() {

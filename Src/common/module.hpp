@@ -23,9 +23,10 @@ public:
     };
 
     enum class Mode: uint8_t {
-        OPERATIONAL         = 0,    // After successful initialization
-        INITIALIZATION      = 1,    // After startup
-        MAINTENANCE         = 2,    // Calibration, self-test
+        STANDY              = 0,    // Low-power state, waiting further commands or events
+        ENGAGED             = 1,    // Fully active and operational
+        INITIALIZATION      = 2,    // After startup
+        MAINTENANCE         = 3,    // Calibration, self-test
     };
 
     enum class Protocol: uint8_t {

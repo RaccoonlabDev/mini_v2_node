@@ -59,7 +59,7 @@ void PWMModule::init() {
 void PWMModule::spin_once() {
     uint32_t crnt_time_ms = HAL_GetTick();
 
-    mode = Module::Mode::OPERATIONAL;
+    mode = Module::Mode::STANDY;
     for (auto& pwm : params) {
         if (crnt_time_ms > pwm.cmd_end_time_ms) {
             pwm.command_val = pwm.def;
@@ -131,7 +131,7 @@ void PWMModule::update_params() {
         logger.log_info("128");
     }
     apply_params();
-    mode = Mode::OPERATIONAL;
+    mode = Mode::STANDY;
 }
 
 void PWMModule::apply_params() {

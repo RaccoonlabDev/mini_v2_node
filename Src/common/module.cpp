@@ -13,7 +13,7 @@ Module::Module(float frequency, Protocol proto) : protocol(proto),
 }
 
 void Module::init() {
-    mode = Mode::OPERATIONAL;
+    mode = Mode::STANDY;
 }
 
 Module::Status Module::get_health() const {
@@ -81,7 +81,7 @@ Module::Status ModuleManager::get_global_status() {
 }
 
 Module::Mode ModuleManager::get_global_mode() {
-    auto global_mode = Module::Mode::OPERATIONAL;
+    auto global_mode = Module::Mode::STANDY;
 
     for (auto app_module : active_modules) {
         if (app_module->get_protocol() == protocol && app_module->get_mode() > global_mode) {
@@ -102,7 +102,7 @@ uint8_t ModuleManager::get_vssc() {
         }
 
         auto is_health_bad = app_module->get_health() > Module::Status::OK;
-        auto is_mode_not_operational = app_module->get_mode() > Module::Mode::OPERATIONAL;
+        auto is_mode_not_operational = app_module->get_mode() > Module::Mode::ENGAGED;
         if (is_health_bad || is_mode_not_operational) {
             vssc += 1 << module_idx;
         }
