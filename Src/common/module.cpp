@@ -49,7 +49,7 @@ void ModuleManager::register_module(Module* app_module) {
         modules_amount++;
         active_modules = std::span<Module*>(modules.data(), modules_amount);
     }
-};
+}
 
 void ModuleManager::init(Module::Protocol proto) {
     protocol = proto;
@@ -58,7 +58,7 @@ void ModuleManager::init(Module::Protocol proto) {
             app_module->init();
         }
     }
-};
+}
 
 void ModuleManager::process() {
     for (auto app_module : active_modules) {
@@ -66,7 +66,7 @@ void ModuleManager::process() {
             app_module->process();
         }
     }
-};
+}
 
 Module::Status ModuleManager::get_global_status() {
     auto global_status = Module::Status::OK;

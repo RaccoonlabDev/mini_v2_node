@@ -7,9 +7,9 @@
 #ifndef SRC_COMMON_MODULE_HPP_
 #define SRC_COMMON_MODULE_HPP_
 
+#include <span>
 #include <cstdint>
 #include <array>
-#include <span>
 #include "main.h"
 
 
@@ -71,7 +71,7 @@ protected:
      * @brief The function manages the parameters from the persistent storage
      * The function is called in process() when the parameters are updated.
      */
-    virtual void update_params() {};
+    virtual void update_params() {}
 
     /**
      * @brief The function is not blocking. It should be finished ASAP.

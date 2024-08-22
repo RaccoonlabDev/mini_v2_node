@@ -5,9 +5,9 @@
  */
 
 #include "canopen.hpp"
+#include <storage.h>
 #include "can_driver.h"
 #include "common/algorithms.hpp"
-#include <storage.h>
 #include <params.hpp>
 
 REGISTER_MODULE(CanopenModule)
@@ -36,13 +36,6 @@ void CanopenModule::raw_command_cb(const RawCommand_t& msg) {
     }
 
     auto raw_command_value = msg.raw_cmd[RAW_COMMAND_CHANNEL];
-    static uint32_t prev_disarm_time = 0;
-    if (raw_command_value < 0 && prev_disarm_time + 5000 < HAL_GetTick()) {
-        auto prev_eng_time = paramsGetIntegerValue(IntParamsIndexes::PARAM_STATS_ENG_TIME);
-        paramsSetIntegerValue(IntParamsIndexes::PARAM_STATS_ENG_TIME, prev_eng_time + HAL_GetTick());
-    } else {
-        prev_disarm_time = HAL_GetTick();
-    }
     uint8_t setpoint_percent = mapFloat((float)raw_command_value, 0.0f, 8191, 0.0f, 100.0f);
 
     CanardCANFrame frame;
