@@ -1,4 +1,3 @@
 uavcan.node.id:         40
-example.integer:        42
 uavcan.sub.setpoint.id: 2000
 uavcan.pub.feedback.id: 2001

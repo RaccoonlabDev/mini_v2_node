@@ -65,6 +65,11 @@ static void blink_board_led() {
 }
 
 Module::Protocol get_protocol() {
+#if defined(CONFIG_USE_CYPHAL) && !defined(CONFIG_USE_DRONECAN)
+    return Module::Protocol::CYPHAL;
+#elif !defined(CONFIG_USE_CYPHAL) && defined(CONFIG_USE_DRONECAN)
+    return Module::Protocol::DRONECAN;
+#else
     auto system_protocol = paramsGetIntegerValue(PARAM_SYSTEM_PROTOCOL);
 
     Module::Protocol protocol;
@@ -75,6 +80,7 @@ Module::Protocol get_protocol() {
     }
 
     return protocol;
+#endif
 }
 
 __attribute__((noreturn)) void application_entry_point() {
