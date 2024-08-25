@@ -22,3 +22,10 @@ system.protocol:
   default: 0
   min: 0
   max: 2
+
+uavcan.node.description:
+  note: User/integrator-defined, human-readable description of this specific node.
+  type: String
+  enum: PARAM_NODE_DESCRIPTION
+  flags: mutable
+  default: ""
