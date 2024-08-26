@@ -31,13 +31,13 @@ cyphal_v3: checks generate_dsdl clean
 dronecan: dronecan_v2
 dronecan_v2: checks clean
 	mkdir -p ${BUILD_OBJ_DIR}
-	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_NODE_V2=ON -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles" ../.. && make
+	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_NODE_V2=ON -G "Unix Makefiles" ../.. && make
 sitl_dronecan: checks clean
 	mkdir -p ${BUILD_OBJ_DIR}
-	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_UBUNTU=ON -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles" ../.. && make
+	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_UBUNTU=ON -G "Unix Makefiles" ../.. && make
 dronecan_v3: checks clean
 	mkdir -p ${BUILD_OBJ_DIR}
-	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_NODE_V3=ON -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles" ../.. && make
+	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_NODE_V3=ON -G "Unix Makefiles" ../.. && make
 
 # Cyphal & DroneCAN
 v3: checks generate_dsdl clean

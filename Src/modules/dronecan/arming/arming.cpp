@@ -10,6 +10,7 @@
 #include "common/algorithms.hpp"
 #include <params.hpp>
 #include <logger.hpp>
+
 Logger logger = Logger("ArmingModule");
 
 REGISTER_MODULE(ArmingModule)

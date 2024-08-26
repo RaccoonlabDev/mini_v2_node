@@ -4,5 +4,3 @@
 list(APPEND APPLICATION_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/circuit_status.cpp
 )
-
-message(STATUS "CS: "${LIBPARAMS_PARAMS})

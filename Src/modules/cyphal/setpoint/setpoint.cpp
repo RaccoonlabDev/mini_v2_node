@@ -44,7 +44,7 @@ void SetpointModule::init() {
     HAL::Pwm::init(HAL::PwmPin::PWM_4);
 
     health = (sub.init() < 0) ? Status::FATAL_MALFANCTION : Status::OK;
-    mode = Mode::OPERATIONAL;
+    mode = Mode::STANDY;
 }
 
 void SetpointModule::spin_once() {

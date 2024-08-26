@@ -13,5 +13,3 @@ list(APPEND LIBPARAMS_PARAMS
 )
 
 include(${SRC_DIR}/drivers/mpu9250/CMakeLists.txt)
-
-message(STATUS "IMU: "${LIBPARAMS_PARAMS})
