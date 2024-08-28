@@ -17,6 +17,9 @@ void ImuModule::init() {
 void ImuModule::update_params() {
     enabled = static_cast<bool>(paramsGetIntegerValue(PARAM_IMU_ENABLE));
     health = (!enabled || initialized) ? Module::Status::OK : Module::Status::MAJOR_FAILURE;
+    if (enabled) {
+        mode = initialized ? Mode::ENGAGED : Mode::INITIALIZATION;
+    }
 }
 
 void ImuModule::spin_once() {

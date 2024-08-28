@@ -1,8 +1,8 @@
 stats.engaged_time:
   type: Integer
-  note: Total engaged time of node in mins.
+  note: Total engaged time of node in seconds.
   enum: PARAM_STATS_ENG_TIME
   flags: mutable
   default: 0
   min: 0
-  max: 65535
+  max: 2147483647

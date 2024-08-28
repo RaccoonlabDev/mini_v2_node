@@ -31,7 +31,7 @@ void ArmingModule::init() {
 
 void ArmingModule::spin_once() {
     if (!is_armed && disarm_time > 0) {
-        auto cur_eng_time = (HAL_GetTick() - ArmingModule::arm_start_time + 30000) / 60000;
+        auto cur_eng_time = (HAL_GetTick() - ArmingModule::arm_start_time) / 1000;
         prev_eng_time = cur_eng_time + prev_eng_time;
         paramsSetIntegerValue(IntParamsIndexes::PARAM_STATS_ENG_TIME, int(prev_eng_time));
         paramsSave();

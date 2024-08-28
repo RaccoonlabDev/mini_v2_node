@@ -65,6 +65,9 @@ void PWMModule::spin_once() {
             pwm.command_val = pwm.def;
         }
         HAL::Pwm::set_duration(pwm.pin, pwm.command_val);
+        if (pwm.command_val != pwm.def) {
+            mode = Module::Mode::ENGAGED;
+        }
     }
 
     status_pub_timeout_ms = 1;

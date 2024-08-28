@@ -6,7 +6,7 @@ The node has the following registers:
 |  2 | system.name             | Defines custom node name. If empty, the node will use the default name. |
 |  3 | system.protocol         | Auto, Cyphal/CAN or DroneCAN |
 |  4 | uavcan.node.description | User/integrator-defined, human-readable description of this specific node. |
-|  5 | stats.engaged_time      | Total engaged time of node in mins. |
+|  5 | stats.engaged_time      | Total engaged time of node in seconds. |
 |  6 | pwm.cmd_ttl_ms          | TTL of specified by pwm.cmd_type commands [ms]. |
 |  7 | pwm.frequency           | PWM frequency [Hz]. |
 |  8 | pwm.cmd_type            | 0 means RawCommand, 1 means ArrayCommand, 2 is reserved for hardpoint.Command. |
