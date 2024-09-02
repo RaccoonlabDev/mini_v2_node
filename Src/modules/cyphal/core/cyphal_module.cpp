@@ -28,12 +28,16 @@ void CyphalModule::init() {
     cyphal::NodeGetInfoSubscriber::setHardwareVersion(2, 1);
 
     health = (res >= 0) ? Status::OK : Status::FATAL_MALFANCTION;
-    mode = Mode::STANDY;
+    mode = Mode::STANDBY;
 }
 
 void CyphalModule::spin_once() {
     cyphal.setNodeHealth(uavcan_node_Health_1_0{(uint8_t)(ModuleManager::get_global_status())});
-    cyphal.setNodeMode(uavcan_node_Mode_1_0{(uint8_t)(ModuleManager::get_global_mode())});
+    auto global_mode = (uint8_t)(ModuleManager::get_global_mode());
+    if (global_mode > 0 ) {
+        global_mode -= 1;
+    }
+    cyphal.setNodeMode(uavcan_node_Mode_1_0{global_mode});
     cyphal.setVSSC(ModuleManager::get_vssc());
     cyphal.process();
 }

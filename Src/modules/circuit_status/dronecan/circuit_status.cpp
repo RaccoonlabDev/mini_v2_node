@@ -11,7 +11,7 @@
 REGISTER_MODULE(DronecanCircuitStatus)
 
 void DronecanCircuitStatus::init() {
-    mode = Module::Mode::STANDY;
+    mode = Module::Mode::STANDBY;
 }
 
 void DronecanCircuitStatus::spin_once() {

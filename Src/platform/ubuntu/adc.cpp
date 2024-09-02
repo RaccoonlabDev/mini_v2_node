@@ -18,6 +18,7 @@ int8_t AdcPeriphery::init() {
     state.temperature = 3115;
     state.current = 2048;
     state.v_in = 640;
+    state.v_5v = 3200;
     _is_adc_already_inited = true;
     return 0;
 }
@@ -31,6 +32,8 @@ uint16_t AdcPeriphery::get(AdcChannel channel) {
         return state.current;
     case AdcChannel::ADC_TEMPERATURE:
         return state.temperature;
+    case AdcChannel::ADC_5V:
+        return state.v_5v;
     default:
         break;
     }

@@ -16,20 +16,17 @@ extern "C" {
 
 class ArmingModule : public Module {
 public:
-    ArmingModule() : Module(0.2) {}
+    ArmingModule() : Module(2, Protocol::DRONECAN) {}
     void init() override;
 
 protected:
     void spin_once() override;
 
 private:
-    static void raw_command_cb(const RawCommand_t& msg);
-    static inline DronecanSubscriber<RawCommand_t> raw_command_sub;
-    static bool is_armed;
-    static uint32_t arm_start_time;
+    Mode global_mode;
+    bool is_armed = {false};
+    uint32_t arm_start_time = 0;
     uint32_t prev_eng_time = 0;
-    static int64_t disarm_time;
-    static constexpr uint8_t RAW_COMMAND_CHANNEL = 0;
 };
 
 #ifdef __cplusplus

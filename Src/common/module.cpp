@@ -13,7 +13,7 @@ Module::Module(float frequency, Protocol proto) : protocol(proto),
 }
 
 void Module::init() {
-    mode = Mode::STANDY;
+    mode = Mode::STANDBY;
 }
 
 Module::Status Module::get_health() const {
@@ -81,7 +81,7 @@ Module::Status ModuleManager::get_global_status() {
 }
 
 Module::Mode ModuleManager::get_global_mode() {
-    auto global_mode = Module::Mode::STANDY;
+    auto global_mode = Module::Mode::STANDBY;
 
     for (auto app_module : active_modules) {
         if (app_module->get_protocol() == protocol && app_module->get_mode() > global_mode) {

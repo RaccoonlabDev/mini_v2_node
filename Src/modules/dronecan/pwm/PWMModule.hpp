@@ -38,21 +38,22 @@ struct PwmChannelsParamsNames {
 struct PwmChannelInfo {
     const PwmChannelsParamsNames names;
     HAL::PwmPin pin;
-    uint16_t min{0};
-    uint16_t max{0};
-    uint16_t def{0};
-    int16_t channel{-1};
-    uint16_t command_val{0};
-    uint32_t cmd_end_time_ms{0};
-    uint32_t next_status_pub_ms{0};
-    uint8_t fb{0};
+    uint16_t    min{0};
+    uint16_t    max{0};
+    uint16_t    def{0};
+    int16_t     channel{-1};
+    uint16_t    command_val{0};
+    uint32_t    cmd_end_time_ms{0};
+    uint32_t    next_status_pub_ms{0};
+    uint8_t     fb{0};
+    bool        is_engaged{false};
 };
 
 class PWMModule : public Module {
 public:
     void init() override;
 
-    inline PWMModule() : Module(50) {}
+    inline PWMModule() : Module(50, Protocol::DRONECAN) {}
 
 protected:
     void update_params() override;
@@ -70,6 +71,7 @@ private:
     static void raw_command_cb(const RawCommand_t& msg);
     static void array_command_callback(CanardRxTransfer* transfer);
     static void hardpoint_callback(CanardRxTransfer* transfer);
+    static void arming_status_callback(const ArmingStatus& msg);
 
     static void publish_esc_status();
     static void publish_actuator_status();

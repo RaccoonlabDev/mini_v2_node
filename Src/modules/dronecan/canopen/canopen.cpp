@@ -5,10 +5,8 @@
  */
 
 #include "canopen.hpp"
-#include <storage.h>
 #include "can_driver.h"
 #include "common/algorithms.hpp"
-#include <params.hpp>
 
 REGISTER_MODULE(CanopenModule)
 
@@ -23,7 +21,7 @@ void CanopenModule::init() {
         health = Status::FATAL_MALFANCTION;
     }
 
-    mode = Module::Mode::STANDY;
+    mode = Module::Mode::STANDBY;
 }
 
 void CanopenModule::spin_once() {

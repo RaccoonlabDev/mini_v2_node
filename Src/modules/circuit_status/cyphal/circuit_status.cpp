@@ -16,7 +16,7 @@
 REGISTER_MODULE(CyphalCircuitStatus)
 
 void CyphalCircuitStatus::init() {
-    mode = Mode::STANDY;
+    mode = Mode::STANDBY;
 }
 
 void CyphalCircuitStatus::update_params() {
