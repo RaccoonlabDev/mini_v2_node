@@ -6,6 +6,7 @@
 
 #include "application.hpp"
 #include <array>
+#include <bitset>
 #include "periphery/adc/circuit_periphery.hpp"
 #include "periphery/led/led.hpp"
 #include "params.hpp"
@@ -13,6 +14,7 @@
 #include "main.h"
 
 #include "periphery/led/led.hpp"
+#include "periphery/gpio/gpio.hpp"
 #include "periphery/iwdg/iwdg.hpp"
 
 static int8_t init_board_periphery() {
@@ -23,7 +25,20 @@ static int8_t init_board_periphery() {
     auto libparams_strings_amount = NUM_OF_STR_PARAMS;
     paramsInit(libparams_integers_amount, libparams_strings_amount, -1, 1);
     paramsLoad();
+    #if defined(CAN1_TERMINATOR) && defined(CAN2_TERMINATOR)
+    auto teminator_parm = paramsGetIntegerValue(IntParamsIndexes::PARAM_SYSTEM_CAN_TEMINATOR);
+    GPIOPeriphery::set(GPIOPin::TERMINATOR1);
+    GPIOPeriphery::set(GPIOPin::TERMINATOR2);
 
+    std::bitset<2> terminator_mask(teminator_parm);
+    for (uint8_t i = 0; i < 2; i++) {
+        if (terminator_mask[i]) {
+            GPIOPeriphery::set(GPIOPin(i));
+        } else {
+            GPIOPeriphery::reset(GPIOPin(i));
+        }
+    }
+    #endif
     return 0;
 }
 

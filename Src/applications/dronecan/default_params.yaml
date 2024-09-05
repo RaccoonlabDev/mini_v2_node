@@ -1,4 +1,6 @@
 uavcan.node.id: 39
+system.protocol : 0
+stats.engaged_time : 0
 pwm.cmd_ttl_ms: 0
 pwm.frequency: 50
 pwm.cmd_type: 1

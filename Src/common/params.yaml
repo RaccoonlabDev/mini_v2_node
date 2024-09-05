@@ -7,6 +7,15 @@ uavcan.node.id:
   min: 0
   max: 255
 
+system.can_terminator:
+  type: Integer
+  note: Bitmask which switch can terminators (0 - both off, 1 - enables second, 2 - enables first, 3 - enables both). Works only for v3.
+  enum: PARAM_SYSTEM_CAN_TEMINATOR
+  flags: mutable
+  default: 0
+  min: 0
+  max: 3
+
 system.name:
   type: String
   note: Defines custom node name. If empty, the node will use the default name.
