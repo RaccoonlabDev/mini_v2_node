@@ -23,7 +23,7 @@ public:
     };
 
     enum class Mode: uint8_t {
-        STANDBY              = 0,    // Low-power state, waiting further commands or events
+        STANDBY             = 0,    // Low-power state, waiting further commands or events
         ENGAGED             = 1,    // Fully active and operational
         INITIALIZATION      = 2,    // After startup
         MAINTENANCE         = 3,    // Calibration, self-test

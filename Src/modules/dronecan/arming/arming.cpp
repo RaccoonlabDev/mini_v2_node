@@ -30,7 +30,7 @@ void ArmingModule::spin_once() {
         arm_start_time = crnt_time_ms;
         return;
     }
-    if (is_armed && global_mode != Mode::ENGAGED && arm_start_time < crnt_time_ms + 1000) {
+    if (is_armed && global_mode != Mode::ENGAGED && arm_start_time + 1000 < crnt_time_ms) {
         is_armed = false;
         auto cur_eng_time = (crnt_time_ms - arm_start_time) / 1000;
         prev_eng_time = cur_eng_time + prev_eng_time;
