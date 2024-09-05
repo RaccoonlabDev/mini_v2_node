@@ -25,10 +25,9 @@ static int8_t init_board_periphery() {
     auto libparams_strings_amount = NUM_OF_STR_PARAMS;
     paramsInit(libparams_integers_amount, libparams_strings_amount, -1, 1);
     paramsLoad();
-    #if defined(CAN1_TERMINATOR) && defined(CAN2_TERMINATOR)
+
+#if defined(CAN1_TERMINATOR_Pin) && defined(CAN2_TERMINATOR_Pin)
     auto teminator_parm = paramsGetIntegerValue(IntParamsIndexes::PARAM_SYSTEM_CAN_TEMINATOR);
-    GPIOPeriphery::set(GPIOPin::TERMINATOR1);
-    GPIOPeriphery::set(GPIOPin::TERMINATOR2);
 
     std::bitset<2> terminator_mask(teminator_parm);
     for (uint8_t i = 0; i < 2; i++) {
@@ -38,7 +37,7 @@ static int8_t init_board_periphery() {
             GPIOPeriphery::reset(GPIOPin(i));
         }
     }
-    #endif
+#endif
     return 0;
 }
 

@@ -13,8 +13,8 @@ extern "C" {
 #endif
 
 enum class GPIOPin {
-    TERMINATOR1,
-    TERMINATOR2,
+    CAN_TERMINATOR1,
+    CAN_TERMINATOR2,
     GPIO_AMOUNT,
 };
 

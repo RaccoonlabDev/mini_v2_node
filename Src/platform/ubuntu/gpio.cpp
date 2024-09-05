@@ -6,21 +6,22 @@
 
 #include "periphery/gpio/gpio.hpp"
 
+#include <vector>
 #include "main.h"
 
-bool gpio[(int)GPIOPin::GPIO_AMOUNT];
+static std::vector<bool> gpio((int)GPIOPin::GPIO_AMOUNT, false);
 
 void GPIOPeriphery::set(GPIOPin gpio_pin) {
-    gpio[(int)gpio_pin] = 1;
+    gpio[(int)gpio_pin] = true;
 }
 bool GPIOPeriphery::get(GPIOPin gpio_pin) {
     return gpio[(int)gpio_pin];
 }
 void GPIOPeriphery::reset() {
-    for (uint8_t i = 0; i < (int)GPIOPin::GPIO_AMOUNT; i++ ) {
-        gpio[i] = 0;
+    for (auto gpio_val : gpio) {
+        gpio_val = false;
     }
 }
 void GPIOPeriphery::reset(GPIOPin gpio_pin) {
-    gpio[(int)gpio_pin] = 0;
+    gpio[(int)gpio_pin] = false;
 }

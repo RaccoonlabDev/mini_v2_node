@@ -10,14 +10,12 @@
 
 void GPIOPeriphery::set(GPIOPin gpio_pin) {
     switch (gpio_pin) {
-        case GPIOPin::TERMINATOR1:
-            HAL_GPIO_WritePin(CAN1_TERMINATOR_GPIO_Port, CAN1_TERMINATOR_Pin,
-                              GPIO_PIN_SET);
+        case GPIOPin::CAN_TERMINATOR1:
+            HAL_GPIO_WritePin(CAN1_TERMINATOR_GPIO_Port, CAN1_TERMINATOR_Pin, GPIO_PIN_SET);
             break;
 
-        case GPIOPin::TERMINATOR2:
-            HAL_GPIO_WritePin(CAN2_TERMINATOR_GPIO_Port,
-                              CAN2_TERMINATOR_Pin, GPIO_PIN_SET);
+        case GPIOPin::CAN_TERMINATOR2:
+            HAL_GPIO_WritePin(CAN2_TERMINATOR_GPIO_Port, CAN2_TERMINATOR_Pin, GPIO_PIN_SET);
             break;
         default:
             break;
@@ -26,10 +24,10 @@ void GPIOPeriphery::set(GPIOPin gpio_pin) {
 
 bool GPIOPeriphery::get(GPIOPin gpio_pin) {
     switch (gpio_pin) {
-        case GPIOPin::TERMINATOR1:
+        case GPIOPin::CAN_TERMINATOR1:
             return HAL_GPIO_ReadPin(CAN1_TERMINATOR_GPIO_Port, CAN1_TERMINATOR_Pin);
 
-        case GPIOPin::TERMINATOR2:
+        case GPIOPin::CAN_TERMINATOR2:
             return HAL_GPIO_ReadPin(CAN2_TERMINATOR_GPIO_Port, CAN2_TERMINATOR_Pin);
 
         default:
@@ -38,21 +36,17 @@ bool GPIOPeriphery::get(GPIOPin gpio_pin) {
 }
 
 void GPIOPeriphery::reset() {
-    HAL_GPIO_WritePin(CAN1_TERMINATOR_GPIO_Port, CAN1_TERMINATOR_Pin,
-                      GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(CAN2_TERMINATOR_GPIO_Port, CAN2_TERMINATOR_Pin,
-                      GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(CAN1_TERMINATOR_GPIO_Port, CAN1_TERMINATOR_Pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(CAN2_TERMINATOR_GPIO_Port, CAN2_TERMINATOR_Pin, GPIO_PIN_RESET);
 }
 
 void GPIOPeriphery::reset(GPIOPin gpio_pin) {
     switch (gpio_pin) {
-        case GPIOPin::TERMINATOR1:
-            HAL_GPIO_WritePin(CAN1_TERMINATOR_GPIO_Port, CAN1_TERMINATOR_Pin,
-                              GPIO_PIN_RESET);
+        case GPIOPin::CAN_TERMINATOR1:
+            HAL_GPIO_WritePin(CAN1_TERMINATOR_GPIO_Port, CAN1_TERMINATOR_Pin, GPIO_PIN_RESET);
             break;
-        case GPIOPin::TERMINATOR2:
-            HAL_GPIO_WritePin(CAN2_TERMINATOR_GPIO_Port, CAN2_TERMINATOR_Pin,
-                              GPIO_PIN_RESET);
+        case GPIOPin::CAN_TERMINATOR2:
+            HAL_GPIO_WritePin(CAN2_TERMINATOR_GPIO_Port, CAN2_TERMINATOR_Pin, GPIO_PIN_RESET);
             break;
         default:
             break;
