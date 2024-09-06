@@ -7,9 +7,9 @@
 #ifndef SRC_COMMON_MODULE_HPP_
 #define SRC_COMMON_MODULE_HPP_
 
+#include <span>
 #include <cstdint>
 #include <array>
-#include <span>
 #include "main.h"
 
 
@@ -23,9 +23,10 @@ public:
     };
 
     enum class Mode: uint8_t {
-        OPERATIONAL         = 0,    // After successful initialization
-        INITIALIZATION      = 1,    // After startup
-        MAINTENANCE         = 2,    // Calibration, self-test
+        STANDBY             = 0,    // Low-power state, waiting further commands or events
+        ENGAGED             = 1,    // Fully active and operational
+        INITIALIZATION      = 2,    // After startup
+        MAINTENANCE         = 3,    // Calibration, self-test
     };
 
     enum class Protocol: uint8_t {
@@ -70,7 +71,7 @@ protected:
      * @brief The function manages the parameters from the persistent storage
      * The function is called in process() when the parameters are updated.
      */
-    virtual void update_params() {};
+    virtual void update_params() {}
 
     /**
      * @brief The function is not blocking. It should be finished ASAP.

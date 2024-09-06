@@ -21,7 +21,7 @@ void CanopenModule::init() {
         health = Status::FATAL_MALFANCTION;
     }
 
-    mode = Module::Mode::OPERATIONAL;
+    mode = Module::Mode::STANDBY;
 }
 
 void CanopenModule::spin_once() {

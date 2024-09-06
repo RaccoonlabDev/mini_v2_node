@@ -33,7 +33,7 @@ void Logger::publish() {
     _transfer_id++;
 }
 
-#if NDEBUG
+#ifdef NDEBUG
 void Logger::log_debug(const char* text) {
     (void)text;
     // Do nothing if _DEBUG is not defined

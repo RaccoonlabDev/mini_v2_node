@@ -19,6 +19,9 @@ if(USE_PLATFORM_UBUNTU)
     set(LIBPARAMS_PLATFORM ubuntu)
     set(CAN_PLATFORM socketcan)
     set(APP_PLATFORM ubuntu)
+    add_definitions(-DLIBPARAMS_PARAMS_DIR="${BUILD_SRC_DIR}")
+    add_definitions(-DLIBPARAMS_INIT_PARAMS_FILE_NAME="default_params")
+    add_definitions(-DLIBPARAMS_TEMP_PARAMS_FILE_NAME="temp_params")
 elseif(USE_PLATFORM_NODE_V2)
     set(LIBPARAMS_PLATFORM stm32f103)
     set(CAN_PLATFORM bxcan)
@@ -45,7 +48,7 @@ list(APPEND LIBPARAMS_PARAMS
 )
 
 include(${LIBPARAMS_PATH}/CMakeLists.txt)
-add_definitions(-DFLASH_DRIVER_STORAGE_FILE="${APPLICATION_DIR}/default_params.yml")
+
 list(APPEND APPLICATION_HEADERS ${ROOT_DIR}/Src ${APPLICATION_DIR})
 include(${APPLICATION_DIR}/CMakeLists.txt)
 

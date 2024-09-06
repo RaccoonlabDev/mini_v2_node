@@ -11,12 +11,15 @@ REGISTER_MODULE(ImuModule)
 
 void ImuModule::init() {
     initialized = imu.initialize();
-    mode = Module::Mode::OPERATIONAL;
+    mode = Module::Mode::STANDBY;
 }
 
 void ImuModule::update_params() {
     enabled = static_cast<bool>(paramsGetIntegerValue(PARAM_IMU_ENABLE));
     health = (!enabled || initialized) ? Module::Status::OK : Module::Status::MAJOR_FAILURE;
+    if (enabled) {
+        mode = initialized ? Mode::STANDBY : Mode::INITIALIZATION;
+    }
 }
 
 void ImuModule::spin_once() {

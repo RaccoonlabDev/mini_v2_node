@@ -26,12 +26,16 @@ void DronecanModule::init() {
     int8_t res = uavcanInitApplication(node_id);
 
     health = (res >= 0) ? Status::OK : Status::FATAL_MALFANCTION;
-    mode = Mode::OPERATIONAL;
+    mode = Mode::STANDBY;
 }
 
 void DronecanModule::spin_once() {
     uavcanSetNodeHealth(static_cast<NodeStatusHealth_t>(ModuleManager::get_global_status()));
-    uavcanSetNodeStatusMode(static_cast<NodeStatusMode_t>(ModuleManager::get_global_mode()));
+    auto global_mode = (uint8_t)(ModuleManager::get_global_mode());
+    if (global_mode > 0 ) {
+        global_mode -= 1;
+    }
+    uavcanSetNodeStatusMode(static_cast<NodeStatusMode_t>(global_mode));
     uavcanSetVendorSpecificStatusCode(ModuleManager::get_vssc());
     uavcanSpinOnce();
 }
