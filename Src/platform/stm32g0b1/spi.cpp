@@ -4,7 +4,7 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#include "periphery/spi/spi.hpp"
+#include "peripheral/spi/spi.hpp"
 #include <array>
 #include <cstring>
 #include "main.h"

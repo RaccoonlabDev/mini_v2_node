@@ -4,7 +4,7 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#include "periphery/iwdg/iwdg.hpp"
+#include "peripheral/iwdg/iwdg.hpp"
 #include "main.h"
 
 #ifdef HAL_IWDG_MODULE_ENABLED

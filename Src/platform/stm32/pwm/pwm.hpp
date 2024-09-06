@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 #include <array>
-#include "periphery/pwm/pwm.hpp"
+#include "peripheral/pwm/pwm.hpp"
 #include "main.h"
 
 namespace HAL {

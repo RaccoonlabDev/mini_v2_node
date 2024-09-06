@@ -4,5 +4,5 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#include "periphery/i2c/i2c.hpp"
+#include "peripheral/i2c/i2c.hpp"
 #include "main.h"

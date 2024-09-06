@@ -3,7 +3,7 @@
  *  Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 ***/ 
 
-#include "periphery/adc/adc.hpp"
+#include "peripheral/adc/adc.hpp"
 #include "main.h"
 
 extern ADC_HandleTypeDef hadc1;

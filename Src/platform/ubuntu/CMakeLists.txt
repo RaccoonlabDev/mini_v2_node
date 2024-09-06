@@ -9,7 +9,7 @@ add_executable(${EXECUTABLE}
     ${ROOT_DIR}/Src/common/application.cpp
     ${ROOT_DIR}/Src/common/module.cpp
 
-    ${ROOT_DIR}/Src/periphery/adc/circuit_periphery.cpp
+    ${ROOT_DIR}/Src/peripheral/adc/circuit_periphery.cpp
     ${CMAKE_CURRENT_LIST_DIR}/adc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/gpio.cpp
     ${CMAKE_CURRENT_LIST_DIR}/pwm.cpp

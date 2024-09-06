@@ -13,7 +13,7 @@
 #include "dronecan.h"
 #include "params.hpp"
 #include "logger.hpp"
-#include "periphery/pwm/pwm.hpp"
+#include "peripheral/pwm/pwm.hpp"
 #include "common/module.hpp"
 #include "publisher.hpp"
 #include "subscriber.hpp"

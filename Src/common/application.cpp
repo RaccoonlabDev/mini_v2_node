@@ -7,15 +7,15 @@
 #include "application.hpp"
 #include <array>
 #include <bitset>
-#include "periphery/adc/circuit_periphery.hpp"
-#include "periphery/led/led.hpp"
+#include "peripheral/adc/circuit_periphery.hpp"
+#include "peripheral/led/led.hpp"
 #include "params.hpp"
 #include "module.hpp"
 #include "main.h"
 
-#include "periphery/led/led.hpp"
-#include "periphery/gpio/gpio.hpp"
-#include "periphery/iwdg/iwdg.hpp"
+#include "peripheral/led/led.hpp"
+#include "peripheral/gpio/gpio.hpp"
+#include "peripheral/iwdg/iwdg.hpp"
 
 static int8_t init_board_periphery() {
     Board::Led::reset();

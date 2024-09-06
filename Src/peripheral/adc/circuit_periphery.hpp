@@ -7,8 +7,8 @@
 #include <stdint.h>
 #include <limits>
 #include <utility>
-#include "periphery/temperature_sensor/temperature_sensor.hpp"
-#include "periphery/adc/adc.hpp"
+#include "peripheral/temperature_sensor/temperature_sensor.hpp"
+#include "peripheral/adc/adc.hpp"
 
 #ifdef __cplusplus
 extern "C" {

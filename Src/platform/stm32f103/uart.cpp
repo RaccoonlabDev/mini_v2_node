@@ -4,5 +4,5 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#include "periphery/uart/uart.hpp"
+#include "peripheral/uart/uart.hpp"
 #include "main.h"

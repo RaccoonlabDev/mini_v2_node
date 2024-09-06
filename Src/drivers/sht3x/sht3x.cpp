@@ -1,9 +1,9 @@
-#include "periphery/sht3x/sht3x.hpp"
+#include "peripheral/sht3x/sht3x.hpp"
 
 #include <cstdint>
 
 #include "main.h"
-#include "periphery/i2c/i2c.hpp"
+#include "peripheral/i2c/i2c.hpp"
 
 static uint16_t uint8_to_uint16(uint8_t msb, uint8_t lsb) {
     return (uint16_t)((uint16_t)msb << 8u) | lsb;

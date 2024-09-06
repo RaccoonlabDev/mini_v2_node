@@ -8,7 +8,7 @@
 #include <algorithm>
 #include "cyphal.hpp"
 #include "params.hpp"
-#include "periphery/adc/circuit_periphery.hpp"
+#include "peripheral/adc/circuit_periphery.hpp"
 
 REGISTER_MODULE(CyphalModule)
 

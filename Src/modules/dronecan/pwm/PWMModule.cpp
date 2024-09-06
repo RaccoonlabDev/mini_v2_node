@@ -14,7 +14,7 @@
 #include "uavcan/equipment/esc/Status.h"
 #include "uavcan/equipment/actuator/ArrayCommand.h"
 #include "uavcan/equipment/actuator/Status.h"
-#include "periphery/adc/circuit_periphery.hpp"
+#include "peripheral/adc/circuit_periphery.hpp"
 #include "common/algorithms.hpp"
 
 #define CH(channel) IntParamsIndexes::PARAM_PWM_##channel##_CH

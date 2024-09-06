@@ -6,7 +6,7 @@
  */
 
 #include "circuit_status.hpp"
-#include "periphery/adc/circuit_periphery.hpp"
+#include "peripheral/adc/circuit_periphery.hpp"
 
 REGISTER_MODULE(DronecanCircuitStatus)
 
