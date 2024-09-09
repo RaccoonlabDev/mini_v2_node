@@ -17,6 +17,7 @@ add_executable(${EXECUTABLE}
     ${ROOT_DIR}/Src/periphery/adc/circuit_periphery.cpp
     ${ROOT_DIR}/Src/platform/stm32/pwm/pwm.cpp
     ${PLATFORM_DIR}/stm32f103/adc.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/gpio.cpp
     ${PLATFORM_DIR}/stm32g0b1/pwm.cpp
     ${PLATFORM_DIR}/stm32g0b1/spi.cpp
     ${PLATFORM_DIR}/stm32f103/iwdg.cpp

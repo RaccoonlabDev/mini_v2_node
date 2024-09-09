@@ -18,9 +18,10 @@ The node has the following registers:
 | №  | Register name           | Description |
 | -- | ----------------------- | ----------- |
 |  1 | uavcan.node.id          | Defines a node-ID. Allowed values [0,127]. |
-|  2 | system.name             | Defines custom node name. If empty, the node will use the default name. |
-|  3 | system.protocol         | Auto, Cyphal/CAN or DroneCAN |
-|  4 | uavcan.node.description | User/integrator-defined, human-readable description of this specific node. |
+|  2 | system.can_terminator   | Bitmask which switch can terminators (0 - both off, 1 - enables second, 2 - enables first, 3 - enables both). Works only for v3. |
+|  3 | system.name             | Defines custom node name. If empty, the node will use the default name. |
+|  4 | system.protocol         | Auto, Cyphal/CAN or DroneCAN |
+|  5 | uavcan.node.description | User/integrator-defined, human-readable description of this specific node. |
 
 > This docs was automatically generated. Do not edit it manually.
 
