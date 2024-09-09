@@ -7,7 +7,6 @@ list(APPEND APPLICATION_SOURCES
     ${libparamsSrc}
     ${DRONECAN_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/dronecan_module.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/logger.cpp
 )
 
 list(APPEND APPLICATION_HEADERS
