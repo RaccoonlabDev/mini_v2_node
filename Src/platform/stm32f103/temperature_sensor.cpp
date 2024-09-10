@@ -16,7 +16,7 @@
  * stm32g0      30              0.76        2.5
  */
 
-#include "periphery/temperature_sensor/temperature_sensor.hpp"
+#include "peripheral/temperature_sensor/temperature_sensor.hpp"
 
 #ifdef STM32G0B1xx
     static const uint16_t TEMP_REF = 30;

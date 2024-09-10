@@ -9,8 +9,8 @@
 #include "application.hpp"
 #include "main.h"
 #include "params.hpp"
-#include "periphery/led/led.hpp"
-#include "periphery/iwdg/iwdg.hpp"
+#include "peripheral/led/led.hpp"
+#include "peripheral/iwdg/iwdg.hpp"
 
 static const std::array<std::pair<uint16_t, uint16_t>, (int)BoardType::BOARDS_AMOUNT> hw_info = {{
     {59, 69},

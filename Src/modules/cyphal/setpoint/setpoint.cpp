@@ -9,7 +9,7 @@
 #include "reg/udral/service/actuator/common/sp/Vector31_0_1.h"
 #include "cyphal.hpp"
 #include "params.hpp"
-#include "periphery/pwm/pwm.hpp"
+#include "peripheral/pwm/pwm.hpp"
 
 REGISTER_MODULE(SetpointModule)
 

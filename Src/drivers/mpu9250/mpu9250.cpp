@@ -6,7 +6,7 @@
 
 #include "mpu9250.hpp"
 #include <cstddef>
-#include "periphery/spi/spi.hpp"
+#include "peripheral/spi/spi.hpp"
 
 // Register Map for Gyroscope and Accelerometer
 enum class Mpu9250Resgiter : uint8_t {

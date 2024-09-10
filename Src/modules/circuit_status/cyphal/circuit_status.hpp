@@ -9,7 +9,7 @@
 
 #include "cyphal_publishers.hpp"
 #include "Udral/circuit_status.hpp"
-#include "periphery/adc/circuit_periphery.hpp"
+#include "peripheral/adc/circuit_periphery.hpp"
 #include "module.hpp"
 
 #ifdef __cplusplus

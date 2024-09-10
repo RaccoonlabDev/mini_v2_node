@@ -7,7 +7,7 @@
 
 #include "as5600.hpp"
 #include <array>
-#include "periphery/i2c/i2c.hpp"
+#include "peripheral/i2c/i2c.hpp"
 
 namespace Driver {
 

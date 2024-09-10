@@ -8,7 +8,7 @@
 #include <algorithm>
 #include "params.hpp"
 #include "dronecan.h"
-#include "periphery/adc/circuit_periphery.hpp"
+#include "peripheral/adc/circuit_periphery.hpp"
 
 REGISTER_MODULE(DronecanModule)
 

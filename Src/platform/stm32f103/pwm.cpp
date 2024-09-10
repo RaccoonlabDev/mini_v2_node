@@ -4,7 +4,7 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#include "periphery/pwm/pwm.hpp"
+#include "peripheral/pwm/pwm.hpp"
 #include "platform/stm32/pwm/pwm.hpp"
 
 extern TIM_HandleTypeDef htim3;

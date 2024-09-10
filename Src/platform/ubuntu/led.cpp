@@ -4,7 +4,7 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#include "periphery/led/led.hpp"
+#include "peripheral/led/led.hpp"
 
 namespace Board {
 
