@@ -4,7 +4,7 @@
  *LICENSE.
  ***/
 
-#include "periphery/gpio/gpio.hpp"
+#include "peripheral/gpio/gpio.hpp"
 
 #include <vector>
 #include "main.h"
