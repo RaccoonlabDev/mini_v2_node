@@ -39,6 +39,16 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
+execute_process(
+    COMMAND git log -1 --format=%cd --date=format:"%Y.%m.%d"
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}  # Adjust the working directory as needed
+    OUTPUT_VARIABLE LATEST_COMMIT_DATE
+    ERROR_QUIET
+)
+
+# Trim whitespace from the output variable
+string(STRIP "${LATEST_COMMIT_DATE}" LATEST_COMMIT_DATE)
+
 # Check each version component
 check_version_component("APP_VERSION_MAJOR" ${APP_VERSION_MAJOR})
 check_version_component("APP_VERSION_MINOR" ${APP_VERSION_MINOR})

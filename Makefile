@@ -5,6 +5,8 @@ ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BUILD_DIR:=$(ROOT_DIR)/build
 BUILD_OBJ_DIR:=$(BUILD_DIR)/obj
 
+all: cyphal_v2 cyphal_v3 dronecan_v2 dronecan_v3
+
 # Cyphal
 NUNAVUT_OUT_DIR:=$(BUILD_DIR)/nunavut_out
 IS_DSDL_GENERATED:=$(shell if [ -d ${NUNAVUT_OUT_DIR} ]; then find ${NUNAVUT_OUT_DIR} -mindepth 1 | wc -l; else echo 0; fi)
@@ -18,26 +20,26 @@ generate_dsdl:
 	fi
 cyphal: cyphal_v2
 cyphal_v2: checks generate_dsdl clean
-	mkdir -p ${BUILD_OBJ_DIR}
-	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=cyphal -DUSE_PLATFORM_NODE_V2=ON -G "Unix Makefiles" ../.. && make
+	mkdir -p ${BUILD_DIR}/cyphal_v2/obj
+	cd ${BUILD_DIR}/cyphal_v2/obj && cmake -DCAN_PROTOCOL=cyphal -DUSE_PLATFORM_NODE_V2=ON -G "Unix Makefiles" ../../.. && make
 sitl_cyphal: checks generate_dsdl clean
-	mkdir -p ${BUILD_OBJ_DIR}
-	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=cyphal -DUSE_PLATFORM_UBUNTU=ON -G "Unix Makefiles" ../.. && make
+	mkdir -p ${BUILD_DIR}/cyphal_sitl/obj
+	cd ${BUILD_DIR}/cyphal_sitl/obj && cmake -DCAN_PROTOCOL=cyphal -DUSE_PLATFORM_UBUNTU=ON -G "Unix Makefiles" ../../.. && make
 cyphal_v3: checks generate_dsdl clean
-	mkdir -p ${BUILD_OBJ_DIR}
-	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=cyphal -DUSE_PLATFORM_NODE_V3=ON -G "Unix Makefiles" ../.. && make
+	mkdir -p ${BUILD_DIR}/cyphal_v3/obj
+	cd ${BUILD_DIR}/cyphal_v3/obj && cmake -DCAN_PROTOCOL=cyphal -DUSE_PLATFORM_NODE_V3=ON -G "Unix Makefiles" ../../.. && make
 
 # Dronecan:
 dronecan: dronecan_v2
 dronecan_v2: checks clean
-	mkdir -p ${BUILD_OBJ_DIR}
-	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_NODE_V2=ON -G "Unix Makefiles" ../.. && make
+	mkdir -p ${BUILD_DIR}/dronecan_v2/obj
+	cd ${BUILD_DIR}/dronecan_v2/obj && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_NODE_V2=ON -G "Unix Makefiles" ../../.. && make
 sitl_dronecan: checks clean
-	mkdir -p ${BUILD_OBJ_DIR}
-	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_UBUNTU=ON -G "Unix Makefiles" ../.. && make
+	mkdir -p ${BUILD_DIR}/dronecan_sitl/obj
+	cd ${BUILD_DIR}/dronecan_sitl/obj && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_UBUNTU=ON -G "Unix Makefiles" ../../.. && make
 dronecan_v3: checks clean
-	mkdir -p ${BUILD_OBJ_DIR}
-	cd ${BUILD_OBJ_DIR} && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_NODE_V3=ON -G "Unix Makefiles" ../.. && make
+	mkdir -p ${BUILD_DIR}/dronecan_v3/obj
+	cd ${BUILD_DIR}/dronecan_v3/obj && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_NODE_V3=ON -G "Unix Makefiles" ../../.. && make
 
 # Cyphal & DroneCAN
 v3: checks generate_dsdl clean
@@ -54,6 +56,6 @@ run:
 	./scripts/tools/can/vcan.sh slcan0
 	./build/obj/example.out
 clean:
-	-rm -fR ${BUILD_OBJ_DIR}/
+	-rm -fR ${BUILD_DIR}/*/obj
 distclean:
 	-rm -fR ${BUILD_DIR}/

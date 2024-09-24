@@ -43,7 +43,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: dronecan_firmware.bin
-          path: build/obj/example.bin
+          path: build/dronecan_${{ matrix.platform }}/obj/example.bin
 
   sitl:
     runs-on: ubuntu-22.04
