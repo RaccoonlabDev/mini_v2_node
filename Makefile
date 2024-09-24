@@ -5,7 +5,7 @@ ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BUILD_DIR:=$(ROOT_DIR)/build
 BUILD_OBJ_DIR:=$(BUILD_DIR)/obj
 
-all: cyphal_v2 cyphal_v3 dronecan_v2 dronecan_v3 sitl_dronecan sitl_cyphal
+all: clean_releases cyphal_v2 cyphal_v3 dronecan_v2 dronecan_v3 sitl_dronecan sitl_cyphal
 
 # Cyphal
 NUNAVUT_OUT_DIR:=$(BUILD_DIR)/nunavut_out
@@ -58,6 +58,8 @@ upload:
 run:
 	./scripts/tools/can/vcan.sh slcan0
 	./build/obj/example.out
+clean_releases:
+	-rm -fR ${BUILD_DIR}/release
 clean:
 	-rm -fR ${BUILD_DIR}/*/obj
 distclean:
