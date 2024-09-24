@@ -25,7 +25,7 @@ pwm.cmd_type:
   min: 0
   max: 2
 
-pwm.1_ch:
+pwm1.ch:
   type: Integer
   note: Index of setpoint channel. [-1; 255]. -1 means disabled, # -2 means GPIO SET.
   enum: PARAM_PWM_1_CH
@@ -34,7 +34,7 @@ pwm.1_ch:
   min: -1
   max: 255
 
-pwm.1_min:
+pwm1.min:
   type: Integer
   note: PWM duration when setpoint is min (RawCommand is 0 or Command is -1.0)
   enum: PARAM_PWM_1_MIN
@@ -43,7 +43,7 @@ pwm.1_min:
   min: 1000
   max: 2000
 
-pwm.1_max:
+pwm1.max:
   type: Integer
   note: PWM duration when setpoint is max (RawCommand is 8191 or Command is 1.0)
   enum: PARAM_PWM_1_MAX
@@ -52,7 +52,7 @@ pwm.1_max:
   min: 1000
   max: 2000
 
-pwm.1_def:
+pwm1.def:
   type: Integer
   note: PWM duration when setpoint is negative or there is no setpoint at all.
   enum: PARAM_PWM_1_DEF
@@ -61,7 +61,7 @@ pwm.1_def:
   min: 1000
   max: 2000
 
-pwm.2_ch:
+pwm2.ch:
   type: Integer
   note: Index of setpoint channel. [-1; 255]. -1 means disabled, # -2 means GPIO SET.
   enum: PARAM_PWM_2_CH
@@ -70,7 +70,7 @@ pwm.2_ch:
   min: -1
   max: 255
 
-pwm.2_min:
+pwm2.min:
   type: Integer
   note: PWM duration when setpoint is min (RawCommand is 0 or Command is -1.0)
   enum: PARAM_PWM_2_MIN
@@ -79,7 +79,7 @@ pwm.2_min:
   min: 1000
   max: 2000
 
-pwm.2_max:
+pwm2.max:
   type: Integer
   note: PWM duration when setpoint is max (RawCommand is 8191 or Command is 1.0)
   enum: PARAM_PWM_2_MAX
@@ -88,7 +88,7 @@ pwm.2_max:
   min: 1000
   max: 2000
 
-pwm.2_def:
+pwm2.def:
   type: Integer
   note: PWM duration when setpoint is negative or there is no setpoint at all.
   enum: PARAM_PWM_2_DEF
@@ -97,7 +97,7 @@ pwm.2_def:
   min: 1000
   max: 2000
 
-pwm.3_ch:
+pwm3.ch:
   type: Integer
   note: Index of setpoint channel. [-1; 255]. -1 means disabled, # -2 means GPIO SET.
   enum: PARAM_PWM_3_CH
@@ -106,7 +106,7 @@ pwm.3_ch:
   min: -1
   max: 255
 
-pwm.3_min:
+pwm3.min:
   type: Integer
   note: PWM duration when setpoint is min (RawCommand is 0 or Command is -1.0)
   enum: PARAM_PWM_3_MIN
@@ -115,7 +115,7 @@ pwm.3_min:
   min: 1000
   max: 2000
 
-pwm.3_max:
+pwm3.max:
   type: Integer
   note: PWM duration when setpoint is max (RawCommand is 8191 or Command is 1.0)
   enum: PARAM_PWM_3_MAX
@@ -124,7 +124,7 @@ pwm.3_max:
   min: 1000
   max: 2000
 
-pwm.3_def:
+pwm3.def:
   type: Integer
   note: PWM duration when setpoint is negative or there is no setpoint at all.
   enum: PARAM_PWM_3_DEF
@@ -133,7 +133,7 @@ pwm.3_def:
   min: 1000
   max: 2000
 
-pwm.4_ch:
+pwm4.ch:
   type: Integer
   note: Index of setpoint channel. [-1; 255]. -1 means disabled, # -2 means GPIO SET.
   enum: PARAM_PWM_4_CH
@@ -142,7 +142,7 @@ pwm.4_ch:
   min: -1
   max: 255
 
-pwm.4_min:
+pwm4.min:
   type: Integer
   note: PWM duration when setpoint is min (RawCommand is 0 or Command is -1.0)
   enum: PARAM_PWM_4_MIN
@@ -151,7 +151,7 @@ pwm.4_min:
   min: 1000
   max: 2000
 
-pwm.4_max:
+pwm4.max:
   type: Integer
   note: PWM duration when setpoint is max (RawCommand is 8191 or Command is 1.0)
   enum: PARAM_PWM_4_MAX
@@ -160,7 +160,7 @@ pwm.4_max:
   min: 1000
   max: 2000
 
-pwm.4_def:
+pwm4.def:
   type: Integer
   note: PWM duration when setpoint is negative or there is no setpoint at all.
   enum: PARAM_PWM_4_DEF
