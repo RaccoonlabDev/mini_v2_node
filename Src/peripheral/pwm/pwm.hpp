@@ -41,6 +41,11 @@ public:
     static uint32_t get_duration(PwmPin pin);
 
     /**
+     * @return the duration of the PWM signal for a specific PWM pin in microseconds
+     */
+    static uint8_t get_percent(PwmPin pin, uint32_t min_duration_us, uint32_t max_duration_us);
+
+    /**
      * @return the frequency of the PWM signal for a specific PWM pin in Hz
      */
     static uint32_t get_frequency(PwmPin pwm_pin);

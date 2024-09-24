@@ -1,0 +1,8 @@
+feedback.type:
+  type: Integer
+  note: Indicates the operational mode of the node. 0 means disabled. When set to 1, the command of corresponding Status type for cmd_type will be transmitted (esc.RawCommand - esc.Status, actuator.ArrayCommand - actuator.Status) with frequency 1 Hz. When set to 2 - 10 Hz. 
+  enum: PARAM_FEEDBACK_TYPE
+  flags: mutable
+  default: 0
+  min: 0
+  max: 2

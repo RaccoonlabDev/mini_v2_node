@@ -5,6 +5,7 @@
  */
 
 #include "peripheral/pwm/pwm.hpp"
+#include "common/algorithms.hpp"
 
 namespace HAL {
 
@@ -22,6 +23,10 @@ void Pwm::set_duration(const PwmPin pwm_pin, uint32_t duration_us) {
 
 uint32_t Pwm::get_duration(PwmPin pwm_pin) {
     return pwm[(int)pwm_pin];
+}
+
+uint8_t Pwm::get_percent(PwmPin pin, uint32_t min_duration_us, uint32_t max_duration_us) {
+    return mapPwmToPct(get_duration(pin), min_duration_us, max_duration_us);
 }
 
 void Pwm::set_frequency(const PwmPin pwm_pin, uint32_t frequency_hz) {
