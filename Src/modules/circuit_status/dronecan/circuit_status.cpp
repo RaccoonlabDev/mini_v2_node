@@ -6,6 +6,7 @@
  */
 
 #include "circuit_status.hpp"
+#include "params.hpp"
 #include "peripheral/adc/circuit_periphery.hpp"
 
 REGISTER_MODULE(DronecanCircuitStatus)
@@ -14,18 +15,49 @@ void DronecanCircuitStatus::init() {
     mode = Module::Mode::STANDBY;
 }
 
-void DronecanCircuitStatus::spin_once() {
-    dev_temperature.msg.temperature = CircuitPeriphery::temperature();
-    dev_temperature.publish();
+void DronecanCircuitStatus::update_params() {
+    node_id = static_cast<uint8_t>(paramsGetIntegerValue(IntParamsIndexes::PARAM_UAVCAN_NODE_ID));
+    bitmask = static_cast<uint8_t>(paramsGetIntegerValue(IntParamsIndexes::PARAM_CRCT_BITMASK));
+}
 
-    circuit_status.msg.voltage = CircuitPeriphery::voltage_vin();
-    circuit_status.msg.current = CircuitPeriphery::current();
+void DronecanCircuitStatus::spin_once() {
+    if (bitmask & static_cast<uint8_t>(Bitmask::ENABLE_DEV_TEMPERATURE_PUB)) {
+        dev_temperature.msg = {
+            .device_id = node_id,
+            .temperature = static_cast<float>(CircuitPeriphery::temperature()),
+            .error_flags = TemperatureErrorFlags_t(0),
+        };
+        dev_temperature.publish();
+    }
+
     uint16_t error_flags = 0;
     error_flags |= CircuitPeriphery::overvoltage() * (uint16_t)ERROR_FLAG_OVERVOLTAGE;
     error_flags |= CircuitPeriphery::undervoltage() * (uint16_t)ERROR_FLAG_UNDERVOLTAGE;
     error_flags |= CircuitPeriphery::overcurrent() * (uint16_t)ERROR_FLAG_OVERCURRENT;
-    circuit_status.msg.error_flags = static_cast<CircuitStatusErrorFlags_t>(error_flags);
-    circuit_status.publish();
 
-    health = CircuitPeriphery::is_failure() ? Status::MINOR_FAILURE : Status::OK;
+    if (bitmask & static_cast<uint8_t>(Bitmask::ENABLE_5V_PUB)) {
+        circuit_status.msg = {
+            .circuit_id = static_cast<uint8_t>(node_id * 10),
+            .voltage = CircuitPeriphery::voltage_5v(),
+            .current = CircuitPeriphery::current(),
+            .error_flags = static_cast<CircuitStatusErrorFlags_t>(error_flags),
+        };
+        circuit_status.publish();
+    }
+
+    if (bitmask & static_cast<uint8_t>(Bitmask::ENABLE_VIN_PUB)) {
+        circuit_status.msg = {
+            .circuit_id = static_cast<uint8_t>(node_id * 10 + 1),
+            .voltage = CircuitPeriphery::voltage_vin(),
+            .current = CircuitPeriphery::current(),
+            .error_flags = static_cast<CircuitStatusErrorFlags_t>(error_flags),
+        };
+        circuit_status.publish();
+    }
+
+    if (bitmask & static_cast<uint8_t>(Bitmask::ENABLE_HW_CHECKS)) {
+        health = CircuitPeriphery::is_failure() ? Status::MINOR_FAILURE : Status::OK;
+    } else {
+        health = Status::OK;
+    }
 }

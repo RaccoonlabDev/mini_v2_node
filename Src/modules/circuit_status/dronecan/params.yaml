@@ -1,0 +1,14 @@
+crct.bitmask:
+  type: Integer
+  note:
+    "Bit mask to enable CircuitStatus features:
+    </br> Bit 1 - enable dev.Temperature with device_id=NODE_ID,
+    </br> Bit 2 - enable 5v publisher,
+    </br> Bit 3 - enable Vin publisher.
+    </br> Bit 4 - enable overvoltage, undervoltage, overcurrent and overheat checks.
+    </br> By default 15 that mean enable all publishers"
+  enum: PARAM_CRCT_BITMASK
+  flags: mutable
+  default: 15
+  min: 0
+  max: 15
