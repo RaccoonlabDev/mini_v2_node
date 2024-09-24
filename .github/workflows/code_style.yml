@@ -17,4 +17,4 @@ jobs:
       - run: pip3 install cpplint
       - name: cpplint
         run: |
-          cpplint Src/modules/*/*pp Src/peripheral/*/*pp Src/platform/*/*pp
+          make code_style

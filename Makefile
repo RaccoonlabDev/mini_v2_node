@@ -5,7 +5,7 @@ ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BUILD_DIR:=$(ROOT_DIR)/build
 BUILD_OBJ_DIR:=$(BUILD_DIR)/obj
 
-all: cyphal_v2 cyphal_v3 dronecan_v2 dronecan_v3
+all: cyphal_v2 cyphal_v3 dronecan_v2 dronecan_v3 sitl_dronecan sitl_cyphal
 
 # Cyphal
 NUNAVUT_OUT_DIR:=$(BUILD_DIR)/nunavut_out
@@ -49,6 +49,9 @@ v3: checks generate_dsdl clean
 # Common:
 checks:
 	@python scripts/prebuild_check.py || (echo "Requirements verification failed. Stopping build." && exit 1)
+
+code_style:
+	cpplint Src/modules/*/*pp Src/peripheral/*/*pp Src/platform/*/*pp
 
 upload:
 	./scripts/tools/stm32/flash.sh ${BUILD_OBJ_DIR}/example.bin
