@@ -61,15 +61,6 @@ pwm.1_def:
   min: 1000
   max: 2000
 
-pwm.1_feedback:
-  type: Integer
-  note: Indicates the operational mode of the node. 0 means disabled. When set to 1, the command of corresponding Status type for cmd_type will be transmitted (esc.RawCommand - esc.Status, actuator.ArrayCommand - actuator.Status) with frequency 1 Hz. When set to 2 - 10 Hz. 
-  enum: PARAM_PWM_1_FB
-  flags: mutable
-  default: 0
-  min: 0
-  max: 2
-
 pwm.2_ch:
   type: Integer
   note: Index of setpoint channel. [-1; 255]. -1 means disabled, # -2 means GPIO SET.
@@ -105,15 +96,6 @@ pwm.2_def:
   default: 1000
   min: 1000
   max: 2000
-
-pwm.2_feedback:
-  type: Integer
-  note: Indicates the operational mode of the node. 0 means disabled. When set to 1, the command of corresponding Status type for cmd_type will be transmitted (esc.RawCommand - esc.Status, actuator.ArrayCommand - actuator.Status) with frequency 1 Hz. When set to 2 - 10 Hz. 
-  enum: PARAM_PWM_2_FB
-  flags: mutable
-  default: 0
-  min: 0
-  max: 2
 
 pwm.3_ch:
   type: Integer
@@ -151,15 +133,6 @@ pwm.3_def:
   min: 1000
   max: 2000
 
-pwm.3_feedback:
-  type: Integer
-  note: Indicates the operational mode of the node. 0 means disabled. When set to 1, the command of corresponding Status type for cmd_type will be transmitted (esc.RawCommand - esc.Status, actuator.ArrayCommand - actuator.Status) with frequency 1 Hz. When set to 2 - 10 Hz. 
-  enum: PARAM_PWM_3_FB
-  flags: mutable
-  default: 0
-  min: 0
-  max: 2
-
 pwm.4_ch:
   type: Integer
   note: Index of setpoint channel. [-1; 255]. -1 means disabled, # -2 means GPIO SET.
@@ -195,12 +168,3 @@ pwm.4_def:
   default: 1000
   min: 1000
   max: 2000
-
-pwm.4_feedback:
-  type: Integer
-  note: Indicates the operational mode of the node. 0 means disabled. When set to 1, the command of corresponding Status type for cmd_type will be transmitted (esc.RawCommand - esc.Status, actuator.ArrayCommand - actuator.Status) with frequency 1 Hz. When set to 2 - 10 Hz. 
-  enum: PARAM_PWM_4_FB
-  flags: mutable
-  default: 0
-  min: 0
-  max: 2

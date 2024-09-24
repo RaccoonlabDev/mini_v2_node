@@ -21,10 +21,7 @@
 #define MIN(channel) IntParamsIndexes::PARAM_PWM_##channel##_MIN
 #define MAX(channel) IntParamsIndexes::PARAM_PWM_##channel##_MAX
 #define DEF(channel) IntParamsIndexes::PARAM_PWM_##channel##_DEF
-#define FB(channel) IntParamsIndexes::PARAM_PWM_##channel##_FB
 
-static constexpr uint16_t CMD_RELEASE_OR_MIN = 0;
-static constexpr uint16_t CMD_HOLD_OR_MAX = 1;
 
 Logger PWMModule::logger = Logger("PWMModule");
 
@@ -35,10 +32,10 @@ CommandType PWMModule::pwm_cmd_type = CommandType::RAW_COMMAND;
 REGISTER_MODULE(PWMModule)
 
 std::array<PwmChannelInfo, static_cast<uint8_t>(HAL::PwmPin::PWM_AMOUNT)> PWMModule::params = {{
-    {{.min = MIN(1), .max = MAX(1), .def = DEF(1), .ch = CH(1), .fb = FB(1)}, HAL::PwmPin::PWM_1},
-    {{.min = MIN(2), .max = MAX(2), .def = DEF(2), .ch = CH(2), .fb = FB(2)}, HAL::PwmPin::PWM_2},
-    {{.min = MIN(3), .max = MAX(3), .def = DEF(3), .ch = CH(3), .fb = FB(3)}, HAL::PwmPin::PWM_3},
-    {{.min = MIN(4), .max = MAX(4), .def = DEF(4), .ch = CH(4), .fb = FB(4)}, HAL::PwmPin::PWM_4},
+    {{.min = MIN(1), .max = MAX(1), .def = DEF(1), .ch = CH(1)}, HAL::PwmPin::PWM_1},
+    {{.min = MIN(2), .max = MAX(2), .def = DEF(2), .ch = CH(2)}, HAL::PwmPin::PWM_2},
+    {{.min = MIN(3), .max = MAX(3), .def = DEF(3), .ch = CH(3)}, HAL::PwmPin::PWM_3},
+    {{.min = MIN(4), .max = MAX(4), .def = DEF(4), .ch = CH(4)}, HAL::PwmPin::PWM_4},
 }};
 
 void PWMModule::init() {
@@ -70,13 +67,6 @@ void PWMModule::spin_once() {
             mode = Mode::ENGAGED;
         }
     }
-    status_pub_timeout_ms = 1;
-    static uint32_t next_pub_ms = 5000;
-
-    if (health == Status::OK && crnt_time_ms > next_pub_ms) {
-        publish_state();
-        next_pub_ms = crnt_time_ms + status_pub_timeout_ms;
-    }
 }
 
 void PWMModule::update_params() {
@@ -86,7 +76,6 @@ void PWMModule::update_params() {
     pwm_cmd_type = (CommandType)paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_CMD_TYPE);
 
     ttl_cmd = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_CMD_TTL_MS);
-    status_pub_timeout_ms = 100;
     uint8_t max_channel = 0;
 
     bool params_error = false;
@@ -109,7 +98,6 @@ void PWMModule::update_params() {
     }
     static uint32_t last_warn_pub_time_ms = 0;
     for (int i = 0; i < static_cast<uint8_t>(HAL::PwmPin::PWM_AMOUNT); i++) {
-        params[i].fb = paramsGetIntegerValue(params[i].names.fb);
         auto channel = paramsGetIntegerValue(params[i].names.ch);
         if (channel < max_channel) {
             params[i].channel = channel;
@@ -143,90 +131,8 @@ void PWMModule::apply_params() {
             HAL::Pwm::set_frequency(params[i].pin, pwm_freq);
         }
     }
-
-    switch (pwm_cmd_type) {
-        case CommandType::RAW_COMMAND:
-            publish_state = publish_esc_status;
-            break;
-        case CommandType::ARRAY_COMMAND:
-            publish_state = publish_actuator_status;
-            break;
-        case CommandType::HARDPOINT_COMMAND:
-            publish_state = publish_hardpoint_status;
-            break;
-        default:
-            break;
-    }
 }
 
-void PWMModule::publish_esc_status() {
-    for (auto& pwm : params) {
-        auto crnt_time_ms = HAL_GetTick();
-        if (pwm.channel < 0 || pwm.fb == 0 || pwm.next_status_pub_ms > crnt_time_ms) {
-            continue;
-        }
-
-        auto& msg = esc_status_pub.msg;
-        msg.esc_index = pwm.channel;
-        auto pwm_val = HAL::Pwm::get_duration(pwm.pin);
-        auto scaled_value = mapPwmToPct(pwm_val, pwm.min, pwm.max);
-        msg.power_rating_pct = (uint8_t)(scaled_value);
-        esc_status_pub.publish();
-
-        pwm.next_status_pub_ms = crnt_time_ms + ((pwm.fb > 1) ? 100 : 1000);
-    }
-}
-
-void PWMModule::publish_actuator_status() {
-    for (auto& pwm : params) {
-        auto crnt_time_ms = HAL_GetTick();
-        if (pwm.channel < 0 || pwm.fb == 0 || pwm.next_status_pub_ms > crnt_time_ms) {
-            continue;
-        }
-
-        auto percent = (uint8_t)mapPwmToPct(HAL::Pwm::get_duration(pwm.pin), pwm.min, pwm.max);
-
-        auto& msg = actuator_status_pub.msg;
-        msg.actuator_id = pwm.channel;
-        msg.power_rating_pct = percent;
-
-        // The following fields are not used in PX4 anyway
-        // Let's fill them with something useful for logging for a while
-        msg.force = CircuitPeriphery::current();
-        msg.speed = CircuitPeriphery::temperature();
-        msg.position = CircuitPeriphery::voltage_5v();
-
-        actuator_status_pub.publish();
-
-        // We don't want to publish this message often, probably 1 Hz is fine
-        // We want to record the maximum current, the highest temperature and the lowest voltage
-        // As a temporary solution, let's publish with 2 Hz
-        pwm.next_status_pub_ms = crnt_time_ms + 500;
-    }
-}
-
-void PWMModule::publish_hardpoint_status() {
-    static uint32_t next_status_pub_ms{0};
-
-    auto crnt_time_ms = HAL_GetTick();
-    if (next_status_pub_ms > crnt_time_ms) {
-        return;
-    }
-    next_status_pub_ms = crnt_time_ms + 1000;
-
-    for (auto& pwm : params) {
-        if (pwm.channel < 0) {
-            continue;
-        }
-
-        auto& msg = hardpoint_status_pub.msg;
-        msg.hardpoint_id = pwm.channel;
-        auto pwm_duration_us = HAL::Pwm::get_duration(pwm.pin);
-        msg.status = (pwm_duration_us == pwm.min) ? CMD_RELEASE_OR_MIN : CMD_HOLD_OR_MAX;
-
-        hardpoint_status_pub.publish();
-    }
-}
 
 void PWMModule::raw_command_cb(const RawCommand_t& msg) {
     if (pwm_cmd_type != CommandType::RAW_COMMAND) {
@@ -291,7 +197,7 @@ void PWMModule::hardpoint_callback(CanardRxTransfer* transfer) {
         pwm.is_engaged = true;
         // TTL has no effect on Hardpoint
         pwm.cmd_end_time_ms = std::numeric_limits<decltype(pwm.cmd_end_time_ms)>::max();
-        pwm.command_val = (cmd.command == CMD_HOLD_OR_MAX) ? pwm.max : pwm.min;
+        pwm.command_val = (cmd.command == 1) ? pwm.max : pwm.min;
     }
 }
 

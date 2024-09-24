@@ -32,7 +32,6 @@ struct PwmChannelsParamsNames {
     uint8_t max;
     uint8_t def;
     uint8_t ch;
-    uint8_t fb;
 };
 
 struct PwmChannelInfo {
@@ -44,8 +43,6 @@ struct PwmChannelInfo {
     int16_t     channel{-1};
     uint16_t    command_val{0};
     uint32_t    cmd_end_time_ms{0};
-    uint32_t    next_status_pub_ms{0};
-    uint8_t     fb{0};
     bool        is_engaged{false};
 };
 
@@ -55,11 +52,12 @@ public:
 
     inline PWMModule() : Module(50, Protocol::DRONECAN) {}
 
+    static std::array<PwmChannelInfo, static_cast<uint8_t>(HAL::PwmPin::PWM_AMOUNT)> params;
+
 protected:
     void update_params() override;
     void spin_once() override;
 
-    static std::array<PwmChannelInfo, static_cast<uint8_t>(HAL::PwmPin::PWM_AMOUNT)> params;
 
 private:
     void (*callback)(CanardRxTransfer*) = {};
@@ -73,17 +71,7 @@ private:
     static void hardpoint_callback(CanardRxTransfer* transfer);
     static void arming_status_callback(const ArmingStatus& msg);
 
-    static void publish_esc_status();
-    static void publish_actuator_status();
-    static void publish_raw_command();
-    static void publish_array_command();
-    static void publish_hardpoint_status();
-
     static inline DronecanSubscriber<RawCommand_t> raw_command_sub;
-
-    static inline DronecanPublisher<ActuatorStatus_t> actuator_status_pub;
-    static inline DronecanPublisher<EscStatus_t> esc_status_pub;
-    static inline DronecanPublisher<HardpointStatus> hardpoint_status_pub;
 
     static uint16_t pwm_freq;
     static CommandType pwm_cmd_type;
