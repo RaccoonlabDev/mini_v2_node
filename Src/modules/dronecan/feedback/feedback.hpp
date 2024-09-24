@@ -26,11 +26,11 @@ enum class FeedbackType: uint8_t {
     NUMBER_OF_FEEDBACKS,
 };
 
-class FeedbackModule : public Module {
+class DronecanFeedbackModule : public Module {
 public:
     void init() override;
 
-    inline FeedbackModule() : Module(10, Protocol::DRONECAN) {}
+    inline DronecanFeedbackModule() : Module(10, Protocol::DRONECAN) {}
 
 protected:
     void spin_once() override;

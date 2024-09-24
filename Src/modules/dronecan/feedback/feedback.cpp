@@ -9,14 +9,14 @@
 #include "peripheral/adc/circuit_periphery.hpp"
 
 
-REGISTER_MODULE(FeedbackModule)
+REGISTER_MODULE(DronecanFeedbackModule)
 
 
-void FeedbackModule::init() {
+void DronecanFeedbackModule::init() {
     mode = Module::Mode::STANDBY;
 }
 
-void FeedbackModule::update_params() {
+void DronecanFeedbackModule::update_params() {
     auto cmd_type_value = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_CMD_TYPE);
     cmd_type = static_cast<CommandType>(cmd_type_value);
 
@@ -36,7 +36,7 @@ void FeedbackModule::update_params() {
     }
 }
 
-void FeedbackModule::spin_once() {
+void DronecanFeedbackModule::spin_once() {
     if (feedback_type == FeedbackType::DISABLED) {
         return;
     }
@@ -62,7 +62,7 @@ void FeedbackModule::spin_once() {
     }
 }
 
-void FeedbackModule::publish_esc_status(PwmChannelInfo& pwm) {
+void DronecanFeedbackModule::publish_esc_status(PwmChannelInfo& pwm) {
     esc_status.msg = {
         .error_count = esc_status.msg.error_count + 1,
         .voltage = CircuitPeriphery::voltage_vin(),
@@ -76,7 +76,7 @@ void FeedbackModule::publish_esc_status(PwmChannelInfo& pwm) {
     esc_status.publish();
 }
 
-void FeedbackModule::publish_actuator_status(PwmChannelInfo& pwm) {
+void DronecanFeedbackModule::publish_actuator_status(PwmChannelInfo& pwm) {
     actuator_status.msg = {
         .actuator_id = static_cast<uint8_t>(pwm.channel),
 
@@ -93,7 +93,7 @@ void FeedbackModule::publish_actuator_status(PwmChannelInfo& pwm) {
     actuator_status.publish();
 }
 
-void FeedbackModule::publish_hardpoint_status(PwmChannelInfo& pwm) {
+void DronecanFeedbackModule::publish_hardpoint_status(PwmChannelInfo& pwm) {
     static constexpr uint16_t CMD_RELEASE_OR_MIN = 0;
     static constexpr uint16_t CMD_HOLD_OR_MAX = 1;
 
