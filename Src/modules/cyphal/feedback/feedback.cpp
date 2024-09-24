@@ -10,7 +10,7 @@
 #include "params.hpp"
 #include "peripheral/pwm/pwm.hpp"
 
-REGISTER_MODULE(FeedbackModule)
+REGISTER_MODULE(CyphalFeedbackModule)
 
 void FeedbackPublisher::publish() {
     uint8_t buffer[reg_udral_service_actuator_common_Feedback_0_1_EXTENT_BYTES_];
@@ -21,12 +21,12 @@ void FeedbackPublisher::publish() {
     }
 }
 
-void FeedbackModule::update_params() {
+void CyphalFeedbackModule::update_params() {
     auto port_id = static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_1_ID));
     pub.setPortId(port_id);
 }
 
-void FeedbackModule::spin_once() {
+void CyphalFeedbackModule::spin_once() {
     pub.msg.heartbeat.health.value = uavcan_node_Health_1_0_NOMINAL;
     pub.msg.heartbeat.readiness.value = reg_udral_service_common_Readiness_0_1_ENGAGED;
     uint32_t pwm_ccr_reg_value = HAL::Pwm::get_duration(HAL::PwmPin::PWM_1);
