@@ -1,0 +1,15 @@
+system.log_level:
+  type: Integer
+  note:
+    "Log level. See [debug.LogLevel](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#loglevel) and [diagnostic.Severity](https://github.com/OpenCyphal/public_regulated_data_types/blob/master/uavcan/diagnostic/Severity.1.0.dsdl).
+    </br> 0 - Log everything (DEBUG, INFO, WARNING, ERROR)
+    </br> 1 - Log at least INFO level
+    </br> 2 - Log at least WARNING level
+    </br> 3 - Log at least ERROR level
+    </br> 4 - Disable logging
+    </br> By default 3 to show only realy important messages."
+  enum: PARAM_LOG_LEVEL
+  flags: mutable
+  default: 3
+  min: 0
+  max: 4

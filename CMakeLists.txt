@@ -73,4 +73,6 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
+include(${CMAKE_DIR}/full_firmware_info.cmake)
+
 add_subdirectory(${ROOT_DIR}/Src/platform/${APP_PLATFORM})
