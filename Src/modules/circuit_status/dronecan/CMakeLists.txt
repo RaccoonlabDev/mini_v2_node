@@ -4,3 +4,7 @@
 list(APPEND APPLICATION_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/circuit_status.cpp
 )
+
+list(APPEND LIBPARAMS_PARAMS
+    ${CMAKE_CURRENT_LIST_DIR}/params.yaml
+)
