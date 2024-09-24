@@ -8,6 +8,7 @@ cmake_path(GET APPLICATIONS_DIR PARENT_PATH SRC_DIR)
 add_definitions(-DCONFIG_USE_DRONECAN=1)
 
 include(${SRC_DIR}/modules/dronecan/core/CMakeLists.txt)
+include(${SRC_DIR}/modules/system/CMakeLists.txt)
 include(${SRC_DIR}/modules/dronecan/arming/CMakeLists.txt)
 include(${SRC_DIR}/modules/circuit_status/dronecan/CMakeLists.txt)
 include(${SRC_DIR}/modules/dronecan/feedback/CMakeLists.txt)
