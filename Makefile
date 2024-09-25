@@ -3,7 +3,6 @@
 
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BUILD_DIR:=$(ROOT_DIR)/build
-BUILD_OBJ_DIR:=$(BUILD_DIR)/obj
 
 all: clean_releases cyphal_v2 cyphal_v3 dronecan_v2 dronecan_v3 v3 sitl_dronecan sitl_cyphal
 
@@ -54,10 +53,10 @@ code_style:
 	cpplint Src/modules/*/*pp Src/peripheral/*/*pp Src/platform/*/*pp
 
 upload:
-	./scripts/tools/stm32/flash.sh ${BUILD_OBJ_DIR}/example.bin
+	LATEST_TARGET=$$(ls -td ${BUILD_DIR}/release/*.bin | head -1) && ./scripts/tools/stm32/flash.sh $$LATEST_TARGET
 run:
 	./scripts/tools/can/vcan.sh slcan0
-	./build/obj/example.out
+	LATEST_TARGET=$$(ls -td ${BUILD_DIR}/* | head -1) && $$LATEST_TARGET/obj/example.out
 clean_releases:
 	-rm -fR ${BUILD_DIR}/release
 clean:
