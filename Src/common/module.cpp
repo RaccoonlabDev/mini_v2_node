@@ -5,6 +5,7 @@
  */
 
 #include "module.hpp"
+#include "params.hpp"
 #include <span>
 
 Module::Module(float frequency, Protocol proto) : protocol(proto),
@@ -51,10 +52,11 @@ void ModuleManager::register_module(Module* app_module) {
     }
 }
 
-void ModuleManager::init(Module::Protocol proto) {
-    protocol = proto;
+void ModuleManager::init() {
+    active_protocol = get_active_protocol();
     for (auto app_module : active_modules) {
-        if (app_module->get_protocol() == protocol) {
+        auto protocol = app_module->get_protocol();
+        if (protocol == Module::Protocol::CYPHAL_AND_DRONECAN || protocol == active_protocol) {
             app_module->init();
         }
     }
@@ -62,17 +64,37 @@ void ModuleManager::init(Module::Protocol proto) {
 
 void ModuleManager::process() {
     for (auto app_module : active_modules) {
-        if (app_module->get_protocol() == protocol) {
+        auto protocol = app_module->get_protocol();
+        if (protocol == Module::Protocol::CYPHAL_AND_DRONECAN || protocol == active_protocol) {
             app_module->process();
         }
     }
+}
+
+Module::Protocol ModuleManager::get_active_protocol() {
+#if defined(CONFIG_USE_CYPHAL) && !defined(CONFIG_USE_DRONECAN)
+    return Module::Protocol::CYPHAL;
+#elif !defined(CONFIG_USE_CYPHAL) && defined(CONFIG_USE_DRONECAN)
+    return Module::Protocol::DRONECAN;
+#else
+    auto system_protocol = paramsGetIntegerValue(PARAM_SYSTEM_PROTOCOL);
+
+    Module::Protocol protocol;
+    if (system_protocol == static_cast<int32_t>(Module::Protocol::CYPHAL)) {
+        protocol = Module::Protocol::CYPHAL;
+    } else {
+        protocol = Module::Protocol::DRONECAN;
+    }
+
+    return protocol;
+#endif
 }
 
 Module::Status ModuleManager::get_global_status() {
     auto global_status = Module::Status::OK;
 
     for (auto app_module : active_modules) {
-        if (app_module->get_protocol() == protocol && app_module->get_health() > global_status) {
+        if (app_module->get_protocol() == active_protocol && app_module->get_health() > global_status) {
             global_status = app_module->get_health();
         }
     }
@@ -84,7 +106,7 @@ Module::Mode ModuleManager::get_global_mode() {
     auto global_mode = Module::Mode::STANDBY;
 
     for (auto app_module : active_modules) {
-        if (app_module->get_protocol() == protocol && app_module->get_mode() > global_mode) {
+        if (app_module->get_protocol() == active_protocol && app_module->get_mode() > global_mode) {
             global_mode = app_module->get_mode();
         }
     }
@@ -97,7 +119,7 @@ uint8_t ModuleManager::get_vssc() {
 
     uint8_t module_idx = 0;
     for (auto app_module : active_modules) {
-        if (app_module->get_protocol() != protocol) {
+        if (app_module->get_protocol() != active_protocol) {
             continue;
         }
 

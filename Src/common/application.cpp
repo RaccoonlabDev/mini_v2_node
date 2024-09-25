@@ -78,28 +78,9 @@ static void blink_board_led() {
     Board::Led::blink(colors.first, colors.second);
 }
 
-Module::Protocol get_protocol() {
-#if defined(CONFIG_USE_CYPHAL) && !defined(CONFIG_USE_DRONECAN)
-    return Module::Protocol::CYPHAL;
-#elif !defined(CONFIG_USE_CYPHAL) && defined(CONFIG_USE_DRONECAN)
-    return Module::Protocol::DRONECAN;
-#else
-    auto system_protocol = paramsGetIntegerValue(PARAM_SYSTEM_PROTOCOL);
-
-    Module::Protocol protocol;
-    if (system_protocol == static_cast<int32_t>(Module::Protocol::CYPHAL)) {
-        protocol = Module::Protocol::CYPHAL;
-    } else {
-        protocol = Module::Protocol::DRONECAN;
-    }
-
-    return protocol;
-#endif
-}
-
 __attribute__((noreturn)) void application_entry_point() {
     init_board_periphery();
-    ModuleManager::init(get_protocol());
+    ModuleManager::init();
 
     while (true) {
         ModuleManager::process();

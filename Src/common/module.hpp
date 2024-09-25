@@ -92,9 +92,10 @@ protected:
 class ModuleManager {
 public:
     static void register_module(Module* app_module);
-    static void init(Module::Protocol proto);
+    static void init();
     static void process();
 
+    static Module::Protocol get_active_protocol();
     static Module::Status get_global_status();
     static Module::Mode get_global_mode();
     static uint8_t get_vssc();
@@ -104,7 +105,7 @@ private:
     static inline std::array<Module*, MAX_MODULES_AMOUNT> modules;
     static inline std::span<Module*> active_modules;
     static inline uint8_t modules_amount{0};
-    static inline Module::Protocol protocol;
+    static inline Module::Protocol active_protocol;
 };
 
 /**
