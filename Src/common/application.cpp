@@ -104,6 +104,6 @@ __attribute__((noreturn)) void application_entry_point() {
     while (true) {
         ModuleManager::process();
         blink_board_led();
-        WatchdogPeriphery::refresh();
+        HAL::Watchdog::refresh();
     }
 }

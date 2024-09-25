@@ -6,12 +6,13 @@
 
 #include <string.h>
 #include "main.h"
+#include "peripheral/iwdg/iwdg.hpp"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void uavcanReadUniqueID(uint8_t out_uid[4]) {
+void platformSpecificReadUniqueID(uint8_t out_uid[4]) {
     const uint32_t UNIQUE_ID_16_BYTES[4] = {
         HAL_GetUIDw0(),
         HAL_GetUIDw1(),
@@ -21,11 +22,16 @@ void uavcanReadUniqueID(uint8_t out_uid[4]) {
     memcpy(out_uid, UNIQUE_ID_16_BYTES, 16);
 }
 
-void uavcanRestartNode() {
+bool platformSpecificRequestRestart() {
+    HAL::Watchdog::request_reboot();
+    return true;
+}
+
+void platformSpecificRebootForce() {
     HAL_NVIC_SystemReset();
 }
 
-uint32_t uavcanGetTimeMs() {
+uint32_t platformSpecificGetTimeMs() {
     return HAL_GetTick();
 }
 

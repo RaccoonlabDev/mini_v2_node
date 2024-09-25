@@ -5,7 +5,20 @@
  */
 
 #include "peripheral/iwdg/iwdg.hpp"
+#include "main.h"
 
-void WatchdogPeriphery::refresh() {
-    // do nothing
+namespace HAL {
+
+static uint32_t watchdog_deadline_ms = 500;
+
+void Watchdog::refresh() {
+    if (!reboot_required) {
+        watchdog_deadline_ms = platformSpecificGetTimeMs() + 500;
+    }
+
+    if (platformSpecificGetTimeMs() > watchdog_deadline_ms) {
+        platformSpecificRebootForce();
+    }
 }
+
+}  // namespace HAL
