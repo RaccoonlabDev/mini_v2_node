@@ -13,10 +13,10 @@ add_executable(${EXECUTABLE}
     ${CMAKE_CURRENT_LIST_DIR}/adc.cpp
     ${ROOT_DIR}/Src/platform/stm32/pwm/pwm.cpp
     ${CMAKE_CURRENT_LIST_DIR}/pwm.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/iwdg.cpp
+    ${ROOT_DIR}/Src/platform/stm32/iwdg/iwdg.cpp
     ${CMAKE_CURRENT_LIST_DIR}/led.cpp
     ${CMAKE_CURRENT_LIST_DIR}/temperature_sensor.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/platform_specific.cpp
+    ${ROOT_DIR}/Src/platform/stm32/platform_specific.cpp
 
     ${coreSources}
     ${driversSources}

@@ -12,6 +12,7 @@
 #include "main.h"
 #include "application.hpp"
 #include "rom.h"
+#include "peripheral/iwdg/iwdg.hpp"
 
 int main() {
     std::cout << "The app has been started." << std::endl;
@@ -20,11 +21,16 @@ int main() {
     return 0;
 }
 
-void uavcanReadUniqueID(uint8_t out_uid[4]) {
+void platformSpecificReadUniqueID(uint8_t out_uid[4]) {
     memset(out_uid, 0x00, 16);
 }
 
-void uavcanRestartNode() {
+bool platformSpecificRequestRestart() {
+    HAL::Watchdog::request_reboot();
+    return true;
+}
+
+void platformSpecificRebootForce() {
     constexpr const char* EXECUTABLE_SYMBOLIC_LINK = "/proc/self/exe";
     constexpr const int MAX_PATH_LENGTH = 1024;
 
@@ -47,7 +53,7 @@ void uavcanRestartNode() {
     exit(1);
 }
 
-uint32_t uavcanGetTimeMs() {
+uint32_t platformSpecificGetTimeMs() {
     return HAL_GetTick();
 }
 

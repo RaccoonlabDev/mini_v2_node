@@ -19,9 +19,10 @@ static inline uint32_t HAL_GetUIDw2() {return 0;}
 
 uint32_t HAL_GetTick();
 void HAL_NVIC_SystemReset();
-void uavcanRestartNode();
+void platformSpecificRebootForce();
+bool platformSpecificRequestRestart();
 
-uint32_t uavcanGetTimeMs();
+uint32_t platformSpecificGetTimeMs();
 
 #ifdef __cplusplus
 }

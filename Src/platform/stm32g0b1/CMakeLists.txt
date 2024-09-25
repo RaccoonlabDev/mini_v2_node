@@ -20,10 +20,10 @@ add_executable(${EXECUTABLE}
     ${CMAKE_CURRENT_LIST_DIR}/gpio.cpp
     ${PLATFORM_DIR}/stm32g0b1/pwm.cpp
     ${PLATFORM_DIR}/stm32g0b1/spi.cpp
-    ${PLATFORM_DIR}/stm32f103/iwdg.cpp
+    ${ROOT_DIR}/Src/platform/stm32/iwdg/iwdg.cpp
     ${PLATFORM_DIR}/stm32f103/led.cpp
     ${PLATFORM_DIR}/stm32f103/temperature_sensor.cpp
-    ${PLATFORM_DIR}/stm32f103/platform_specific.cpp
+    ${ROOT_DIR}/Src/platform/stm32/platform_specific.cpp
 
     ${coreSources}
     ${driversSources}

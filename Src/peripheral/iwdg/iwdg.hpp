@@ -7,13 +7,26 @@
 #ifndef SRC_PERIPHERY_IWDG_HPP_
 #define SRC_PERIPHERY_IWDG_HPP_
 
-class WatchdogPeriphery {
+namespace HAL {
+
+class Watchdog {
 public:
     /**
-     * @brief Refresh the IWDG
-     * Reload IWDG counter with value defined in the reload register
+     * @brief Reload IWDG counter with value defined in the reload register
      */
     static void refresh();
+
+    /**
+     * @brief Block all refresh calls, so the application will be rebooted soon
+     */
+    static void request_reboot() {
+        reboot_required = true;
+    }
+
+private:
+    static inline bool reboot_required{false};
 };
+
+}  // namespace HAL
 
 #endif  // SRC_PERIPHERY_IWDG_HPP_

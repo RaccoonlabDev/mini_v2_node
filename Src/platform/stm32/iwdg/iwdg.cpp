@@ -11,8 +11,14 @@
 extern IWDG_HandleTypeDef hiwdg;
 #endif  // HAL_IWDG_MODULE_ENABLED
 
-void WatchdogPeriphery::refresh() {
+namespace HAL {
+
+void Watchdog::refresh() {
+    if (!reboot_required) {
 #ifdef HAL_IWDG_MODULE_ENABLED
-    HAL_IWDG_Refresh(&hiwdg);
+        HAL_IWDG_Refresh(&hiwdg);
 #endif  // HAL_IWDG_MODULE_ENABLED
+    }
 }
+
+}  // namespace HAL
