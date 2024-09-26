@@ -61,16 +61,18 @@ static void blink_board_led() {
     auto mode = ModuleManager::get_global_mode();
 
     std::pair<Board::Led::Color, Board::Led::Color> colors;
-    if (mode == Module::Mode::INITIALIZATION) {
-        colors = {Board::Led::Color::RED, Board::Led::Color::BLUE};
-    } else if (mode == Module::Mode::MAINTENANCE) {
-        colors = {Board::Led::Color::RED, Board::Led::Color::BLUE};
-    } else if (status >= Module::Status::FATAL_MALFANCTION) {
+    if (status >= Module::Status::FATAL_MALFANCTION) {
         colors = {Board::Led::Color::RED, Board::Led::Color::BLACK};
     } else if (status >= Module::Status::MAJOR_FAILURE) {
         colors = {Board::Led::Color::MAGENTA, Board::Led::Color::BLACK};
     } else if (status >= Module::Status::MINOR_FAILURE) {
         colors = {Board::Led::Color::YELLOW, Board::Led::Color::BLACK};
+    } else if (mode == Module::Mode::ENGAGED) {
+        colors = {Board::Led::Color::GREEN, Board::Led::Color::BLACK};
+    } else if (mode == Module::Mode::INITIALIZATION) {
+        colors = {Board::Led::Color::RED, Board::Led::Color::BLUE};
+    } else if (mode == Module::Mode::MAINTENANCE) {
+        colors = {Board::Led::Color::RED, Board::Led::Color::BLUE};
     } else {
         colors = {Board::Led::Color::BLUE, Board::Led::Color::BLACK};
     }
