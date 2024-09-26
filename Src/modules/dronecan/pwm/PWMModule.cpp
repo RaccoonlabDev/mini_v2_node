@@ -23,8 +23,6 @@
 #define DEF(channel) IntParamsIndexes::PARAM_PWM_##channel##_DEF
 
 
-Logger PWMModule::logger = Logger("PWMModule");
-
 uint16_t PWMModule::ttl_cmd = 500;
 uint16_t PWMModule::pwm_freq = 50;
 CommandType PWMModule::pwm_cmd_type = CommandType::RAW_COMMAND;
@@ -43,7 +41,6 @@ void PWMModule::init() {
 
     update_params();
 
-    logger.init("PWMModule");
     for (auto param : params) {
         HAL::Pwm::init(param.pin);
     }

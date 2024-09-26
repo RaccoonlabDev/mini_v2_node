@@ -11,6 +11,7 @@ add_executable(${EXECUTABLE}
     ${APPLICATION_SOURCES}
     ${BUILD_SRC_DIR}/params.cpp
     ${ROOT_DIR}/Src/common/algorithms.cpp
+    ${ROOT_DIR}/Src/common/logging.cpp
     ${ROOT_DIR}/Src/common/application.cpp
     ${ROOT_DIR}/Src/common/module.cpp
 

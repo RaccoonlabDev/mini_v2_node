@@ -8,10 +8,10 @@
 #include <storage.h>
 #include "can_driver.h"
 #include "common/algorithms.hpp"
+#include "common/logging.hpp"
 #include "params.hpp"
-#include "logger.hpp"
 
-static Logger logger = Logger("SYS");
+static Logging logger("SYS");
 
 REGISTER_MODULE(SystemModule)
 

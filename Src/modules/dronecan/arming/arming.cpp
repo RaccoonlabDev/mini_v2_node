@@ -11,7 +11,7 @@
 #include <params.hpp>
 #include <logger.hpp>
 
-Logger logger = Logger("ArmingModule");
+DronecanLogger logger = DronecanLogger("ArmingModule");
 
 
 REGISTER_MODULE(ArmingModule)
