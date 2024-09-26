@@ -12,7 +12,7 @@
 #include "algorithms.hpp"
 #include "dronecan.h"
 #include "params.hpp"
-#include "logger.hpp"
+#include "common/logging.hpp"
 #include "peripheral/pwm/pwm.hpp"
 #include "common/module.hpp"
 #include "publisher.hpp"
@@ -81,7 +81,7 @@ private:
     bool verbose = false;
 
     static bool publish_error;
-    static Logger logger;
+    static inline Logging logger{"PWM"};
 };
 
 #endif  // SRC_MODULES_PWM_PWMMODULE_HPP_
