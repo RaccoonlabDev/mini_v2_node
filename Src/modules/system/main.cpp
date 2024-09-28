@@ -5,8 +5,6 @@
  */
 
 #include "modules/system/main.hpp"
-#include <storage.h>
-#include "can_driver.h"
 #include "common/algorithms.hpp"
 #include "common/logging.hpp"
 #include "params.hpp"

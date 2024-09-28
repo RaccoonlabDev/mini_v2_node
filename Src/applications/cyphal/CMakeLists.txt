@@ -8,6 +8,7 @@ cmake_path(GET APPLICATIONS_DIR PARENT_PATH SRC_DIR)
 add_definitions(-DCONFIG_USE_CYPHAL=1)
 
 include(${SRC_DIR}/modules/cyphal/core/CMakeLists.txt)
+include(${SRC_DIR}/modules/system/CMakeLists.txt)
 include(${SRC_DIR}/modules/circuit_status/cyphal/CMakeLists.txt)
 include(${SRC_DIR}/modules/cyphal/feedback/CMakeLists.txt)
 include(${SRC_DIR}/modules/cyphal/setpoint/CMakeLists.txt)
