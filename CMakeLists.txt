@@ -53,10 +53,6 @@ if(USE_PLATFORM_UBUNTU)
     add_definitions(-DLIBPARAMS_TEMP_PARAMS_FILE_NAME="temp_params")
 endif()
 
-list(APPEND LIBPARAMS_PARAMS
-    ${ROOT_DIR}/Src/common/params.yaml
-)
-
 include(${LIBPARAMS_PATH}/CMakeLists.txt)
 
 list(APPEND APPLICATION_HEADERS ${ROOT_DIR}/Src ${APPLICATION_DIR})
