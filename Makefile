@@ -41,6 +41,9 @@ dronecan_v3: checks clean
 	cd ${BUILD_DIR}/dronecan_v3/obj && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_NODE_V3=ON -G "Unix Makefiles" ../../.. && make
 
 # Cyphal & DroneCAN
+v2: checks generate_dsdl clean
+	mkdir -p ${BUILD_DIR}/both_v2/obj
+	cd ${BUILD_DIR}/both_v2/obj && cmake -DCAN_PROTOCOL=both -DUSE_PLATFORM_NODE_V2=ON -G "Unix Makefiles" ../../.. && make
 v3: checks generate_dsdl clean
 	mkdir -p ${BUILD_DIR}/both_v3/obj
 	cd ${BUILD_DIR}/both_v3/obj && cmake -DCAN_PROTOCOL=both -DUSE_PLATFORM_NODE_V3=ON -G "Unix Makefiles" ../../.. && make
