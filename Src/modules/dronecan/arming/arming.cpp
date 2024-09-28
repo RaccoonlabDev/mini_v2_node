@@ -5,36 +5,29 @@
  */
 
 #include "arming.hpp"
-#include <storage.h>
-#include "can_driver.h"
+#include "params.hpp"
 #include "common/algorithms.hpp"
-#include <params.hpp>
-#include <logger.hpp>
-
-DronecanLogger logger = DronecanLogger("ArmingModule");
-
 
 REGISTER_MODULE(ArmingModule)
 
-void ArmingModule::init() {
-    health = Status::OK;
-    prev_eng_time = paramsGetIntegerValue(IntParamsIndexes::PARAM_STATS_ENG_TIME);
-    mode = Module::Mode::STANDBY;
-}
-
 void ArmingModule::spin_once() {
-    global_mode = ModuleManager::get_global_mode();
+    auto global_mode = ModuleManager::get_global_mode();
     auto crnt_time_ms = HAL_GetTick();
     if (global_mode == Mode::ENGAGED && !is_armed) {
         is_armed = true;
         arm_start_time = crnt_time_ms;
         return;
     }
-    if (is_armed && global_mode != Mode::ENGAGED && arm_start_time + 1000 < crnt_time_ms) {
+
+    uint32_t elapsed_time_ms = crnt_time_ms - arm_start_time;
+    if (is_armed && global_mode != Mode::ENGAGED) {
         is_armed = false;
-        auto cur_eng_time = (crnt_time_ms - arm_start_time) / 1000;
-        prev_eng_time = cur_eng_time + prev_eng_time;
-        paramsSetIntegerValue(IntParamsIndexes::PARAM_STATS_ENG_TIME, int(prev_eng_time));
-        paramsSave();
+        if (elapsed_time_ms > PERIOD_OF_INSENSITIVITY_MS) {
+            uint32_t prev_eng_time = paramsGetIntegerValue(IntParamsIndexes::PARAM_STATS_ENG_TIME);
+            auto new_eng_time = prev_eng_time + elapsed_time_ms / 1000;
+            paramsSetIntegerValue(IntParamsIndexes::PARAM_STATS_ENG_TIME, int(new_eng_time));
+            paramsSave();
+            logger.log_info("Engaged time has been udpated");
+        }
     }
 }
