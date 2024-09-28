@@ -65,6 +65,7 @@ public:
     Status get_health() const;
     Mode get_mode() const;
     Protocol get_protocol() const;
+    bool is_enabled() const;
 
 protected:
     /**

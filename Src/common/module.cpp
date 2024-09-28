@@ -5,8 +5,8 @@
  */
 
 #include "module.hpp"
-#include "params.hpp"
 #include <span>
+#include "params.hpp"
 
 Module::Module(float frequency, Protocol proto) : protocol(proto),
                                                   period_ms(period_ms_from_frequency(frequency)) {
@@ -27,6 +27,10 @@ Module::Mode Module::get_mode() const {
 
 Module::Protocol Module::get_protocol() const {
     return protocol;
+}
+bool Module::is_enabled() const {
+    auto active_protocol = ModuleManager::get_active_protocol();
+    return protocol == Protocol::CYPHAL_AND_DRONECAN || protocol == active_protocol;
 }
 
 void Module::process() {
@@ -53,10 +57,8 @@ void ModuleManager::register_module(Module* app_module) {
 }
 
 void ModuleManager::init() {
-    active_protocol = get_active_protocol();
     for (auto app_module : active_modules) {
-        auto protocol = app_module->get_protocol();
-        if (protocol == Module::Protocol::CYPHAL_AND_DRONECAN || protocol == active_protocol) {
+        if (app_module->is_enabled()) {
             app_module->init();
         }
     }
@@ -64,8 +66,7 @@ void ModuleManager::init() {
 
 void ModuleManager::process() {
     for (auto app_module : active_modules) {
-        auto protocol = app_module->get_protocol();
-        if (protocol == Module::Protocol::CYPHAL_AND_DRONECAN || protocol == active_protocol) {
+        if (app_module->is_enabled()) {
             app_module->process();
         }
     }
@@ -94,7 +95,7 @@ Module::Status ModuleManager::get_global_status() {
     auto global_status = Module::Status::OK;
 
     for (auto app_module : active_modules) {
-        if (app_module->get_protocol() == active_protocol && app_module->get_health() > global_status) {
+        if (app_module->is_enabled() && app_module->get_health() > global_status) {
             global_status = app_module->get_health();
         }
     }
@@ -106,7 +107,7 @@ Module::Mode ModuleManager::get_global_mode() {
     auto global_mode = Module::Mode::STANDBY;
 
     for (auto app_module : active_modules) {
-        if (app_module->get_protocol() == active_protocol && app_module->get_mode() > global_mode) {
+        if (app_module->is_enabled() && app_module->get_mode() > global_mode) {
             global_mode = app_module->get_mode();
         }
     }
@@ -119,7 +120,7 @@ uint8_t ModuleManager::get_vssc() {
 
     uint8_t module_idx = 0;
     for (auto app_module : active_modules) {
-        if (app_module->get_protocol() != active_protocol) {
+        if (!app_module->is_enabled()) {
             continue;
         }
 
