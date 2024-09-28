@@ -30,7 +30,7 @@ bool platformSpecificRequestRestart() {
     return true;
 }
 
-void platformSpecificRebootForce() {
+__attribute__((noreturn)) void platformSpecificRebootForce() {
     constexpr const char* EXECUTABLE_SYMBOLIC_LINK = "/proc/self/exe";
     constexpr const int MAX_PATH_LENGTH = 1024;
 
@@ -55,10 +55,6 @@ void platformSpecificRebootForce() {
 
 uint32_t platformSpecificGetTimeMs() {
     return HAL_GetTick();
-}
-
-void HAL_NVIC_SystemReset() {
-    std::cout << "The app has been receved Restart command. Ignore." << std::endl;
 }
 
 uint32_t HAL_GetTick() {

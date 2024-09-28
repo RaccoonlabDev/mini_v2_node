@@ -16,7 +16,8 @@
 #include "publisher.hpp"
 #include "subscriber.hpp"
 
-#include "modules/dronecan/pwm/PWMModule.hpp"
+#include "modules/pwm/main.hpp"
+#include "modules/pwm/dronecan_frontend/dronecan_frontend.hpp"
 
 enum class FeedbackType: uint8_t {
     DISABLED,
@@ -36,6 +37,7 @@ protected:
     void spin_once() override;
     void update_params() override;
 
+private:
     void publish_esc_status(PwmChannelInfo& pwm);
     void publish_actuator_status(PwmChannelInfo& pwm);
     void publish_hardpoint_status(PwmChannelInfo& pwm);

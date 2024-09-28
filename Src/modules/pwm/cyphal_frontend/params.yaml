@@ -1,0 +1,4 @@
+uavcan.sub.setpoint:
+  type: Port
+  data_type: reg.udral.service.actuator.common.sp.Vector31.0.1
+  enum_base: PARAM_SUB_SETPOINT

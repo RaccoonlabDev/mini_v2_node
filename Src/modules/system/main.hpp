@@ -8,6 +8,7 @@
 #define SRC_MODULES_SYSTEM_HPP_
 
 #include "module.hpp"
+#include "common/logging.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,7 +21,10 @@ public:
 
 protected:
     void spin_once() override;
+
+private:
     bool need_notification{false};
+    static inline Logging logger{"SYS"};
 };
 
 #ifdef __cplusplus

@@ -16,15 +16,6 @@ pwm.frequency:
   min: 50
   max: 400
 
-pwm.cmd_type:
-  type: Integer
-  note: 0 means RawCommand, 1 means ArrayCommand, 2 is reserved for hardpoint.Command.
-  enum: PARAM_PWM_CMD_TYPE
-  flags: mutable
-  default: 0
-  min: 0
-  max: 2
-
 pwm1.ch:
   type: Integer
   note: Index of setpoint channel. [-1; 255]. -1 means disabled, # -2 means GPIO SET.

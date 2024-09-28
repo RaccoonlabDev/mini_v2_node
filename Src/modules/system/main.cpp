@@ -6,10 +6,7 @@
 
 #include "modules/system/main.hpp"
 #include "common/algorithms.hpp"
-#include "common/logging.hpp"
 #include "params.hpp"
-
-static Logging logger("SYS");
 
 REGISTER_MODULE(SystemModule)
 
