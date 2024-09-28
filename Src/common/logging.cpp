@@ -7,6 +7,7 @@
 
 #include "common/logging.hpp"
 #include "common/module.hpp"
+#include "params.hpp"
 
 #ifndef CONFIG_USE_DRONECAN
 #define CONFIG_USE_DRONECAN 0
@@ -23,7 +24,11 @@
 Logging::Logging(const char* source_) : source(source_) {
 }
 
-void Logging::log([[maybe_unused]] uint8_t severity, [[maybe_unused]] const char* text) const {
+void Logging::log(uint8_t severity, [[maybe_unused]] const char* text) const {
+    if (severity < paramsGetIntegerValue(PARAM_LOG_LEVEL)) {
+        return;
+    }
+
 #if CONFIG_USE_DRONECAN == 1
     if (ModuleManager::get_active_protocol() == Module::Protocol::DRONECAN) {
         DronecanLogger::log_global(severity, source, text);

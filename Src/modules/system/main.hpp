@@ -15,7 +15,7 @@ extern "C" {
 
 class SystemModule : public Module {
 public:
-    SystemModule() : Module(2, Protocol::DRONECAN) {}
+    SystemModule() : Module(2, Protocol::CYPHAL_AND_DRONECAN) {}
     void init() override;
 
 protected:
