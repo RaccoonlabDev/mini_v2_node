@@ -9,9 +9,9 @@
 
 namespace HAL {
 
-static uint32_t watchdog_deadline_ms = 500;
-
 void Watchdog::refresh() {
+    static uint32_t watchdog_deadline_ms = 500;
+
     if (!reboot_required) {
         watchdog_deadline_ms = platformSpecificGetTimeMs() + 500;
     }
