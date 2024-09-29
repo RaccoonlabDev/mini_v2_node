@@ -7,6 +7,7 @@ set(ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
 set(SRC_DIR ${ROOT_DIR}/Src)
 set(CMAKE_DIR ${ROOT_DIR}/cmake)
 set(LIBPARAMS_PATH ${ROOT_DIR}/Libs/libparams)
+set(DOC_PATH ${ROOT_DIR}/docs/${CAN_PROTOCOL}/README.md)
 
 # Option 1. Choose the platform
 option(USE_PLATFORM_UBUNTU "Build for SITL (Software In The Loop)" OFF)
