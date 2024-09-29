@@ -1,4 +1,4 @@
-name: build
+name: deploy
 on:
   push:
     branches:
@@ -7,12 +7,14 @@ on:
     branches:
     - '*'
 jobs:
-  stm32f103:
+  deploy:
     strategy:
       matrix:
         include:
           - os: ubuntu-22.04
             target: all
+          - os: windows-latest
+            target: dronecan_v2
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     steps:
@@ -35,4 +37,5 @@ jobs:
         run: make ${{ matrix.target }}
 
       - name: Deploy binaries to Telegram
+        if: matrix.os == 'ubuntu-22.04' && matrix.target == 'all' && github.ref == 'refs/heads/main' && github.repository == 'RaccoonlabDev/mini_v2_node'
         run: ./scripts/deploy_release_to_telegram.py --bot-token ${{ secrets.TELEGRAM_BOT_TOKEN }} --chat-id ${{ secrets.TELEGRAM_CHAT_ID }}
