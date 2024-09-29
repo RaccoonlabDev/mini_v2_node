@@ -7,8 +7,8 @@
 #ifndef SRC_CYPHAL_APPLICATION_CIRCUIT_STATUS_CIRCUIT_STATUS_HPP_
 #define SRC_CYPHAL_APPLICATION_CIRCUIT_STATUS_CIRCUIT_STATUS_HPP_
 
-#include "cyphal_publishers.hpp"
-#include "Udral/circuit_status.hpp"
+#include "cyphalNode/cyphal.hpp"
+#include "cyphalNode/udral/circuit_status.hpp"
 #include "peripheral/adc/circuit_periphery.hpp"
 #include "module.hpp"
 

@@ -7,8 +7,7 @@
 #ifndef SRC_CYPHAL_APPLICATION_FEEDBACK_HPP_
 #define SRC_CYPHAL_APPLICATION_FEEDBACK_HPP_
 
-#include "cyphal.hpp"
-#include "cyphal_publishers.hpp"
+#include "cyphalNode/cyphal.hpp"
 #include "reg/udral/service/actuator/common/Feedback_0_1.h"
 #include "module.hpp"
 
