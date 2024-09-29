@@ -6,7 +6,7 @@
 
 #include "feedback.hpp"
 #include <algorithm>
-#include "cyphal.hpp"
+#include "cyphalNode/cyphal.hpp"
 #include "params.hpp"
 #include "peripheral/pwm/pwm.hpp"
 

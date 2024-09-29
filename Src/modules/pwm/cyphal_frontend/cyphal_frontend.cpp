@@ -8,8 +8,7 @@
 #include "reg/udral/service/actuator/common/sp/Vector31_0_1.h"
 #include "common/algorithms.hpp"
 
-#include "cyphal.hpp"
-#include "cyphal_subscribers.hpp"
+#include "cyphalNode/cyphal.hpp"
 
 class SetpointSubscriber: public cyphal::CyphalSubscriber {
 public:

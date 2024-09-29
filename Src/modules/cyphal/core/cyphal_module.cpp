@@ -6,7 +6,7 @@
 
 #include "cyphal_module.hpp"
 #include <algorithm>
-#include "cyphal.hpp"
+#include "cyphalNode/cyphal.hpp"
 #include "params.hpp"
 #include "peripheral/adc/circuit_periphery.hpp"
 

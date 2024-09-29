@@ -8,7 +8,7 @@
 #define SRC_CYPHAL_APPLICATION_CYPHAL_CYPHAL_MODULE_HPP_
 
 #include "module.hpp"
-#include "cyphal.hpp"
+#include "cyphalNode/cyphal.hpp"
 
 #ifdef __cplusplus
 extern "C" {

@@ -8,7 +8,7 @@ include(${ROOT_DIR}/Libs/Cyphal/CMakeLists.txt)
 
 list(APPEND APPLICATION_SOURCES
     ${CYPHAL_SRC}
-    ${ROOT_DIR}/Libs/Cyphal/Udral/circuit_status.cpp
+    ${ROOT_DIR}/Libs/Cyphal/src/udral/circuit_status.cpp
     ${CMAKE_CURRENT_LIST_DIR}/cyphal_module.cpp
 )
 
