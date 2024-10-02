@@ -9,29 +9,49 @@
 #include "cyphalNode/cyphal.hpp"
 #include "params.hpp"
 #include "peripheral/pwm/pwm.hpp"
+#include "peripheral/adc/circuit_periphery.hpp"
 
 REGISTER_MODULE(CyphalFeedbackModule)
 
-void FeedbackPublisher::publish() {
-    uint8_t buffer[reg_udral_service_actuator_common_Feedback_0_1_EXTENT_BYTES_];
-    size_t size = reg_udral_service_actuator_common_Feedback_0_1_EXTENT_BYTES_;
-    int32_t res = reg_udral_service_actuator_common_Feedback_0_1_serialize_(&msg, buffer, &size);
-    if (NUNAVUT_SUCCESS == res) {
-        push(size, buffer);
-    }
-}
 
 void CyphalFeedbackModule::update_params() {
-    auto port_id = static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_1_ID));
-    pub.setPortId(port_id);
+    udral_feedbacks[0].setPortId(static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_1_ID)));
+    udral_feedbacks[1].setPortId(static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_2_ID)));
+    udral_feedbacks[2].setPortId(static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_3_ID)));
+    udral_feedbacks[3].setPortId(static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_4_ID)));
+
+    compact_feedbacks[0].setPortId(static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_COMPACT_FEEDBACK_1_ID)));
+    compact_feedbacks[1].setPortId(static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_COMPACT_FEEDBACK_2_ID)));
+    compact_feedbacks[2].setPortId(static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_COMPACT_FEEDBACK_3_ID)));
+    compact_feedbacks[3].setPortId(static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_COMPACT_FEEDBACK_4_ID)));
 }
 
 void CyphalFeedbackModule::spin_once() {
-    pub.msg.heartbeat.health.value = uavcan_node_Health_1_0_NOMINAL;
-    pub.msg.heartbeat.readiness.value = reg_udral_service_common_Readiness_0_1_ENGAGED;
-    uint32_t pwm_ccr_reg_value = HAL::Pwm::get_duration(HAL::PwmPin::PWM_1);
-    uint32_t pwm_duration = std::clamp(pwm_ccr_reg_value, (uint32_t)1000, (uint32_t)2000);
-    pub.msg.demand_factor_pct = static_cast<int8_t>((pwm_duration - 1000) / 10);
+    for (size_t pin_idx = 0; pin_idx < PWMModule::get_pins_amount(); pin_idx++) {
+        auto& udral_feedback = udral_feedbacks[pin_idx];
+        if (!udral_feedback.isEnabled()) {
+            continue;
+        }
 
-    pub.publish();
+        udral_feedback.msg.heartbeat.health.value = uavcan_node_Health_1_0_NOMINAL;
+        udral_feedback.msg.heartbeat.readiness.value = reg_udral_service_common_Readiness_0_1_ENGAGED;
+        udral_feedback.msg.demand_factor_pct = PWMModule::get_pin_percent(pin_idx);
+        udral_feedback.publish();
+    }
+
+    for (size_t pin_idx = 0; pin_idx < PWMModule::get_pins_amount(); pin_idx++) {
+        auto& compact_feedback = compact_feedbacks[pin_idx];
+        if (!compact_feedback.isEnabled()) {
+            continue;
+        }
+
+        compact_feedback.msg = {
+            .dc_voltage = CircuitPeriphery::voltage_vin(),
+            .dc_current = CircuitPeriphery::current(),
+            .phase_current_amplitude = CircuitPeriphery::current(),
+            .velocity = 0,
+            .demand_factor_pct = (int8_t)PWMModule::get_pin_percent(pin_idx),
+        };
+        compact_feedback.publish();
+    }
 }
