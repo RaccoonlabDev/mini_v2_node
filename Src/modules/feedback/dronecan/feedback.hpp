@@ -38,9 +38,9 @@ protected:
     void update_params() override;
 
 private:
-    void publish_esc_status(PwmChannelInfo& pwm);
-    void publish_actuator_status(PwmChannelInfo& pwm);
-    void publish_hardpoint_status(PwmChannelInfo& pwm);
+    void publish_esc_status(uint8_t pin_idx);
+    void publish_actuator_status(uint8_t pin_idx);
+    void publish_hardpoint_status(uint8_t pin_idx);
     
     static inline DronecanPublisher<ActuatorStatus_t> actuator_status;
     static inline DronecanPublisher<EscStatus_t> esc_status;

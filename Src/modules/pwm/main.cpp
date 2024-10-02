@@ -61,6 +61,22 @@ void PWMModule::init() {
 #endif  // CONFIG_USE_CYPHAL
 }
 
+int8_t PWMModule::get_pin_channel(uint8_t pin_idx) {
+    return pin_idx < PWMModule::get_pins_amount() ? params[pin_idx].channel : -1;
+}
+
+bool PWMModule::is_pin_enabled(uint8_t pin_idx) {
+    return get_pin_channel(pin_idx) >= 0;
+}
+
+uint8_t PWMModule::get_pin_percent(uint8_t pin_idx) {
+    if (!is_pin_enabled(pin_idx)) {
+        return 0;
+    }
+
+    return HAL::Pwm::get_percent(params[pin_idx].pin, params[pin_idx].min, params[pin_idx].max);
+}
+
 /**
  * Control:
  * 1. Set default PWM for a channel if his command is outdated
