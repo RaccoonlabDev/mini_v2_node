@@ -41,20 +41,20 @@ void DronecanFeedbackModule::spin_once() {
         return;
     }
 
-    for (auto& pwm : PWMModule::params) {
-        if (pwm.channel < 0) {
+    for (uint_fast8_t pin_idx = 0; pin_idx < PWMModule::get_pins_amount(); pin_idx++) {
+        if (!PWMModule::is_pin_enabled(pin_idx)) {
             continue;
         }
 
         switch (cmd_type) {
             case CommandType::RAW_COMMAND:
-                publish_esc_status(pwm);
+                publish_esc_status(pin_idx);
                 break;
             case CommandType::ARRAY_COMMAND:
-                publish_actuator_status(pwm);
+                publish_actuator_status(pin_idx);
                 break;
             case CommandType::HARDPOINT_COMMAND:
-                publish_hardpoint_status(pwm);
+                publish_hardpoint_status(pin_idx);
                 break;
             default:
                 break;
@@ -62,23 +62,23 @@ void DronecanFeedbackModule::spin_once() {
     }
 }
 
-void DronecanFeedbackModule::publish_esc_status(PwmChannelInfo& pwm) {
+void DronecanFeedbackModule::publish_esc_status(uint8_t pin_idx) {
     esc_status.msg = {
         .error_count = esc_status.msg.error_count + 1,
         .voltage = CircuitPeriphery::voltage_vin(),
         .current = CircuitPeriphery::current(),
         .temperature = static_cast<float>(CircuitPeriphery::temperature()),
         .rpm = 0,
-        .power_rating_pct = HAL::Pwm::get_percent(pwm.pin, pwm.min, pwm.max),
-        .esc_index = static_cast<uint8_t>(pwm.channel),
+        .power_rating_pct = PWMModule::get_pin_percent(pin_idx),
+        .esc_index = (uint8_t)PWMModule::get_pin_channel(pin_idx),
     };
 
     esc_status.publish();
 }
 
-void DronecanFeedbackModule::publish_actuator_status(PwmChannelInfo& pwm) {
+void DronecanFeedbackModule::publish_actuator_status(uint8_t pin_idx) {
     actuator_status.msg = {
-        .actuator_id = static_cast<uint8_t>(pwm.channel),
+        .actuator_id = (uint8_t)PWMModule::get_pin_channel(pin_idx),
 
         // The following fields are not used in PX4 anyway
         // Let's fill them with something useful for logging for a while
@@ -87,23 +87,21 @@ void DronecanFeedbackModule::publish_actuator_status(PwmChannelInfo& pwm) {
         .speed = static_cast<float>(CircuitPeriphery::temperature()),
 
         .reserved = 0,
-        .power_rating_pct = HAL::Pwm::get_percent(pwm.pin, pwm.min, pwm.max),
+        .power_rating_pct = PWMModule::get_pin_percent(pin_idx),
     };
 
     actuator_status.publish();
 }
 
-void DronecanFeedbackModule::publish_hardpoint_status(PwmChannelInfo& pwm) {
+void DronecanFeedbackModule::publish_hardpoint_status(uint8_t pin_idx) {
     static constexpr uint16_t CMD_RELEASE_OR_MIN = 0;
     static constexpr uint16_t CMD_HOLD_OR_MAX = 1;
 
-    auto pwm_duration_us = HAL::Pwm::get_duration(pwm.pin);
-
     hardpoint_status.msg = {
-        .hardpoint_id = static_cast<uint8_t>(pwm.channel),
+        .hardpoint_id = (uint8_t)PWMModule::get_pin_channel(pin_idx),
         .payload_weight = 0.0f,
         .payload_weight_variance = 0.0f,
-        .status = (pwm_duration_us == pwm.min) ? CMD_RELEASE_OR_MIN : CMD_HOLD_OR_MAX,
+        .status = PWMModule::get_pin_percent(pin_idx) == 0 ? CMD_RELEASE_OR_MIN : CMD_HOLD_OR_MAX,
     };
 
     hardpoint_status.publish();
