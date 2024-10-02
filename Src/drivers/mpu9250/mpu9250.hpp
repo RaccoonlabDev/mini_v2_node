@@ -34,6 +34,10 @@ public:
      * @return 0 on success, negative otherwise
      */
     int8_t read_magnetometer(std::array<int16_t, 3>* mag) const;
+
+    int8_t set_accel_odr(uint8_t odr);
+
+    int8_t set_gyro_odr(uint8_t odr);
 private:
     bool initialized{false};
 };

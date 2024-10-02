@@ -11,17 +11,17 @@ typedef double real_t;
 
 #define M_2PI           6.28318530717958647692
 
-inline fftw_plan init_rfft(real_t** hanning_window, real_t** in, real_t** out, uint16_t N) {
-    *hanning_window = fftw_alloc_real(N);
-    for (int n = 0; n < N; n++) {
-        const float hanning_value = 0.5f * (1.f - cos(M_2PI * n / (N - 1)));
+inline fftw_plan init_rfft(real_t** hanning_window, real_t** in, real_t** out, uint16_t *N) {
+    *hanning_window = fftw_alloc_real(*N);
+    for (int n = 0; n < *N; n++) {
+        const float hanning_value = 0.5f * (1.f - cos(M_2PI * n / (*N - 1)));
         (*hanning_window)[n] = hanning_value;
     }
     // Allocate input and output arrays
-    *in = (real_t*) fftw_alloc_real(sizeof(real_t)*N);
-    *out = (real_t*) fftw_alloc_real(sizeof(real_t)*N);
+    *in = (real_t*) fftw_alloc_real(sizeof(real_t)* (*N));
+    *out = (real_t*) fftw_alloc_real(sizeof(real_t)* 2 * *N);
     // Create plan
-    return fftw_plan_r2r_1d(N, *in, *out, FFTW_R2HC, FFTW_ESTIMATE);
+    return fftw_plan_r2r_1d(*N, *in, *out, FFTW_R2HC, FFTW_ESTIMATE);
 }
 
 /*
@@ -42,11 +42,20 @@ inline void apply_hanning_window(real_t* in, real_t* out, real_t* hanning_window
 template<typename T>
 inline void get_real_imag_by_index(T* in, T out[2], uint16_t N, int index) {
     out[0] = in[index];
-    // For FFTW_R2HC kind the imaginary part is zero
-    // due to symmetries of the real-input DFT, and is not stored
     out[1] = 0;
 }
 
+template<typename T>
+inline T get_real_by_index(T* in, uint16_t index) {
+    return in[index];
+}
+
+// For FFTW_R2HC kind the imaginary part is zero
+// due to symmetries of the real-input DFT, and is not stored
+template<typename T>
+inline T get_imag_by_index(T* in, uint16_t index) {
+    return 0;
+}
 /*
 The function written based on fftw3 library.
 @param plan: The plan for the r2c transform.

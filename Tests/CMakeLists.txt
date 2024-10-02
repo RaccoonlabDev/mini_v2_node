@@ -4,11 +4,6 @@ project(tests CXX C)
 set(TESTS_DIR ${CMAKE_CURRENT_LIST_DIR})
 cmake_path(GET TESTS_DIR PARENT_PATH ROOT_DIR)
 
-message(STATUS "ROOT_DIR: ${ROOT_DIR}")
-message(STATUS "CMAKE_CURRENT_LIST_DIR: ${CMAKE_CURRENT_LIST_DIR}")
-message(STATUS "CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
-message(STATUS "CRNT_DIR: ${CRNT_DIR}")
-
 # Check if the COVERAGE flag is set
 option(COVERAGE "Enable coverage flags" OFF)
 option(TEST_NUM "Enable test num" OFF)

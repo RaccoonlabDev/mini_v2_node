@@ -8,9 +8,7 @@
 #include <cstring>
 #include <cstdio>
 #include "FFT.hpp"
-#include "common/logging.hpp"
 
-Logging logger("FFT");
 bool FFT::init(uint16_t window_size, uint16_t num_axes, float sample_rate_hz) {
     if (window_size > FFT_MAX_SIZE) {
         return false;
@@ -18,15 +16,11 @@ bool FFT::init(uint16_t window_size, uint16_t num_axes, float sample_rate_hz) {
     n_axes = num_axes;
     bool buffers_allocated = AllocateBuffers(window_size);
     rfft_spec = init_rfft(&_hanning_window, &_fft_input_buffer,
-                          &_fft_output_buffer, window_size);
+                          &_fft_output_buffer, &window_size);
     size = window_size;
     _sample_rate_hz = sample_rate_hz;
     _resolution_hz =  sample_rate_hz / size;
     fft_max_freq = _sample_rate_hz / 2;
-    char buffer[100];
-    snprintf(buffer, sizeof(buffer), "_resolution_hz: %d, num_axes: %d, sample_rate_hz: %d",
-           (int)( _resolution_hz * 1000), n_axes, (int)(_sample_rate_hz * 1000));
-    logger.log_info(buffer);
     return buffers_allocated;
 }
 
@@ -40,13 +34,14 @@ void FFT::update(float *input) {
             // convert int16_t -> real_t (scaling isn't relevant)
             data_buffer[axis][buffer_index] = conv_input[axis] / 2;
             buffer_index++;
+            _fft_updated[axis] = false;
+
             continue;
         }
 
         apply_hanning_window(data_buffer[axis].data(), _fft_input_buffer,
                                 _hanning_window, size);
         rfft_one_cycle(rfft_spec, _fft_input_buffer, _fft_output_buffer);
-        _fft_updated = true;
         find_peaks(axis);
 
         // reset
@@ -54,8 +49,7 @@ void FFT::update(float *input) {
         const int overlap_start = size / 4;
         memmove(&data_buffer[axis][0], &data_buffer[axis][overlap_start],
                 sizeof(real_t) * overlap_start * 3);
-        buffer_index = overlap_start * 3;
-        _fft_updated = false;
+        _fft_buffer_index[axis] = overlap_start * 3;
     }
 }
 
@@ -81,20 +75,20 @@ void FFT::find_peaks(uint8_t axis) {
         float real_f, imag_f;
         convert_real_t_to_float(&real_imag[0], &real_f, 1);
         convert_real_t_to_float(&real_imag[1], &imag_f, 1);
-        const float fft_magnitude = sqrtf(real_f * real_f);
+        const float fft_magnitude = sqrtf(real_f * real_f + imag_f * imag_f);
         _peak_magnitudes_all[fft_index] = fft_magnitude;
         bin_mag_sum += fft_magnitude;
     }
-
+    // char buffer[50];
+    // snprintf(buffer, sizeof(buffer), "bin_mag_sum: %d", (int)bin_mag_sum);
+    // logger.log_info(buffer);
     for (uint8_t i = 0; i < MAX_NUM_PEAKS; i++) {
         float largest_peak = 0;
         uint16_t largest_peak_index = 0;
 
         // Identify i'th peak bin
         for (uint16_t bin_index = 1; bin_index < size/2; bin_index++) {
-            float frhz = float(_resolution_hz);
-            float fbi = float(bin_index);
-            float freq_hz = frhz * fbi;
+            float freq_hz = _resolution_hz * bin_index;
 
             if ((_peak_magnitudes_all[bin_index] > largest_peak)
                 && (freq_hz >= fft_min_freq)
@@ -118,19 +112,25 @@ void FFT::find_peaks(uint8_t axis) {
         if (raw_peak_index[peak_new] == 0) {
             continue;
         }
+        static uint16_t indx = 0;
+        indx++;
+        (void) indx;
         float adjusted_bin = 0.5f *
                         estimate_peak_freq(fft_output_buffer_float, 2 * raw_peak_index[peak_new]);
-        if (!std::isfinite(adjusted_bin)) {
+        if (adjusted_bin > size || adjusted_bin < 0) {
             continue;
         }
 
         float freq_adjusted = _resolution_hz * adjusted_bin;
         // snr is in dB
-        const float snr = 10.f * log10f((size - 1) * peak_magnitude[peak_new] /
-                        (bin_mag_sum - peak_magnitude[peak_new]));
-
-        if (!std::isfinite(freq_adjusted)
-            || (snr < MIN_SNR)
+        float snr;
+        if (bin_mag_sum - peak_magnitude[peak_new] < 1.0e-19f) {
+            snr = 0;
+        } else {
+            snr = 10.f * log10f((size - 1) * peak_magnitude[peak_new] /
+                            (bin_mag_sum - peak_magnitude[peak_new]));
+        }
+        if ((snr < MIN_SNR)
             || (freq_adjusted < fft_min_freq)
             || (freq_adjusted > fft_max_freq)) {
                 continue;
@@ -144,6 +144,8 @@ void FFT::find_peaks(uint8_t axis) {
             if (!peak_close && peak_frequencies_prev[peak_prev] > 0) {
                 continue;
             }
+            _fft_updated[axis] = true;
+
             // keep
             peak_frequencies[axis][num_peaks_found] = freq_adjusted;
             peak_snr[axis][num_peaks_found] = snr;
@@ -156,6 +158,13 @@ void FFT::find_peaks(uint8_t axis) {
             break;
         }
     }
+    float max_snr_peak = 0;
+    for (int peak_index = 0; peak_index < MAX_NUM_PEAKS; peak_index++) {
+        if (peak_snr[axis][peak_index] > max_snr_peak) {
+            max_snr_peak = peak_frequencies[axis][peak_index];
+        }
+    }
+    peak_frequencies[axis][0] = max_snr_peak;
 }
 
 static constexpr float tau(float x) {
@@ -167,34 +176,41 @@ static constexpr float tau(float x) {
 }
 
 float FFT::estimate_peak_freq(float fft[], int peak_index) {
-    if (peak_index < 2) {
-        return NAN;
+    if (peak_index < 2 || peak_index >= size) {
+        return -1;
     }
 
     // find peak location using Quinn's Second Estimator (2020-06-14: http://dspguru.com/dsp/howtos/how-to-interpolate-fft-peak/)
-    float real_imag[3][2];
+    // float real_imag[3][2];
     float real[3];
     float imag[3];
     for (int i = -1; i < 2; i++) {
-        get_real_imag_by_index(fft, real_imag[i + 1], size, peak_index + i);
-        real[i + 1] = real_imag[i + 1][0];
-        imag[i + 1] = real_imag[i + 1][1];
+        real[i + 1] = get_real_by_index(fft, peak_index + i);
+        imag[i + 1] = get_imag_by_index(fft, peak_index + i);
     }
 
     static constexpr int k = 1;
 
     const float divider = (real[k] * real[k] + imag[k] * imag[k]);
-
+    if (divider < 1.0e-19f) {
+        return -1;
+    }
     // ap = (X[k + 1].r * X[k].r + X[k+1].i * X[k].i) / (X[k].r * X[k].r + X[k].i * X[k].i)
     float ap = (real[k + 1] * real[k] + imag[k + 1] * imag[k]) / divider;
 
     // dp = -ap / (1 – ap)
+    if (1.0f - ap < 1.0e-19f) {
+        return -1;
+    }
     float dp = -ap  / (1.f - ap);
 
     // am = (X[k - 1].r * X[k].r + X[k – 1].i * X[k].i) / (X[k].r * X[k].r + X[k].i * X[k].i)
     float am = (real[k - 1] * real[k] + imag[k - 1] * imag[k]) / divider;
 
     // dm = am / (1 – am)
+    if (1.0f - am < 1.0e-19f) {
+        return -1;
+    }
     float dm = am / (1.f - am);
 
     // d = (dp + dm) / 2 + tau(dp * dp) – tau(dm * dm)

@@ -17,7 +17,7 @@ enum class Mpu9250Resgiter : uint8_t {
 
 // Register Map for Magnetometer (AK8963)
 enum class MagnetometerResgiter : uint8_t {
-    REG_MAG_XOUT_L = 0x03,
+    REG_MAG_XOUT_L  = 0x03,
 };
 
 constexpr auto MPU9250_WHO_AM_I_ID = std::byte(0x71);   // REG_WHO_AM_I expected value

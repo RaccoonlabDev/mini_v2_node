@@ -15,7 +15,6 @@ $(info BUILD_DIR: ${BUILD_DIR})
 
 CFLAGS := "-g -O0 -DDEBUG"
 CMAKE_FLAGS := -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CC} -DCMAKE_C_FLAGS=${CFLAGS} -DCMAKE_CXX_FLAGS=${CFLAGS} -DCMAKE_BUILD_TYPE=Debug
-# cmake /home/user/Documents/work/mini_v2_node/Tests -DCMAKE_C_COMPILER=cc -DCMAKE_CXX_COMPILER=cc -DCMAKE_C_FLAGS="-g -O0 -DDEBUG" -DCMAKE_CXX_FLAGS="-g -O0 -DDEBUG" -DCMAKE_BUILD_TYPE=Debug
 
 all: test_common
 
@@ -27,7 +26,7 @@ create_build_dir:
 coverage: create_build_dir
 	cd ${BUILD_DIR} && cmake -DCOVERAGE=1 ${CRNT_DIR} && make
 	cd ${BUILD_DIR} && ./algorithms
-	cd ${BUILD_DIR} && ./ft
+	cd ${BUILD_DIR} && ./fft
 
 	echo "\n1. Algorithms:"
 	cd ${BUILD_DIR} && gcov ${BUILD_DIR}/CMakeFiles/algorithms.dir${REPO_DIR}/common/algorithms.cpp.gcda

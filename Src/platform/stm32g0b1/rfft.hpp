@@ -17,9 +17,9 @@ The function specifies arm_rfft_instance_q15 from CMSIS-DSP library based on the
 @return: The plan for the r2c transform.
 */
 inline arm_rfft_instance_q15 init_rfft(real_t** hanning_window, real_t** in,
-                                        real_t** out, uint16_t N) {
+                                        real_t** out, uint16_t *N) {
     arm_rfft_instance_q15 _rfft_q15;
-    switch (N) {
+    switch (*N) {
         case 256:
             _rfft_q15.fftLenReal = 256;
             _rfft_q15.twidCoefRModifier = 32U;
@@ -38,7 +38,7 @@ inline arm_rfft_instance_q15 init_rfft(real_t** hanning_window, real_t** in,
             _rfft_q15.pCfft = &arm_cfft_sR_q15_len512;
             break;
         default:
-            N = 256;
+            *N = 256;
             _rfft_q15.fftLenReal = 256;
             _rfft_q15.twidCoefRModifier = 32U;
             _rfft_q15.pCfft = &arm_cfft_sR_q15_len128;
@@ -52,11 +52,11 @@ inline arm_rfft_instance_q15 init_rfft(real_t** hanning_window, real_t** in,
     // *out = new real_t[N * 2];
     // *hanning_window = new real_t[N];
 
-    *in = (real_t*)calloc(N, sizeof(real_t));
-    *out = (real_t*)calloc(N * 2, sizeof(real_t));
-    *hanning_window = (real_t*)calloc(N, sizeof(real_t));
-    for (int n = 0; n < N; n++) {
-        const float hanning_value = 0.5f * (1.f - cos(M_2PI * n / (N - 1)));
+    *in = (real_t*)calloc(*N, sizeof(real_t));
+    *out = (real_t*)calloc(*N * 2, sizeof(real_t));
+    *hanning_window = (real_t*)calloc(*N, sizeof(real_t));
+    for (int n = 0; n < *N; n++) {
+        const float hanning_value = 0.5f * (1.f - cos(M_2PI * n / (*N - 1)));
         (*hanning_window)[n] = hanning_value;
         arm_float_to_q15(&hanning_value,  &(*hanning_window)[n], 1);
     }
@@ -100,6 +100,16 @@ inline void get_real_imag_by_index(T* in, T* out, uint16_t N, int index) {
     (void)N;
     out[0] = in[2 * index];
     out[1] = in[2 * index + 1];
+}
+
+template<typename T>
+inline T get_real_by_index(T* in, int index) {
+    return in[index];
+}
+
+template<typename T>
+inline T get_imag_by_index(T* in, int index) {
+    return in[index + 1];
 }
 
 #endif  // SRC_PLATFORM_STM32_MATH_RFFT_HPP_

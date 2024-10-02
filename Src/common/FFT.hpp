@@ -19,7 +19,7 @@ extern "C" {
 #define FFT_MAX_SIZE    2048
 #define MAX_NUM_PEAKS   3
 #define MIN_SNR         1.0f
-#define NUM_AXES        3
+#define MAX_NUM_AXES        3
 
 class FFT {
 public:
@@ -28,12 +28,13 @@ public:
     float fft_min_freq = 0;
     float fft_max_freq;
     float _resolution_hz;
-    float peak_frequencies [NUM_AXES][MAX_NUM_PEAKS] {};
-    float peak_snr [NUM_AXES][MAX_NUM_PEAKS] {};
+    float peak_frequencies [MAX_NUM_AXES][MAX_NUM_PEAKS] {0};
+    float peak_snr [MAX_NUM_AXES][MAX_NUM_PEAKS] {0};
+    bool _fft_updated[MAX_NUM_AXES]{false};
+    uint32_t total_time;
 
 private:
     uint16_t size;
-
     real_t *_hanning_window{nullptr};
     real_t *_fft_output_buffer{nullptr};
     real_t *_fft_input_buffer{nullptr};
@@ -41,7 +42,6 @@ private:
     std::vector<float> _peak_magnitudes_all;
 
     uint16_t _fft_buffer_index[3] {};
-    bool _fft_updated{false};
     uint8_t n_axes;
     float _sample_rate_hz;
 
@@ -56,14 +56,14 @@ private:
         return (data_buffer[0].data() && data_buffer[1].data() && data_buffer[2].data()
                 && _peak_magnitudes_all.data());
     }
-    // #ifdef HAL_MODULE_ENABLED
+    #ifdef HAL_MODULE_ENABLED
         // specification of arm_rfft_instance_q15
         // https://arm-software.github.io/CMSIS_5/DSP/html/group__RealFFT.html
         arm_rfft_instance_q15 rfft_spec;
-    // #else
+    #else
         // plan for the r2c transform from fftw3 library.
-        // fftw_plan rfft_spec;
-    // #endif
+        fftw_plan rfft_spec;
+    #endif
 };
 
 #ifdef __cplusplus
