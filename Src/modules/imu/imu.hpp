@@ -4,13 +4,15 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#ifndef SRC_MODULES_CANOPEN_HPP_
-#define SRC_MODULES_CANOPEN_HPP_
+#ifndef SRC_MODULES_IMU_HPP_
+#define SRC_MODULES_IMU_HPP_
 
 #include <numbers>
 #include "module.hpp"
 #include "publisher.hpp"
 #include "drivers/mpu9250/mpu9250.hpp"
+#include "common/FFT.hpp"
+#include "common/logging.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,7 +20,7 @@ extern "C" {
 
 class ImuModule : public Module {
 public:
-    ImuModule() : Module(10.0) {}
+    ImuModule() : Module(400.0, Protocol::DRONECAN) {}
     void init() override;
 
 protected:
@@ -29,6 +31,8 @@ private:
     DronecanPublisher<AhrsRawImu> pub;
     DronecanPublisher<MagneticFieldStrength2> mag;
     Mpu9250 imu;
+    FFT fft;
+    Logging logger{"IMU"};
     bool initialized{false};
     bool enabled{false};
 
@@ -45,4 +49,4 @@ private:
 }
 #endif
 
-#endif  // SRC_MODULES_CANOPEN_HPP_
+#endif  // SRC_MODULES_IMU_HPP_

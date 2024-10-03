@@ -34,6 +34,7 @@ public:
      * @return 0 on success, negative otherwise
      */
     int8_t read_magnetometer(std::array<int16_t, 3>* mag) const;
+
 private:
     bool initialized{false};
 };
