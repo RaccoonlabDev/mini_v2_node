@@ -159,12 +159,15 @@ void FFT::find_peaks(uint8_t axis) {
         }
     }
     float max_snr_peak = 0;
+    uint8_t max_peak_index = 0;
     for (int peak_index = 0; peak_index < MAX_NUM_PEAKS; peak_index++) {
         if (peak_snr[axis][peak_index] > max_snr_peak) {
-            max_snr_peak = peak_frequencies[axis][peak_index];
+            max_snr_peak = peak_snr[axis][peak_index];
+            max_peak_index = peak_index;
         }
     }
-    peak_frequencies[axis][0] = max_snr_peak;
+    peak_frequencies[axis][0] = peak_frequencies[axis][max_peak_index];
+    peak_snr[axis][0] = peak_snr[axis][max_peak_index];
 }
 
 static constexpr float tau(float x) {
