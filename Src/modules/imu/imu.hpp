@@ -4,8 +4,8 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#ifndef SRC_MODULES_CANOPEN_HPP_
-#define SRC_MODULES_CANOPEN_HPP_
+#ifndef SRC_MODULES_IMU_HPP_
+#define SRC_MODULES_IMU_HPP_
 
 #include <numbers>
 #include "module.hpp"
@@ -18,20 +18,31 @@ extern "C" {
 
 class ImuModule : public Module {
 public:
-    ImuModule() : Module(10.0) {}
+    enum class Bitmask : uint8_t {
+        DISABLED                    = 0,
+        ENABLE_VIB_ESTIM            = 2,
+        ENABLE_FFT_ACC              = 4,
+        ENABLE_FFT_GYR              = 8,
+        ENABLE_ALL_BY_DEFAULT       = 15,
+    };
+    ImuModule() : Module(400.0, Protocol::DRONECAN) {}
     void init() override;
 
 protected:
     void spin_once() override;
     void update_params() override;
+    void get_vibration(std::array<float, 3> data);
+    void fft();
 
 private:
     DronecanPublisher<AhrsRawImu> pub;
     DronecanPublisher<MagneticFieldStrength2> mag;
     Mpu9250 imu;
+    float vibration = 0.0f;
     bool initialized{false};
     bool enabled{false};
-
+    uint8_t bitmask{0};
+    uint16_t pub_timeout_ms{0};
     static constexpr float raw_gyro_to_rad_per_second(int16_t raw_gyro) {
         return raw_gyro * std::numbers::pi_v<float> / 131.0f / 180.0f;
     }
@@ -45,4 +56,4 @@ private:
 }
 #endif
 
-#endif  // SRC_MODULES_CANOPEN_HPP_
+#endif  // SRC_MODULES_IMU_HPP_
