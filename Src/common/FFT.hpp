@@ -18,7 +18,7 @@ extern "C" {
 
 #define FFT_MAX_SIZE    512
 #define MAX_NUM_PEAKS   3
-#define MIN_SNR         1.0f
+#define MIN_SNR         8.0f
 #define MAX_NUM_AXES    3
 constexpr size_t NUMBER_OF_SAMPLES = 512;
 
@@ -36,9 +36,9 @@ public:
 
 private:
     uint16_t size;
-    real_t *_hanning_window{nullptr};
-    real_t *_fft_output_buffer{nullptr};
-    real_t *_fft_input_buffer{nullptr};
+    real_t _hanning_window[FFT_MAX_SIZE] {};
+    real_t _fft_output_buffer[FFT_MAX_SIZE * 2] {};
+    real_t _fft_input_buffer[FFT_MAX_SIZE] {};
     std::array<std::array<real_t, NUMBER_OF_SAMPLES>, MAX_NUM_AXES> data_buffer;
     std::array<float, NUMBER_OF_SAMPLES> _peak_magnitudes_all;
 

@@ -11,17 +11,17 @@ typedef double real_t;
 
 #define M_2PI           6.28318530717958647692
 
-inline fftw_plan init_rfft(real_t** hanning_window, real_t** in, real_t** out, uint16_t *N) {
-    *hanning_window = fftw_alloc_real(*N);
+inline fftw_plan init_rfft(real_t* hanning_window, real_t* in, real_t* out, uint16_t *N) {
+    // *hanning_window = fftw_alloc_real(*N);
     for (int n = 0; n < *N; n++) {
         const float hanning_value = 0.5f * (1.f - cos(M_2PI * n / (*N - 1)));
-        (*hanning_window)[n] = hanning_value;
+        hanning_window[n] = hanning_value;
     }
     // Allocate input and output arrays
-    *in = (real_t*) fftw_alloc_real(sizeof(real_t)* (*N));
-    *out = (real_t*) fftw_alloc_real(sizeof(real_t)* 2 * *N);
+    // *in = (real_t*) fftw_alloc_real(sizeof(real_t)* (*N));
+    // *out = (real_t*) fftw_alloc_real(sizeof(real_t)* 2 * *N);
     // Create plan
-    return fftw_plan_r2r_1d(*N, *in, *out, FFTW_R2HC, FFTW_ESTIMATE);
+    return fftw_plan_r2r_1d(*N, in, out, FFTW_R2HC, FFTW_ESTIMATE);
 }
 
 /*
