@@ -4,26 +4,31 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
+#include <math.h>
 #include "imu.hpp"
 #include "params.hpp"
 
 REGISTER_MODULE(ImuModule)
 
 void ImuModule::init() {
-    initialized = imu.initialize();
+    bool imu_initialized = imu.initialize();
     mode = Module::Mode::STANDBY;
+    initialized = imu_initialized;
 }
 
 void ImuModule::update_params() {
-    enabled = static_cast<bool>(paramsGetIntegerValue(PARAM_IMU_ENABLE));
-    health = (!enabled || initialized) ? Module::Status::OK : Module::Status::MAJOR_FAILURE;
-    if (enabled) {
+    auto pub_frequency = static_cast<uint16_t>(
+                                paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_PUB_FREQUENCY));
+    pub_timeout_ms = pub_frequency == 0 ? 0 : 1000 / pub_frequency;
+    bitmask = static_cast<uint8_t>(paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_MODE_BITMASK));
+    health = (!bitmask || initialized) ? Module::Status::OK : Module::Status::MAJOR_FAILURE;
+    if (bitmask) {
         mode = initialized ? Mode::STANDBY : Mode::INITIALIZATION;
     }
 }
 
 void ImuModule::spin_once() {
-    if (!enabled || !initialized) {
+    if (!bitmask || !initialized) {
         return;
     }
 
@@ -32,26 +37,51 @@ void ImuModule::spin_once() {
         mag.publish();
     }
 
-    bool updated{false};
+    bool updated[2]{false, false};
 
-    std::array<int16_t, 3> accel_raw;
-    if (imu.read_accelerometer(&accel_raw) >= 0) {
-        pub.msg.accelerometer_latest[0] = raw_accel_to_meter_per_square_second(accel_raw[0]);
-        pub.msg.accelerometer_latest[1] = raw_accel_to_meter_per_square_second(accel_raw[1]);
-        pub.msg.accelerometer_latest[2] = raw_accel_to_meter_per_square_second(accel_raw[2]);
-        updated = true;
-    }
-
-    std::array<int16_t, 3> gyro_raw;
+    std::array<int16_t, 3>  accel_raw = {0, 0, 0};
+    std::array<int16_t, 3>  gyro_raw  = {0, 0, 0};
+    std::array<float, 3>    gyro      = {0.0f, 0.0f, 0.0f};
+    std::array<float, 3>    accel     = {0.0f, 0.0f, 0.0f};
     if (imu.read_gyroscope(&gyro_raw) >= 0) {
-        pub.msg.rate_gyro_latest[0] = raw_gyro_to_rad_per_second(gyro_raw[0]);
-        pub.msg.rate_gyro_latest[1] = raw_gyro_to_rad_per_second(gyro_raw[1]);
-        pub.msg.rate_gyro_latest[2] = raw_gyro_to_rad_per_second(gyro_raw[2]);
-        updated = true;
+        gyro = {
+                raw_gyro_to_rad_per_second(gyro_raw[0]),
+                raw_gyro_to_rad_per_second(gyro_raw[1]),
+                raw_gyro_to_rad_per_second(gyro_raw[2])};
+        pub.msg.rate_gyro_latest[0] = gyro[0];
+        pub.msg.rate_gyro_latest[1] = gyro[1];
+        pub.msg.rate_gyro_latest[2] = gyro[2];
+        updated[0] = true;
     }
 
-    if (updated) {
-        pub.msg.timestamp = HAL_GetTick() * 1000;
-        pub.publish();
+    if (imu.read_accelerometer(&accel_raw) >= 0) {
+        accel = {
+                raw_accel_to_meter_per_square_second(accel_raw[0]),
+                raw_accel_to_meter_per_square_second(accel_raw[1]),
+                raw_accel_to_meter_per_square_second(accel_raw[2])};
+        get_vibration(accel);
+        pub.msg.accelerometer_latest[0] = accel[0];
+        pub.msg.accelerometer_latest[1] = accel[1];
+        pub.msg.accelerometer_latest[2] = accel[2];
+        updated[1] = true;
+    }
+
+    if (pub_timeout_ms != 0 && HAL_GetTick() - pub.msg.timestamp / 1000 > pub_timeout_ms) {
+        if (updated[0] && updated[1]) {
+            pub.msg.timestamp = HAL_GetTick() * 1000;
+            pub.publish();
+        }
+    }
+}
+
+void ImuModule::get_vibration(std::array<float, 3> data) {
+    if (bitmask & static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_VIB_ESTIM)) {
+        float diff_magnitude = 0.0f;
+        for (uint8_t i = 0; i < 3; i++) {
+            diff_magnitude += std::pow(data[i] - pub.msg.accelerometer_latest[i], 2);
+        }
+        vibration = 0.99f * vibration + 0.01f * std::sqrt(diff_magnitude);
+        pub.msg.integration_interval = vibration;
+        return;
     }
 }

@@ -1,8 +1,23 @@
-imu.enable:
+imu.mode:
   type: Integer
-  note: Enable or disable IMU publisher.
-  enum: PARAM_IMU_ENABLE
+  note: 
+      "Bit mask to enable IMU features:
+    </br> Bit 1 - enable RawImu publisher,
+    </br> Bit 2 - enable vibration metric publishing to RawImu.integration_interval,
+    </br> Bit 3 - enable FFT acceleration publishing to RawImu.accelerometer_integral,
+    </br> Bit 4 - enable FFT acceleration publishing to RawImu.rate_gyro_integral,
+    </br> By default 15 that mean enable all publishers"
+  enum: PARAM_IMU_MODE_BITMASK
   flags: mutable
   default: 0
   min: 0
-  max: 1
+  max: 16
+
+imu.pub_frequency:
+  type: Integer
+  note: Frequency of IMU publisher [Hz].
+  enum: PARAM_IMU_PUB_FREQUENCY
+  flags: mutable
+  default: 1
+  min: 0
+  max: 400
