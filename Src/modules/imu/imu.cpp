@@ -82,12 +82,6 @@ void ImuModule::spin_once() {
             pub.publish();
         }
     }
-    if (HAL_GetTick() % 1000 == 0) {
-        char buffer[90];
-        snprintf(buffer, sizeof(buffer), "%d %d %d\n", int(1000 * fft_accel.peak_snr[0][0]),
-                int(1000 * fft_accel.peak_snr[1][0]), int(1000 * fft_accel.peak_snr[2][0]));
-        logger.log_info(buffer);
-    }
 }
 
 void ImuModule::get_vibration(std::array<float, 3> data) {
