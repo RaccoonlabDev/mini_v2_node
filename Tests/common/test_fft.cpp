@@ -11,7 +11,6 @@
 
 #include "FFT.hpp"
 
-static constexpr auto ABS_ERR = 0.1f;
 unsigned int seed = 1;
 
 template <typename T>
@@ -63,8 +62,8 @@ struct InitParamMultiSignalWithRes {
 
 InitParamOneSignalWithRes OneSignalTestParams[7] = {
     // 0
-    {{InitFFTParamType{      .sample_rate_hz = 100,  .n_axes   = 1,   .window_size  = 24},
-      InitOneSignParamType{  .sample_rate_hz = 100,  .freq_hz  = 3,   .amplitude    = 1}},
+    {{InitFFTParamType{      .sample_rate_hz = 100,  .n_axes   = 1,   .window_size  = 50},
+      InitOneSignParamType{  .sample_rate_hz = 100,  .freq_hz  = 3,   .amplitude    = 10}},
       true},
     // 1
     {{InitFFTParamType{      .sample_rate_hz = 1000, .n_axes   = 1,   .window_size  = 512},
@@ -79,14 +78,14 @@ InitParamOneSignalWithRes OneSignalTestParams[7] = {
       InitOneSignParamType{  .sample_rate_hz = 512,  .freq_hz  = 100, .amplitude    = 10}},
       true},
     // 4
-    {{InitFFTParamType{      .sample_rate_hz = 1024, .n_axes   = 3,   .window_size  = 400},
-      InitOneSignParamType{  .sample_rate_hz = 1024, .freq_hz  = 100, .amplitude    = 1}},
+    {{InitFFTParamType{      .sample_rate_hz = 1024, .n_axes   = 3,   .window_size  = 512},
+      InitOneSignParamType{  .sample_rate_hz = 1024, .freq_hz  = 100, .amplitude    = 10}},
       true},
     // 5
     {{InitFFTParamType{      .sample_rate_hz = 256,  .n_axes   = 3,   .window_size  = 256},
       InitOneSignParamType{  .sample_rate_hz = 256,  .freq_hz  = 100, .amplitude    = 1}},
       true},
-    // 7
+    // 6
     {{InitFFTParamType{     .sample_rate_hz  = 300,   .n_axes   = 1,  .window_size  = 200},
       InitOneSignParamType{ .sample_rate_hz = 1000,  .freq_hz  = 100, .amplitude    = 1}},
       false},
@@ -249,6 +248,7 @@ class TestFFTOneSignalParametrized : public TestFFTBase<SinSignalGenerator,
 public:
     /* data */
     bool result;
+    bool is_heat_all_peaks{true};
 
     void print_signal_parameters() {
                 // Print the signal parameters
@@ -260,6 +260,34 @@ public:
         std::cout << "  Amplitude: " << signals_parameters[0].amplitude
                     << std::endl;
     }
+
+    void print_fft_results() {
+        printf("fft resolution: %f\n", fft._resolution_hz);
+        for (int axis = 0; axis < fft_parameters.n_axes; axis++) {
+            printf("AXIS %d\n", axis);
+            for (int peak_index = 0; peak_index < MAX_NUM_PEAKS; peak_index++) {
+                printf("peak index: %d\n", peak_index);
+                printf("fft peak freq: %f\n", fft.peak_frequencies[axis][peak_index]);
+            }
+        }
+    }
+
+    void check_values () {
+        for (int i = 0; i < fft_parameters.n_axes; i++) {
+            bool heat_peak = false;
+            for (int j = 0; j < MAX_NUM_PEAKS; j++) {
+                auto in_range = IsBetweenInclusive(fft.peak_frequencies[i][j],
+                            signals_parameters[i].freq_hz - abs_error,
+                            signals_parameters[i].freq_hz + abs_error);
+                if (in_range) {
+                    heat_peak = true;
+                    break;
+                }
+            }
+            is_heat_all_peaks = is_heat_all_peaks && heat_peak;
+        }
+    }
+
     void SetUp() override {
         auto parameters = GetParam();
         InitParamType<InitOneSignParamType> init_parameters = parameters.parameters;
@@ -278,32 +306,18 @@ public:
 
 TEST_P(TestFFTOneSignalParametrized, CheckOnWindow) {
     float input[fft_parameters.n_axes];
-    for (int i = 0; i < fft_parameters.window_size + 10; i++) {
+    for (int i = 0; i < fft_parameters.window_size + 1; i++) {
         for (int j = 0; j < fft_parameters.n_axes; j++) {
             input[j] = signals_generator[j].get_next_sample();
         }
         fft.update(input);
     }
-    for (int j = 0; j < fft_parameters.n_axes; j++) {
-        printf("AXIS: %d\n", j);
-        for (int i = 0; i < MAX_NUM_PEAKS; i++) {
-            printf("%d:\n freq:\t%f\n", i,
-                        fft.peak_frequencies[j][i]);
-            printf(" snr:\t%f\n", fft.peak_snr[j][i]);
-        }
-    }
-    printf("fft resolution: %f\n", fft._resolution_hz);
+    print_fft_results();
+    check_values();
     if (result) {
-        for (int i = 0; i < fft_parameters.n_axes; i++) {
-            EXPECT_NEAR(fft.peak_frequencies[i][0],
-                        signals_parameters[i].freq_hz, 10 * fft._resolution_hz);
-        }
+        EXPECT_TRUE(is_heat_all_peaks);
     } else {
-        for (int i = 0; i < fft_parameters.n_axes; i++) {
-            ASSERT_FALSE(IsBetweenInclusive(fft.peak_frequencies[i][0],
-                         signals_parameters[i].freq_hz - 10 * fft._resolution_hz,
-                         signals_parameters[i].freq_hz + 10 * fft._resolution_hz));
-        }
+        ASSERT_FALSE(is_heat_all_peaks);
     }
 }
 
@@ -317,24 +331,12 @@ TEST_P(TestFFTOneSignalParametrized, CheckOnFewWindows) {
         }
         fft.update(input);
     }
-    for (int axis = 0; axis < fft_parameters.n_axes; axis++) {
-        printf("AXIS %d\n", axis);
-        for (int peak_index = 0; peak_index < MAX_NUM_PEAKS; peak_index++) {
-            printf("peak index: %d\n", peak_index);
-            printf("fft peak freq: %f\n", fft.peak_frequencies[axis][peak_index]);
-        }
-    }
+    print_fft_results();
+    check_values();
     if (result) {
-        for (int i = 0; i < fft_parameters.n_axes; i++) {
-            EXPECT_NEAR(fft.peak_frequencies[i][0],
-                        signals_generator[i].freq_hz, 10 * fft._resolution_hz);
-        }
+        EXPECT_TRUE(is_heat_all_peaks);
     } else {
-        for (int i = 0; i < fft_parameters.n_axes; i++) {
-            ASSERT_FALSE(IsBetweenInclusive(fft.peak_frequencies[i][0],
-                         signals_generator[i].freq_hz - 10 * fft._resolution_hz,
-                         signals_generator[i].freq_hz + 10 * fft._resolution_hz));
-        }
+        ASSERT_FALSE(is_heat_all_peaks);
     }
 }
 

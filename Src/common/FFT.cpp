@@ -119,7 +119,11 @@ void FFT::find_peaks(uint8_t axis) {
         // snr is in dB
         float snr;
         if (bin_mag_sum - peak_magnitude[peak_new] < 1.0e-19f) {
-            snr = 0;
+            if (bin_mag_sum > 0) {
+                snr = MIN_SNR;
+            } else {
+                snr = 0.0f;
+            }
         } else {
             snr = 10.f * log10f((size - 1) * peak_magnitude[peak_new] /
                             (bin_mag_sum - peak_magnitude[peak_new]));
@@ -135,9 +139,6 @@ void FFT::find_peaks(uint8_t axis) {
         for (int peak_prev = 0; peak_prev < MAX_NUM_PEAKS; peak_prev++) {
             bool peak_close = (fabsf(freq_adjusted - peak_frequencies_prev[peak_prev])
                                 < (_resolution_hz * 0.25f));
-            // if (!peak_close && peak_frequencies_prev[peak_prev] > 0) {
-            //     continue;
-            // }
             _fft_updated[axis] = true;
 
             // keep
@@ -203,7 +204,7 @@ float FFT::estimate_peak_freq(float fft[], int peak_index) {
     float ap = (real[k + 1] * real[k] + imag[k + 1] * imag[k]) / divider;
 
     // dp = -ap / (1 – ap)
-    if (1.0f - ap < 1.0e-19f) {
+    if (std::fabs(1.0f - ap) < 1.0e-19f) {
         return -1;
     }
     float dp = -ap  / (1.f - ap);
@@ -212,7 +213,7 @@ float FFT::estimate_peak_freq(float fft[], int peak_index) {
     float am = (real[k - 1] * real[k] + imag[k - 1] * imag[k]) / divider;
 
     // dm = am / (1 – am)
-    if (1.0f - am < 1.0e-19f) {
+    if (std::fabs(1.f - am) < 1.0e-19f) {
         return -1;
     }
     float dm = am / (1.f - am);
