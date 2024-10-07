@@ -16,8 +16,10 @@ The function specifies arm_rfft_instance_q15 from CMSIS-DSP library based on the
 @param N: The size of the Hanning window.
 @return: The plan for the r2c transform.
 */
-inline arm_rfft_instance_q15 init_rfft(real_t** hanning_window, real_t** in,
-                                        real_t** out, uint16_t *N) {
+inline arm_rfft_instance_q15 init_rfft(real_t* hanning_window, real_t* in,
+                                        real_t* out, uint16_t *N) {
+    (void) in;
+    (void) out;
     arm_rfft_instance_q15 _rfft_q15;
     switch (*N) {
         case 256:
@@ -52,13 +54,13 @@ inline arm_rfft_instance_q15 init_rfft(real_t** hanning_window, real_t** in,
     // *out = new real_t[N * 2];
     // *hanning_window = new real_t[N];
 
-    *in = (real_t*)calloc(*N, sizeof(real_t));
-    *out = (real_t*)calloc(*N * 2, sizeof(real_t));
-    *hanning_window = (real_t*)calloc(*N, sizeof(real_t));
+    // *in = (real_t*)calloc(*N, sizeof(real_t));
+    // *out = (real_t*)calloc(*N * 2, sizeof(real_t));
+    // *hanning_window = (real_t*)calloc(*N, sizeof(real_t));
     for (int n = 0; n < *N; n++) {
         const float hanning_value = 0.5f * (1.f - cos(M_2PI * n / (*N - 1)));
-        (*hanning_window)[n] = hanning_value;
-        arm_float_to_q15(&hanning_value,  &(*hanning_window)[n], 1);
+        hanning_window[n] = hanning_value;
+        arm_float_to_q15(&hanning_value,  &hanning_window[n], 1);
     }
 
     return _rfft_q15;
