@@ -14,8 +14,8 @@ bool FFT::init(uint16_t window_size, uint16_t num_axes, float sample_rate_hz) {
         return false;
     }
     n_axes = num_axes;
-    rfft_spec = init_rfft(&_hanning_window, &_fft_input_buffer,
-                          &_fft_output_buffer, &window_size);
+    rfft_spec = init_rfft(_hanning_window, _fft_input_buffer,
+                          _fft_output_buffer, &window_size);
     size = window_size;
     _sample_rate_hz = sample_rate_hz;
     _resolution_hz =  sample_rate_hz / size;
@@ -109,9 +109,6 @@ void FFT::find_peaks(uint8_t axis) {
         if (raw_peak_index[peak_new] == 0) {
             continue;
         }
-        static uint16_t indx = 0;
-        indx++;
-        (void) indx;
         float adjusted_bin = 0.5f *
                         estimate_peak_freq(fft_output_buffer_float, 2 * raw_peak_index[peak_new]);
         if (adjusted_bin > size || adjusted_bin < 0) {
@@ -138,9 +135,9 @@ void FFT::find_peaks(uint8_t axis) {
         for (int peak_prev = 0; peak_prev < MAX_NUM_PEAKS; peak_prev++) {
             bool peak_close = (fabsf(freq_adjusted - peak_frequencies_prev[peak_prev])
                                 < (_resolution_hz * 0.25f));
-            if (!peak_close && peak_frequencies_prev[peak_prev] > 0) {
-                continue;
-            }
+            // if (!peak_close && peak_frequencies_prev[peak_prev] > 0) {
+            //     continue;
+            // }
             _fft_updated[axis] = true;
 
             // keep
@@ -154,6 +151,13 @@ void FFT::find_peaks(uint8_t axis) {
             num_peaks_found++;
             break;
         }
+    }
+    if (num_peaks_found == 0) {
+        for (int peak_new = 0; peak_new < MAX_NUM_PEAKS; peak_new++) {
+            peak_frequencies[axis][peak_new] = 0;
+            peak_snr[axis][peak_new] = 0;
+        }
+        return;
     }
     float max_snr_peak = 0;
     uint8_t max_peak_index = 0;
