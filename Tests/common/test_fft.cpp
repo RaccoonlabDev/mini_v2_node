@@ -268,6 +268,7 @@ public:
             for (int peak_index = 0; peak_index < MAX_NUM_PEAKS; peak_index++) {
                 printf("peak index: %d\n", peak_index);
                 printf("fft peak freq: %f\n", fft.peak_frequencies[axis][peak_index]);
+                printf("fft peak snr: %f\n", fft.peak_snr[axis][peak_index]);
             }
         }
     }
@@ -415,7 +416,7 @@ TEST_P(TestFFTOnMultiSignalsParametrized, CheckOnWindow) {
             EXPECT_TRUE(heat_peak);
         } else {
             ASSERT_FALSE(heat_peak);
-            }
+        }
     }
 }
 
