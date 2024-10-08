@@ -58,9 +58,9 @@ private:
     uint8_t n_axes;
     float _sample_rate_hz;
 
-    float estimate_peak_freq(float fft[], int peak_index);
+    float _estimate_peak_freq(float fft[], int peak_index);
     void find_peaks(uint8_t axis);
-    void find_dominant();
+    void _find_dominant();
     // void identify_bin_peaks(uint8_t axis);
     void _identify_peaks_bins(float peak_magnitude[MAX_NUM_PEAKS],
                              uint16_t raw_peak_index[MAX_NUM_PEAKS]);

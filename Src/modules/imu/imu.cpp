@@ -102,7 +102,7 @@ void ImuModule::update_accel_fft() {
     }
     fft_accel.update(accel.data());
     pub.msg.accelerometer_integral[0] = fft_accel.dominant_frequency;
-    pub.msg.accelerometer_integral[1] = fft_accel.dominant_mag;
+    pub.msg.accelerometer_integral[1] = fft_accel.dominant_mag * 1000;
     pub.msg.accelerometer_integral[2] = fft_accel.dominant_snr;
 }
 
@@ -112,6 +112,6 @@ void ImuModule::update_gyro_fft() {
     }
     fft_gyro.update(gyro.data());
     pub.msg.rate_gyro_integral[0] = fft_gyro.dominant_frequency;
-    pub.msg.rate_gyro_integral[1] = fft_gyro.dominant_mag;
+    pub.msg.rate_gyro_integral[1] = fft_gyro.dominant_mag * 1000;
     pub.msg.rate_gyro_integral[2] = fft_gyro.dominant_snr;
 }

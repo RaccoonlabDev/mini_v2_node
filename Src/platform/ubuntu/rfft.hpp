@@ -56,6 +56,7 @@ namespace fft {
     inline T get_imag_by_index(T* in, uint16_t index) {
         return 0;
     }
+
     /*
     The function written based on fftw3 library.
     @param plan: The plan for the r2c transform.
