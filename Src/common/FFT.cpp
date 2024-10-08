@@ -50,7 +50,7 @@ void FFT::update(float *input) {
                 sizeof(real_t) * overlap_start * 3);
         _fft_buffer_index[axis] = overlap_start * 3;
     }
-    find_dominant();
+    _find_dominant();
 }
 
 void FFT::find_peaks(uint8_t axis) {
@@ -61,12 +61,9 @@ void FFT::find_peaks(uint8_t axis) {
     float bin_mag_sum = 0;
     // calculate magnitudes for each fft bin
     for (uint16_t fft_index = 0; fft_index < size/2; fft_index ++) {
-        real_t real_imag[2] = {0, 0};
-        fft::get_real_imag_by_index(_fft_output_buffer.data(), real_imag, size, fft_index);
-        float real_f, imag_f;
-        fft::convert_real_t_to_float(&real_imag[0], &real_f, 1);
-        fft::convert_real_t_to_float(&real_imag[1], &imag_f, 1);
-        const float fft_magnitude = sqrtf(real_f * real_f + imag_f * imag_f);
+        auto real = fft::get_imag_by_index(fft_output_buffer_float, fft_index);
+        auto imag = fft::get_imag_by_index(fft_output_buffer_float, fft_index);
+        const float fft_magnitude = sqrtf(real * real + imag * imag);
         _peak_magnitudes_all[fft_index] = fft_magnitude;
         bin_mag_sum += fft_magnitude;
     }
@@ -88,7 +85,7 @@ void FFT::find_peaks(uint8_t axis) {
     }
 }
 
-void FFT::find_dominant() {
+void FFT::_find_dominant() {
     if (!is_updated()) {
         return;
     }
@@ -126,7 +123,7 @@ void FFT::_identify_peaks_bins(float peak_magnitude[MAX_NUM_PEAKS],
 
         if (largest_peak_index > 0) {
             raw_peak_index[i] = largest_peak_index;
-            peak_magnitude[i] = _peak_magnitudes_all[largest_peak_index];
+            peak_magnitude[i] = largest_peak;
             // remove peak + sides (included in frequency estimate later)
             _peak_magnitudes_all[largest_peak_index - 1] = 0;
             _peak_magnitudes_all[largest_peak_index]     = 0;
@@ -145,7 +142,7 @@ uint16_t FFT::_estimate_peaks(float* peak_magnitude,
             continue;
         }
         float adjusted_bin = 0.5f *
-                        estimate_peak_freq(fft, 2 * raw_peak_index[peak_new]);
+                        _estimate_peak_freq(fft, 2 * raw_peak_index[peak_new]);
         if (adjusted_bin > size || adjusted_bin < 0) {
             continue;
         }
@@ -196,7 +193,7 @@ static constexpr float tau(float x) {
     return addend_1 - multiplier_2 * addend_2;
 }
 
-float FFT::estimate_peak_freq(float fft[], int peak_index) {
+float FFT::_estimate_peak_freq(float fft[], int peak_index) {
     if (peak_index < 2 || peak_index >= size) {
         return -1;
     }
