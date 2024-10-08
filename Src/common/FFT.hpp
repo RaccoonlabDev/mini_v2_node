@@ -29,25 +29,45 @@ public:
     float fft_min_freq = 0;
     float fft_max_freq;
     float _resolution_hz;
-    float peak_frequencies [MAX_NUM_AXES][MAX_NUM_PEAKS] {0};
-    float peak_snr [MAX_NUM_AXES][MAX_NUM_PEAKS] {0};
-    bool _fft_updated[MAX_NUM_AXES]{false};
+    float dominant_frequency;
+    float dominant_snr;
+    float dominant_mag;
+    std::array<std::array<float, MAX_NUM_PEAKS>, MAX_NUM_AXES> peak_frequencies {0};
+    std::array<std::array<float, MAX_NUM_PEAKS>, MAX_NUM_AXES> peak_magnitudes {0};
+    std::array<std::array<float, MAX_NUM_PEAKS>, MAX_NUM_AXES> peak_snr {0};
     uint32_t total_time;
+    bool is_updated() {
+        for (uint8_t axis = 0; axis < n_axes; axis++) {
+            if (!_fft_updated[axis]) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 private:
     uint16_t size;
-    real_t _hanning_window[FFT_MAX_SIZE] {};
-    real_t _fft_output_buffer[FFT_MAX_SIZE * 2] {};
-    real_t _fft_input_buffer[FFT_MAX_SIZE] {};
+    std::array<bool, MAX_NUM_AXES>          _fft_updated{false};
+    std::array<real_t, FFT_MAX_SIZE>        _hanning_window;
+    std::array<real_t, FFT_MAX_SIZE * 2>    _fft_output_buffer;
+    std::array<real_t, FFT_MAX_SIZE>        _fft_input_buffer;
+    std::array<float, NUMBER_OF_SAMPLES>    _peak_magnitudes_all;
+    std::array<uint16_t, MAX_NUM_AXES>      _fft_buffer_index;
     std::array<std::array<real_t, NUMBER_OF_SAMPLES>, MAX_NUM_AXES> data_buffer;
-    std::array<float, NUMBER_OF_SAMPLES> _peak_magnitudes_all;
 
-    uint16_t _fft_buffer_index[3] {};
     uint8_t n_axes;
     float _sample_rate_hz;
 
     float estimate_peak_freq(float fft[], int peak_index);
     void find_peaks(uint8_t axis);
+    void find_dominant();
+    // void identify_bin_peaks(uint8_t axis);
+    void _identify_peaks_bins(float peak_magnitude[MAX_NUM_PEAKS],
+                             uint16_t raw_peak_index[MAX_NUM_PEAKS]);
+    uint16_t _estimate_peaks(float* peak_magnitude,
+                                    uint16_t* raw_peak_index,
+                                    float* fft_output_buffer_float,
+                                    float bin_mag_sum, uint8_t axis);
     #ifdef HAL_MODULE_ENABLED
         // specification of arm_rfft_instance_q15
         // https://arm-software.github.io/CMSIS_5/DSP/html/group__RealFFT.html
