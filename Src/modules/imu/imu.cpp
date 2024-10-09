@@ -11,8 +11,6 @@
 
 REGISTER_MODULE(ImuModule)
 
-Logging logger{"IMU"};
-
 void ImuModule::init() {
     bool imu_initialized = imu.initialize();
     mode = Module::Mode::STANDBY;
