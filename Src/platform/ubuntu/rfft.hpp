@@ -1,5 +1,10 @@
-/* These definitions need to be changed depending on the floating-point precision */
-#pragma once
+/*
+ * Copyright (C) 2024 Anastasiia Stepanova <asiiapine@gmail.com>
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 #ifndef SRC_PLATFORM_UBUNTU_MATH_RFFT_HPP_
 #define SRC_PLATFORM_UBUNTU_MATH_RFFT_HPP_
 
@@ -10,16 +15,21 @@ typedef double real_t;
 #include <complex>
 
 #define M_2PI           6.28318530717958647692
-namespace fft {
+namespace rfft {
+    /*
+    The function specifies fftw_plan from the FFTW3 library.
+    @param window_size: The size of the input array.
+    @param hanning_window: Pointer to the Hanning window container.
+    @param in: input data buffer
+    @param out: rfft output data buffer
+    @param N: The size of the Hanning window.
+    @return: The plan for the r2c transform.
+    */
     inline fftw_plan init_rfft(real_t* hanning_window, real_t* in, real_t* out, uint16_t *N) {
-        // *hanning_window = fftw_alloc_real(*N);
         for (int n = 0; n < *N; n++) {
             const float hanning_value = 0.5f * (1.f - cos(M_2PI * n / (*N - 1)));
             hanning_window[n] = hanning_value;
         }
-        // Allocate input and output arrays
-        // *in = (real_t*) fftw_alloc_real(sizeof(real_t)* (*N));
-        // *out = (real_t*) fftw_alloc_real(sizeof(real_t)* 2 * *N);
         // Create plan
         return fftw_plan_r2r_1d(*N, in, out, FFTW_R2HC, FFTW_ESTIMATE);
     }
@@ -76,6 +86,6 @@ namespace fft {
             out[n] = (real_t)in[n];
         }
     }
-}  // namespace fft
+}  // namespace rfft
 
 #endif  // SRC_PLATFORM_UBUNTU_MATH_RFFT_HPP_

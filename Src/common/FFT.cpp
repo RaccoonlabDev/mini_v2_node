@@ -14,7 +14,7 @@ bool FFT::init(uint16_t window_size, uint16_t num_axes, float sample_rate_hz) {
         return false;
     }
     n_axes = num_axes;
-    rfft_spec = fft::init_rfft(_hanning_window.data(), _fft_input_buffer.data(),
+    rfft_spec = rfft::init_rfft(_hanning_window.data(), _fft_input_buffer.data(),
                           _fft_output_buffer.data(), &window_size);
     size = window_size;
     _sample_rate_hz = sample_rate_hz;
@@ -25,7 +25,7 @@ bool FFT::init(uint16_t window_size, uint16_t num_axes, float sample_rate_hz) {
 
 void FFT::update(float *input) {
     real_t conv_input[n_axes];
-    fft::convert_float_to_real_t(input, conv_input, n_axes);
+    rfft::convert_float_to_real_t(input, conv_input, n_axes);
     for (uint8_t axis = 0; axis < n_axes; axis++) {
         uint16_t &buffer_index = _fft_buffer_index[axis];
 
@@ -34,17 +34,15 @@ void FFT::update(float *input) {
             data_buffer[axis][buffer_index] = conv_input[axis] / 2;
             buffer_index++;
             _fft_updated[axis] = false;
-
             continue;
         }
 
-        fft::apply_hanning_window(data_buffer[axis].data(), _fft_input_buffer.data(),
+        rfft::apply_hanning_window(data_buffer[axis].data(), _fft_input_buffer.data(),
                                 _hanning_window.data(), size);
-        fft::rfft_one_cycle(rfft_spec, _fft_input_buffer.data(), _fft_output_buffer.data());
+        rfft::rfft_one_cycle(rfft_spec, _fft_input_buffer.data(), _fft_output_buffer.data());
         find_peaks(axis);
 
-        // reset
-        // shift buffer (3/4 overlap)
+        // shift buffer (3/4 overlap) as sliding window for input data
         const int overlap_start = size / 4;
         memmove(&data_buffer[axis][0], &data_buffer[axis][overlap_start],
                 sizeof(real_t) * overlap_start * 3);
@@ -55,14 +53,14 @@ void FFT::update(float *input) {
 
 void FFT::find_peaks(uint8_t axis) {
     float fft_output_buffer_float[size];
-    fft::convert_real_t_to_float(_fft_output_buffer.data(), fft_output_buffer_float, size);
+    rfft::convert_real_t_to_float(_fft_output_buffer.data(), fft_output_buffer_float, size);
 
     // sum total energy across all used buckets for SNR
     float bin_mag_sum = 0;
     // calculate magnitudes for each fft bin
     for (uint16_t fft_index = 0; fft_index < size/2; fft_index ++) {
-        auto real = fft::get_imag_by_index(fft_output_buffer_float, fft_index);
-        auto imag = fft::get_imag_by_index(fft_output_buffer_float, fft_index);
+        auto real = rfft::get_real_by_index(fft_output_buffer_float, fft_index);
+        auto imag = rfft::get_imag_by_index(fft_output_buffer_float, fft_index);
         const float fft_magnitude = sqrtf(real * real + imag * imag);
         _peak_magnitudes_all[fft_index] = fft_magnitude;
         bin_mag_sum += fft_magnitude;
@@ -203,8 +201,8 @@ float FFT::_estimate_peak_freq(float fft[], int peak_index) {
     float real[3];
     float imag[3];
     for (int i = -1; i < 2; i++) {
-        real[i + 1] = fft::get_real_by_index(fft, peak_index + i);
-        imag[i + 1] = fft::get_imag_by_index(fft, peak_index + i);
+        real[i + 1] = rfft::get_real_by_index(fft, peak_index + i);
+        imag[i + 1] = rfft::get_imag_by_index(fft, peak_index + i);
     }
 
     static constexpr int k = 1;

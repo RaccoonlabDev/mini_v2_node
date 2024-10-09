@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2024 Anastasiia Stepanova <asiiapine@gmail.com>
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 #ifndef SRC_PLATFORM_STM32_MATH_RFFT_HPP_
 #define SRC_PLATFORM_STM32_MATH_RFFT_HPP_
 
@@ -6,13 +13,13 @@
 typedef q15_t real_t;
 #define M_2PI           6.28318530717958647692
 
-namespace fft {
+namespace rfft {
     /*
     The function specifies arm_rfft_instance_q15 from CMSIS-DSP library based on the window size.
     @param window_size: The size of the input array.
     @param hanning_window: Pointer to the Hanning window container.
-    @param in: used fo incompatability with ubuntu version
-    @param out: used fo incompatability with ubuntu version
+    @param in: used for compatability with ubuntu version
+    @param out: used for compatability with ubuntu version
     @param N: The size of the Hanning window.
     @return: The plan for the r2c transform.
     */
@@ -50,13 +57,6 @@ namespace fft {
         _rfft_q15.ifftFlagR = 0;
         _rfft_q15.bitReverseFlagR = 1;
 
-        // *in = new real_t[N];
-        // *out = new real_t[N * 2];
-        // *hanning_window = new real_t[N];
-
-        // *in = (real_t*)calloc(*N, sizeof(real_t));
-        // *out = (real_t*)calloc(*N * 2, sizeof(real_t));
-        // *hanning_window = (real_t*)calloc(*N, sizeof(real_t));
         for (int n = 0; n < *N; n++) {
             const float hanning_value = 0.5f * (1.f - cos(M_2PI * n / (*N - 1)));
             hanning_window[n] = hanning_value;
@@ -113,6 +113,6 @@ namespace fft {
     inline T get_imag_by_index(T* in, int index) {
         return in[index + 1];
     }
-}  // namespace fft
+}  // namespace rfft
 
 #endif  // SRC_PLATFORM_STM32_MATH_RFFT_HPP_
