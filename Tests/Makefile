@@ -4,8 +4,7 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 CRNT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-TESTS_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-REPO_DIR := $(abspath $(dir $(lastword $(TESTS_DIR))))
+REPO_DIR := $(abspath $(dir $(lastword $(CRNT_DIR))))
 BUILD_DIR=${REPO_DIR}/build/Tests
 
 $(info CRNT_DIR: ${CRNT_DIR})
@@ -29,10 +28,10 @@ coverage: create_build_dir
 	cd ${BUILD_DIR} && ./fft
 
 	echo "\n1. Algorithms:"
-	cd ${BUILD_DIR} && gcov ${BUILD_DIR}/CMakeFiles/algorithms.dir${REPO_DIR}/common/algorithms.cpp.gcda
+	cd ${BUILD_DIR} && gcov ${BUILD_DIR}/CMakeFiles/algorithms.dir/common/test_algorithms.cpp.gcda
 
 	echo "\n2. FFT:"
-	cd ${BUILD_DIR} && gcov ${BUILD_DIR}/CMakeFiles/fft.dir${REPO_DIR}/common/fft.c.gcda
+	cd ${BUILD_DIR} && gcov ${BUILD_DIR}/CMakeFiles/fft.dir/common/test_fft.cpp.gcda
 
 algorithms: create_build_dir
 	cd ${BUILD_DIR} && cmake -S ${CRNT_DIR} && make && ./algorithms

@@ -5,8 +5,9 @@
  */
 
 #include <gtest/gtest.h>
-#include <cmath>  // For std::fabs
 #include <algorithm>  // For std::clamp
+#include <cstdlib>
+#include <cmath>  // For std::fabs
 #include <tuple>  // for tuple
 
 #include "FFT.hpp"
@@ -63,23 +64,17 @@ struct InitParamMultiSignalWithRes {
 class SinSignalGenerator {
 public:
     SinSignalGenerator(){}
-    explicit SinSignalGenerator(InitOneSignParamType signal_parameters) {
-        this->sample_rate_hz = signal_parameters.sample_rate_hz;
-        this->freq_hz = signal_parameters.freq_hz;
-        this->amplitude = signal_parameters.amplitude;
-        this->phase = 0;
-        this->secs = 0;
-    }
-    SinSignalGenerator(float sample_rate_hz, float freq_hz, float amplitude) {
-        this->sample_rate_hz = sample_rate_hz;
-        this->freq_hz = freq_hz;
-        this->amplitude = amplitude;
-        this->phase = 0;
-        this->secs = 0;
-    }
+    explicit SinSignalGenerator(InitOneSignParamType signal_parameters) :
+                                        sample_rate_hz(signal_parameters.sample_rate_hz),
+                                        freq_hz(signal_parameters.freq_hz),
+                                        amplitude(signal_parameters.amplitude) {}
+    SinSignalGenerator(float sample_rate_hz, float freq_hz, float amplitude) :
+                                        sample_rate_hz(sample_rate_hz),
+                                        freq_hz(freq_hz),
+                                        amplitude(amplitude) {}
     float get_next_sample() {
         auto sin = sinf(2 * M_PI * freq_hz * secs + phase);
-        float sample = (float)amplitude * sin;
+        float sample = amplitude * sin;
         secs += 1 / sample_rate_hz;
         return sample;
     }
@@ -88,48 +83,51 @@ public:
 
 private:
     float sample_rate_hz;
-    float phase;
-    float secs;
+    float phase = 0;
+    float secs = 0;
 };
 
 class MultiSignalsSinGenerator {
 public:
-    std::vector<SinSignalGenerator> signals_generator;
+    uint16_t max_freq;
     uint8_t n_signals;
+    uint16_t min_freq = 0;
+    uint16_t sample_rate_hz;
+    std::vector<SinSignalGenerator> signals_generator;
     std::vector<std::tuple<uint16_t, uint16_t>> dominant_sig;
 
     void init() {
         signals_generator.resize(n_signals);
         uint16_t max_amplitude = 0;
         for (int j = 0; j < n_signals; j++) {
-            uint16_t freq_hz = rand_r(&seed) % (max_freq - min_freq) + min_freq;
-            uint16_t amplitude = 1 + rand_r(&seed) % 100;
+            uint16_t freq_hz = std::rand() % (max_freq - min_freq) + min_freq;
+            uint16_t amplitude = 1 + std::rand() % 100;
             signals_generator[j] = SinSignalGenerator(sample_rate_hz, freq_hz, amplitude);
             if (amplitude > max_amplitude) {
                 max_amplitude = amplitude;
                 dominant_sig.insert(dominant_sig.begin(), std::make_tuple(amplitude, freq_hz));
             }
         }
-        for (int j = 0; j < dominant_sig.size(); j++) {
-            printf("dominant freq: %d\n", std::get<1>(dominant_sig[j]));
+        for (auto dominant : dominant_sig) {
+            std::cout <<"dominant freq: " << std::get<1>(dominant) << "\n";
         }
         // sort by amplitude value
         std::sort(dominant_sig.begin(), dominant_sig.end());
     }
 
-    MultiSignalsSinGenerator() {}
+    MultiSignalsSinGenerator() = default;
 
-    MultiSignalsSinGenerator(uint8_t n_signals, uint16_t sample_rate_hz, uint16_t max_freq) {
-        this->n_signals = n_signals;
-        this->sample_rate_hz = sample_rate_hz;
-        this->max_freq = max_freq;
+    MultiSignalsSinGenerator(uint8_t n_signals, uint16_t sample_rate_hz, uint16_t max_freq) :
+                                                n_signals(n_signals),
+                                                sample_rate_hz(sample_rate_hz),
+                                                max_freq(max_freq) {
         init();
     }
 
-    explicit MultiSignalsSinGenerator(InitMultiSignalsParamType parameters) {
-        this->n_signals = parameters.n_signals;
-        this->sample_rate_hz = parameters.sample_rate_hz;
-        this->max_freq = parameters.max_freq;
+    explicit MultiSignalsSinGenerator(InitMultiSignalsParamType parameters) :
+                                                n_signals(parameters.n_signals),
+                                                sample_rate_hz(parameters.sample_rate_hz),
+                                                max_freq(parameters.max_freq) {
         init();
     }
 
@@ -140,17 +138,11 @@ public:
         }
         return sample;
     }
-
-private:
-    uint16_t max_freq;
-    uint16_t min_freq = 0;
-    uint16_t sample_rate_hz;
 };
 
 template<typename T, typename InitParamType>
 class TestFFTBase : public ::testing::Test {
 public:
-    /* data */
     FFT fft;
     std::vector<T> signals_generator;
     InitFFTParamType fft_parameters;
@@ -158,7 +150,6 @@ public:
     float abs_error;
 
     void print_fft_parameters() {
-        // Print the FFT parameters
         std::cout << "FFT Parameters: " << std::endl;
         std::cout << "  Sample Rate (Hz): " << fft_parameters.sample_rate_hz << std::endl;
         std::cout << "  Window Size: " << fft_parameters.window_size << std::endl;
@@ -180,12 +171,10 @@ class TestFFTOneSignalParametrized : public TestFFTBase<SinSignalGenerator,
                                             InitOneSignParamType>,
                         public testing::WithParamInterface<InitParamOneSignalWithRes> {
 public:
-    /* data */
     bool result;
     bool is_heat_all_peaks{true};
 
     void print_signal_parameters() {
-                // Print the signal parameters
         std::cout << "Signal Parameters: " << std::endl;
         std::cout << "  Sample Rate (Hz): " << signals_parameters[0].sample_rate_hz
                     << std::endl;
@@ -196,37 +185,38 @@ public:
     }
 
     void print_fft_results() {
-        printf("fft resolution: %f\n", fft._resolution_hz);
+        std::cout <<"fft resolution: " << fft._resolution_hz << "\n";
         for (int axis = 0; axis < fft_parameters.n_axes; axis++) {
-            printf("AXIS %d\n", axis);
+            std::cout <<"AXIS " << axis << "\n";
             for (int peak_index = 0; peak_index < MAX_NUM_PEAKS; peak_index++) {
-                printf("peak index: %d\n", peak_index);
-                printf("fft peak freq: %f\n", fft.peak_frequencies[axis][peak_index]);
-                printf("fft peak snr: %f\n", fft.peak_snr[axis][peak_index]);
+                std::cout <<"peak index: " << peak_index << "\n";
+                std::cout <<"fft peak freq: " << fft.peak_frequencies[axis][peak_index] << "\n";
+                std::cout <<"fft peak snr: " << fft.peak_snr[axis][peak_index] << "\n";
             }
         }
     }
 
-    void check_values () {
-        for (int i = 0; i < fft_parameters.n_axes; i++) {
-            bool heat_peak = false;
-            for (int j = 0; j < MAX_NUM_PEAKS; j++) {
-                auto in_range = IsBetweenInclusive(fft.peak_frequencies[i][j],
-                            signals_parameters[i].freq_hz - abs_error,
-                            signals_parameters[i].freq_hz + abs_error);
-                if (in_range) {
-                    heat_peak = true;
-                    break;
-                }
+    void check_axis(int axis) {
+        bool heat_peak = false;
+        for (int j = 0; j < MAX_NUM_PEAKS; j++) {
+            auto in_range = IsBetweenInclusive(fft.peak_frequencies[axis][j],
+                        signals_parameters[axis].freq_hz - abs_error,
+                        signals_parameters[axis].freq_hz + abs_error);
+            if (in_range) {
+                heat_peak = true;
+                break;
             }
-            is_heat_all_peaks = is_heat_all_peaks && heat_peak;
+        }
+        if (result) {
+            EXPECT_TRUE(heat_peak);
+        } else {
+            ASSERT_FALSE(heat_peak);
         }
     }
 
     void SetUp() override {
-        auto parameters = GetParam();
-        InitParamType<InitOneSignParamType> init_parameters = parameters.parameters;
-        result = parameters.result;
+        InitParamType<InitOneSignParamType> init_parameters = GetParam().parameters;
+        result = GetParam().result;
         fft_parameters = init_parameters.fft_parameters;
         // expand signal_parameters to multiple axes if needed
         signals_parameters.resize(fft_parameters.n_axes);
@@ -239,7 +229,8 @@ public:
     }
 };
 
-InitParamOneSignalWithRes OneSignalTestParams[7] = {
+const std::array<InitParamOneSignalWithRes, 7> OneSignalTestParams = {
+{
     // 0
     {{InitFFTParamType{      .sample_rate_hz = 100,  .n_axes   = 1,   .window_size  = 50},
       InitOneSignParamType{  .sample_rate_hz = 100,  .freq_hz  = 3,   .amplitude    = 10}},
@@ -268,6 +259,7 @@ InitParamOneSignalWithRes OneSignalTestParams[7] = {
     {{InitFFTParamType{     .sample_rate_hz  = 100,   .n_axes   = 1,  .window_size  = 200},
       InitOneSignParamType{ .sample_rate_hz = 1000,  .freq_hz  = 100, .amplitude    = 1}},
       false},
+}
 };
 
 TEST_P(TestFFTOneSignalParametrized, CheckOnWindow) {
@@ -279,18 +271,14 @@ TEST_P(TestFFTOneSignalParametrized, CheckOnWindow) {
         fft.update(input);
     }
     print_fft_results();
-    check_values();
-    if (result) {
-        EXPECT_TRUE(is_heat_all_peaks);
-    } else {
-        ASSERT_FALSE(is_heat_all_peaks);
+    for (int axis = 0; axis < fft_parameters.n_axes; axis++) {
+        check_axis(axis);
     }
 }
 
 TEST_P(TestFFTOneSignalParametrized, CheckOnFewWindows) {
     float input[fft_parameters.n_axes];
-    auto n_updates = (rand_r(&seed) % 8 + 2) * fft_parameters.window_size;
-    // auto n_updates = (2 + rand_r(&seed) % 10) * fft_parameters.window_size;
+    auto n_updates = (std::rand() % 8 + 2) * fft_parameters.window_size;
     for (int i = 0; i < n_updates + 10; i++) {
         for (int j = 0; j < fft_parameters.n_axes; j++) {
             input[j] = signals_generator[j].get_next_sample();
@@ -298,11 +286,8 @@ TEST_P(TestFFTOneSignalParametrized, CheckOnFewWindows) {
         fft.update(input);
     }
     print_fft_results();
-    check_values();
-    if (result) {
-        EXPECT_TRUE(is_heat_all_peaks);
-    } else {
-        ASSERT_FALSE(is_heat_all_peaks);
+    for (int axis = 0; axis < fft_parameters.n_axes; axis++) {
+        check_axis(axis);
     }
 }
 
@@ -317,24 +302,21 @@ class TestFFTOnMultiSignalsParametrized : public TestFFTBase<MultiSignalsSinGene
                                                  InitMultiSignalsParamType>,
                 public ::testing::WithParamInterface<InitParamMultiSignalWithRes> {
 public:
-    /* data */
     bool result;
     std::vector<float> input;
     void print_signal_parameters() {
-                // Print the signal parameters
         std::cout << "Signal Parameters: " << std::endl;
         std::cout << "  Sample Rate (Hz): " << signals_parameters[0].sample_rate_hz
                     << std::endl;
-        std::cout << "  Number of Signals: " << signals_parameters[0].n_signals
+        std::cout << "  Number of Signals: " << (int)signals_parameters[0].n_signals
                     << std::endl;
         std::cout << "  Max Freq: " << signals_parameters[0].max_freq
                     << std::endl;
     }
 
     void SetUp() override {
-        auto parameters = GetParam();
-        InitParamType<InitMultiSignalsParamType> init_parameters = parameters.parameters;
-        result = parameters.result;
+        InitParamType<InitMultiSignalsParamType> init_parameters = GetParam().parameters;
+        result = GetParam().result;
         fft_parameters = init_parameters.fft_parameters;
         signals_parameters.resize(fft_parameters.n_axes);
         input.resize(fft_parameters.n_axes);
@@ -345,11 +327,42 @@ public:
         print_fft_parameters();
         init();
     }
+
+    void check_axis(int axis) {
+        bool heat_peak;
+        auto signal_generator = signals_generator[axis];
+        auto n_dominants = signal_generator.dominant_sig.size();
+        auto n_signals = signal_generator.n_signals;
+        std::cout << "dominant sig: \n" << signal_generator.dominant_sig.size() << "\n";
+        for (auto dominant : signal_generator.dominant_sig) {
+            std::cout << (int)(std::get<1>(dominant)) << "\n";
+        }
+        std::cout << "peak freq: \n";
+        for (int peak_index = 0; peak_index < MAX_NUM_PEAKS; peak_index++) {
+            std::cout << fft.peak_frequencies[axis][peak_index] << "\n";
+            for (auto dominant : signal_generator.dominant_sig) {
+                if (IsBetweenInclusive(fft.peak_frequencies[axis][peak_index],
+                            (int)std::get<1>(dominant) - abs_error,
+                            (int)std::get<1>(dominant) + abs_error)) {
+                    heat_peak = true;
+                    break;
+                }
+            }
+            if (heat_peak) {
+                break;
+            }
+        }
+        if (result) {
+            EXPECT_TRUE(heat_peak);
+        } else {
+            ASSERT_FALSE(heat_peak);
+        }
+    }
 };
 
-InitParamMultiSignalWithRes MultiSignalTestParams[8] = {
+const std::array<InitParamMultiSignalWithRes, 8> MultiSignalTestParams = {
     // 0
-    {{InitFFTParamType{          .sample_rate_hz = 24,   .n_axes    = 1,   .window_size = 24},
+    {{{InitFFTParamType{          .sample_rate_hz = 24,   .n_axes    = 1,   .window_size = 24},
       InitMultiSignalsParamType{ .sample_rate_hz = 24,   .n_signals = 2,   .max_freq    = 12}},
       true},
     // 1
@@ -380,6 +393,7 @@ InitParamMultiSignalWithRes MultiSignalTestParams[8] = {
     {{InitFFTParamType{          .sample_rate_hz = 512, .n_axes     = 3,   .window_size = 512},
       InitMultiSignalsParamType{ .sample_rate_hz = 512, .n_signals  = 10,   .max_freq   = 256}},
       true},
+}
 };
 
 TEST_P(TestFFTOnMultiSignalsParametrized, CheckOnWindow) {
@@ -390,33 +404,7 @@ TEST_P(TestFFTOnMultiSignalsParametrized, CheckOnWindow) {
         fft.update(input.data());
     }
     for (int axis = 0; axis < fft_parameters.n_axes; axis++) {
-        bool heat_peak;
-        auto signal_generator = signals_generator[axis];
-        auto n_dominants = signal_generator.dominant_sig.size();
-        auto n_signals = signal_generator.n_signals;
-        printf("abs error: %f\n", abs_error);
-        for (int peak_index = 0; peak_index < MAX_NUM_PEAKS; peak_index++) {
-            printf("peak index: %d\n", peak_index);
-            printf("fft peak freq: %f\n", fft.peak_frequencies[axis][peak_index]);
-            for (int j = 0; j < n_dominants; j++) {
-                auto dominant_freq = signal_generator.dominant_sig[j];
-                printf("dominant freq: %d\n", std::get<1>(dominant_freq));
-                if (IsBetweenInclusive(fft.peak_frequencies[axis][peak_index],
-                            std::get<1>(dominant_freq) - abs_error,
-                            std::get<1>(dominant_freq) + abs_error)) {
-                    heat_peak = true;
-                    break;
-                }
-            }
-            if (heat_peak) {
-                break;
-            }
-        }
-        if (result) {
-            EXPECT_TRUE(heat_peak);
-        } else {
-            ASSERT_FALSE(heat_peak);
-        }
+        check_axis(axis);
     }
 }
 

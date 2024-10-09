@@ -24,8 +24,8 @@ bool FFT::init(uint16_t window_size, uint16_t num_axes, float sample_rate_hz) {
 }
 
 void FFT::update(float *input) {
-    real_t conv_input[n_axes];
-    rfft::convert_float_to_real_t(input, conv_input, n_axes);
+    std::array<real_t, MAX_NUM_AXES> conv_input;
+    rfft::convert_float_to_real_t(input, conv_input.data(), n_axes);
     for (uint8_t axis = 0; axis < n_axes; axis++) {
         uint16_t &buffer_index = _fft_buffer_index[axis];
 
@@ -52,25 +52,25 @@ void FFT::update(float *input) {
 }
 
 void FFT::find_peaks(uint8_t axis) {
-    float fft_output_buffer_float[size];
-    rfft::convert_real_t_to_float(_fft_output_buffer.data(), fft_output_buffer_float, size);
+    std::array<float, NUMBER_OF_SAMPLES> fft_output_buffer_float;
+    rfft::convert_real_t_to_float(_fft_output_buffer.data(), fft_output_buffer_float.data(), size);
 
     // sum total energy across all used buckets for SNR
     float bin_mag_sum = 0;
     // calculate magnitudes for each fft bin
     for (uint16_t fft_index = 0; fft_index < size/2; fft_index ++) {
-        auto real = rfft::get_real_by_index(fft_output_buffer_float, fft_index);
-        auto imag = rfft::get_imag_by_index(fft_output_buffer_float, fft_index);
+        auto real = rfft::get_real_by_index(fft_output_buffer_float.data(), fft_index);
+        auto imag = rfft::get_imag_by_index(fft_output_buffer_float.data(), fft_index);
         const float fft_magnitude = sqrtf(real * real + imag * imag);
         _peak_magnitudes_all[fft_index] = fft_magnitude;
         bin_mag_sum += fft_magnitude;
     }
-    float peak_magnitude[MAX_NUM_PEAKS] {};
-    uint16_t raw_peak_index[MAX_NUM_PEAKS] {};
+    std::array<float, MAX_NUM_PEAKS> peak_magnitude;
+    std::array<uint16_t, MAX_NUM_PEAKS> raw_peak_index;
 
-    _identify_peaks_bins(peak_magnitude, raw_peak_index);
-    auto num_peaks_found = _estimate_peaks(peak_magnitude, raw_peak_index,
-                                                fft_output_buffer_float, bin_mag_sum, axis);
+    _identify_peaks_bins(peak_magnitude.data(), raw_peak_index.data());
+    auto num_peaks_found = _estimate_peaks(peak_magnitude.data(), raw_peak_index.data(),
+                                                fft_output_buffer_float.data(), bin_mag_sum, axis);
     // reset values if no peaks found
     _fft_updated[axis] = true;
     if (num_peaks_found == 0) {
@@ -183,23 +183,22 @@ uint16_t FFT::_estimate_peaks(float* peak_magnitude,
     return num_peaks_found;
 }
 
+// tau(x) = 1/4 * log(3*x^2 + 6*x + 1) - sqrt(6)/24*log((x + 1 - sqrt(2/3))/(x + 1 + sqrt(2/3)))
 static constexpr float tau(float x) {
-    // tau(x) = 1/4 * log(3*x*x + 6*x + 1) - sqrt(6)/24*log((x + 1 - sqrt(2/3))/(x + 1 + sqrt(2/3)))
     float addend_1 = 1/4 * logf(3 * x * x + 6 * x + 1);
     float multiplier_2 = sqrtf(6) / 24;
     float addend_2 = logf((x + 1 - sqrtf(2 / 3)) / (x + 1 + sqrtf(2 / 3)));
     return addend_1 - multiplier_2 * addend_2;
 }
 
+// find peak location using Quinn's Second Estimator (2020-06-14: http://dspguru.com/dsp/howtos/how-to-interpolate-fft-peak/)
 float FFT::_estimate_peak_freq(float fft[], int peak_index) {
     if (peak_index < 2 || peak_index >= size) {
         return -1;
     }
 
-    // find peak location using Quinn's Second Estimator (2020-06-14: http://dspguru.com/dsp/howtos/how-to-interpolate-fft-peak/)
-    // float real_imag[3][2];
-    float real[3];
-    float imag[3];
+    std::array<float, 3> real;
+    std::array<float, 3> imag;
     for (int i = -1; i < 2; i++) {
         real[i + 1] = rfft::get_real_by_index(fft, peak_index + i);
         imag[i + 1] = rfft::get_imag_by_index(fft, peak_index + i);

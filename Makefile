@@ -58,6 +58,9 @@ v3: checks generate_dsdl clean
 checks:
 	@python scripts/prebuild_check.py || (echo "Requirements verification failed. Stopping build." && exit 1)
 
+coverage:
+	cd Tests && $(MAKE) -s coverage
+
 code_style:
 	cpplint Src/modules/*/*pp Src/peripheral/*/*pp Src/platform/*/*pp
 
