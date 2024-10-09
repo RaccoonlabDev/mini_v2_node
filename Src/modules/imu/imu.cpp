@@ -7,6 +7,7 @@
 #include <math.h>
 #include "imu.hpp"
 #include "params.hpp"
+#include "common/logging.hpp"
 
 REGISTER_MODULE(ImuModule)
 
@@ -14,6 +15,10 @@ void ImuModule::init() {
     bool imu_initialized = imu.initialize();
     mode = Module::Mode::STANDBY;
     initialized = imu_initialized;
+    fft_accel.init(512, 3, 512);
+    fft_accel.fft_min_freq = 20;
+    fft_gyro.init(512, 3, 512);
+    fft_gyro.fft_min_freq = 20;
 }
 
 void ImuModule::update_params() {
@@ -41,8 +46,6 @@ void ImuModule::spin_once() {
 
     std::array<int16_t, 3>  accel_raw = {0, 0, 0};
     std::array<int16_t, 3>  gyro_raw  = {0, 0, 0};
-    std::array<float, 3>    gyro      = {0.0f, 0.0f, 0.0f};
-    std::array<float, 3>    accel     = {0.0f, 0.0f, 0.0f};
     if (imu.read_gyroscope(&gyro_raw) >= 0) {
         gyro = {
                 raw_gyro_to_rad_per_second(gyro_raw[0]),
@@ -52,6 +55,7 @@ void ImuModule::spin_once() {
         pub.msg.rate_gyro_latest[1] = gyro[1];
         pub.msg.rate_gyro_latest[2] = gyro[2];
         updated[0] = true;
+        update_gyro_fft();
     }
 
     if (imu.read_accelerometer(&accel_raw) >= 0) {
@@ -64,6 +68,7 @@ void ImuModule::spin_once() {
         pub.msg.accelerometer_latest[1] = accel[1];
         pub.msg.accelerometer_latest[2] = accel[2];
         updated[1] = true;
+        update_accel_fft();
     }
 
     if (pub_timeout_ms != 0 && HAL_GetTick() - pub.msg.timestamp / 1000 > pub_timeout_ms) {
@@ -75,13 +80,34 @@ void ImuModule::spin_once() {
 }
 
 void ImuModule::get_vibration(std::array<float, 3> data) {
-    if (bitmask & static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_VIB_ESTIM)) {
-        float diff_magnitude = 0.0f;
-        for (uint8_t i = 0; i < 3; i++) {
-            diff_magnitude += std::pow(data[i] - pub.msg.accelerometer_latest[i], 2);
-        }
-        vibration = 0.99f * vibration + 0.01f * std::sqrt(diff_magnitude);
-        pub.msg.integration_interval = vibration;
+    if (!(bitmask & static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_VIB_ESTIM))) {
         return;
     }
+    float diff_magnitude = 0.0f;
+    for (uint8_t i = 0; i < 3; i++) {
+        diff_magnitude += std::pow(data[i] - pub.msg.accelerometer_latest[i], 2);
+    }
+    vibration = 0.99f * vibration + 0.01f * std::sqrt(diff_magnitude);
+    pub.msg.integration_interval = vibration;
+    return;
+}
+
+void ImuModule::update_accel_fft() {
+    if (!(bitmask & static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_FFT_ACC))) {
+        return;
+    }
+    fft_accel.update(accel.data());
+    pub.msg.accelerometer_integral[0] = fft_accel.dominant_frequency;
+    pub.msg.accelerometer_integral[1] = fft_accel.dominant_mag * 1000;
+    pub.msg.accelerometer_integral[2] = fft_accel.dominant_snr;
+}
+
+void ImuModule::update_gyro_fft() {
+    if (!(bitmask & static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_FFT_GYR))) {
+        return;
+    }
+    fft_gyro.update(gyro.data());
+    pub.msg.rate_gyro_integral[0] = fft_gyro.dominant_frequency;
+    pub.msg.rate_gyro_integral[1] = fft_gyro.dominant_mag * 1000;
+    pub.msg.rate_gyro_integral[2] = fft_gyro.dominant_snr;
 }
