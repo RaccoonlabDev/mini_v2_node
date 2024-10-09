@@ -60,72 +60,6 @@ struct InitParamMultiSignalWithRes {
     bool result;
 };
 
-InitParamOneSignalWithRes OneSignalTestParams[7] = {
-    // 0
-    {{InitFFTParamType{      .sample_rate_hz = 100,  .n_axes   = 1,   .window_size  = 50},
-      InitOneSignParamType{  .sample_rate_hz = 100,  .freq_hz  = 3,   .amplitude    = 10}},
-      true},
-    // 1
-    {{InitFFTParamType{      .sample_rate_hz = 1000, .n_axes   = 1,   .window_size  = 512},
-      InitOneSignParamType{  .sample_rate_hz = 1000, .freq_hz  = 100, .amplitude    = 10}},
-      true},
-    // 2
-    {{InitFFTParamType{      .sample_rate_hz = 1000, .n_axes   = 1,   .window_size  = 100},
-      InitOneSignParamType{  .sample_rate_hz = 1000, .freq_hz  = 5,   .amplitude    = 10}},
-      true},
-    // 3
-    {{InitFFTParamType{      .sample_rate_hz = 512,  .n_axes   = 1,   .window_size  = 512},
-      InitOneSignParamType{  .sample_rate_hz = 512,  .freq_hz  = 100, .amplitude    = 10}},
-      true},
-    // 4
-    {{InitFFTParamType{      .sample_rate_hz = 1024, .n_axes   = 3,   .window_size  = 512},
-      InitOneSignParamType{  .sample_rate_hz = 1024, .freq_hz  = 100, .amplitude    = 10}},
-      true},
-    // 5
-    {{InitFFTParamType{      .sample_rate_hz = 256,  .n_axes   = 3,   .window_size  = 256},
-      InitOneSignParamType{  .sample_rate_hz = 256,  .freq_hz  = 100, .amplitude    = 1}},
-      true},
-    // 6
-    {{InitFFTParamType{     .sample_rate_hz  = 300,   .n_axes   = 1,  .window_size  = 200},
-      InitOneSignParamType{ .sample_rate_hz = 1000,  .freq_hz  = 100, .amplitude    = 1}},
-      false},
-};
-
-InitParamMultiSignalWithRes MultiSignalTestParams[8] = {
-    // 0
-    {{InitFFTParamType{          .sample_rate_hz = 24,   .n_axes    = 1,   .window_size = 24},
-      InitMultiSignalsParamType{ .sample_rate_hz = 24,   .n_signals = 2,   .max_freq    = 12}},
-      true},
-    // 1
-    {{InitFFTParamType{          .sample_rate_hz = 512, .n_axes    = 1,   .window_size = 512},
-      InitMultiSignalsParamType{ .sample_rate_hz = 512, .n_signals = 5,   .max_freq    = 256}},
-      true},
-    // 2
-    {{InitFFTParamType{          .sample_rate_hz = 1000, .n_axes    = 1,   .window_size = 100},
-      InitMultiSignalsParamType{ .sample_rate_hz = 1000, .n_signals = 4,   .max_freq    = 50}},
-      true},
-    // 3
-    {{InitFFTParamType{          .sample_rate_hz = 2000, .n_axes    = 1,   .window_size = 256},
-      InitMultiSignalsParamType{ .sample_rate_hz = 2000, .n_signals = 10,   .max_freq   = 128}},
-      true},
-    // 4
-    {{InitFFTParamType{          .sample_rate_hz = 2000, .n_axes    = 1,   .window_size = 200},
-      InitMultiSignalsParamType{ .sample_rate_hz = 2000, .n_signals = 12,   .max_freq   = 100}},
-      true},
-    // 5
-    {{InitFFTParamType{          .sample_rate_hz = 1024, .n_axes    = 1,   .window_size = 512},
-      InitMultiSignalsParamType{ .sample_rate_hz = 1024, .n_signals = 15,   .max_freq   = 256}},
-      true},
-    // 6
-    {{InitFFTParamType{          .sample_rate_hz = 256, .n_axes     = 3,   .window_size = 256},
-      InitMultiSignalsParamType{ .sample_rate_hz = 256, .n_signals  = 13,   .max_freq   = 128}},
-      true},
-    // 7
-    {{InitFFTParamType{          .sample_rate_hz = 512, .n_axes     = 3,   .window_size = 512},
-      InitMultiSignalsParamType{ .sample_rate_hz = 512, .n_signals  = 10,   .max_freq   = 256}},
-      true},
-};
-
 class SinSignalGenerator {
 public:
     SinSignalGenerator(){}
@@ -305,6 +239,37 @@ public:
     }
 };
 
+InitParamOneSignalWithRes OneSignalTestParams[7] = {
+    // 0
+    {{InitFFTParamType{      .sample_rate_hz = 100,  .n_axes   = 1,   .window_size  = 50},
+      InitOneSignParamType{  .sample_rate_hz = 100,  .freq_hz  = 3,   .amplitude    = 10}},
+      true},
+    // 1
+    {{InitFFTParamType{      .sample_rate_hz = 1000, .n_axes   = 1,   .window_size  = 100},
+      InitOneSignParamType{  .sample_rate_hz = 1000, .freq_hz  = 5,   .amplitude    = 10}},
+      true},
+    // 2
+    {{InitFFTParamType{      .sample_rate_hz = 512,  .n_axes   = 1,   .window_size  = 512},
+      InitOneSignParamType{  .sample_rate_hz = 512,  .freq_hz  = 100, .amplitude    = 10}},
+      true},
+    // 3
+    {{InitFFTParamType{      .sample_rate_hz = 1000, .n_axes   = 1,   .window_size  = 512},
+      InitOneSignParamType{  .sample_rate_hz = 1000, .freq_hz  = 100, .amplitude    = 10}},
+      true},
+    // 4
+    {{InitFFTParamType{      .sample_rate_hz = 1024, .n_axes   = 3,   .window_size  = 512},
+      InitOneSignParamType{  .sample_rate_hz = 1024, .freq_hz  = 100, .amplitude    = 10}},
+      true},
+    // 5
+    {{InitFFTParamType{      .sample_rate_hz = 256,  .n_axes   = 3,   .window_size  = 256},
+      InitOneSignParamType{  .sample_rate_hz = 256,  .freq_hz  = 200, .amplitude    = 1}},
+      false},
+    // 6
+    {{InitFFTParamType{     .sample_rate_hz  = 100,   .n_axes   = 1,  .window_size  = 200},
+      InitOneSignParamType{ .sample_rate_hz = 1000,  .freq_hz  = 100, .amplitude    = 1}},
+      false},
+};
+
 TEST_P(TestFFTOneSignalParametrized, CheckOnWindow) {
     float input[fft_parameters.n_axes];
     for (int i = 0; i < fft_parameters.window_size + 1; i++) {
@@ -380,6 +345,41 @@ public:
         print_fft_parameters();
         init();
     }
+};
+
+InitParamMultiSignalWithRes MultiSignalTestParams[8] = {
+    // 0
+    {{InitFFTParamType{          .sample_rate_hz = 24,   .n_axes    = 1,   .window_size = 24},
+      InitMultiSignalsParamType{ .sample_rate_hz = 24,   .n_signals = 2,   .max_freq    = 12}},
+      true},
+    // 1
+    {{InitFFTParamType{          .sample_rate_hz = 512, .n_axes    = 1,   .window_size = 512},
+      InitMultiSignalsParamType{ .sample_rate_hz = 512, .n_signals = 5,   .max_freq    = 256}},
+      true},
+    // 2
+    {{InitFFTParamType{          .sample_rate_hz = 1000, .n_axes    = 1,   .window_size = 100},
+      InitMultiSignalsParamType{ .sample_rate_hz = 1000, .n_signals = 4,   .max_freq    = 50}},
+      true},
+    // 3
+    {{InitFFTParamType{          .sample_rate_hz = 2000, .n_axes    = 1,   .window_size = 256},
+      InitMultiSignalsParamType{ .sample_rate_hz = 2000, .n_signals = 10,   .max_freq   = 128}},
+      true},
+    // 4
+    {{InitFFTParamType{          .sample_rate_hz = 2000, .n_axes    = 1,   .window_size = 200},
+      InitMultiSignalsParamType{ .sample_rate_hz = 2000, .n_signals = 12,   .max_freq   = 100}},
+      true},
+    // 5
+    {{InitFFTParamType{          .sample_rate_hz = 1024, .n_axes    = 1,   .window_size = 512},
+      InitMultiSignalsParamType{ .sample_rate_hz = 1024, .n_signals = 15,   .max_freq   = 256}},
+      true},
+    // 6
+    {{InitFFTParamType{          .sample_rate_hz = 256, .n_axes     = 3,   .window_size = 256},
+      InitMultiSignalsParamType{ .sample_rate_hz = 256, .n_signals  = 13,   .max_freq   = 128}},
+      true},
+    // 7
+    {{InitFFTParamType{          .sample_rate_hz = 512, .n_axes     = 3,   .window_size = 512},
+      InitMultiSignalsParamType{ .sample_rate_hz = 512, .n_signals  = 10,   .max_freq   = 256}},
+      true},
 };
 
 TEST_P(TestFFTOnMultiSignalsParametrized, CheckOnWindow) {

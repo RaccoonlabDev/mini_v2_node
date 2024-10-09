@@ -17,9 +17,6 @@ void ImuModule::init() {
     bool imu_initialized = imu.initialize();
     mode = Module::Mode::STANDBY;
     initialized = imu_initialized;
-    // for (int i = 0; i < 2; i++) {
-    //     fft[i].init(512, 3, 512);
-    // }
     fft_accel.init(512, 3, 512);
     fft_accel.fft_min_freq = 20;
     fft_gyro.init(512, 3, 512);
@@ -85,15 +82,16 @@ void ImuModule::spin_once() {
 }
 
 void ImuModule::get_vibration(std::array<float, 3> data) {
-    if (bitmask & static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_VIB_ESTIM)) {
-        float diff_magnitude = 0.0f;
-        for (uint8_t i = 0; i < 3; i++) {
-            diff_magnitude += std::pow(data[i] - pub.msg.accelerometer_latest[i], 2);
-        }
-        vibration = 0.99f * vibration + 0.01f * std::sqrt(diff_magnitude);
-        pub.msg.integration_interval = vibration;
+    if (!(bitmask & static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_VIB_ESTIM))) {
         return;
     }
+    float diff_magnitude = 0.0f;
+    for (uint8_t i = 0; i < 3; i++) {
+        diff_magnitude += std::pow(data[i] - pub.msg.accelerometer_latest[i], 2);
+    }
+    vibration = 0.99f * vibration + 0.01f * std::sqrt(diff_magnitude);
+    pub.msg.integration_interval = vibration;
+    return;
 }
 
 void ImuModule::update_accel_fft() {
