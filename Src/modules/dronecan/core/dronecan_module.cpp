@@ -17,9 +17,12 @@ DronecanModule::DronecanModule() : Module(0, Protocol::DRONECAN) {
 
 void DronecanModule::init() {
     auto node_name_param_idx = static_cast<ParamIndex_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT);
-    const auto& [board_name, name_length] = CircuitPeriphery::get_board_name();
-    paramsSetStringValue(node_name_param_idx, name_length, (const uint8_t*)board_name);
-    uavcanSetNodeName(board_name);
+    const auto current_node_name = (const char*)paramsGetStringValue(node_name_param_idx);
+    if(strlen(current_node_name) == 0) {
+        const auto& [board_name, name_length] = CircuitPeriphery::get_board_name();
+        paramsSetStringValue(node_name_param_idx, name_length, (const uint8_t*)board_name);
+    }
+    uavcanSetNodeName((const char*)paramsGetStringValue(node_name_param_idx));
 
     int param_node_id_value = paramsGetIntegerValue(IntParamsIndexes::PARAM_UAVCAN_NODE_ID);
     auto node_id = std::clamp(param_node_id_value, 1, 126);
