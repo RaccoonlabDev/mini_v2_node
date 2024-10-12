@@ -1,18 +1,13 @@
-/*
- * Copyright (C) 2022-2024 Dmitry Ponomarev <ponomarevda96@gmail.com>
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+/**
+ * This program is free software under the GNU General Public License v3.
+ * See <https://www.gnu.org/licenses/> for details.
+ * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
 #ifndef SRC_COMMON_ALGORITHMS_H_
 #define SRC_COMMON_ALGORITHMS_H_
 
 #include <stdint.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 typedef uint16_t PwmDurationUs;
 
@@ -63,8 +58,27 @@ float mapPwmToPct(uint16_t pwm_val, int16_t pwm_min, int16_t pwm_max);
 
 void movingAverage(float* prev_avg, float crnt_val, uint16_t size);
 
-#ifdef __cplusplus
-}
-#endif
+/**
+ * @brief The Adaptive Alpha Filter is a variation of the exponential smoothing filter,
+ * where the smoothing factor α is adjusted dynamically based on the magnitude of changes
+ * between consecutive inputs.
+ */
+class AdaptiveAlphaFilter {
+public:
+    AdaptiveAlphaFilter(float small_delta = 0.0f, float large_delta = 100.0f,
+                        float smooth_alpha = 0.10f, float fast_alpha = 0.90f);
+
+    float update(float new_value);
+
+private:
+    float linearly_interpolate_alpha(float delta) const;
+
+    const float SMALL_DELTA;
+    const float LARGE_DELTA;
+    const float SMOOTH_ALPHA;
+    const float FAST_ALPHA;
+
+    float previous_filtered_value{0.0f};
+};
 
 #endif  // SRC_COMMON_ALGORITHMS_H_

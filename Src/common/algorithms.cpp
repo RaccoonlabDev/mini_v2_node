@@ -1,8 +1,7 @@
-/*
- * Copyright (C) 2022-2024 Dmitry Ponomarev <ponomarevda96@gmail.com>
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+/**
+ * This program is free software under the GNU General Public License v3.
+ * See <https://www.gnu.org/licenses/> for details.
+ * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
 #include "algorithms.hpp"
@@ -63,4 +62,35 @@ void movingAverage(float* prev_avg, float crnt_val, uint16_t size) {
     if (prev_avg != nullptr && size != 0) {
         *prev_avg = (*prev_avg * (size - 1) + crnt_val) / size;
     }
+}
+
+
+AdaptiveAlphaFilter::AdaptiveAlphaFilter(float small_delta, float large_delta,
+                                         float smooth_alpha, float fast_alpha) :
+    SMALL_DELTA(small_delta),
+    LARGE_DELTA(large_delta),
+    SMOOTH_ALPHA(smooth_alpha),
+    FAST_ALPHA(fast_alpha) {
+}
+
+float AdaptiveAlphaFilter::update(float new_value) {
+    float delta = new_value - previous_filtered_value;
+    float alpha = linearly_interpolate_alpha(delta);
+    previous_filtered_value += alpha * delta;
+    return previous_filtered_value;
+}
+
+float AdaptiveAlphaFilter::linearly_interpolate_alpha(float delta) const {
+    auto abs_delta = fabs(delta);
+    float alpha;
+    if (abs_delta <= SMALL_DELTA) {
+        alpha = SMOOTH_ALPHA;
+    } else if (abs_delta >= LARGE_DELTA) {
+        alpha = FAST_ALPHA;
+    } else {
+        float fraction = (abs_delta - SMALL_DELTA) / (LARGE_DELTA - SMALL_DELTA);
+        alpha = SMOOTH_ALPHA + fraction * (FAST_ALPHA - SMOOTH_ALPHA);
+    }
+
+    return alpha;
 }
