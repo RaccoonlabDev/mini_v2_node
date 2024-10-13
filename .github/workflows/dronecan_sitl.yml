@@ -1,4 +1,4 @@
-name: dronecan
+name: dronecan_sitl
 on:
   push:
     branches:
