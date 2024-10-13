@@ -11,14 +11,26 @@
 extern IWDG_HandleTypeDef hiwdg;
 #endif  // HAL_IWDG_MODULE_ENABLED
 
+#ifdef FDCAN1
+    extern FDCAN_HandleTypeDef hfdcan1;
+#endif  // FDCAN1
+
 namespace HAL {
 
 void Watchdog::refresh() {
-    if (!reboot_required) {
 #ifdef HAL_IWDG_MODULE_ENABLED
-        HAL_IWDG_Refresh(&hiwdg);
-#endif  // HAL_IWDG_MODULE_ENABLED
+    if (reboot_required) {
+        return;
     }
+#endif  // HAL_IWDG_MODULE_ENABLED
+
+#if defined(HAL_IWDG_MODULE_ENABLED) && defined(FDCAN1)
+    if (!__HAL_FDCAN_GET_FLAG(&hfdcan1, FDCAN_FLAG_BUS_OFF)) {
+        HAL_IWDG_Refresh(&hiwdg);
+    }
+#elif defined(HAL_IWDG_MODULE_ENABLED)
+    HAL_IWDG_Refresh(&hiwdg);
+#endif  // HAL_IWDG_MODULE_ENABLED
 }
 
 }  // namespace HAL
