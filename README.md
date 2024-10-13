@@ -1,4 +1,4 @@
-[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=RaccoonlabDev_mini_v2_node&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=RaccoonlabDev_mini_v2_node) [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=RaccoonlabDev_mini_v2_node&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=RaccoonlabDev_mini_v2_node) [![cyphal](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/cyphal.yml/badge.svg)](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/cyphal.yml) [![dronecan](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/dronecan.yml/badge.svg)](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/dronecan.yml) [![dronecan](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/code_style.yml/badge.svg)](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/code_style.yml)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=RaccoonlabDev_mini_v2_node&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=RaccoonlabDev_mini_v2_node) [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=RaccoonlabDev_mini_v2_node&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=RaccoonlabDev_mini_v2_node) [![cyphal_sitl](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/cyphal_sitl.yml/badge.svg)](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/cyphal_sitl.yml) [![dronecan_sitl](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/dronecan_sitl.yml/badge.svg)](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/dronecan_sitl.yml) [![code_style](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/code_style.yml/badge.svg)](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/code_style.yml) [![build_and_deploy](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/build_and_deploy.yml/badge.svg)](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/build_and_deploy.yml)
 
 # Cyphal/DroneCAN application
 
@@ -15,12 +15,12 @@ Please, refer Wiki for details:
 - [x] Small firmware image and software is friendly for customization,
 - [x] Redundant CAN interface (node v3),
 - [x] MPU-9250 IMU (node v3).
+- [x] CAN terminator resistors control (node v3).
 
 Not suported or tested yet / In Roadmap:
 - [ ] Cyphal/DroneCAN Bootloader,
 - [ ] Dynamics Node Allocation (DNA),
 - [ ] Vibration Analysis: estimate dominant frequency and magnitude of vibrations for diagnosing mechanical issues or ensuring smooth operation in drones or robotic platforms in real time,
-- [ ] CAN terminator resistors control (node v3).
 
 ### 2. SUPPORTED HARDWARE
 
