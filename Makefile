@@ -1,5 +1,11 @@
 # Copyright (C) 2023-2024 Dmitry Ponomarev <ponomarevda96@gmail.com>
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
+# Variables
+CC := arm-none-eabi-gcc
+CFLAGS := "-g -O0 -o -DDEBUG"
+
+# Make sure these flags are used in the cmake build command as well
+CMAKE_FLAGS := -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CC} -DCMAKE_C_FLAGS=${CFLAGS} -DCMAKE_CXX_FLAGS=${CFLAGS} -DCMAKE_BUILD_TYPE=Debug
 
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BUILD_DIR:=$(ROOT_DIR)/build
@@ -35,7 +41,7 @@ dronecan_v2: checks clean
 	cd ${BUILD_DIR}/dronecan_v2/obj && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_NODE_V2=ON -G "Unix Makefiles" ../../.. && make
 sitl_dronecan: checks clean
 	mkdir -p ${BUILD_DIR}/dronecan_sitl/obj
-	cd ${BUILD_DIR}/dronecan_sitl/obj && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_UBUNTU=ON -G "Unix Makefiles" ../../.. && make
+	cd ${BUILD_DIR}/dronecan_sitl/obj && cmake -DCAN_PROTOCOL=dronecan -DCMAKE_BUILD_TYPE=DEBUG -DUSE_PLATFORM_UBUNTU=ON -G "Unix Makefiles" ../../.. && make
 dronecan_v3: checks clean
 	mkdir -p ${BUILD_DIR}/dronecan_v3/obj
 	cd ${BUILD_DIR}/dronecan_v3/obj && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_NODE_V3=ON -G "Unix Makefiles" ../../.. && make

@@ -28,6 +28,13 @@ Module::Mode Module::get_mode() const {
 Module::Protocol Module::get_protocol() const {
     return protocol;
 }
+
+void Module::set_protocol(Module::Protocol new_protocol) {
+    protocol = new_protocol;
+    paramsSetIntegerValue(IntParamsIndexes::PARAM_SYSTEM_PROTOCOL, (int)(protocol));
+    paramsSave();
+}
+
 bool Module::is_enabled() const {
     auto active_protocol = ModuleManager::get_active_protocol();
     return protocol == Protocol::CYPHAL_AND_DRONECAN || protocol == active_protocol;
