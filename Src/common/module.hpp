@@ -95,7 +95,7 @@ public:
     static void register_module(Module* app_module);
     static void init();
     static void process();
-
+    static void set_protocol(Module::Protocol protocol);
     static Module::Protocol get_active_protocol();
     static Module::Status get_global_status();
     static Module::Mode get_global_mode();

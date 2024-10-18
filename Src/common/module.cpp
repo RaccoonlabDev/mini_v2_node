@@ -72,6 +72,12 @@ void ModuleManager::process() {
     }
 }
 
+void ModuleManager::set_protocol(Module::Protocol protocol) {
+    ModuleManager::active_protocol = protocol;
+    paramsSetIntegerValue(IntParamsIndexes::PARAM_SYSTEM_PROTOCOL, (int)(protocol));
+    paramsSave();
+}
+
 Module::Protocol ModuleManager::get_active_protocol() {
 #if defined(CONFIG_USE_CYPHAL) && !defined(CONFIG_USE_DRONECAN)
     return Module::Protocol::CYPHAL;
