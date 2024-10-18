@@ -30,8 +30,6 @@ The node has the following registers:
 | pwm4.max                | PWM duration when setpoint is max (RawCommand is 8191 or Command is 1.0) |
 | pwm4.def                | PWM duration when setpoint is negative or there is no setpoint at all. |
 | pwm.cmd_type            | 0 means RawCommand, 1 means ArrayCommand, 2 is reserved for hardpoint.Command. |
-| imu.mode                | Bit mask to enable IMU features: </br> Bit 1 - enable RawImu publisher, </br> Bit 2 - enable vibration metric publishing to RawImu.integration_interval, </br> Bit 3 - enable FFT acceleration publishing to RawImu.accelerometer_integral, </br> Bit 4 - enable FFT acceleration publishing to RawImu.rate_gyro_integral, </br> By default 15 that mean enable all publishers |
-| imu.pub_frequency       | Frequency of IMU publisher [Hz]. |
 
 > This docs was automatically generated. Do not edit it manually.
 

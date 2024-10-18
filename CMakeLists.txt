@@ -1,6 +1,8 @@
 # Copyright (C) 2023-2024 Dmitry Ponomarev <ponomarevda96@gmail.com>
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 cmake_minimum_required(VERSION 3.15.3)
+set(CMAKE_C_FLAGS_DEBUG "-g -DDEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -DDEBUG")
 
 # Pathes
 set(ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})

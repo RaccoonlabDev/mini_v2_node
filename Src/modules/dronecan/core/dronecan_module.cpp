@@ -33,6 +33,11 @@ void DronecanModule::init() {
 }
 
 void DronecanModule::spin_once() {
+    if (uavcanCheckProtocol() == CanardFrameProtocol::CANARD_FRAME_CYPHAL) {
+        Module::set_protocol(Module::Protocol::CYPHAL);
+        return;
+    }
+
     uavcanSetNodeHealth(static_cast<NodeStatusHealth_t>(ModuleManager::get_global_status()));
     auto global_mode = (uint8_t)(ModuleManager::get_global_mode());
     if (global_mode > 0 ) {
