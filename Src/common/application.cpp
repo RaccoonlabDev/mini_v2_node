@@ -4,7 +4,6 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#include <can_driver.h>
 #include <array>
 #include <bitset>
 #include "peripheral/adc/circuit_periphery.hpp"
@@ -12,6 +11,7 @@
 #include "params.hpp"
 #include "module.hpp"
 #include "main.h"
+#include "can_driver.h"
 
 #include "application.hpp"
 #include "peripheral/gpio/gpio.hpp"
