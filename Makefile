@@ -55,6 +55,10 @@ checks:
 code_style:
 	cpplint Src/modules/*/*pp Src/peripheral/*/*pp Src/platform/*/*pp
 
+tests:
+	mkdir -p ${BUILD_DIR}/tests
+	cd ${BUILD_DIR}/tests && cmake ../../Src/drivers/as5600/tests && make && ./test_as5600
+
 upload:
 	LATEST_TARGET=$$(ls -td ${BUILD_DIR}/release/*.bin | head -1) && ./scripts/tools/stm32/flash.sh $$LATEST_TARGET
 run:
