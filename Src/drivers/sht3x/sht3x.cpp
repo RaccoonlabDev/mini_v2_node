@@ -1,47 +1,19 @@
-#include "peripheral/sht3x/sht3x.hpp"
+/**
+ * This program is free software under the GNU General Public License v3.
+ * See <https://www.gnu.org/licenses/> for details.
+ */
 
-#include <cstdint>
-
-#include "main.h"
+#include "sht3x.hpp"
 #include "peripheral/i2c/i2c.hpp"
 
-static uint16_t uint8_to_uint16(uint8_t msb, uint8_t lsb) {
-    return (uint16_t)((uint16_t)msb << 8u) | lsb;
-}
+namespace Driver {
 
-static uint8_t calculate_crc(const uint8_t *data, size_t length) {
-    uint8_t crc = 0xff;
-    for (size_t i = 0; i < length; i++) {
-        crc ^= data[i];
-        for (size_t j = 0; j < 8; j++) {
-            if ((crc & 0x80u) != 0) {
-                crc = (uint8_t)((uint8_t)(crc << 1u) ^ 0x31u);
-            } else {
-                crc <<= 1u;
-            }
-        }
-    }
-    return crc;
-}
-
-bool SHT3XPeriphery::sendCommand(const SHT3XHandle &handle, SHT3XCommand command) {
-    uint8_t command_buffer[2] = {(uint8_t)((uint16_t)command >> 8u),
-                                 (uint8_t)((uint16_t)command & 0xffu)};
-
-    return HAL::I2C::transmit(handle.device_address << 1u, command_buffer,
-                                  sizeof(command_buffer));
-}
-
-bool SHT3XPeriphery::readTemperatureHumidity(const SHT3XHandle &handle,
-                                             float *temperature,
-                                             float *humidity) {
-    sendCommand(handle, SHT3XCommand::SHT3X_COMMAND_MEASURE_HIGHREP_STRETCH);
-    HAL_Delay(1);
+bool SHT3X::read(float *temperature, float *humidity) const {
+    sendCommand(device_address, SHT3XCommand::SHT3X_COMMAND_MEASURE_HIGHREP_STRETCH);
 
     uint8_t buffer[6];
 
-    if (!HAL::I2C::receive(handle.device_address << 1u, buffer,
-                               sizeof(buffer))) {
+    if (!HAL::I2C::receive(device_address << 1u, buffer, sizeof(buffer))) {
         return false;
     }
 
@@ -59,3 +31,32 @@ bool SHT3XPeriphery::readTemperatureHumidity(const SHT3XHandle &handle,
 
     return true;
 }
+
+bool SHT3X::sendCommand(uint8_t device_address, SHT3XCommand command) {
+    uint8_t command_buffer[2] = {(uint8_t)((uint16_t)command >> 8u),
+                                 (uint8_t)((uint16_t)command & 0xffu)};
+
+    return HAL::I2C::transmit(device_address << 1u, command_buffer,
+                                  sizeof(command_buffer));
+}
+
+uint16_t SHT3X::uint8_to_uint16(uint8_t msb, uint8_t lsb) {
+    return (uint16_t)((uint16_t)msb << 8u) | lsb;
+}
+
+uint8_t SHT3X::calculate_crc(const uint8_t *data, size_t length) {
+    uint8_t crc = 0xff;
+    for (size_t i = 0; i < length; i++) {
+        crc ^= data[i];
+        for (size_t j = 0; j < 8; j++) {
+            if ((crc & 0x80u) != 0) {
+                crc = (uint8_t)((uint8_t)(crc << 1u) ^ 0x31u);
+            } else {
+                crc <<= 1u;
+            }
+        }
+    }
+    return crc;
+}
+
+}  // namespace Driver
