@@ -1,10 +1,15 @@
+/**
+ * This program is free software under the GNU General Public License v3.
+ * See <https://www.gnu.org/licenses/> for details.
+ */
+
 #ifndef SRC_DRIVERS_SHT3X_SHT3X_HPP_
 #define SRC_DRIVERS_SHT3X_SHT3X_HPP_
 
 #include <cstdint>
+#include <cstddef>
 
-#define SHT3X_I2C_DEVICE_ADDRESS_ADDR_PIN_LOW 0x44
-#define SHT3X_I2C_DEVICE_ADDRESS_ADDR_PIN_HIGH 0x45
+namespace Driver {
 
 enum class SHT3XCommand {
     SHT3X_COMMAND_MEASURE_HIGHREP_STRETCH = 0x2c06,
@@ -18,34 +23,37 @@ enum class SHT3XCommand {
     SHT3X_COMMAND_MEASURE_LOWREP_10HZ = 0x272a
 };
 
-struct SHT3XHandle {
-    /**
-     * The I2C device address.
-     * @see{PCA9865_I2C_DEVICE_ADDRESS_ADDR_PIN_LOW} and
-     * @see{SHT3X_I2C_DEVICE_ADDRESS_ADDR_PIN_HIGH}
-     */
-    uint16_t device_address;
-};
 
-class SHT3XPeriphery {
-  public:
+class SHT3X {
+public:
+    static constexpr uint8_t DEV_ADDR_PIN_LOW = 0x44;
+    static constexpr uint8_t DEV_ADDR_PIN_HIGH = 0x45;
+
+    SHT3X(uint8_t dev_addr): device_address(dev_addr) {}
+
     /**
-     * Execute a command defined in SHT3XCommand
+     * @brief Takes a single temperature and humidity measurement.
+     * @param temperature Pointer to the storage location for the sampled temperature.
+     * @param humidity Pointer to the storage location for the sampled humidity.
+     * @return True on success, false otherwise.
+     */
+    bool read(float* temperature, float* humidity) const;
+
+private:
+    /**
+     * @brief Execute a command defined in SHT3XCommand
      * @param handle Handle to the SHT3x device.
      * @param command SHT3XCommand
      * @return True on success, false otherwise.
      */
-    static bool sendCommand(const SHT3XHandle &handle, SHT3XCommand command);
-    /**
-     * Takes a single temperature and humidity measurement.
-     * @param handle Handle to the SHT3x device.
-     * @param temperature Pointer to the storage location for the sampled
-     * temperature.
-     * @param humidity Pointer to the storage location for the sampled humidity.
-     * @return True on success, false otherwise.
-     */
-    static bool readTemperatureHumidity(const SHT3XHandle &handle, float *temperature,
-                                        float *humidity);
+    static bool sendCommand(uint8_t device_address, SHT3XCommand command);
+
+    static uint16_t uint8_to_uint16(uint8_t msb, uint8_t lsb);
+    static uint8_t calculate_crc(const uint8_t* data, size_t length);
+
+    uint8_t device_address;
 };
+
+}  // namespace Driver
 
 #endif  // SRC_DRIVERS_SHT3X_SHT3X_HPP_

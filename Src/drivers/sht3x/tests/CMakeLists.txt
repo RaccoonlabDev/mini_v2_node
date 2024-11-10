@@ -2,14 +2,14 @@
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 
 cmake_minimum_required(VERSION 3.10)
-project(as5600)
+project(sht3x)
 
-add_library(as5600
-    ../as5600.cpp
+add_library(sht3x
+    ../sht3x.cpp
     ../../../Src/platform/ubuntu/i2c.cpp
 )
 
-target_include_directories(as5600 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(sht3x PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 find_package(GTest REQUIRED)
 include_directories(
@@ -17,12 +17,12 @@ include_directories(
     ../../../../Src
 )
 
-add_executable(test_as5600
-    test_as5600.cpp
+add_executable(test_sht3x
+    test_sht3x.cpp
 )
 
-target_link_libraries(test_as5600
-    as5600
+target_link_libraries(test_sht3x
+    sht3x
     GTest::GTest
     GTest::Main
 )
