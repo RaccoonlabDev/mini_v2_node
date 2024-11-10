@@ -32,7 +32,7 @@ public:
 
     /**
      * @brief The MAGNITUDE register indicates the magnitude value of the internal CORDIC.
-     * @return Angle within [0, 360] on success, negative error code otherwise
+     * @return Unitless magnitude within [0, 4095] on success, negative error code otherwise
      */
     int16_t get_magnitude();
 

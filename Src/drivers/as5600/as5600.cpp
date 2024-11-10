@@ -7,6 +7,7 @@
 
 #include "as5600.hpp"
 #include <array>
+#include <algorithm>
 #include "peripheral/i2c/i2c.hpp"
 
 namespace Driver {
@@ -56,17 +57,12 @@ int16_t AS5600::get_angle() {
 
 int16_t AS5600::get_status() {
     auto reg_value = HAL::I2C::read_register_1_byte(I2C_AS5600, REG_STATUS);
-    return (reg_value >= 0) ? ((uint8_t)reg_value & 0b111000) : -reg_value;
+    return (reg_value >= 0) ? ((uint8_t)reg_value & 0b111000) : reg_value;
 }
 
 int16_t AS5600::get_magnitude() {
     auto reg_value = HAL::I2C::read_register_2_bytes(I2C_AS5600, REG_MAGNITUDE);
-
-    if (reg_value < 0) {
-        return reg_value;
-    }
-    int16_t angle_deg = reg_value / 4095.0f * 360.0f;
-    return std::clamp(angle_deg, (int16_t)0, (int16_t)359);
+    return (reg_value >= 0) ? std::clamp(reg_value, (int32_t)0, (int32_t)4095) : reg_value;
 }
 
 }  // namespace Driver
