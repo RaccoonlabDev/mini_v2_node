@@ -13,27 +13,24 @@ TEST(AS5600Test, HelloWorld) {
 
 TEST(AS5600Test, init) {
     Driver::AS5600 as5600;
-    as5600.init();
+    (void)as5600;
+    Driver::AS5600::init();
 }
 
 TEST(AS5600Test, is_ready) {
-    Driver::AS5600 as5600;
-    as5600.is_ready();
+    Driver::AS5600::is_ready();
 }
 
 TEST(AS5600Test, get_angle) {
-    Driver::AS5600 as5600;
-    as5600.get_angle();
+    Driver::AS5600::get_angle();
 }
 
 TEST(AS5600Test, get_magnitude) {
-    Driver::AS5600 as5600;
-    as5600.get_magnitude();
+    Driver::AS5600::get_magnitude();
 }
 
 TEST(AS5600Test, get_status) {
-    Driver::AS5600 as5600;
-    as5600.get_status();
+    Driver::AS5600::get_status();
 }
 
 int main(int argc, char **argv) {

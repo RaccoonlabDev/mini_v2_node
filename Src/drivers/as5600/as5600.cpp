@@ -12,18 +12,6 @@
 
 namespace Driver {
 
-/**
- * @note AS5600 registers
- */
-static constexpr uint8_t REG_RAW_ANGLE = 0x0C;  // Unscaled and unmodified angle
-static constexpr uint8_t REG_ANGLE = 0x0E;      // Scaled output value
-static constexpr uint8_t REG_STATUS = 0x0B;     // Bits that indicate the current state
-static constexpr uint8_t REG_MAGNITUDE = 0x1B;  // The magnitude value of the internal CORDIC
-
-static constexpr uint8_t I2C_ADDRESS_AS5600 = 0x36;
-static constexpr uint8_t I2C_AS5600 = (I2C_ADDRESS_AS5600 << 1) + 1;
-
-
 int8_t AS5600::init() {
     if (auto i2c_init_status = HAL::I2C::init(); i2c_init_status < 0) {
         return i2c_init_status;
@@ -57,12 +45,12 @@ int16_t AS5600::get_angle() {
 
 int16_t AS5600::get_status() {
     auto reg_value = HAL::I2C::read_register_1_byte(I2C_AS5600, REG_STATUS);
-    return (reg_value >= 0) ? ((uint8_t)reg_value & 0b111000) : reg_value;
+    return reg_value >= 0 ? reg_value & 0b111000 : reg_value;
 }
 
 int16_t AS5600::get_magnitude() {
     auto reg_value = HAL::I2C::read_register_2_bytes(I2C_AS5600, REG_MAGNITUDE);
-    return (reg_value >= 0) ? std::clamp(reg_value, (int32_t)0, (int32_t)4095) : reg_value;
+    return reg_value >= 0 ? std::clamp(reg_value, 0, 4095) : reg_value;
 }
 
 }  // namespace Driver

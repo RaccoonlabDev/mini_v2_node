@@ -11,7 +11,7 @@
 
 namespace Driver {
 
-enum class SHT3XCommand {
+enum class SHT3XCommand : uint16_t {
     SHT3X_COMMAND_MEASURE_HIGHREP_STRETCH = 0x2c06,
     SHT3X_COMMAND_CLEAR_STATUS = 0x3041,
     SHT3X_COMMAND_SOFT_RESET = 0x30A2,
@@ -29,7 +29,7 @@ public:
     static constexpr uint8_t DEV_ADDR_PIN_LOW = 0x44;
     static constexpr uint8_t DEV_ADDR_PIN_HIGH = 0x45;
 
-    SHT3X(uint8_t dev_addr): device_address(dev_addr) {}
+    explicit SHT3X(uint8_t dev_addr): device_address(dev_addr), i2c_address(dev_addr << 1) {}
 
     /**
      * @brief Takes a single temperature and humidity measurement.
@@ -42,16 +42,16 @@ public:
 private:
     /**
      * @brief Execute a command defined in SHT3XCommand
-     * @param handle Handle to the SHT3x device.
      * @param command SHT3XCommand
      * @return True on success, false otherwise.
      */
-    static bool sendCommand(uint8_t device_address, SHT3XCommand command);
+    bool sendCommand(SHT3XCommand command) const;
 
     static uint16_t uint8_to_uint16(uint8_t msb, uint8_t lsb);
     static uint8_t calculate_crc(const uint8_t* data, size_t length);
 
     uint8_t device_address;
+    uint8_t i2c_address;
 };
 
 }  // namespace Driver

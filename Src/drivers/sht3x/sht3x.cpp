@@ -9,17 +9,15 @@
 namespace Driver {
 
 bool SHT3X::read(float *temperature, float *humidity) const {
-    sendCommand(device_address, SHT3XCommand::SHT3X_COMMAND_MEASURE_HIGHREP_STRETCH);
+    sendCommand(SHT3XCommand::SHT3X_COMMAND_MEASURE_HIGHREP_STRETCH);
 
     uint8_t buffer[6];
 
-    if (!HAL::I2C::receive(device_address << 1u, buffer, sizeof(buffer))) {
+    if (!HAL::I2C::receive(i2c_address, buffer, sizeof(buffer))) {
         return false;
     }
 
-    uint8_t temperature_crc = calculate_crc(buffer, 2);
-    uint8_t humidity_crc = calculate_crc(buffer + 3, 2);
-    if (temperature_crc != buffer[2] || humidity_crc != buffer[5]) {
+    if (calculate_crc(buffer, 2) != buffer[2] || calculate_crc(buffer + 3, 2) != buffer[5]) {
         return false;
     }
 
@@ -32,12 +30,13 @@ bool SHT3X::read(float *temperature, float *humidity) const {
     return true;
 }
 
-bool SHT3X::sendCommand(uint8_t device_address, SHT3XCommand command) {
-    uint8_t command_buffer[2] = {(uint8_t)((uint16_t)command >> 8u),
-                                 (uint8_t)((uint16_t)command & 0xffu)};
+bool SHT3X::sendCommand(SHT3XCommand command) const {
+    uint8_t command_buffer[2] = {
+        (uint8_t)((uint16_t)command >> 8u),
+        (uint8_t)((uint16_t)command & 0xffu)
+    };
 
-    return HAL::I2C::transmit(device_address << 1u, command_buffer,
-                                  sizeof(command_buffer));
+    return HAL::I2C::transmit(i2c_address, command_buffer, sizeof(command_buffer));
 }
 
 uint16_t SHT3X::uint8_to_uint16(uint8_t msb, uint8_t lsb) {
