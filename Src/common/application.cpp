@@ -4,7 +4,6 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#include "application.hpp"
 #include <array>
 #include <bitset>
 #include "peripheral/adc/circuit_periphery.hpp"
@@ -12,8 +11,9 @@
 #include "params.hpp"
 #include "module.hpp"
 #include "main.h"
+#include "can_driver.h"
 
-#include "peripheral/led/led.hpp"
+#include "application.hpp"
 #include "peripheral/gpio/gpio.hpp"
 #include "peripheral/iwdg/iwdg.hpp"
 
@@ -39,6 +39,14 @@ static int8_t init_board_periphery() {
     }
 #endif
     return 0;
+}
+
+static int8_t init_can_driver() {
+    int16_t res = canDriverInit(1000000, CAN_DRIVER_FIRST);
+    return res;
+}
+static int8_t get_can_driver_protocol() {
+    return canDriverGetProtocol(CAN_DRIVER_FIRST);
 }
 
 /**
@@ -82,10 +90,16 @@ static void blink_board_led() {
 
 __attribute__((noreturn)) void application_entry_point() {
     init_board_periphery();
+    init_can_driver();
     ModuleManager::init();
-
+    int8_t can_driver_protocol = CanProtocol::CAN_PROTOCOL_UNKNOWN;
     while (true) {
-        ModuleManager::process();
+        if (can_driver_protocol == CanProtocol::CAN_PROTOCOL_UNKNOWN) {
+            can_driver_protocol = get_can_driver_protocol();
+            ModuleManager::set_protocol(static_cast<Module::Protocol>(can_driver_protocol));
+        } else {
+            ModuleManager::process();
+        }
         blink_board_led();
         HAL::Watchdog::refresh();
     }
