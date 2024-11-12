@@ -12,9 +12,8 @@
 REGISTER_MODULE(ImuModule)
 
 void ImuModule::init() {
-    bool imu_initialized = imu.initialize();
+    initialized = imu.initialize();
     mode = Module::Mode::STANDBY;
-    initialized = imu_initialized;
     fft_accel.init(512, 3, 512);
     fft_accel.fft_min_freq = 20;
     fft_gyro.init(512, 3, 512);
@@ -33,6 +32,9 @@ void ImuModule::update_params() {
 }
 
 void ImuModule::spin_once() {
+    if (!initialized) {
+        initialized = imu.initialize();
+    }
     if (!bitmask || !initialized) {
         return;
     }
