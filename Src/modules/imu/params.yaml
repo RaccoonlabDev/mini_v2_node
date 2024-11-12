@@ -11,7 +11,7 @@ imu.mode:
   flags: mutable
   default: 0
   min: 0
-  max: 16
+  max: 15
 
 imu.pub_frequency:
   type: Integer
