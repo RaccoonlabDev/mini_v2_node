@@ -4,7 +4,7 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#include "peripheral/led/led.hpp"
+#include "led.hpp"
 #include <cstddef>
 #include "main.h"
 
@@ -22,14 +22,26 @@ namespace Board {
 static void write_red(bool enabled) {
     GPIO_PinState state = enabled ? GPIO_PIN_RESET : GPIO_PIN_SET;
     HAL_GPIO_WritePin(INTERNAL_LED_RED_GPIO_Port, INTERNAL_LED_RED_Pin, state);
+
+#ifdef EXT_RGB_LED_RED_GPIO_Port
+    HAL_GPIO_WritePin(EXT_RGB_LED_RED_GPIO_Port, EXT_RGB_LED_RED_Pin, state);
+#endif
 }
 static void write_green(bool enabled) {
     GPIO_PinState state = enabled ? GPIO_PIN_RESET : GPIO_PIN_SET;
     HAL_GPIO_WritePin(INTERNAL_LED_GREEN_GPIO_Port, INTERNAL_LED_GREEN_Pin, state);
+
+#ifdef EXT_RGB_LED_GREEN_GPIO_Port
+    HAL_GPIO_WritePin(EXT_RGB_LED_GREEN_GPIO_Port, EXT_RGB_LED_GREEN_Pin, state);
+#endif
 }
 static void write_blue(bool enabled) {
     GPIO_PinState state = enabled ? GPIO_PIN_RESET : GPIO_PIN_SET;
     HAL_GPIO_WritePin(INTERNAL_LED_BLUE_GPIO_Port, INTERNAL_LED_BLUE_Pin, state);
+
+#ifdef EXT_RGB_LED_BLUE_GPIO_Port
+    HAL_GPIO_WritePin(EXT_RGB_LED_BLUE_GPIO_Port, EXT_RGB_LED_BLUE_Pin, state);
+#endif
 }
 
 void Led::set(Color color) {
