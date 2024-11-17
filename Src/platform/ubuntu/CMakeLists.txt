@@ -4,6 +4,7 @@
 set(EXECUTABLE ${PROJECT_NAME}.out)
 add_executable(${EXECUTABLE}
     ${APPLICATION_SOURCES}
+    ${PERIPHERAL_SOURCES}
     ${BUILD_SRC_DIR}/params.cpp
     ${ROOT_DIR}/Src/common/algorithms.cpp
     ${ROOT_DIR}/Src/common/logging.cpp
