@@ -21,6 +21,9 @@ static void spi_set_nss(bool nss_state) {
 #ifdef SPI2_NSS_GPIO_Port
     auto state = nss_state ? GPIO_PIN_SET : GPIO_PIN_RESET;
     HAL_GPIO_WritePin(SPI2_NSS_GPIO_Port, SPI2_NSS_Pin, state);
+#elif defined(SPI_SS_GPIO_Port)
+    auto state = nss_state ? GPIO_PIN_SET : GPIO_PIN_RESET;
+    HAL_GPIO_WritePin(SPI_SS_GPIO_Port, SPI_SS_Pin, state);
 #endif
 }
 
