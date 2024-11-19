@@ -7,7 +7,6 @@
 #include <stdint.h>
 #include <limits>
 #include <utility>
-#include "peripheral/temperature_sensor/temperature_sensor.hpp"
 #include "peripheral/adc/adc.hpp"
 
 #ifdef __cplusplus
@@ -32,10 +31,10 @@ public:
         return AdcPeriphery::init();
     }
 
-    static uint16_t temperature() {
-        uint16_t temp = AdcPeriphery::get(AdcChannel::ADC_TEMPERATURE);
-        return stm32TemperatureParse(temp);
-    }
+    /**
+     * @return Temperature, Kelvin
+     */
+    static uint16_t temperature();
 
     /**
      * @return The current in Amperes if the hardware supports it, otherwise NaN.
