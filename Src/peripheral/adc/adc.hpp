@@ -5,7 +5,6 @@
 #define SRC_PERIPHERY_ADC_ADC_HPP_
 
 #include <stdint.h>
-#include "peripheral/temperature_sensor/temperature_sensor.hpp"
 #ifdef __cplusplus
 extern "C" {
 #endif

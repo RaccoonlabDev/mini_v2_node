@@ -24,7 +24,6 @@ add_executable(${EXECUTABLE}
     ${CMAKE_CURRENT_LIST_DIR}/gpio.cpp
     ${PLATFORM_DIR}/stm32g0b1/pwm.cpp
     ${ROOT_DIR}/Src/platform/stm32/iwdg/iwdg.cpp
-    ${PLATFORM_DIR}/stm32f103/temperature_sensor.cpp
     ${ROOT_DIR}/Src/platform/stm32/platform_specific.cpp
 
     ${coreSources}
