@@ -5,15 +5,15 @@
  */
 
 #include <gtest/gtest.h>
+#include <random>
 #include <algorithm>  // For std::clamp
 #include <cstdlib>
 #include <cmath>  // For std::fabs
 #include <tuple>  // for tuple
-
 #include "FFT.hpp"
 
 unsigned int seed = 1;
-
+std::random_device rd;  // Will be used to obtain a seed for the random number engine
 template <typename T>
 auto IsInRange(T lo, T hi) {
     return AllOf(Ge((lo)), Le((hi)));
@@ -99,17 +99,16 @@ public:
     void init() {
         signals_generator.resize(n_signals);
         uint16_t max_amplitude = 0;
+        std::uniform_int_distribution<int> dist(0, max_freq);
+
         for (int j = 0; j < n_signals; j++) {
-            uint16_t freq_hz = std::rand() % (max_freq - min_freq) + min_freq;
-            uint16_t amplitude = 1 + std::rand() % 100;
+            uint16_t freq_hz = dist(rd) % (max_freq - min_freq) + min_freq;
+            uint16_t amplitude = 1 + dist(rd) % 100;
             signals_generator[j] = SinSignalGenerator(sample_rate_hz, freq_hz, amplitude);
             if (amplitude > max_amplitude) {
                 max_amplitude = amplitude;
                 dominant_sig.insert(dominant_sig.begin(), std::make_tuple(amplitude, freq_hz));
             }
-        }
-        for (auto dominant : dominant_sig) {
-            std::cout <<"dominant freq: " << std::get<1>(dominant) << "\n";
         }
         // sort by amplitude value
         std::sort(dominant_sig.begin(), dominant_sig.end());
@@ -223,8 +222,9 @@ public:
         for (int i = 0; i < fft_parameters.n_axes; i++) {
             signals_parameters[i] = init_parameters.signals_parameters;
         }
-        print_signal_parameters();
-        print_fft_parameters();
+        // To print FFT parameters for debug uncomment the following line
+        // print_signal_parameters();
+        // print_fft_parameters();
         init();
     }
 };
@@ -270,7 +270,8 @@ TEST_P(TestFFTOneSignalParametrized, CheckOnWindow) {
         }
         fft.update(input);
     }
-    print_fft_results();
+    // To print FFT results for debug uncomment the following line
+    // print_fft_results();
     for (int axis = 0; axis < fft_parameters.n_axes; axis++) {
         check_axis(axis);
     }
@@ -278,14 +279,16 @@ TEST_P(TestFFTOneSignalParametrized, CheckOnWindow) {
 
 TEST_P(TestFFTOneSignalParametrized, CheckOnFewWindows) {
     float input[fft_parameters.n_axes];
-    auto n_updates = (std::rand() % 8 + 2) * fft_parameters.window_size;
+    std::uniform_int_distribution<int> dist(0, 8);
+    auto n_updates = (dist(rd) % 8 + 2) * fft_parameters.window_size;
     for (int i = 0; i < n_updates + 10; i++) {
         for (int j = 0; j < fft_parameters.n_axes; j++) {
             input[j] = signals_generator[j].get_next_sample();
         }
         fft.update(input);
     }
-    print_fft_results();
+    // To print FFT results for debug uncomment the following line
+    // print_fft_results();
     for (int axis = 0; axis < fft_parameters.n_axes; axis++) {
         check_axis(axis);
     }
@@ -323,8 +326,9 @@ public:
         for (int i = 0; i < fft_parameters.n_axes; i++) {
             signals_parameters[i] = init_parameters.signals_parameters;
         }
-        print_signal_parameters();
-        print_fft_parameters();
+        // To print FFT parameters for debug uncomment the following line
+        // print_signal_parameters();
+        // print_fft_parameters();
         init();
     }
 
@@ -333,13 +337,9 @@ public:
         auto signal_generator = signals_generator[axis];
         auto n_dominants = signal_generator.dominant_sig.size();
         auto n_signals = signal_generator.n_signals;
-        std::cout << "dominant sig: \n" << signal_generator.dominant_sig.size() << "\n";
         for (auto dominant : signal_generator.dominant_sig) {
-            std::cout << (int)(std::get<1>(dominant)) << "\n";
         }
-        std::cout << "peak freq: \n";
         for (int peak_index = 0; peak_index < MAX_NUM_PEAKS; peak_index++) {
-            std::cout << fft.peak_frequencies[axis][peak_index] << "\n";
             for (auto dominant : signal_generator.dominant_sig) {
                 if (IsBetweenInclusive(fft.peak_frequencies[axis][peak_index],
                             (int)std::get<1>(dominant) - abs_error,
