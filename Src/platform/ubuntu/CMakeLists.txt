@@ -1,6 +1,9 @@
 # Copyright (C) 2023-2024 Dmitry Ponomarev <ponomarevda96@gmail.com>
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 
+# Generate temp parameters for SITL
+include(${CMAKE_DIR}/libparams_generate_default_params.cmake)
+
 set(EXECUTABLE ${PROJECT_NAME}.out)
 add_executable(${EXECUTABLE}
     ${APPLICATION_SOURCES}
