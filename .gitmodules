@@ -1,18 +1,18 @@
 [submodule "Libs/Cyphal"]
 	path = Libs/Cyphal
-	url = git@github.com:RaccoonlabDev/libcanard_stm32_cyphal.git
+	url = https://github.com/RaccoonlabDev/cyphal_application.git
 [submodule "Libs/Dronecan"]
 	path = Libs/Dronecan
-	url = git@github.com:PonomarevDA/dronecan_application.git
+	url = https://github.com/PonomarevDA/dronecan_application.git
 [submodule "Libs/libparams"]
 	path = Libs/libparams
-	url = git@github.com:PonomarevDA/libparams.git
+	url = https://github.com/PonomarevDA/libparams.git
 [submodule "scripts/tools"]
 	path = scripts/tools
-	url = git@github.com:PonomarevDA/tools.git
+	url = https://github.com/PonomarevDA/tools.git
 [submodule "Libs/stm32-cube-project"]
 	path = Libs/stm32-cube-project
 	url = https://github.com/RaccoonLabHardware/mini-v2-software.git
 [submodule "Libs/mini-v3-ioc"]
 	path = Libs/mini-v3-ioc
-	url = git@github.com:RaccoonLabHardware/mini-v3-ioc.git
+	url = https://github.com/RaccoonLabHardware/mini-v3-ioc.git
