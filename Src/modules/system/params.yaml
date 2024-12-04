@@ -4,8 +4,8 @@ uavcan.node.id:
   enum: PARAM_UAVCAN_NODE_ID
   flags: mutable
   default: 42
-  min: 0
-  max: 255
+  min: 1
+  max: 126
 
 uavcan.node.description:
   note: User/integrator-defined, human-readable description of this specific node.
