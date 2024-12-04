@@ -37,7 +37,7 @@ void DronecanCircuitStatus::spin_once() {
 
     if (bitmask & static_cast<uint8_t>(Bitmask::ENABLE_5V_PUB)) {
         circuit_status.msg = {
-            .circuit_id = static_cast<uint8_t>(node_id * 10),
+            .circuit_id = static_cast<uint16_t>(node_id * 10),
             .voltage = CircuitPeriphery::voltage_5v(),
             .current = CircuitPeriphery::current(),
             .error_flags = static_cast<CircuitStatusErrorFlags_t>(error_flags),
@@ -47,7 +47,7 @@ void DronecanCircuitStatus::spin_once() {
 
     if (bitmask & static_cast<uint8_t>(Bitmask::ENABLE_VIN_PUB)) {
         circuit_status.msg = {
-            .circuit_id = static_cast<uint8_t>(node_id * 10 + 1),
+            .circuit_id = static_cast<uint16_t>(node_id * 10 + 1),
             .voltage = CircuitPeriphery::voltage_vin(),
             .current = CircuitPeriphery::current(),
             .error_flags = static_cast<CircuitStatusErrorFlags_t>(error_flags),
