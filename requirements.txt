@@ -1,1 +1,1 @@
-raccoonlab-tools>=0.1.0
+raccoonlab-tools==0.2.0
