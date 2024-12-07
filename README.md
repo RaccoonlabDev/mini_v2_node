@@ -38,7 +38,7 @@ The following table outlines the compatibility of the project with different ope
 | Ubuntu 24.04          | ✅ Supported          | ✅ Supported        | Latest Ubuntu LTS version.             |
 | Ubuntu 22.04          | ✅ Supported          | ✅ Supported        | Fully supported for both modes.        |
 | Ubuntu 20.04          | ✅ Supported          | ❌ Not Supported    | Will be deprecated in April, 2026. |
-| Windows (latest)      | ✅ Supported          | ✅ Supported        | Current "latest" Windows version.      |
+| Windows (2022)      | ✅ Supported          | ✅ Supported        | Current "latest" Windows version.      |
 
 ### 3. USE CASES
 
