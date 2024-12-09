@@ -14,9 +14,9 @@ REGISTER_MODULE(ImuModule)
 void ImuModule::init() {
     initialized = imu.initialize();
     mode = Module::Mode::STANDBY;
-    fft_accel.init(512, 3, 512);
+    fft_accel.init(256, 3, 256);
     fft_accel.fft_min_freq = 20;
-    fft_gyro.init(512, 3, 512);
+    fft_gyro.init(256, 3, 256);
     fft_gyro.fft_min_freq = 20;
 }
 
@@ -108,7 +108,7 @@ void ImuModule::update_gyro_fft() {
     if (!(bitmask & static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_FFT_GYR))) {
         return;
     }
-    fft_gyro.update(gyro.data());
+    // fft_gyro.update(gyro.data());
     pub.msg.rate_gyro_integral[0] = fft_gyro.dominant_frequency;
     pub.msg.rate_gyro_integral[1] = fft_gyro.dominant_mag * 1000;
     pub.msg.rate_gyro_integral[2] = fft_gyro.dominant_snr;

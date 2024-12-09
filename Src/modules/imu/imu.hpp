@@ -27,7 +27,7 @@ public:
         ENABLE_FFT_GYR              = 8,
         ENABLE_ALL_BY_DEFAULT       = 15,
     };
-    ImuModule() : Module(512.0, Protocol::DRONECAN) {}
+    ImuModule() : Module(256, Protocol::DRONECAN) {}
     void init() override;
 
 protected:
