@@ -1,9 +1,13 @@
-/***
- * Copyright (C) 2024 Anastasiia Stepanova  <asiiapine96@gmail.com>
- *  Distributed under the terms of the GPL v3 license, available in the file LICENSE.
-***/ 
+/**
+ * This program is free software under the GNU General Public License v3.
+ * See <https://www.gnu.org/licenses/> for details.
+ * Author: Anastasiia Stepanova <asiiapine@gmail.com>
+ * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
+ */
 
 #include "peripheral/adc/adc.hpp"
+
+namespace HAL {
 
 struct adcState {
     uint16_t current;
@@ -14,7 +18,7 @@ struct adcState {
 };
 adcState state = {};
 
-int8_t AdcPeriphery::init() {
+int8_t Adc::init() {
     state.temperature = 3115;
     state.current = 2048;
     state.v_in = 640;
@@ -23,7 +27,7 @@ int8_t AdcPeriphery::init() {
     return 0;
 }
 
-uint16_t AdcPeriphery::get(AdcChannel channel) {
+uint16_t Adc::get(AdcChannel channel) {
     switch (channel)
     {
     case AdcChannel::ADC_VIN:
@@ -39,3 +43,5 @@ uint16_t AdcPeriphery::get(AdcChannel channel) {
     }
     return 0;
 }
+
+}  // namespace HAL

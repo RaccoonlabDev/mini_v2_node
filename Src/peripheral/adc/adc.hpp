@@ -1,13 +1,16 @@
-// Copyright (C) 2024 Anastasiia Stepanova <asiiapine@gmail.com>
-// Distributed under the terms of the GPL v3 license, available in the file LICENSE.
+/**
+ * This program is free software under the GNU General Public License v3.
+ * See <https://www.gnu.org/licenses/> for details.
+ * Author: Anastasiia Stepanova <asiiapine@gmail.com>
+ * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
+ */
 
-#ifndef SRC_PERIPHERY_ADC_ADC_HPP_
-#define SRC_PERIPHERY_ADC_ADC_HPP_
+#ifndef SRC_PERIPHERAL_ADC_ADC_HPP_
+#define SRC_PERIPHERAL_ADC_ADC_HPP_
 
 #include <stdint.h>
-#ifdef __cplusplus
-extern "C" {
-#endif
+
+namespace HAL {
 
 enum class AdcChannel : uint8_t {
     ADC_VIN,
@@ -18,7 +21,7 @@ enum class AdcChannel : uint8_t {
     ADC_NUMBER_OF_CNANNELS,
 };
 
-class AdcPeriphery {
+class Adc {
 public:
     static int8_t init();
     static uint16_t get(AdcChannel channel);
@@ -26,8 +29,6 @@ private:
     static inline bool _is_adc_already_inited = false;
 };
 
-#ifdef __cplusplus
-}
-#endif
+}  // namespace HAL
 
-#endif  // SRC_PERIPHERY_ADC_ADC_HPP_
+#endif  // SRC_PERIPHERAL_ADC_ADC_HPP_

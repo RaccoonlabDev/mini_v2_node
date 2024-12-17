@@ -28,7 +28,7 @@ enum class BoardType : uint8_t {
 class CircuitPeriphery{
 public:
     static int8_t init(){
-        return AdcPeriphery::init();
+        return HAL::Adc::init();
     }
 
     /**
@@ -49,24 +49,24 @@ public:
         constexpr float MAX_SENSOR_CURRENT = 10.0f;
         constexpr float CALIBRATION_COEF = 0.6666667f;
         constexpr float ADC_CURRENT_MULTIPLIER = MAX_SENSOR_CURRENT * CALIBRATION_COEF / 4095.0f;
-        uint16_t curr = AdcPeriphery::get(AdcChannel::ADC_CURRENT);
+        uint16_t curr = HAL::Adc::get(HAL::AdcChannel::ADC_CURRENT);
         return curr * ADC_CURRENT_MULTIPLIER;
     }
 
     static float voltage_vin() {
         constexpr float ADC_VIN_MULTIPLIER = 1.0f / 64.0f;
-        uint16_t volt = AdcPeriphery::get(AdcChannel::ADC_VIN);
+        uint16_t volt = HAL::Adc::get(HAL::AdcChannel::ADC_VIN);
         return volt * ADC_VIN_MULTIPLIER;
     }
 
     static float voltage_5v() {
         constexpr float ADC_5V_MULTIPLIER = 1.0f / 640.0f;
-        uint16_t volt = AdcPeriphery::get(AdcChannel::ADC_5V);
+        uint16_t volt = HAL::Adc::get(HAL::AdcChannel::ADC_5V);
         return volt * ADC_5V_MULTIPLIER;
     }
 
     static uint16_t hardware_version() {
-        return AdcPeriphery::get(AdcChannel::ADC_VERSION);
+        return HAL::Adc::get(HAL::AdcChannel::ADC_VERSION);
     }
 
     static bool overvoltage() {
