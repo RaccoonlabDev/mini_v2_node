@@ -1,19 +1,23 @@
-/***
- * Copyright (C) 2024 Anastasiia Stepanova  <asiiapine96@gmail.com>
- *  Distributed under the terms of the GPL v3 license, available in the file LICENSE.
-***/ 
+/**
+ * This program is free software under the GNU General Public License v3.
+ * See <https://www.gnu.org/licenses/> for details.
+ * Author: Anastasiia Stepanova <asiiapine@gmail.com>
+ * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
+ */
 
 #include "peripheral/adc/adc.hpp"
 #include "main.h"
 
 extern ADC_HandleTypeDef hadc1;
+
 static uint32_t adc_current_avg = 0;
 static uint32_t adc_current_sum = 0;
 static uint32_t adc_dma_counter = 0;
+static uint16_t adc_dma_buffer[static_cast<uint8_t>(HAL::AdcChannel::ADC_NUMBER_OF_CNANNELS)];
 
-static inline uint16_t adc_dma_buffer[static_cast<uint8_t>(AdcChannel::ADC_NUMBER_OF_CNANNELS)];
+namespace HAL {
 
-int8_t AdcPeriphery::init() {
+int8_t Adc::init() {
     if (HAL_ADCEx_Calibration_Start(&hadc1) != HAL_OK) {
         return -1;
     }
@@ -27,7 +31,7 @@ int8_t AdcPeriphery::init() {
     return 0;
 }
 
-uint16_t AdcPeriphery::get(AdcChannel channel) {
+uint16_t Adc::get(AdcChannel channel) {
     if (!_is_adc_already_inited || channel >= AdcChannel::ADC_NUMBER_OF_CNANNELS) {
         return 0;
     }
@@ -37,6 +41,8 @@ uint16_t AdcPeriphery::get(AdcChannel channel) {
     return adc_dma_buffer[static_cast<uint8_t>(channel)];
 }
 
+}  // namespace HAL
+
 #ifdef HAL_ADC_MODULE_ENABLED
 /**
  * @note We assume that hadc->Instance == ADC1 always!
@@ -44,7 +50,7 @@ uint16_t AdcPeriphery::get(AdcChannel channel) {
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
     adc_dma_counter++;
 
-    adc_current_sum += adc_dma_buffer[static_cast<uint8_t>(AdcChannel::ADC_CURRENT)];
+    adc_current_sum += adc_dma_buffer[static_cast<uint8_t>(HAL::AdcChannel::ADC_CURRENT)];
     if (adc_dma_counter > 4000) {
         adc_current_avg = adc_current_sum / adc_dma_counter;
         adc_current_sum = 0;
@@ -54,7 +60,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
 
     HAL_ADC_Start_DMA(hadc,
                       (uint32_t*)(void*)&adc_dma_buffer,
-                      static_cast<uint8_t>(AdcChannel::ADC_NUMBER_OF_CNANNELS)
+                      static_cast<uint8_t>(HAL::AdcChannel::ADC_NUMBER_OF_CNANNELS)
     );
 }
 #endif

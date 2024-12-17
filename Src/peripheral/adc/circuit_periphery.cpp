@@ -36,7 +36,7 @@ static const std::array<std::pair<const char*, uint16_t>, (int)BoardType::BOARDS
 }};
 
 uint16_t CircuitPeriphery::temperature() {
-    auto adc_12b = AdcPeriphery::get(AdcChannel::ADC_TEMPERATURE);
+    auto adc_12b = HAL::Adc::get(HAL::AdcChannel::ADC_TEMPERATURE);
     uint16_t temperature_kelvin;
 #ifdef STM32G0B1xx
     temperature_kelvin = __HAL_ADC_CALC_TEMPERATURE(3300, adc_12b, ADC_RESOLUTION_12B) + 273;
