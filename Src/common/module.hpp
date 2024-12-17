@@ -62,9 +62,16 @@ public:
     /**
      * @brief Module state getters
      */
-    Status get_health() const;
-    Mode get_mode() const;
-    Protocol get_protocol() const;
+    Status get_health() const {
+        return _health;
+    }
+    Mode get_mode() const {
+        return _mode;
+    }
+    Protocol get_protocol() const {
+        return _protocol;
+    }
+
     bool is_enabled() const;
 
 protected:
@@ -79,14 +86,28 @@ protected:
      */
     virtual void spin_once() = 0;
 
+    /**
+     * @brief Module state setters
+     */
+    void set_health(Status health) {
+        _health = health;
+    }
+    void set_mode(Mode mode) {
+        _mode = mode;
+    }
+    void set_period_ms(uint32_t new_period_ms) {
+        _period_ms = new_period_ms;
+    }
+
     static uint32_t period_ms_from_frequency(float frequency);
 
-    Status health{Status::OK};
-    Mode mode{Mode::INITIALIZATION};
-    Protocol protocol;
+private:
+    uint32_t _period_ms;
+    uint32_t _next_spin_time_ms{0};
 
-    uint32_t period_ms;
-    uint32_t next_spin_time_ms{0};
+    Protocol _protocol;
+    Status _health{Status::OK};
+    Mode _mode{Mode::INITIALIZATION};
 };
 
 

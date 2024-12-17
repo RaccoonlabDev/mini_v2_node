@@ -11,9 +11,9 @@
 REGISTER_MODULE(SystemModule)
 
 void SystemModule::init() {
-    health = Status::OK;
     need_notification = paramsGetIntegerValue(IntParamsIndexes::PARAM_LOG_LEVEL) <= 1;
-    mode = Module::Mode::STANDBY;
+    set_health(Status::OK);
+    set_mode(Mode::STANDBY);
 }
 
 void SystemModule::spin_once() {

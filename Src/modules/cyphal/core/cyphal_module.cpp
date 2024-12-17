@@ -27,8 +27,8 @@ void CyphalModule::init() {
 
     cyphal::NodeGetInfoSubscriber::setHardwareVersion(2, 1);
 
-    health = (res >= 0) ? Status::OK : Status::FATAL_MALFANCTION;
-    mode = Mode::STANDBY;
+    set_health(res >= 0 ? Status::OK : Status::FATAL_MALFANCTION);
+    set_mode(Mode::STANDBY);
 }
 
 void CyphalModule::spin_once() {

@@ -12,7 +12,7 @@ REGISTER_MODULE(ImuModule)
 
 void ImuModule::init() {
     bool imu_initialized = imu.initialize();
-    mode = Module::Mode::STANDBY;
+    set_mode(Mode::STANDBY);
     initialized = imu_initialized;
 }
 
@@ -21,9 +21,9 @@ void ImuModule::update_params() {
                                 paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_PUB_FREQUENCY));
     pub_timeout_ms = pub_frequency == 0 ? 0 : 1000 / pub_frequency;
     bitmask = static_cast<uint8_t>(paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_MODE_BITMASK));
-    health = (!bitmask || initialized) ? Module::Status::OK : Module::Status::MAJOR_FAILURE;
+    set_health((!bitmask || initialized) ? Module::Status::OK : Module::Status::MAJOR_FAILURE);
     if (bitmask) {
-        mode = initialized ? Mode::STANDBY : Mode::INITIALIZATION;
+        set_mode(initialized ? Mode::STANDBY : Mode::INITIALIZATION);
     }
 }
 

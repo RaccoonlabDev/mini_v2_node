@@ -28,8 +28,8 @@ void DronecanModule::init() {
     auto node_id = std::clamp(param_node_id_value, 1, 126);
     int8_t res = uavcanInitApplication(node_id);
 
-    health = (res >= 0) ? Status::OK : Status::FATAL_MALFANCTION;
-    mode = Mode::STANDBY;
+    set_health(res >= 0 ? Status::OK : Status::FATAL_MALFANCTION);
+    set_mode(Mode::STANDBY);
 }
 
 void DronecanModule::spin_once() {

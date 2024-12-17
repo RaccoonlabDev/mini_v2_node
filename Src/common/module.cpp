@@ -8,38 +8,27 @@
 #include <span>
 #include "params.hpp"
 
-Module::Module(float frequency, Protocol proto) : protocol(proto),
-                                                  period_ms(period_ms_from_frequency(frequency)) {
+Module::Module(float frequency, Protocol proto) : _period_ms(period_ms_from_frequency(frequency)),
+                                                  _protocol(proto) {
     ModuleManager::register_module(this);
 }
 
 void Module::init() {
-    mode = Mode::STANDBY;
+    _mode = Mode::STANDBY;
 }
 
-Module::Status Module::get_health() const {
-    return health;
-}
-
-Module::Mode Module::get_mode() const {
-    return mode;
-}
-
-Module::Protocol Module::get_protocol() const {
-    return protocol;
-}
 bool Module::is_enabled() const {
     auto active_protocol = ModuleManager::get_active_protocol();
-    return protocol == Protocol::CYPHAL_AND_DRONECAN || protocol == active_protocol;
+    return _protocol == Protocol::CYPHAL_AND_DRONECAN || _protocol == active_protocol;
 }
 
 void Module::process() {
     uint32_t crnt_time_ms = HAL_GetTick();
-    if (crnt_time_ms < next_spin_time_ms) {
+    if (crnt_time_ms < _next_spin_time_ms) {
         return;
     }
 
-    next_spin_time_ms = crnt_time_ms + period_ms;
+    _next_spin_time_ms = crnt_time_ms + _period_ms;
     update_params();
     spin_once();
 }
