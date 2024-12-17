@@ -108,7 +108,7 @@ void PWMModule::spin_once() {
         }
     }
 
-    if (!at_least_one_channel_is_engaged && mode == Mode::ENGAGED) {
+    if (!at_least_one_channel_is_engaged && get_mode() == Mode::ENGAGED) {
         if (ttl_detected) {
             logger.log_warn("TTL");
         } else {
@@ -116,11 +116,11 @@ void PWMModule::spin_once() {
         }
     }
 
-    if (at_least_one_channel_is_engaged && mode == Mode::STANDBY) {
+    if (at_least_one_channel_is_engaged && get_mode() == Mode::STANDBY) {
         logger.log_info("Engaged");
     }
 
-    mode = at_least_one_channel_is_engaged ? Mode::ENGAGED : Module::Mode::STANDBY;
+    set_mode(at_least_one_channel_is_engaged ? Mode::ENGAGED : Module::Mode::STANDBY);
 }
 
 void PWMModule::update_params() {

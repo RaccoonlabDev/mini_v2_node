@@ -11,17 +11,17 @@
 REGISTER_MODULE(CanopenModule)
 
 void CanopenModule::init() {
-    health = Status::OK;
+    set_health(Status::OK);
 
     if (canDriverInit(1000000, CAN_DRIVER_SECOND) < 0) {
-        health = Status::FATAL_MALFANCTION;
+        set_health(Status::FATAL_MALFANCTION);
     }
 
     if (raw_command_sub.init(raw_command_cb) < 0) {
-        health = Status::FATAL_MALFANCTION;
+        set_health(Status::FATAL_MALFANCTION);
     }
 
-    mode = Module::Mode::STANDBY;
+    set_mode(Mode::STANDBY);
 }
 
 void CanopenModule::spin_once() {

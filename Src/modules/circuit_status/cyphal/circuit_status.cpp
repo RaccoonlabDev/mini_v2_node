@@ -16,7 +16,7 @@
 REGISTER_MODULE(CyphalCircuitStatus)
 
 void CyphalCircuitStatus::init() {
-    mode = Mode::STANDBY;
+    set_mode(Mode::STANDBY);
 }
 
 void CyphalCircuitStatus::update_params() {
@@ -48,5 +48,5 @@ void CyphalCircuitStatus::spin_once() {
         temperature_pub.publish(uavcan_si_sample_temperature_Scalar_1_0{0, temp});
     }
 
-    health = CircuitPeriphery::is_failure() ? Status::MINOR_FAILURE : Status::OK;
+    set_health(CircuitPeriphery::is_failure() ? Status::MINOR_FAILURE : Status::OK);
 }

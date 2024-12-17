@@ -13,7 +13,7 @@ REGISTER_MODULE(DronecanFeedbackModule)
 
 
 void DronecanFeedbackModule::init() {
-    mode = Module::Mode::STANDBY;
+    set_mode(Mode::STANDBY);
 }
 
 void DronecanFeedbackModule::update_params() {
@@ -23,6 +23,7 @@ void DronecanFeedbackModule::update_params() {
     auto feedback_type_value = paramsGetIntegerValue(IntParamsIndexes::PARAM_FEEDBACK_TYPE);
     feedback_type = static_cast<FeedbackType>(feedback_type_value);
 
+    uint32_t period_ms;
     switch (feedback_type) {
         case FeedbackType::DEFAULT_1_HZ:
             period_ms = 1000;
@@ -34,6 +35,8 @@ void DronecanFeedbackModule::update_params() {
             period_ms = 1000;
             break;
     }
+
+    set_period_ms(period_ms);
 }
 
 void DronecanFeedbackModule::spin_once() {

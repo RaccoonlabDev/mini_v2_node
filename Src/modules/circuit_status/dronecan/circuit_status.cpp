@@ -12,7 +12,7 @@
 REGISTER_MODULE(DronecanCircuitStatus)
 
 void DronecanCircuitStatus::init() {
-    mode = Module::Mode::STANDBY;
+    set_mode(Mode::STANDBY);
 }
 
 void DronecanCircuitStatus::update_params() {
@@ -56,8 +56,8 @@ void DronecanCircuitStatus::spin_once() {
     }
 
     if (bitmask & static_cast<uint8_t>(Bitmask::ENABLE_HW_CHECKS)) {
-        health = CircuitPeriphery::is_failure() ? Status::MINOR_FAILURE : Status::OK;
+        set_health(CircuitPeriphery::is_failure() ? Status::MINOR_FAILURE : Status::OK);
     } else {
-        health = Status::OK;
+        set_health(Status::OK);
     }
 }
