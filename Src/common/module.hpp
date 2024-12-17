@@ -79,7 +79,9 @@ protected:
      * @brief The function manages the parameters from the persistent storage
      * The function is called in process() when the parameters are updated.
      */
-    virtual void update_params() {}
+    virtual void update_params() {
+        // do nothing by default
+    }
 
     /**
      * @brief The function is not blocking. It should be finished ASAP.
