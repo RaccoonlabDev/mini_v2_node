@@ -29,6 +29,4 @@ set(CMAKE_EXE_LINKER_FLAGS "-mcpu=${TARGET_ARCHITECTURE} -mthumb -lc -lm -lnosys
 add_compile_definitions(
     USE_HAL_DRIVER
     ${CPU}
-    CYPHAL_NUM_OF_CAN_BUSES=2
-    NUM_OF_CAN_BUSES=2
 )
