@@ -31,15 +31,15 @@ elseif(USE_PLATFORM_NODE_V3)
     set(APP_PLATFORM stm32g0b1)
     set(PLATFORM_NAME v3)
     include(${CMAKE_DIR}/stm32g0b1.cmake)
+    add_compile_definitions(CYPHAL_NUM_OF_CAN_BUSES=2)
 else()
     message(SEND_ERROR "Platform Error: Either v2 (stm32f103), v3 (stm32g0) or SITL (Linux) should be specified.")
 endif()
 
 # Option 2. Choose the protocol
-if(CAN_PROTOCOL STREQUAL "dronecan" OR CAN_PROTOCOL STREQUAL "cyphal" OR CAN_PROTOCOL STREQUAL "both")
-    set(APPLICATION_DIR ${ROOT_DIR}/Src/applications/${CAN_PROTOCOL})
-else()
-    message(SEND_ERROR "CAN_PROTOCOL is unknown.")
+set(APPLICATION_DIR ${ROOT_DIR}/Src/applications/${CAN_PROTOCOL})
+if(NOT (EXISTS ${APPLICATION_DIR} AND IS_DIRECTORY ${APPLICATION_DIR}))
+    message(FATAL_ERROR "CAN_PROTOCOL '${CAN_PROTOCOL}' is unknown.")
 endif()
 
 # Set build dir based on hardware version and protocol
