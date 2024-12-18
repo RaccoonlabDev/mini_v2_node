@@ -6,7 +6,6 @@ cmake_path(GET CMAKE_CURRENT_LIST_DIR PARENT_PATH PLATFORM_DIR)
 cmake_path(GET PLATFORM_DIR PARENT_PATH SRC_DIR)
 cmake_path(GET SRC_DIR PARENT_PATH ROOT_DIR)
 
-include(${ROOT_DIR}/Src/peripheral/spi/CMakeLists.txt)
 include(${ROOT_DIR}/Src/peripheral/adc/CMakeLists.txt)
 
 set(EXECUTABLE ${PROJECT_NAME}.out)
