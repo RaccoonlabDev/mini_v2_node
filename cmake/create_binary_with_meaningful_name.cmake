@@ -12,7 +12,7 @@ set(SOURCE_BIN "${BUILD_OBJ_DIR}/example.bin")
 # message(FATAL_ERROR "${SOURCE_BIN}")
 
 # Define the source and destination paths
-set(DESTINATION_DIR "${BUILD_ROOT_DIR}/release")
+set(DESTINATION_DIR "${BUILD_RELEASE_DIR}")
 set(DESTINATION_BIN "${DESTINATION_DIR}/node_${PLATFORM_NAME}_${CAN_PROTOCOL}_${LATEST_COMMIT_DATE}_v${APP_VERSION_MAJOR}.${APP_VERSION_MINOR}.${APP_VERSION_PATCH}_${GIT_HASH_SHORT_8_DIGITS}.bin")
 
 # Create the release directory if it doesn't exist
