@@ -59,6 +59,8 @@ int8_t Mpu9250::read_gyroscope(std::array<int16_t, 3>* gyro) const {
 }
 
 int8_t Mpu9250::read_magnetometer(std::array<int16_t, 3>* mag) const {
-    (void)mag;
+    (*mag)[0] = 0.0;
+    (*mag)[1] = 0.0;
+    (*mag)[2] = 0.0;
     return -1;  // not supported yet
 }
