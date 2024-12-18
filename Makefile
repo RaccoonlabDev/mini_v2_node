@@ -48,6 +48,30 @@ v3: checks generate_dsdl clean
 	mkdir -p ${BUILD_DIR}/both_v3/obj
 	cd ${BUILD_DIR}/both_v3/obj && cmake -DCAN_PROTOCOL=both -DUSE_PLATFORM_NODE_V3=ON -G "Unix Makefiles" ../../.. && make
 
+# Bootloader
+bootloader: bootloader_v3
+bootloader_v3: generate_dsdl
+	mkdir -p ${BUILD_DIR}/bootloader_v3/libs/kocherga && \
+	cd ${BUILD_DIR}/bootloader_v3/libs/kocherga && \
+	if [ ! -d .git ]; then \
+		git clone https://github.com/Zubax/kocherga.git . && \
+		git checkout d806ba1; \
+	else \
+			echo "Repository already exists, skipping clone."; \
+	fi
+
+	mkdir -p ${BUILD_DIR}/bootloader_v3/libs/bootloader-ioc && \
+	cd ${BUILD_DIR}/bootloader_v3/libs/bootloader-ioc && \
+	if [ ! -d .git ]; then \
+		git clone https://github.com/RaccoonLabHardware/v3-software-template.git . && \
+		git checkout dc90159; \
+	else \
+			echo "Repository already exists, skipping clone."; \
+	fi
+
+	mkdir -p ${BUILD_DIR}/bootloader_v3/obj
+	cd ${BUILD_DIR}/bootloader_v3/obj && cmake -DCAN_PROTOCOL=both -DUSE_PLATFORM_NODE_V3=ON -DBUILD_OBJ_DIR=`pwd` -G "Unix Makefiles" ../../.. && make
+
 # Common:
 checks:
 	@python scripts/prebuild_check.py || (echo "Requirements verification failed. Stopping build." && exit 1)

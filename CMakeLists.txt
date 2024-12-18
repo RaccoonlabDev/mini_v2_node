@@ -42,11 +42,19 @@ else()
     message(SEND_ERROR "CAN_PROTOCOL is unknown.")
 endif()
 
-# Set build dir based on hardware version and protocol
-set(BUILD_ROOT_DIR ${ROOT_DIR}/build)
-set(BUILD_TARGET_DIR ${BUILD_ROOT_DIR}/${CAN_PROTOCOL}_${PLATFORM_NAME})
-set(BUILD_SRC_DIR ${BUILD_TARGET_DIR}/src)
-set(BUILD_OBJ_DIR ${BUILD_TARGET_DIR}/obj)
+# Set build dir based on the hardware version and protocol
+if(DEFINED BUILD_OBJ_DIR)
+    cmake_path(GET BUILD_OBJ_DIR PARENT_PATH BUILD_TARGET_DIR)
+    set(BUILD_SRC_DIR ${BUILD_TARGET_DIR}/src)
+else()
+    set(BUILD_TARGET_DIR ${ROOT_DIR}/build/${CAN_PROTOCOL}_${PLATFORM_NAME})
+    set(BUILD_SRC_DIR ${BUILD_TARGET_DIR}/src)
+    set(BUILD_OBJ_DIR ${BUILD_TARGET_DIR}/obj)
+endif()
+
+message(STATUS "BUILD_TARGET_DIR is set to ${BUILD_TARGET_DIR}")
+message(STATUS "BUILD_OBJ_DIR is set to ${BUILD_OBJ_DIR}")
+message(STATUS "BUILD_SRC_DIR is set to ${BUILD_SRC_DIR}")
 
 if(USE_PLATFORM_UBUNTU)
     add_definitions(-DLIBPARAMS_PARAMS_DIR="${BUILD_SRC_DIR}")
