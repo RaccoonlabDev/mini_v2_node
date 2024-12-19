@@ -4,7 +4,7 @@ REPOSITORY_PATH="$(dirname "$SCRIPT_DIR")"
 
 LIBS_DIR="$REPOSITORY_PATH/build/bootloader_v3/libs"
 KOCHERGA_REPO="https://github.com/Zubax/kocherga.git"
-KOCHERGA_COMMIT="d806ba1"
+KOCHERGA_COMMIT="85f24d4"
 BOOTLOADER_IOC_REPO="https://github.com/RaccoonLabHardware/v3-software-template.git"
 BOOTLOADER_IOC_COMMIT="dc90159"
 

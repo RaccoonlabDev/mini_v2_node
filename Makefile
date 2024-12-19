@@ -54,7 +54,7 @@ bootloader_v3: generate_dsdl
 	./scripts/install_bootloader.sh
 
 	mkdir -p ${BUILD_DIR}/bootloader_v3/obj
-	cd ${BUILD_DIR}/bootloader_v3/obj && cmake -DCAN_PROTOCOL=both -DUSE_PLATFORM_NODE_V3=ON -DBUILD_OBJ_DIR=${BUILD_DIR}/bootloader_v3/obj -G "Unix Makefiles" ../../.. && make
+	cd ${BUILD_DIR}/bootloader_v3/obj && cmake -DCAN_PROTOCOL=bootloader -DUSE_PLATFORM_BOOTLOADER_NODE_V3=ON -DBUILD_OBJ_DIR=${BUILD_DIR}/bootloader_v3/obj -G "Unix Makefiles" ../../.. && make
 
 # Common:
 checks:
