@@ -1,0 +1,96 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+    {
+        "name": "Dronecan (gdb) sitl",
+        "type": "cppdbg",
+        "request": "launch",
+
+        "program": "build/dronecan_sitl/obj/example.out",
+    },
+    {
+        "name": "Cyphal (gdb) sitl",
+        "type": "cppdbg",
+        "request": "launch",
+
+        "program": "build/cyphal_sitl/obj/example.out",
+    },
+    {
+        "type": "cortex-debug",
+        "request": "launch",
+        "name": "Dronecan (OpenOCD) G0",
+        "servertype": "openocd",
+        "runToEntryPoint": "main",
+        "executable": "build/dronecan_v3/obj/Src/platform/stm32g0b1/example.out",
+
+        "device": "STM32G0B1CEU6",
+        "configFiles": [
+            "interface/stlink.cfg",
+            "target/stm32g0x.cfg"
+        ],
+        "showDevDebugOutput": "raw",
+        "overrideLaunchCommands": [
+        "interpreter-exec console \"monitor reset halt\"",
+        "-enable-pretty-printing"
+        ],
+    },
+    {
+        "type": "cortex-debug",
+        "request": "launch",
+        "name": "Dronecan (OpenOCD) F103",
+        "servertype": "openocd",
+        "runToEntryPoint": "main",
+        "executable": "build/dronecan_v2/obj/Src/platform/stm32f103/example.out",
+
+        "device": "STM32F103T8U6",
+        "configFiles": [
+            "interface/stlink.cfg",
+            "target/stm32f1x.cfg"
+        ],
+        "showDevDebugOutput": "raw",
+        "overrideLaunchCommands": [
+        "interpreter-exec console \"monitor reset halt\"",
+        "-enable-pretty-printing"
+        ],
+    },
+    {
+        "type": "cortex-debug",
+        "request": "launch",
+        "name": "Cyphal (OpenOCD) G0",
+        "servertype": "openocd",
+        "runToEntryPoint": "main",
+        "executable": "build/cyphal_v3/obj/Src/platform/stm32g0b1/example.out",
+
+        "device": "STM32G0B1CEU6",
+        "configFiles": [
+            "interface/stlink.cfg",
+            "target/stm32g0x.cfg"
+        ],
+        "showDevDebugOutput": "raw",
+        "overrideLaunchCommands": [
+        "interpreter-exec console \"monitor reset halt\"",
+        "-enable-pretty-printing"
+        ],
+    },
+    {
+        "type": "cortex-debug",
+        "request": "launch",
+        "name": "Cyphal (OpenOCD) F103",
+        "servertype": "openocd",
+        "runToEntryPoint": "main",
+        "executable": "build/cyphal_v2/obj/Src/platform/stm32f103/example.out",
+
+        "device": "STM32F103T8U6",
+        "configFiles": [
+            "interface/stlink.cfg",
+            "target/stm32f1x.cfg"
+        ],
+        "showDevDebugOutput": "raw",
+        "overrideLaunchCommands": [
+        "interpreter-exec console \"monitor reset halt\"",
+        "-enable-pretty-printing"
+        ],
+    }
+    ],
+
+}
