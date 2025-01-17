@@ -106,6 +106,6 @@ void DronecanPwmFrontend::hardpoint_callback(const HardpointCommand& msg) {
     }
 }
 
-void DronecanPwmFrontend::arming_status_callback(const ArmingStatus& msg) {
-    (void)msg;  // Not supported yet, what to do with ArmingStatus?
+void DronecanPwmFrontend::arming_status_callback(const SafetyArmingStatus& msg) {
+    (void)msg;  // Not supported yet, what to do with SafetyArmingStatus?
 }
