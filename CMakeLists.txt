@@ -65,6 +65,14 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WARNING_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNING_FLAGS} -Wno-volatile")
 set(CMAKE_CXX_STANDARD 20)
 
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(STATUS "Debug mode is enabled")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -DDEBUG")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -DDEBUG")
+endif()
+
 # Prebuild
 include(${CMAKE_DIR}/params.cmake)
 include(${CMAKE_DIR}/git.cmake)
@@ -75,10 +83,6 @@ add_definitions(-DHW_VERSION_MINOR=1)
 
 # Project
 project(example CXX C ASM)
-
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-endif()
 
 include(${CMAKE_DIR}/full_firmware_info.cmake)
 
