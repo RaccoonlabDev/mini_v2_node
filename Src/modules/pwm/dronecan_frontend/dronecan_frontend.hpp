@@ -39,8 +39,8 @@ public:
     static void hardpoint_callback(const HardpointCommand& msg);
     static inline DronecanSubscriber<HardpointCommand> hardpoint_sub;
 
-    static void arming_status_callback(const ArmingStatus& msg);
-    static inline DronecanSubscriber<ArmingStatus> arming_status_sub;
+    static void arming_status_callback(const SafetyArmingStatus& msg);
+    static inline DronecanSubscriber<SafetyArmingStatus> arming_status_sub;
 
 private:
     PWMModule* backend;
