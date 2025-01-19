@@ -1,0 +1,5 @@
+[MASTER]
+disable=
+    C0116, # missing-function-docstring
+    C0115, # missing-class-docstring
+    R0903, # too-few-public-methods
