@@ -53,13 +53,10 @@ checks:
 	@python scripts/prebuild_check.py || (echo "Requirements verification failed. Stopping build." && exit 1)
 
 code_style:
-	cpplint Src/modules/*/*pp Src/peripheral/*/*pp Src/platform/*/*pp
+	${ROOT_DIR}/scripts/code_style.sh
 
 tests:
-	mkdir -p ${BUILD_DIR}/tests/as5600
-	mkdir -p ${BUILD_DIR}/tests/sht3x
-	cd ${BUILD_DIR}/tests/as5600 && cmake ../../../Src/drivers/as5600/tests && make && ./test_as5600
-	cd ${BUILD_DIR}/tests/sht3x && cmake ../../../Src/drivers/sht3x/tests && make && ./test_sht3x
+	${ROOT_DIR}/scripts/tests.sh
 
 upload:
 	LATEST_TARGET=$$(ls -td ${BUILD_DIR}/release/*.bin | head -1) && ./scripts/tools/stm32/flash.sh $$LATEST_TARGET
