@@ -31,6 +31,10 @@ def is_dir_nonempty(directory) -> bool:
 def is_first_build() -> bool:
     return not is_dir_nonempty(BUILD_DIR)
 
+def is_precommit_hook_configured(repo_path: str = REPO_DIR) -> bool:
+    pre_commit_hook_path = os.path.join(repo_path, '.git', 'hooks', 'pre-commit')
+    return os.path.isfile(pre_commit_hook_path) and os.access(pre_commit_hook_path, os.X_OK)
+
 def get_all_branch_tags() -> str:
     cmd = ["git", "tag", "--merged"]
     tags = subprocess.check_output(cmd, stderr=subprocess.DEVNULL, text=True).strip()
@@ -118,6 +122,44 @@ class PrebuildChecker:
         except KeyboardInterrupt:
             sys.exit(1)
 
+    def check_pre_commit_hook(self) -> None:
+        """
+        Check if the pre-commit hook is configured. If not, prompt the user to create it.
+        """
+
+        if is_precommit_hook_configured():
+            logger.info("The pre-commit hook is already configured.")
+            return
+
+        logger.info("The pre-commit hook is not configured.")
+        if not self.prompt:
+            return
+
+        hook_path = os.path.join('.git', 'hooks', 'pre-commit')
+        hook_script = (
+            "#!/bin/bash\n"
+            "CRNT_DIR=$( cd -- \"$( dirname -- \"${BASH_SOURCE[0]}\" )\" &> /dev/null && pwd )\n"
+            "GIT_DIR=\"$(dirname \"$CRNT_DIR\")\"\n"
+            "REPO_DIR=\"$(dirname \"$GIT_DIR\")\"\n"
+            "${REPO_DIR}/scripts/pre_commit.sh\n"
+        )
+        try:
+            user_input = input("Do you want to create a pre-commit hook? [y/N]:\n").strip().lower()
+            if user_input != 'y':
+                logger.info("Skipped pre-commit hook setup.")
+                return
+
+            # Write the hook script
+            with open(hook_path, 'w', encoding="utf-8") as hook_file:
+                hook_file.write(hook_script)
+
+            # Make the hook executable
+            os.chmod(hook_path, 0o700)
+            logger.info("Pre-commit hook created successfully at '%s'.", hook_path)
+
+        except KeyboardInterrupt:
+            sys.exit(1)
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.ERROR)
     logger.setLevel(logging.DEBUG)
@@ -131,3 +173,4 @@ if __name__ == "__main__":
         checker.check_branch_tags()
         checker.check_python_requirements()
         checker.check_submodules()
+        checker.check_pre_commit_hook()
