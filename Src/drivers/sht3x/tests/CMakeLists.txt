@@ -1,7 +1,7 @@
 # Copyright (C) 2024 Dmitry Ponomarev <ponomarevda96@gmail.com>
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.15.3)
 project(sht3x)
 
 add_library(sht3x
