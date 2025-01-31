@@ -19,18 +19,39 @@ if(USE_PLATFORM_UBUNTU)
     set(CAN_PLATFORM socketcan)
     set(APP_PLATFORM ubuntu)
     set(PLATFORM_NAME sitl)
+    include(${CMAKE_DIR}/toolchain-ubuntu.cmake)
 elseif(USE_PLATFORM_NODE_V2)
     set(LIBPARAMS_PLATFORM stm32f103)
     set(CAN_PLATFORM bxcan)
     set(APP_PLATFORM stm32f103)
     set(PLATFORM_NAME v2)
-    include(${CMAKE_DIR}/stm32f103xB.cmake)
+
+    set(stm32cubeMxProjectPath  ${ROOT_DIR}/Libs/stm32-cube-project)
+    FILE(GLOB ldFile            ${stm32cubeMxProjectPath}/*_FLASH.ld)
+    FILE(GLOB coreSources       ${stm32cubeMxProjectPath}/Core/Src/*)
+    FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c)
+    FILE(GLOB startupFile       ${stm32cubeMxProjectPath}/*.s
+                                ${stm32cubeMxProjectPath}/Core/Startup/*.s
+    )
+
+    set(CMAKE_EXE_LINKER_FLAGS "-T${ldFile} -Wl,-Map=${PROJECT_NAME}.map,--cref")
+    include(${CMAKE_DIR}/toolchain-stm32f103xB.cmake)
 elseif(USE_PLATFORM_NODE_V3)
     set(LIBPARAMS_PLATFORM stm32g0b1)
     set(CAN_PLATFORM fdcan)
     set(APP_PLATFORM stm32g0b1)
     set(PLATFORM_NAME v3)
-    include(${CMAKE_DIR}/stm32g0b1.cmake)
+
+    set(stm32cubeMxProjectPath  ${ROOT_DIR}/Libs/mini-v3-ioc)
+    FILE(GLOB ldFile            ${stm32cubeMxProjectPath}/*_FLASH.ld)
+    FILE(GLOB coreSources       ${stm32cubeMxProjectPath}/Core/Src/*)
+    FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c)
+    FILE(GLOB startupFile       ${stm32cubeMxProjectPath}/*.s
+                                ${stm32cubeMxProjectPath}/Core/Startup/*.s
+    )
+
+    set(CMAKE_EXE_LINKER_FLAGS "-T${ldFile} -Wl,-Map=${PROJECT_NAME}.map,--cref")
+    include(${CMAKE_DIR}/toolchain-stm32g0b1.cmake)
     add_compile_definitions(CYPHAL_NUM_OF_CAN_BUSES=2)
 else()
     message(SEND_ERROR "Platform Error: Either v2 (stm32f103), v3 (stm32g0) or SITL (Linux) should be specified.")
