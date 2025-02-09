@@ -22,7 +22,7 @@ Not suported or tested yet / In Roadmap:
 - [ ] Dynamics Node Allocation (DNA),
 - [ ] Vibration Analysis: estimate dominant frequency and magnitude of vibrations for diagnosing mechanical issues or ensuring smooth operation in drones or robotic platforms in real time,
 
-### 2. SUPPORTED HARDWARE
+### 2. TARGET HARDWARE
 
 The software supports RL v2 nodes (stm32f103, 128 KBytes flash) and v3 nodes (stm32g0b1, 512 KBytes flash).
 
@@ -30,15 +30,6 @@ The software supports RL v2 nodes (stm32f103, 128 KBytes flash) and v3 nodes (st
 | ---- | ---- | ------ | ----------- |
 | Mini v2 </br> stm32f103 </br> 128 KBytes flash | <img src="https://docs.raccoonlab.co/assets/img/view_top.6b0ef99e.png" alt="drawing" width="120"> | <img src="https://docs.raccoonlab.co/assets/img/pinout.c14a3021.png" alt="drawing" width="120"> | <img src="https://raw.githubusercontent.com/RaccoonLabHardware/mini_v2_stm32cubemx_project/main/Assets/stm32cubemx.png" alt="drawing" width="160"> |
 | Mini v3 </br> stm32fg0b1 </br> 512 KBytes flash | <img src="https://docs.raccoonlab.co/assets/img/t-view-bottom.7eadba26.png" alt="drawing" width="120"> | <img src="https://docs.raccoonlab.co/assets/img/pinout.e7b1d6b7.png" alt="drawing" width="120"> | <img src="https://github.com/RaccoonLabHardware/v3-software-template/blob/main/Assets/stm32cubemx.png" alt="drawing" width="160"> |
-
-The following table outlines the compatibility of the project with different operating systems, modes, and support timelines.
-
-| **Operating System** | **DroneCAN Support** | **Cyphal Support** | **Notes**                              |
-|-----------------------|-----------------------|---------------------|----------------------------------------|
-| Ubuntu 24.04          | ✅ Supported          | ✅ Supported        | Latest Ubuntu LTS version.             |
-| Ubuntu 22.04          | ✅ Supported          | ✅ Supported        | Fully supported for both modes.        |
-| Ubuntu 20.04          | ✅ Supported          | ❌ Not Supported    | Will be deprecated in April, 2026. |
-| Windows (2022)      | ✅ Supported          | ✅ Supported        | Current "latest" Windows version.      |
 
 ### 3. USE CASES
 
@@ -90,12 +81,33 @@ This node is a versatile device integrating PWM control, IMU sensing, and dual C
 
     > Software doesn't support it yet...
 
+### 4. INSTALLATION
 
-### 4. Q&A
+The following table outlines the compatibility of the project with different operating systems, modes, and support timelines.
+
+| **Operating System** | **DroneCAN Support** | **Cyphal Support** | **Notes**                              |
+|----------------------|----------------------|--------------------|----------------------------------------|
+| Manjaro (latest)     | ✅ Supported         | ✅ Supported       | Latest Manjaro LTS version.            |
+| Ubuntu 24.04         | ✅ Supported         | ✅ Supported       | Latest Ubuntu LTS version.             |
+| Ubuntu 22.04         | ✅ Supported         | ✅ Supported       | Fully supported for both modes.        |
+| Ubuntu 20.04         | ✅ Supported         | ❌ Not Supported   | Will be deprecated in April, 2026.     |
+| Windows (2022)       | ✅ Supported         | ✅ Supported       | Current "latest" Windows version.      |
+
+The installation process is the same Ubuntu, Manjaro and Windows and it consists of 2 steps:
+
+```bash
+# 1. Install python requirements
+pip install -r requirements.txt
+
+# 2. Install other requirements
+./scripts/install.py
+```
+
+### 5. Q&A
 
 If you are strugguling with the software building, please refer to the build workflow [build.yml](.github/workflows/build.yml) for a hint. If it doesn't help, you can open [an issue]( https://github.com/RaccoonlabDev/mini_v2_node/issues?q=is%3Aissue+).
 
-### 5. More examples
+### 6. More examples
 
 Consider the following projects as examples:
 

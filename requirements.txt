@@ -1,1 +1,4 @@
+setuptools
+pyyaml
+cpplint
 raccoonlab-tools==0.2.0

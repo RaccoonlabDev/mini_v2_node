@@ -11,11 +11,19 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-22.04
+          - runs-on: ubuntu-22.04
+            container: "ubuntu:22.04"
             target: all
-          - os: windows-2022
+
+          - runs-on: windows-2022
+            container: ""  # Containers on Windows runners are not supported
             target: dronecan_v2
-    runs-on: ${{ matrix.os }}
+
+          - runs-on: ubuntu-22.04
+            container: "manjaro:latest"
+            target: "all"
+
+    runs-on: ${{ matrix.runs-on }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -23,21 +31,16 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Install dependencies
+      - name: Install dependencies (Ubuntu & Manjaro & Windows)
         run: |
-          python -m pip install -r requirements.txt
+          pip install -r requirements.txt
           python -m pip install yakut
-          if [ "${{ runner.os }}" == "Linux" ]; then
-            sudo apt-get install -y gcc-arm-none-eabi
-          elif [ "${{ runner.os }}" == "Windows" ]; then
-            choco install -y gcc-arm-embedded make
-            choco install -y cmake
-          fi
+          python scripts/install.py
         shell: bash
 
       - name: Build
         run: make ${{ matrix.target }}
 
       - name: Deploy binaries to Telegram
-        if: matrix.os == 'ubuntu-22.04' && matrix.target == 'all' && github.ref == 'refs/heads/main' && github.repository == 'RaccoonlabDev/mini_v2_node'
+        if: matrix.runs-on == 'ubuntu-22.04' && matrix.target == 'all' && github.ref == 'refs/heads/main' && github.repository == 'RaccoonlabDev/mini_v2_node'
         run: ./scripts/deploy_release_to_telegram.py --bot-token ${{ secrets.TELEGRAM_BOT_TOKEN }} --chat-id ${{ secrets.TELEGRAM_CHAT_ID }}
