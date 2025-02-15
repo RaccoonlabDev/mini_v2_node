@@ -8,3 +8,5 @@ list(APPEND APPLICATION_SOURCES
 list(APPEND LIBPARAMS_PARAMS
     ${CMAKE_CURRENT_LIST_DIR}/params.yaml
 )
+
+include(${SRC_DIR}/peripheral/adc/CMakeLists.txt)

@@ -5,7 +5,6 @@
  */
 
 #include "peripheral/i2c/i2c.hpp"
-#include "main.h"
 
 namespace HAL {
 

@@ -7,13 +7,13 @@ cmake_path(GET DRIVERS_DIR PARENT_PATH SRC_DIR)
 cmake_path(GET SRC_DIR PARENT_PATH ROOT_DIR)
 
 # Include guard
-if(SRC_DRIVERS_AS5600_DIR)
+if(SRC_DRIVERS_SHT3X_DIR)
     return()
 endif()
-set(SRC_DRIVERS_AS5600_DIR ${CMAKE_CURRENT_LIST_DIR})
+set(SRC_DRIVERS_SHT3X_DIR ${CMAKE_CURRENT_LIST_DIR})
 
 list(APPEND APPLICATION_SOURCES
-    ${ROOT_DIR}/Src/drivers/as5600/as5600.cpp
+    ${ROOT_DIR}/Src/drivers/sht3x/sht3x.cpp
 )
 
 include(${ROOT_DIR}/Src/peripheral/i2c/CMakeLists.txt)
