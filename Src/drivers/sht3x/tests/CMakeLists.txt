@@ -4,25 +4,44 @@
 cmake_minimum_required(VERSION 3.15.3)
 project(sht3x)
 
-add_library(sht3x
-    ../sht3x.cpp
-    ../../../Src/platform/ubuntu/i2c.cpp
+#
+# Pathes
+#
+cmake_path(GET CMAKE_CURRENT_LIST_DIR PARENT_PATH DRIVER_DIR)
+cmake_path(GET DRIVER_DIR PARENT_PATH DRIVERS_DIR)
+cmake_path(GET DRIVERS_DIR PARENT_PATH SRC_DIR)
+cmake_path(GET SRC_DIR PARENT_PATH ROOT_DIR)
+
+#
+# Config
+#
+set(APP_PLATFORM ubuntu)
+
+#
+# Dependencies
+#
+find_package(GTest REQUIRED)
+
+#
+# Includes
+#
+include(${DRIVER_DIR}/CMakeLists.txt)
+
+#
+# Target
+#
+set(EXECUTABLE test_${PROJECT_NAME})
+add_executable(${EXECUTABLE}
+    main.cpp
+    ${APPLICATION_SOURCES}
+    ${PERIPHERAL_SOURCES}
 )
 
-target_include_directories(sht3x PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-
-find_package(GTest REQUIRED)
-include_directories(
+target_include_directories(${EXECUTABLE} PRIVATE
     ${GTEST_INCLUDE_DIRS}
     ../../../../Src
 )
 
-add_executable(test_sht3x
-    test_sht3x.cpp
-)
-
-target_link_libraries(test_sht3x
-    sht3x
+target_link_libraries(${EXECUTABLE}
     GTest::GTest
-    GTest::Main
 )
