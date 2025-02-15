@@ -4,8 +4,8 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#ifndef SRC_PLATFORM_STM32_PWM_HPP_
-#define SRC_PLATFORM_STM32_PWM_HPP_
+#ifndef SRC_PERIPHERAL_PWM_STM32_PWM_HPP_
+#define SRC_PERIPHERAL_PWM_STM32_PWM_HPP_
 
 #include <stdint.h>
 #include <array>
@@ -24,4 +24,4 @@ extern const std::array<PwmPinInfo, static_cast<uint8_t>(PwmPin::PWM_AMOUNT)> pw
 
 }  // namespace HAL
 
-#endif  // SRC_PLATFORM_STM32_PWM_HPP_
+#endif  // SRC_PERIPHERAL_PWM_STM32_PWM_HPP_

@@ -4,7 +4,7 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#include "pwm.hpp"
+#include "pwm_stm32.hpp"
 #include "common/algorithms.hpp"
 
 extern TIM_HandleTypeDef htim4;

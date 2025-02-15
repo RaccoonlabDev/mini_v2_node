@@ -19,3 +19,5 @@ if(CAN_PROTOCOL STREQUAL "cyphal" OR CAN_PROTOCOL STREQUAL "both")
     list(APPEND LIBPARAMS_PARAMS ${SETPOINT_MODULE_DIR}/cyphal_frontend/params.yaml)
     list(APPEND APPLICATION_SOURCES ${CMAKE_CURRENT_LIST_DIR}/cyphal_frontend/cyphal_frontend.cpp)
 endif()
+
+include(${SRC_DIR}/drivers/rcpwm/CMakeLists.txt)
