@@ -62,7 +62,7 @@ upload:
 	LATEST_TARGET=$$(ls -td ${BUILD_DIR}/release/*.bin | head -1) && ./scripts/tools/stm32/flash.sh $$LATEST_TARGET
 run:
 	./scripts/tools/can/vcan.sh slcan0
-	LATEST_TARGET=$$(ls -td ${BUILD_DIR}/* | head -1) && $$LATEST_TARGET/obj/example.out
+	LATEST_TARGET=$$(ls -td ${BUILD_DIR}/* | head -1) && $$LATEST_TARGET/obj/node
 clean_releases:
 	-rm -fR ${BUILD_DIR}/release
 clean:
