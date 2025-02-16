@@ -1,11 +1,7 @@
 # Copyright (C) 2023-2024 Dmitry Ponomarev <ponomarevda96@gmail.com>
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 
-include(${ROOT_DIR}/Src/peripheral/adc/CMakeLists.txt)
-include(${ROOT_DIR}/Src/peripheral/gpio/CMakeLists.txt)
-include(${ROOT_DIR}/Src/peripheral/iwdg/CMakeLists.txt)
-
-set(EXECUTABLE ${PROJECT_NAME}.out)
+set(EXECUTABLE ${PROJECT_NAME})
 add_executable(${EXECUTABLE}
     ${APPLICATION_SOURCES}
     ${PERIPHERAL_SOURCES}

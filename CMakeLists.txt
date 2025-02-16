@@ -80,12 +80,6 @@ include(${LIBPARAMS_PATH}/CMakeLists.txt)
 list(APPEND APPLICATION_HEADERS ${ROOT_DIR}/Src ${APPLICATION_DIR})
 include(${APPLICATION_DIR}/CMakeLists.txt)
 
-# Set compile options
-set(WARNING_FLAGS "-Wall -Wextra -Wfloat-equal -Werror -Wundef -Wshadow -Wpointer-arith -Wunreachable-code -Wstrict-overflow=5 -Wwrite-strings -Wswitch-default")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WARNING_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNING_FLAGS} -Wno-volatile")
-set(CMAKE_CXX_STANDARD 20)
-
 # Prebuild
 include(${CMAKE_DIR}/params.cmake)
 include(${CMAKE_DIR}/git.cmake)
@@ -95,12 +89,16 @@ add_definitions(-DHW_VERSION_MAJOR=2)
 add_definitions(-DHW_VERSION_MINOR=1)
 
 # Project
-project(example CXX C ASM)
+project(node CXX C ASM)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
 include(${CMAKE_DIR}/full_firmware_info.cmake)
+
+include(${ROOT_DIR}/Src/peripheral/adc/CMakeLists.txt)
+include(${ROOT_DIR}/Src/peripheral/gpio/CMakeLists.txt)
+include(${ROOT_DIR}/Src/peripheral/iwdg/CMakeLists.txt)
 
 add_subdirectory(${ROOT_DIR}/Src/platform/${APP_PLATFORM})
