@@ -2,6 +2,7 @@
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 
 include(${ROOT_DIR}/Src/peripheral/adc/CMakeLists.txt)
+include(${ROOT_DIR}/Src/peripheral/iwdg/CMakeLists.txt)
 
 set(EXECUTABLE ${PROJECT_NAME}.out)
 add_executable(${EXECUTABLE}
@@ -15,7 +16,6 @@ add_executable(${EXECUTABLE}
 
     ${ROOT_DIR}/Src/peripheral/adc/circuit_periphery.cpp
     ${CMAKE_CURRENT_LIST_DIR}/pwm.cpp
-    ${ROOT_DIR}/Src/platform/stm32/iwdg/iwdg.cpp
     ${ROOT_DIR}/Src/platform/stm32/platform_specific.cpp
 
     ${coreSources}

@@ -7,6 +7,7 @@ cmake_path(GET PLATFORM_DIR PARENT_PATH SRC_DIR)
 cmake_path(GET SRC_DIR PARENT_PATH ROOT_DIR)
 
 include(${ROOT_DIR}/Src/peripheral/adc/CMakeLists.txt)
+include(${ROOT_DIR}/Src/peripheral/iwdg/CMakeLists.txt)
 
 set(EXECUTABLE ${PROJECT_NAME}.out)
 add_executable(${EXECUTABLE}
@@ -21,7 +22,6 @@ add_executable(${EXECUTABLE}
     ${ROOT_DIR}/Src/peripheral/adc/circuit_periphery.cpp
     ${CMAKE_CURRENT_LIST_DIR}/gpio.cpp
     ${PLATFORM_DIR}/stm32g0b1/pwm.cpp
-    ${ROOT_DIR}/Src/platform/stm32/iwdg/iwdg.cpp
     ${ROOT_DIR}/Src/platform/stm32/platform_specific.cpp
 
     ${coreSources}
