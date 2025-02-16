@@ -2,6 +2,7 @@
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 
 include(${ROOT_DIR}/Src/peripheral/adc/CMakeLists.txt)
+include(${ROOT_DIR}/Src/peripheral/gpio/CMakeLists.txt)
 include(${ROOT_DIR}/Src/peripheral/iwdg/CMakeLists.txt)
 
 set(EXECUTABLE ${PROJECT_NAME}.out)

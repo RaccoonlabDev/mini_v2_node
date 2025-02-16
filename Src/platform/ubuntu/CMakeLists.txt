@@ -2,6 +2,7 @@
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 
 include(${ROOT_DIR}/Src/peripheral/adc/CMakeLists.txt)
+include(${ROOT_DIR}/Src/peripheral/gpio/CMakeLists.txt)
 include(${ROOT_DIR}/Src/peripheral/iwdg/CMakeLists.txt)
 
 # Generate temp parameters for SITL
@@ -18,7 +19,6 @@ add_executable(${EXECUTABLE}
     ${ROOT_DIR}/Src/common/module.cpp
 
     ${ROOT_DIR}/Src/peripheral/adc/circuit_periphery.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/gpio.cpp
     ${CMAKE_CURRENT_LIST_DIR}/platform_specific.cpp
 )
 

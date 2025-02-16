@@ -8,14 +8,12 @@
 #include <array>
 #include <bitset>
 #include "peripheral/adc/circuit_periphery.hpp"
+#include "peripheral/gpio/gpio.hpp"
+#include "peripheral/iwdg/iwdg.hpp"
 #include "peripheral/led/led.hpp"
 #include "params.hpp"
 #include "module.hpp"
 #include "main.h"
-
-#include "peripheral/led/led.hpp"
-#include "peripheral/gpio/gpio.hpp"
-#include "peripheral/iwdg/iwdg.hpp"
 
 static int8_t init_board_periphery() {
     Board::Led::reset();
@@ -27,16 +25,11 @@ static int8_t init_board_periphery() {
     paramsLoad();
 
 #if defined(CAN1_TERMINATOR_Pin) && defined(CAN2_TERMINATOR_Pin)
-    auto teminator_parm = paramsGetIntegerValue(IntParamsIndexes::PARAM_SYSTEM_CAN_TEMINATOR);
+    auto teminator_param = paramsGetIntegerValue(IntParamsIndexes::PARAM_SYSTEM_CAN_TEMINATOR);
 
-    std::bitset<2> terminator_mask(teminator_parm);
-    for (uint8_t i = 0; i < 2; i++) {
-        if (terminator_mask[i]) {
-            GPIOPeriphery::set(GPIOPin(i));
-        } else {
-            GPIOPeriphery::reset(GPIOPin(i));
-        }
-    }
+    std::bitset<2> terminator_mask(teminator_param);
+    HAL::GPIO::set(HAL::GPIO::Pin::CAN1_TERMINATOR, terminator_mask[0]);
+    HAL::GPIO::set(HAL::GPIO::Pin::CAN2_TERMINATOR, terminator_mask[1]);
 #endif
     return 0;
 }
