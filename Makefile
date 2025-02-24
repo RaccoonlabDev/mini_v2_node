@@ -48,6 +48,14 @@ v3: checks generate_dsdl clean
 	mkdir -p ${BUILD_DIR}/both_v3/obj
 	cd ${BUILD_DIR}/both_v3/obj && cmake -DCAN_PROTOCOL=both -DUSE_PLATFORM_NODE_V3=ON -G "Unix Makefiles" ../../.. && make
 
+# Bootloader
+bootloader: bootloader_v3
+bootloader_v3: generate_dsdl
+	./scripts/install_bootloader.sh
+
+	mkdir -p ${BUILD_DIR}/bootloader_v3/obj
+	cd ${BUILD_DIR}/bootloader_v3/obj && cmake -DCAN_PROTOCOL=bootloader -DUSE_PLATFORM_BOOTLOADER_NODE_V3=ON -DBUILD_OBJ_DIR=${BUILD_DIR}/bootloader_v3/obj -G "Unix Makefiles" ../../.. && make
+
 # Common:
 checks:
 	@python scripts/prebuild_check.py || (echo "Requirements verification failed. Stopping build." && exit 1)
