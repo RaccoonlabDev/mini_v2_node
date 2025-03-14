@@ -18,17 +18,28 @@ jobs:
             target: dronecan_v2
 
           - runs-on: ubuntu-22.04
-            container: manjaroarm/manjaro-aarch64-base
+            container: archlinux:latest
             target: "all"
 
     runs-on: ${{ matrix.runs-on }}
     container: ${{ matrix.container }}
     timeout-minutes: 10
     steps:
+      - name: Install Git and dependencies
+        run: |
+          if [[ -f /etc/os-release ]]; then
+            . /etc/os-release
+            echo "OS: $NAME"
+            if [[ "$NAME" == "Arch Linux" ]]; then
+              pacman -Sy --noconfirm git
+            fi
+          fi
+        shell: bash
       - uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
+
 
       - name: Install dependencies (Ubuntu & Manjaro & Windows)
         run: |
