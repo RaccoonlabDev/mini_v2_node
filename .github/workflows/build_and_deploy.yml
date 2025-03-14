@@ -12,11 +12,9 @@ jobs:
       matrix:
         include:
           - runs-on: ubuntu-22.04
-            container: "ubuntu:22.04"
             target: all
 
           - runs-on: windows-2022
-            container: ""  # Containers on Windows runners are not supported
             target: dronecan_v2
 
           - runs-on: ubuntu-22.04
@@ -24,6 +22,7 @@ jobs:
             target: "all"
 
     runs-on: ${{ matrix.runs-on }}
+    container: ${{ matrix.container }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
