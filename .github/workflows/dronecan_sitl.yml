@@ -1,11 +1,6 @@
 name: dronecan_sitl
-on:
-  push:
-    branches:
-    - main
-  pull_request:
-    branches:
-    - '*'
+on: push
+
 jobs:
   sitl:
     strategy:
