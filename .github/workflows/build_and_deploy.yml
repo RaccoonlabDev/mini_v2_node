@@ -1,11 +1,7 @@
 name: build_and_deploy
-on:
-  push:
-    branches:
-    - main
-  pull_request:
-    branches:
-    - '*'
+
+on: push
+
 jobs:
   build_and_deploy:
     strategy:
@@ -41,6 +37,14 @@ jobs:
       - name: Build
         run: make ${{ matrix.target }}
 
+      # if: matrix.runs-on == 'ubuntu-22.04' && github.ref == 'refs/heads/main' && github.repository == 'RaccoonlabDev/mini_v2_node'
+
       - name: Deploy binaries to Telegram
-        if: matrix.runs-on == 'ubuntu-22.04' && matrix.target == 'all' && github.ref == 'refs/heads/main' && github.repository == 'RaccoonlabDev/mini_v2_node'
-        run: ./scripts/deploy_release_to_telegram.py --bot-token ${{ secrets.TELEGRAM_BOT_TOKEN }} --chat-id ${{ secrets.TELEGRAM_CHAT_ID }}
+        if: matrix.runs-on == 'ubuntu-22.04' && github.repository == 'RaccoonlabDev/mini_v2_node'
+        uses: PonomarevDA/telegram-upload@v1.0.1
+        with:
+          bot_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          files: build/release/*.bin
+          message: "Node"
+          add_git_info: "true"
