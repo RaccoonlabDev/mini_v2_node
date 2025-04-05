@@ -1,11 +1,6 @@
 name: tests
-on:
-  push:
-    branches:
-    - main
-  pull_request:
-    branches:
-    - '*'
+on: push
+
 jobs:
   tests:
     runs-on: ubuntu-22.04

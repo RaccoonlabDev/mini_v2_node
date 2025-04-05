@@ -1,11 +1,6 @@
 name: cyphal_sitl
-on:
-  push:
-    branches:
-    - main
-  pull_request:
-    branches:
-    - '*'
+on: push
+
 jobs:
   sitl:
     runs-on: ubuntu-22.04

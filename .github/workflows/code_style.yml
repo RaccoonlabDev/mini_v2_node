@@ -1,12 +1,5 @@
 name: code_style
-
-on:
-  push:
-    branches:
-    - main
-  pull_request:
-    branches:
-    - '*'
+on: push
 
 jobs:
   cpplint:
