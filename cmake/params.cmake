@@ -21,11 +21,11 @@ if(NOT result EQUAL 0)
     message(FATAL_ERROR "Failed to execute generate_params.py script. Return code: ${result}")
 endif()
 
-execute_process(
-    COMMAND python3 ${LIBPARAMS_PATH}/scripts/generate_docs.py --output ${DOC_PATH} ${LIBPARAMS_PARAMS}
-    WORKING_DIRECTORY ${APPLICATION_DIR}
-    RESULT_VARIABLE result
-)
-if(NOT result EQUAL 0)
-    message(FATAL_ERROR "Failed to execute generate_docs.py script. Return code: ${result}")
-endif()
+# execute_process(
+#     COMMAND python3 ${LIBPARAMS_PATH}/scripts/generate_docs.py --output ${DOC_PATH} ${LIBPARAMS_PARAMS}
+#     WORKING_DIRECTORY ${APPLICATION_DIR}
+#     RESULT_VARIABLE result
+# )
+# if(NOT result EQUAL 0)
+#     message(FATAL_ERROR "Failed to execute generate_docs.py script. Return code: ${result}")
+# endif()
