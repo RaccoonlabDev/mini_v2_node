@@ -37,7 +37,7 @@ def main():
             
             elif "manjaro" in os_info:
                 print("Detected Manjaro. Installing packages...")
-                run_command("sudo pacman -S cmake arm-none-eabi-gcc arm-none-eabi-binutils arm-none-eabi-newlib")
+                run_command("sudo pacman -S python-pip cmake arm-none-eabi-gcc arm-none-eabi-binutils arm-none-eabi-newlib")
 
             else:
                 print("Unknown Linux distribution.")

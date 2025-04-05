@@ -7,19 +7,18 @@ jobs:
     strategy:
       matrix:
         include:
-          - runs-on: ubuntu-22.04
-            container: "ubuntu:22.04"
+          - runner: ubuntu-22.04
+            image: "" # Let's use a GitHub-hosted virtual machine itself
             target: all
 
-          - runs-on: windows-2022
-            container: ""  # Containers on Windows runners are not supported
+          - runner: windows-2022
+            image: ""  # Containers on Windows runners are not supported
             target: dronecan_v2
 
-          - runs-on: ubuntu-22.04
-            container: "manjaro:latest"
-            target: "all"
+    runs-on: ${{ matrix.runner }}
+    container:
+      image: ${{ matrix.image }}
 
-    runs-on: ${{ matrix.runs-on }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -37,10 +36,10 @@ jobs:
       - name: Build
         run: make ${{ matrix.target }}
 
-      # if: matrix.runs-on == 'ubuntu-22.04' && github.ref == 'refs/heads/main' && github.repository == 'RaccoonlabDev/mini_v2_node'
-
       - name: Deploy binaries to Telegram
-        if: matrix.runs-on == 'ubuntu-22.04' && github.repository == 'RaccoonlabDev/mini_v2_node'
+        if: matrix.runner == 'ubuntu-22.04' &&
+            github.ref == 'refs/heads/${{ github.event.repository.default_branch }}' &&
+            github.repository == 'RaccoonlabDev/mini_v2_node'
         uses: PonomarevDA/telegram-upload@v1.0.1
         with:
           bot_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
