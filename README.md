@@ -90,7 +90,7 @@ The following table outlines the compatibility of the project with different ope
 | Manjaro (latest)     | ✅ Supported         | ✅ Supported       | Latest Manjaro LTS version.            |
 | Ubuntu 24.04         | ✅ Supported         | ✅ Supported       | Latest Ubuntu LTS version.             |
 | Ubuntu 22.04         | ✅ Supported         | ✅ Supported       | Fully supported for both modes.        |
-| Ubuntu 20.04         | ✅ Supported         | ❌ Not Supported   | Will be deprecated in April, 2026.     |
+| Ubuntu 20.04         | ❌ Not Supported     | ❌ Not Supported   | Deprecated in 2025-04-15.              |
 | Windows (2022)       | ✅ Supported         | ✅ Supported       | Current "latest" Windows version.      |
 
 The installation process is the same Ubuntu, Manjaro and Windows and it consists of 2 steps:

@@ -40,7 +40,7 @@ jobs:
           matrix.runner == 'ubuntu-22.04' &&
           github.ref_name == github.event.repository.default_branch &&
           github.repository == 'RaccoonlabDev/mini_v2_node'
-        uses: PonomarevDA/telegram-upload@v1.0.1
+        uses: PonomarevDA/telegram-upload@v1
         with:
           bot_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
