@@ -8,7 +8,6 @@ jobs:
         include:
           - os: ubuntu-24.04
           - os: ubuntu-22.04
-          - os: ubuntu-20.04
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     steps:
@@ -21,14 +20,6 @@ jobs:
         run: |
           pip install -r requirements.txt
           sudo apt-get install -y gcc-arm-none-eabi linux-modules-extra-$(uname -r)
-
-      - name: Setup GCC for Ubuntu 20.04
-        if: matrix.os == 'ubuntu-20.04'
-        run: |
-          sudo apt update
-          sudo apt install -y gcc-10 g++-10
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100
 
       - name: Build SITL DroneCAN
         run: make sitl_dronecan
