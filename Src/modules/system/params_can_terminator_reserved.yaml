@@ -1,0 +1,8 @@
+system.reserved1:
+  type: Integer
+  note: Bitmask which switch can terminators (0 - both off, 1 - enables second, 2 - enables first, 3 - enables both). Works only for v3.
+  enum: PARAM_SYSTEM_CAN_TEMINATOR
+  flags: mutable
+  default: 0
+  min: 0
+  max: 0
