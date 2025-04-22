@@ -39,10 +39,6 @@ public:
     PWMModule() : Module(50, Protocol::CYPHAL_AND_DRONECAN) {}
     void init() override;
 
-    static constexpr uint8_t get_pins_amount() {
-        return static_cast<uint8_t>(HAL::PwmPin::PWM_AMOUNT);
-    }
-
     static int8_t get_pin_channel(uint8_t pin_idx);
     static bool is_pin_enabled(uint8_t pin_idx);
     static uint8_t get_pin_percent(uint8_t pin_idx);

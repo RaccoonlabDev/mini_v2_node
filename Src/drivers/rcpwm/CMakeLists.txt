@@ -8,6 +8,7 @@ endif()
 set(SRC_DRIVERS_RCPWM_DIR ${CMAKE_CURRENT_LIST_DIR})
 
 list(APPEND APPLICATION_SOURCES
+    ${CMAKE_CURRENT_LIST_DIR}/rcpwm.cpp
 )
 
 include(${ROOT_DIR}/Src/peripheral/pwm/CMakeLists.txt)
