@@ -8,7 +8,6 @@
 #include <algorithm>
 #include "cyphalNode/cyphal.hpp"
 #include "params.hpp"
-#include "peripheral/pwm/pwm.hpp"
 #include "peripheral/adc/circuit_periphery.hpp"
 
 REGISTER_MODULE(CyphalFeedbackModule)
@@ -35,7 +34,7 @@ void CyphalFeedbackModule::spin_once() {
 
         udral_feedback.msg.heartbeat.health.value = uavcan_node_Health_1_0_NOMINAL;
         udral_feedback.msg.heartbeat.readiness.value = reg_udral_service_common_Readiness_0_1_ENGAGED;
-        udral_feedback.msg.demand_factor_pct = PWMModule::get_pin_percent(pin_idx);
+        udral_feedback.msg.demand_factor_pct = Driver::RCPWM::get_pin_percent(pin_idx);
         udral_feedback.publish();
     }
 
@@ -50,7 +49,7 @@ void CyphalFeedbackModule::spin_once() {
             .dc_current = CircuitPeriphery::current(),
             .phase_current_amplitude = CircuitPeriphery::current(),
             .velocity = 0,
-            .demand_factor_pct = (int8_t)PWMModule::get_pin_percent(pin_idx),
+            .demand_factor_pct = (int8_t)Driver::RCPWM::get_pin_percent(pin_idx),
         };
         compact_feedback.publish();
     }

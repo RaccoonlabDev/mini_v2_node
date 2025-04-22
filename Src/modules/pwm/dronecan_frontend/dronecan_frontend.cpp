@@ -6,8 +6,8 @@
  */
 
 #include "dronecan_frontend.hpp"
-#include <limits>
 #include "modules/pwm/main.hpp"
+#include "common/zip.hpp"
 
 void DronecanPwmFrontend::init(PWMModule* backend_) {
     backend = backend_;
@@ -32,22 +32,22 @@ void DronecanPwmFrontend::raw_command_callback(const RawCommand_t& msg) {
         return;
     }
 
-    for (auto& pwm : PWMModule::params) {
+    for (auto&& [pwm, timing] : zip(Driver::RCPWM::channels, PWMModule::timings)) {
         if (pwm.channel >= msg.size || pwm.channel < 0) {
             continue;
         }
 
-        auto cmd = msg.raw_cmd[pwm.channel];
-        pwm.last_recv_time_ms = HAL_GetTick();
+        auto cmd_int14 = msg.raw_cmd[pwm.channel];
 
-        if (cmd < 0) {
-            pwm.engaged_deadline_ms = 0;
-            HAL::Pwm::set_duration(pwm.pin, pwm.def);
-        } else if (cmd == 0) {
-            HAL::Pwm::set_duration(pwm.pin, pwm.min);
+        if (cmd_int14 < 0) {
+            timing.set_standby_state();
+            pwm.set_default();
+        } else if (cmd_int14 == 0) {
+            timing.set_default_state();
+            pwm.set_percent(0);
         } else {
-            pwm.engaged_deadline_ms = pwm.last_recv_time_ms + PWMModule::cmd_ttl;
-            HAL::Pwm::set_duration(pwm.pin, mapInt16CommandToPwm(cmd, pwm.min, pwm.max, pwm.def));
+            timing.set_engaged_state();
+            pwm.set_int14(cmd_int14);
         }
     }
 }
@@ -60,7 +60,7 @@ void DronecanPwmFrontend::array_command_callback(const ArrayCommand_t& msg) {
         return;
     }
 
-    for (auto& pwm : PWMModule::params) {
+    for (auto&& [pwm, timing] : zip(Driver::RCPWM::channels, PWMModule::timings)) {
         if (pwm.channel < 0 || pwm.channel > 255) {
             continue;
         }
@@ -70,14 +70,16 @@ void DronecanPwmFrontend::array_command_callback(const ArrayCommand_t& msg) {
                 continue;
             }
 
-            auto cmd = msg.commads[array_command_idx].command_value;
-            pwm.last_recv_time_ms = HAL_GetTick();
+            auto normalized_command = msg.commads[array_command_idx].command_value;
 
-            if (cmd < -0.001f || cmd > 0.001f) {
-                pwm.engaged_deadline_ms = HAL_GetTick() + PWMModule::cmd_ttl;
+            bool is_engaged = normalized_command < -0.001f || normalized_command > 0.001f;
+            if (is_engaged) {
+                timing.set_engaged_state();
+            } else {
+                timing.set_default_state();
             }
 
-            HAL::Pwm::set_duration(pwm.pin, mapFloatCommandToPwm(cmd, pwm.min, pwm.max, pwm.def));
+            pwm.set_normalized_servo(normalized_command);
         }
     }
 }
@@ -89,20 +91,16 @@ void DronecanPwmFrontend::hardpoint_callback(const HardpointCommand& msg) {
         return;
     }
 
-    for (auto& pwm : PWMModule::params) {
+    for (auto&& [pwm, timing] : zip(Driver::RCPWM::channels, PWMModule::timings)) {
         if (msg.hardpoint_id != pwm.channel) {
             continue;
         }
 
         auto cmd = msg.command;
 
-        // TTL has no effect on Hardpoint Command, so we don't update it
-        pwm.last_recv_time_ms = std::numeric_limits<uint32_t>::max();
+        timing.set_engage_forever();  // TTL has no effect on Hardpoint Command
 
-        // Hardpoint doesn't support engaged state monitoring and then it is always engaged
-        pwm.engaged_deadline_ms = std::numeric_limits<uint32_t>::max();
-
-        HAL::Pwm::set_duration(pwm.pin, cmd == 1 ? pwm.max : pwm.min);
+        pwm.set_percent(cmd == 1 ? 100 : 0);
     }
 }
 
