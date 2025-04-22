@@ -1,4 +1,4 @@
-system.reserved3:
+system.reserved4:
   type: "Integer"
   enum: "PARAM_BOOTLOADER_INTERNAL"
   flags: "mutable"

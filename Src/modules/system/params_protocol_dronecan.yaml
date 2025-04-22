@@ -1,4 +1,4 @@
-system.reserved2:
+system.reserved3:
   type: Integer
   note: Auto, Cyphal/CAN or DroneCAN
   enum: PARAM_SYSTEM_PROTOCOL

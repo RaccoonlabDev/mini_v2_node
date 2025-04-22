@@ -36,3 +36,12 @@ system.name:
   enum: PARAM_SYSTEM_NAME
   flags: mutable
   default: "co.raccoonlab.mini"
+
+system.reserved1:
+  type: Integer
+  note: Reservew for parameters crc calculation
+  enum: PARAM_SYSTEM_CRC
+  flags: mutable
+  default: 0
+  min: 0
+  max: 0
