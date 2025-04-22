@@ -6,8 +6,9 @@
  */
 
 #include "feedback.hpp"
+#include "peripheral/pwm/pwm.hpp"
 #include "peripheral/adc/circuit_periphery.hpp"
-
+#include "modules/pwm/main.hpp"
 
 REGISTER_MODULE(DronecanFeedbackModule)
 
@@ -17,50 +18,27 @@ void DronecanFeedbackModule::init() {
 }
 
 void DronecanFeedbackModule::update_params() {
-    auto cmd_type_value = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_CMD_TYPE);
-    cmd_type = static_cast<CommandType>(cmd_type_value);
-
-    auto feedback_type_value = paramsGetIntegerValue(IntParamsIndexes::PARAM_FEEDBACK_TYPE);
-    feedback_type = static_cast<FeedbackType>(feedback_type_value);
-
-    uint32_t period_ms;
-    switch (feedback_type) {
-        case FeedbackType::DEFAULT_1_HZ:
-            period_ms = 1000;
-            break;
-        case FeedbackType::DEFAULT_10_HZ:
-            period_ms = 100;
-            break;
-        default:
-            period_ms = 1000;
-            break;
-    }
-
-    set_period_ms(period_ms);
+    feedback_esc_enabled = static_cast<bool>(paramsGetIntegerValue(IntParamsIndexes::PARAM_FEEDBACK_ESC_ENABLE));
+    feedback_actuator_enabled = static_cast<bool>(paramsGetIntegerValue(IntParamsIndexes::PARAM_FEEDBACK_ACTUATOR_ENABLE));
+    feedback_hardpoint_enabled = static_cast<bool>(paramsGetIntegerValue(IntParamsIndexes::PARAM_FEEDBACK_HARDPOINT_ENABLE));
 }
 
 void DronecanFeedbackModule::spin_once() {
-    if (feedback_type == FeedbackType::DISABLED) {
-        return;
-    }
-
     for (uint_fast8_t pin_idx = 0; pin_idx < PWMModule::get_pins_amount(); pin_idx++) {
         if (!PWMModule::is_pin_enabled(pin_idx)) {
             continue;
         }
 
-        switch (cmd_type) {
-            case CommandType::RAW_COMMAND:
-                publish_esc_status(pin_idx);
-                break;
-            case CommandType::ARRAY_COMMAND:
-                publish_actuator_status(pin_idx);
-                break;
-            case CommandType::HARDPOINT_COMMAND:
-                publish_hardpoint_status(pin_idx);
-                break;
-            default:
-                break;
+        if (feedback_esc_enabled) {
+            publish_esc_status(pin_idx);
+        }
+
+        if (feedback_actuator_enabled) {
+            publish_actuator_status(pin_idx);
+        }
+
+        if (feedback_hardpoint_enabled) {
+            publish_hardpoint_status(pin_idx);
         }
     }
 }
