@@ -25,6 +25,7 @@ list(APPEND LIBPARAMS_PARAMS
     ${CMAKE_CURRENT_LIST_DIR}/params_common.yaml
     ${CMAKE_CURRENT_LIST_DIR}/${PARAMS_SYSTEM_CAN_TERMINATOR}
     ${CMAKE_CURRENT_LIST_DIR}/params_protocol_${CAN_PROTOCOL}.yaml
+    ${CMAKE_CURRENT_LIST_DIR}/params_bootloader_reserved.yaml
 )
 
 include(${ROOT_DIR}/Src/peripheral/led/CMakeLists.txt)
