@@ -9,23 +9,11 @@
 #define SRC_MODULES_FEEDBACK_HPP_
 
 #include "common/module.hpp"
-#include "peripheral/pwm/pwm.hpp"
 
 #include "dronecan.h"
 #include "logger.hpp"
 #include "publisher.hpp"
 #include "subscriber.hpp"
-
-#include "modules/pwm/main.hpp"
-#include "modules/pwm/dronecan_frontend/dronecan_frontend.hpp"
-
-enum class FeedbackType: uint8_t {
-    DISABLED,
-    DEFAULT_1_HZ,
-    DEFAULT_10_HZ,
-
-    NUMBER_OF_FEEDBACKS,
-};
 
 class DronecanFeedbackModule : public Module {
 public:
@@ -46,8 +34,9 @@ private:
     static inline DronecanPublisher<EscStatus_t> esc_status;
     static inline DronecanPublisher<HardpointStatus> hardpoint_status;
 
-    CommandType cmd_type;
-    FeedbackType feedback_type;
+    bool feedback_esc_enabled{false};
+    bool feedback_actuator_enabled{false};
+    bool feedback_hardpoint_enabled{false};
 };
 
 #endif  // SRC_MODULES_FEEDBACK_HPP_
