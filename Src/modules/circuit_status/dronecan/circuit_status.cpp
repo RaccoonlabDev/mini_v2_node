@@ -33,12 +33,21 @@ void DronecanCircuitStatus::spin_once() {
     uint16_t error_flags = 0;
     if (CircuitPeriphery::overvoltage()) {
         error_flags |= (uint16_t)ERROR_FLAG_OVERVOLTAGE;
+        if (circuit_status.msg.error_flags == 0) {
+            logger.log_warn("overvoltage");
+        }
     }
     if (CircuitPeriphery::undervoltage()) {
         error_flags |= (uint16_t)ERROR_FLAG_UNDERVOLTAGE;
+        if (circuit_status.msg.error_flags == 0) {
+            logger.log_warn("undervoltage");
+        }
     }
     if (CircuitPeriphery::overcurrent()) {
         error_flags |= (uint16_t)ERROR_FLAG_OVERCURRENT;
+        if (circuit_status.msg.error_flags == 0) {
+            logger.log_warn("overcurrent");
+        }
     }
 
     if (bitmask & static_cast<uint8_t>(Bitmask::ENABLE_5V_PUB)) {
