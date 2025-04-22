@@ -10,6 +10,7 @@
 
 #include "common/module.hpp"
 #include "publisher.hpp"
+#include "common/logging.hpp"
 
 class DronecanCircuitStatus : public Module {
 public:
@@ -35,6 +36,8 @@ private:
 
     uint8_t node_id{0};
     uint8_t bitmask{0};
+
+    static inline Logging logger{"CRCT"};
 };
 
 #endif  // SRC_MODULES_CIRCUIT_STATUS_DRONECAN_CIRCUIT_STATUS_HPP_
