@@ -7,6 +7,7 @@
 #include "cyphal_frontend.hpp"
 #include "reg/udral/service/actuator/common/sp/Vector31_0_1.h"
 #include "common/algorithms.hpp"
+#include "common/zip.hpp"
 
 #include "cyphalNode/cyphal.hpp"
 
@@ -46,19 +47,19 @@ void SetpointSubscriber::callback(const cyphal::CanardRxTransfer& transfer) {
 
     int16_t number_of_setpoints = len / 2;
 
-    for (auto& pwm : PWMModule::params) {
+    for (auto&& [pwm, timing] : zip(Driver::RCPWM::channels, PWMModule::timings)) {
         if (pwm.channel >= number_of_setpoints) {
             continue;
         }
 
-        auto value = std::clamp(msg.value[pwm.channel], 0.0f, 1.0f);
-        pwm.last_recv_time_ms = HAL_GetTick();
+        auto normalized_motor_value = msg.value[pwm.channel];
 
-        if (value > 0) {
-            pwm.engaged_deadline_ms = HAL_GetTick() + PWMModule::cmd_ttl;
+        if (normalized_motor_value > 0) {
+            timing.set_engaged_state();
+        } else {
+            timing.set_default_state();
         }
 
-        auto pwm_duration = (uint32_t)mapFloat(value, 0.0f, +1.0f, pwm.min, pwm.max);
-        HAL::Pwm::set_duration(pwm.pin, pwm_duration);
+        pwm.set_normalized_motor(normalized_motor_value);
     }
 }
