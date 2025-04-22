@@ -8,6 +8,7 @@
 #include "modules/pwm/main.hpp"
 #include <limits>
 #include "common/algorithms.hpp"
+#include "drivers/rcpwm/rcpwm.hpp"
 
 #ifndef CONFIG_USE_DRONECAN
 #define CONFIG_USE_DRONECAN 0
@@ -62,7 +63,7 @@ void PWMModule::init() {
 }
 
 int8_t PWMModule::get_pin_channel(uint8_t pin_idx) {
-    return pin_idx < PWMModule::get_pins_amount() ? params[pin_idx].channel : -1;
+    return pin_idx < Driver::RCPWM::get_pins_amount() ? params[pin_idx].channel : -1;
 }
 
 bool PWMModule::is_pin_enabled(uint8_t pin_idx) {

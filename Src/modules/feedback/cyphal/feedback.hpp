@@ -13,6 +13,7 @@
 #include "cyphalNode/zubax/compact_feedback.hpp"
 #include "modules/pwm/main.hpp"
 #include "module.hpp"
+#include "drivers/rcpwm/rcpwm.hpp"
 
 class CyphalFeedbackModule : public Module {
 public:
@@ -23,8 +24,8 @@ protected:
     void spin_once() override;
 
 private:
-    std::array<udral::FeedbackPublisher, PWMModule::get_pins_amount()> udral_feedbacks;
-    std::array<zubax::telega::CompactFeedbackPublisher, PWMModule::get_pins_amount()> compact_feedbacks;
+    std::array<udral::FeedbackPublisher, Driver::RCPWM::get_pins_amount()> udral_feedbacks;
+    std::array<zubax::telega::CompactFeedbackPublisher, Driver::RCPWM::get_pins_amount()> compact_feedbacks;
 };
 
 #endif  // SRC_CYPHAL_APPLICATION_FEEDBACK_HPP_

@@ -27,7 +27,7 @@ void CyphalFeedbackModule::update_params() {
 }
 
 void CyphalFeedbackModule::spin_once() {
-    for (size_t pin_idx = 0; pin_idx < PWMModule::get_pins_amount(); pin_idx++) {
+    for (size_t pin_idx = 0; pin_idx < Driver::RCPWM::get_pins_amount(); pin_idx++) {
         auto& udral_feedback = udral_feedbacks[pin_idx];
         if (!udral_feedback.isEnabled()) {
             continue;
@@ -39,7 +39,7 @@ void CyphalFeedbackModule::spin_once() {
         udral_feedback.publish();
     }
 
-    for (size_t pin_idx = 0; pin_idx < PWMModule::get_pins_amount(); pin_idx++) {
+    for (size_t pin_idx = 0; pin_idx < Driver::RCPWM::get_pins_amount(); pin_idx++) {
         auto& compact_feedback = compact_feedbacks[pin_idx];
         if (!compact_feedback.isEnabled()) {
             continue;

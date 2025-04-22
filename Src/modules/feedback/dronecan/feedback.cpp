@@ -9,6 +9,7 @@
 #include "peripheral/pwm/pwm.hpp"
 #include "peripheral/adc/circuit_periphery.hpp"
 #include "modules/pwm/main.hpp"
+#include "drivers/rcpwm/rcpwm.hpp"
 
 REGISTER_MODULE(DronecanFeedbackModule)
 
@@ -24,7 +25,7 @@ void DronecanFeedbackModule::update_params() {
 }
 
 void DronecanFeedbackModule::spin_once() {
-    for (uint_fast8_t pin_idx = 0; pin_idx < PWMModule::get_pins_amount(); pin_idx++) {
+    for (uint_fast8_t pin_idx = 0; pin_idx < Driver::RCPWM::get_pins_amount(); pin_idx++) {
         if (!PWMModule::is_pin_enabled(pin_idx)) {
             continue;
         }
