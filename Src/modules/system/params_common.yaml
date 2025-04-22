@@ -14,31 +14,6 @@ uavcan.node.description:
   flags: mutable
   default: ""
 
-system.can_terminator:
-  type: Integer
-  note: Bitmask which switch can terminators (0 - both off, 1 - enables second, 2 - enables first, 3 - enables both). Works only for v3.
-  enum: PARAM_SYSTEM_CAN_TEMINATOR
-  flags: mutable
-  default: 0
-  min: 0
-  max: 3
-
-system.name:
-  type: String
-  note: Defines custom node name. If empty, the node will use the default name.
-  enum: PARAM_SYSTEM_NAME
-  flags: mutable
-  default: "co.raccoonlab.mini"
-
-system.protocol:
-  type: Integer
-  note: Auto, Cyphal/CAN or DroneCAN
-  enum: PARAM_SYSTEM_PROTOCOL
-  flags: mutable
-  default: 0
-  min: 0
-  max: 2
-
 system.log_level:
   type: Integer
   note:
@@ -54,3 +29,10 @@ system.log_level:
   default: 3
   min: 0
   max: 4
+
+system.name:
+  type: String
+  note: Defines custom node name. If empty, the node will use the default name.
+  enum: PARAM_SYSTEM_NAME
+  flags: mutable
+  default: "co.raccoonlab.mini"

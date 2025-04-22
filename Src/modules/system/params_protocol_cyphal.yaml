@@ -1,0 +1,8 @@
+system.reserved2:
+  type: Integer
+  note: Auto, Cyphal/CAN or DroneCAN
+  enum: PARAM_SYSTEM_PROTOCOL
+  flags: mutable
+  default: 1
+  min: 1
+  max: 1
