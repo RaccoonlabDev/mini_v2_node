@@ -86,5 +86,6 @@ void DronecanFeedbackModule::publish_hardpoint_status(uint8_t pin_idx) {
         .status = Driver::RCPWM::get_pin_percent(pin_idx) == 0 ? CMD_RELEASE_OR_MIN : CMD_HOLD_OR_MAX,
     };
 
-    hardpoint_status.publish();
+    // Hardpoint serialization has a bug, let's skip it until it is fixed
+    // hardpoint_status.publish();
 }
