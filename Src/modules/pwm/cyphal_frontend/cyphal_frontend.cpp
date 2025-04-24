@@ -60,6 +60,6 @@ void SetpointSubscriber::callback(const cyphal::CanardRxTransfer& transfer) {
             timing.set_default_state();
         }
 
-        pwm.set_normalized_motor(normalized_motor_value);
+        pwm.set_normalized_unsigned(normalized_motor_value);
     }
 }

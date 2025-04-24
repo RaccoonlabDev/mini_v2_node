@@ -70,16 +70,15 @@ void DronecanPwmFrontend::array_command_callback(const ArrayCommand_t& msg) {
                 continue;
             }
 
-            auto normalized_command = msg.commads[array_command_idx].command_value;
+            auto command = msg.commads[array_command_idx].command_value;
 
-            bool is_engaged = normalized_command < -0.001f || normalized_command > 0.001f;
-            if (is_engaged) {
+            if (auto is_engaged = command < -0.001f || command >  0.001f; is_engaged) {
                 timing.set_engaged_state();
             } else {
                 timing.set_default_state();
             }
 
-            pwm.set_normalized_servo(normalized_command);
+            pwm.set_normalized_signed(command);
         }
     }
 }
