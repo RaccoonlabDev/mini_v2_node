@@ -10,7 +10,7 @@
 
 #include <algorithm>
 #include "params.hpp"
-#include "ttl.hpp"
+#include "common/ttl.hpp"
 #include "peripheral/pwm/pwm.hpp"
 #include "common/algorithms.hpp"
 #include "common/module.hpp"

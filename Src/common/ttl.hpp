@@ -4,8 +4,8 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#ifndef SRC_MODULES_PWM_TTL_HPP_
-#define SRC_MODULES_PWM_TTL_HPP_
+#ifndef SRC_COMMON_TTL_HPP_
+#define SRC_COMMON_TTL_HPP_
 
 #include <stdint.h>
 #include <limits>
@@ -72,7 +72,7 @@ public:
      * @brief ENGAGED means the actuator is not in the default state (for example a motor is
      * spinning or a servo is rotating) and the timeout deadline has not been reached yet.
      */
-    inline bool is_engaged() {
+    inline bool is_engaged() const {
         return HAL_GetTick() < engaged_deadline_ms;
     }
 
@@ -80,14 +80,14 @@ public:
      * @brief SLEEP means the command has not been received yet or the timeout has been expired.
      * The actuator goes to the minimal power consumption mode or to the initial state.
      */
-    inline bool is_sleeping() {
+    inline bool is_sleeping() const {
         return last_recv_time_ms == 0 && engaged_deadline_ms == 0;
     }
 
     /**
      * @brief Fresh command state refers either STANDBY or ENGAGED state.
      */
-    inline bool is_command_fresh() {
+    inline bool is_command_fresh() const {
         return last_recv_time_ms != 0 && HAL_GetTick() < last_recv_time_ms + cmd_ttl;
     }
 
@@ -97,4 +97,4 @@ private:
     uint32_t cmd_ttl{500};
 };
 
-#endif  // SRC_MODULES_PWM_TTL_HPP_
+#endif  // SRC_COMMON_TTL_HPP_

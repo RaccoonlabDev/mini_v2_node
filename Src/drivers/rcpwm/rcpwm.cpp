@@ -64,7 +64,7 @@ bool Driver::RCPWM::is_pin_enabled(uint8_t pin_idx) {
     return get_pin_channel(pin_idx) >= 0;
 }
 
-void Driver::RcpwmChannel::set_us(uint16_t duration_us) {
+void Driver::RcpwmChannel::set_us(uint16_t duration_us) const {
     HAL::Pwm::set_duration(pin, duration_us);
 }
 
@@ -74,24 +74,24 @@ void Driver::RcpwmChannel::set_percent(uint8_t percent) {
     } else if (percent >= 100) {
         set_us(max);
     } else {
-        set_normalized_motor(0.01 * percent);
+        set_normalized_unsigned(0.01 * percent);
     }
 }
 
-void Driver::RcpwmChannel::set_normalized_servo(float normalized_servo_value) {
-    normalized_servo_value = std::clamp(normalized_servo_value, -1.0f, +1.0f);
-    set_us(mapFloatCommandToPwm(normalized_servo_value, min, max, def));
+void Driver::RcpwmChannel::set_normalized_signed(float normalized_signed_value) const {
+    normalized_signed_value = std::clamp(normalized_signed_value, -1.0f, +1.0f);
+    set_us(mapFloatCommandToPwm(normalized_signed_value, min, max, def));
 }
 
-void Driver::RcpwmChannel::set_normalized_motor(float normalized_motor_value) {
-    normalized_motor_value = std::clamp(normalized_motor_value, 0.0f, 1.0f);
-    set_us((uint16_t)mapFloat(normalized_motor_value, 0.0f, +1.0f, min, max));
+void Driver::RcpwmChannel::set_normalized_unsigned(float normalized_unsigned_value) const {
+    normalized_unsigned_value = std::clamp(normalized_unsigned_value, 0.0f, 1.0f);
+    set_us((uint16_t)mapFloat(normalized_unsigned_value, 0.0f, +1.0f, min, max));
 }
 
-void Driver::RcpwmChannel::set_int14(uint16_t cmd_int14) {
+void Driver::RcpwmChannel::set_int14(uint16_t cmd_int14) const {
     set_us(mapInt16CommandToPwm(cmd_int14, min, max, def));
 }
 
-void Driver::RcpwmChannel::set_default() {
+void Driver::RcpwmChannel::set_default() const {
     set_us(def);
 }

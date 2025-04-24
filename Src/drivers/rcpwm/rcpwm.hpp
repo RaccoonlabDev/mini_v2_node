@@ -32,7 +32,7 @@ struct RcpwmChannel {
     /**
      * @brief Set output as us [1000 .. 2000]
      */
-    void set_us(uint16_t duration_us);
+    void set_us(uint16_t duration_us) const;
 
     /**
      * @brief Set output as percentage [0 .. 100]
@@ -40,24 +40,26 @@ struct RcpwmChannel {
     void set_percent(uint8_t percent);
 
     /**
-     * @brief Set output value as a normalized servo float [-1.0 .. +1.0]
+     * @brief Set output value as a normalized signed float [-1.0 .. +1.0]
+     * where -1.0 means min, +1.0 means max and 0.0 means the neutral position
      */
-    void set_normalized_servo(float value);
+    void set_normalized_signed(float value) const;
 
     /**
-     * @brief Set output value as a normalized motor float [0.0 .. 1.0]
+     * @brief Set output value as a normalized unsigned float [0.0 .. 1.0]
+     * where 0.0 means min and +1.0 means max output
      */
-    void set_normalized_motor(float value);
+    void set_normalized_unsigned(float value) const;
 
     /**
      * @brief Set output as int14 command [-8192, 8191]
      */
-    void set_int14(uint16_t cmd_int14);
+    void set_int14(uint16_t cmd_int14) const;
 
     /**
      * @brief The default PWM duration withing [1000; 2000] us
      */
-    void set_default();
+    void set_default() const;
 };
 
 class RCPWM {
