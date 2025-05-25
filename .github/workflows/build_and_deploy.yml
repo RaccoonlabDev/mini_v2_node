@@ -27,8 +27,7 @@ jobs:
 
       - name: Install dependencies (Ubuntu & Manjaro & Windows)
         run: |
-          pip install -r requirements.txt
-          python -m pip install yakut
+          pip install -r requirements-cyphal.txt
           python scripts/install.py
         shell: bash
 
