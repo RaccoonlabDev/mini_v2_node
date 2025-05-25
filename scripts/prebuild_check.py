@@ -104,6 +104,13 @@ class PrebuildChecker:
         if is_dir_nonempty(LIBPARAMS_DIR):
             return
 
+        if not sys.stdin.isatty():
+            logger.error(
+                "Submodules are nto found. "
+                "Please update them with git submodule update --init --recursive"
+            )
+            sys.exit(1)
+
         cmd = ['git', 'submodule', 'update', '--init', '--recursive']
         logger.error("Submodules do not exist. Run: '%s'", ' '.join(cmd))
         if not self.prompt:
@@ -126,6 +133,10 @@ class PrebuildChecker:
         """
         Check if the pre-commit hook is configured. If not, prompt the user to create it.
         """
+
+        if not sys.stdin.isatty():
+            logger.info("Non-interactive mode detected. Skipping pre-commit hook setup.")
+            return
 
         if is_precommit_hook_configured():
             logger.info("The pre-commit hook is already configured.")
