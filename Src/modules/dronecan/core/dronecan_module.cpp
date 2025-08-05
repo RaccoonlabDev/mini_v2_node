@@ -16,7 +16,7 @@ DronecanModule::DronecanModule() : Module(0, Protocol::DRONECAN) {
 }
 
 void DronecanModule::init() {
-    auto node_name_param_idx = static_cast<ParamIndex_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT);
+    auto node_name_param_idx = static_cast<ParamIndex_t>(StrParamsIndexes::PARAM_SYSTEM_NAME);
     const auto current_node_name = (const char*)paramsGetStringValue(node_name_param_idx);
     if(strlen(current_node_name) == 0) {
         const auto& [board_name, name_length] = CircuitPeriphery::get_board_name();
