@@ -7,6 +7,7 @@ set(ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
 set(SRC_DIR ${ROOT_DIR}/Src)
 set(CMAKE_DIR ${ROOT_DIR}/cmake)
 set(LIBPARAMS_PATH ${ROOT_DIR}/Libs/libparams)
+set(LIBPARAMS_CMAKE libparams.cmake)
 set(DOC_PATH ${ROOT_DIR}/docs/${CAN_PROTOCOL}/README.md)
 
 # Option 1. Choose the platform
@@ -75,7 +76,7 @@ if(USE_PLATFORM_UBUNTU)
     add_definitions(-DLIBPARAMS_TEMP_PARAMS_FILE_NAME="temp_params")
 endif()
 
-include(${LIBPARAMS_PATH}/CMakeLists.txt)
+include(${LIBPARAMS_PATH}/${LIBPARAMS_CMAKE})
 
 list(APPEND APPLICATION_HEADERS ${ROOT_DIR}/Src ${APPLICATION_DIR})
 include(${APPLICATION_DIR}/CMakeLists.txt)
