@@ -5,15 +5,15 @@
         "name": "Dronecan (gdb) sitl",
         "type": "cppdbg",
         "request": "launch",
-
-        "program": "build/dronecan_sitl/obj/node",
+        "cwd": "${workspaceFolder}",
+        "program": "${workspaceFolder}/build/dronecan_sitl/obj/Src/platform/ubuntu/node",
     },
     {
         "name": "Cyphal (gdb) sitl",
         "type": "cppdbg",
         "request": "launch",
-
-        "program": "build/cyphal_sitl/obj/node",
+        "cwd": "${workspaceFolder}",
+        "program": "${workspaceFolder}/build/cyphal_sitl/obj/Src/platform/ubuntu/node",
     },
     {
         "type": "cortex-debug",
