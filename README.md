@@ -20,7 +20,8 @@ Please, refer Wiki for details:
 Not suported or tested yet / In Roadmap:
 - [ ] Cyphal/DroneCAN Bootloader,
 - [ ] Dynamics Node Allocation (DNA),
-- [ ] Vibration Analysis: estimate dominant frequency and magnitude of vibrations for diagnosing mechanical issues or ensuring smooth operation in drones or robotic platforms in real time,
+- [ ] Vibration Analysis: estimate dominant frequency and magnitude of vibrations for diagnosing mechanical issues or ensuring smooth operation in drones or robotic platforms in real time.
+- [ ] AS5600 I2C sensor encodetor for servo position estimation
 
 ### 2. TARGET HARDWARE
 
@@ -35,53 +36,17 @@ The software supports RL v2 nodes (stm32f103, 128 KBytes flash) and v3 nodes (st
 
 This node is a versatile device integrating PWM control, IMU sensing, and dual CAN bus communication, suitable for various applications in robotics, drones, and other embedded systems. Below are the detailed use cases for different scenarios.
 
-**1. Basic ESC and Servo Control**
+| Use case | Description |
+|-|-|
+| <img src="https://docs.raccoonlab.co/assets/img/mini_v2_with_servo.4761fdf2.png" alt="drawing" width="400"> | **1. Basic ESC and Servo Control** </br> PWM1-4 to control PWM ESCs via Cyphal/DroneCAN. </br> PWM1-2 to control 5V servos. </br> DroneCAN interface: [RawCommand](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#rawcommand) / [ArrayCommand](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#arraycommand). </br> Cyphal/CAN interface: [UDRAL setpoint](https://github.com/OpenCyphal/public_regulated_data_types/blob/master/reg/udral/service/actuator/esc/_.0.1.dsdl) |
+| <img src="https://docs.raccoonlab.co/assets/img/mini_v2_with_esc_flame.0ffb552f.png" alt="drawing" width="400"> | **2. Advanced ESC Control with Feedback** </br> PWM3-4 for controlling PWM ESCs </br> UART or ADC feedback on the FB pin. </br> DroneCAN interface: [esc.Status](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#status-2) / [actuator.Status](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#status). </br> Cyphal/CAN interface: [UDRAL Feedback](https://github.com/OpenCyphal/public_regulated_data_types/blob/master/reg/udral/service/actuator/common/Feedback.0.1.dsdl) |
+| <img src="https://docs.raccoonlab.co/assets/img/lw20_i2c.82bad2a4.png" alt="drawing" width="400"> | **3. CAN-I2C Converter** </br> PWM1 and PWM2 as I2C pins. </br> Cyphal/DroneCAN adapter for I2C peripherals. </br> DroneCAN examples: [range_sensor.Measurement](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#measurement).|
+| | **4. Cargo Gripper** </br> PWM1-2 to control servo-based cargo grippers. </br> UAV payload management systems. </br> DroneCAN interface: [hardpoint.Command](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#command-1). |
+| | **5. CAN-CAN converter** </br> CAN1 for Cyphal/DroneCAN. </br> CAN2 for another CAN protocol. </br> Cyphal/DroneCAN adapter for another CAN device. </br> Examples: KST/CAN servo, CANopen motor, CAN BMS. </br> Keep a consistend CAN network. </br> Supported only on Mini v3 node. |
+| | **6. Servo Position Estimation with I2C Encoder** </br> PWM3-4 for a servo </br> PWM1-2 for a [AS5600 I2C encoder](https://docs.raccoonlab.co/guide/as5600/). </br> Estimate the angular position of the servo. </br> DroneCAN interface: [actuator.Status](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#status). |
+| | **7. Vibration Analysis with IMU** </br> Utilize the onboard IMU (MPU9250) </br> Monitor vibrations in your system. </br> Estimate dominant frequency and magnitude of vibrations. </br> Crucial for diagnosing mechanical issues </br> or ensuring smooth operation in drones or robotic platforms. </br> DroneCAN interface: [ahrs.RawIMU](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#rawimu). |
 
-- Use PWM1-4 to control ESC via Cyphal or DroneCAN esc.RawCommand or actuator.ArrayCommand messages.
-- Connect standard 5V servos to PWM1-PWM2 for controlling servo motors. Ideal for use cases requiring precise angular movement, such as robotic arms or UAV control surfaces.
-
-    <img src="https://docs.raccoonlab.co/assets/img/mini_v2_with_servo.4761fdf2.png" alt="drawing" width="400">
-
-**2. Advanced ESC Control with Feedback**
-
-- Utilize PWM3 or PWM4 for controlling ESCs with UART or ADC feedback on the FB pin.
-
-    <img src="https://docs.raccoonlab.co/assets/img/mini_v2_with_esc_flame.0ffb552f.png" alt="drawing" width="400">
-
-**3. CAN-I2C Converter**
-
-- Configure PWM1 and PWM2 as I2C pins to act as a CAN-I2C converter.
-- Use the node as an adapter to connect I2C peripherals like rangefinders or environmental sensors to a CAN-based network.
-
-    <img src="https://docs.raccoonlab.co/assets/img/lw20_i2c.82bad2a4.png" alt="drawing" width="400">
-
-**4. Cargo Gripper**
-
-- Use PWM1 or PWM2 to control servo-based cargo grippers via DroneCAN hardpoint.Command messages.
-- Ideal for UAV payload management systems, enabling secure and precise handling of cargo.
-
-**5. Dual CAN Bus Interface for Protocol Conversion**
-
-- Leverage the node’s dual CAN interfaces (CAN1 and CAN2) to convert between different CAN protocols.
-- For example, connect CAN1 to an autopilot using DroneCAN or Cyphal/CAN, and CAN2 to a motor or servo using canopen or another protocol.
-- This enables seamless integration between devices using different CAN standards, making it ideal for systems where components from various manufacturers need to communicate.
-
-    > Supported only on Mini v3 node
-
-**6. Servo Position Estimation with I2C Encoder**
-- Connect a servo motor to PWM3 or PWM4 and an I2C encoder to PWM1/SDA and PWM2/SDC to estimate the angular position of the servo.
-- Consider [AS5600 I2C sensor](https://docs.raccoonlab.co/guide/as5600/) encoder.
-
-    > An example of this feature is not included in the repository yet...
-
-**7. Vibration Analysis with IMU**
-
-- Utilize the onboard IMU (MPU9250) to monitor vibrations in your system.
-- Estimate dominant frequency and magnitude of vibrations, which is crucial for diagnosing mechanical issues or ensuring smooth operation in drones or robotic platforms.
-
-    > Software doesn't support it yet...
-
-### 4. INSTALLATION
+### 4. SOFTWARE PREREQUISITES
 
 The following table outlines the compatibility of the project with different operating systems, modes, and support timelines.
 
@@ -93,21 +58,50 @@ The following table outlines the compatibility of the project with different ope
 | Ubuntu 20.04         | ❌ Not Supported     | ❌ Not Supported   | Deprecated in 2025-04-15.              |
 | Windows (2022)       | ✅ Supported         | ✅ Supported       | Current "latest" Windows version.      |
 
-The installation process is the same Ubuntu, Manjaro and Windows and it consists of 2 steps:
+### 5. QUICK START
+
+**Installation**. The process is the same for Ubuntu, Manjaro and Windows:
 
 ```bash
-# 1. Install python requirements
+# 1. Make a fork of the repository and clone the repository with submodules
+git clone git@github.com:RaccoonlabDev/mini_v2_node.git --recursive
+
+# 2. Install python requirements
 pip install -r requirements.txt
 
-# 2. Install other requirements
+# 3. Install other requirements
 ./scripts/install.py
 ```
 
-### 5. Q&A
+**Build**. You can build the desired target with make command. Examples:
+
+```bash
+# Build DroneCAN firmware for Mini v2 (stm32f103):
+make dronecan_v2
+
+# Build DroneCAN firmware for Mini v3 (stm32g0):
+make dronecan_v3
+```
+
+**Uploading**. You can upload the firmware with the make command as well:
+
+```bash
+make dronecan_v2 upload
+```
+
+**SITL**. If you don't have the hardware at the moment, you can try the node in software in the loop mode:
+
+```bash
+make sitl_dronecan run
+```
+
+**GUI Tool**. To have a full interraction experience with the node use [DroneCAN/gui_tool](https://github.com/dronecan/gui_tool) or [Cyphal yakut](https://github.com/OpenCyphal/yakut) / [Yukon](https://github.com/OpenCyphal/yukon).
+
+### 6. Q&A
 
 If you are strugguling with the software building, please refer to the build workflow [build.yml](.github/workflows/build.yml) for a hint. If it doesn't help, you can open [an issue]( https://github.com/RaccoonlabDev/mini_v2_node/issues?q=is%3Aissue+).
 
-### 6. More examples
+### 7. More examples
 
 Consider the following projects as examples:
 
