@@ -35,7 +35,7 @@ system.name:
   note: Defines custom node name. If empty, the node will use the default name.
   enum: PARAM_SYSTEM_NAME
   flags: mutable
-  default: "co.raccoonlab.mini"
+  default: "co.rl.mini"
 
 system.reserved1:
   type: Integer
