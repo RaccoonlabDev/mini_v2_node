@@ -8,7 +8,7 @@ set(SRC_DIR ${ROOT_DIR}/Src)
 set(CMAKE_DIR ${ROOT_DIR}/cmake)
 set(LIBPARAMS_PATH ${ROOT_DIR}/Libs/libparams)
 set(LIBPARAMS_CMAKE libparams.cmake)
-set(DOC_PATH ${ROOT_DIR}/docs/${CAN_PROTOCOL}/README.md)
+set(DOC_PATH ${ROOT_DIR}/docs/${CAN_PROTOCOL}.md)
 
 # Option 1. Choose the platform
 option(USE_PLATFORM_UBUNTU "Build for SITL (Software In The Loop)" OFF)
