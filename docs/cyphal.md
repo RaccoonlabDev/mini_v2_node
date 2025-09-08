@@ -26,10 +26,12 @@ The node has the following registers:
 | ----------------------- | ----------- |
 | uavcan.node.id          | Defines a node-ID. Allowed values [0,127]. |
 | uavcan.node.description | User/integrator-defined, human-readable description of this specific node. |
-| system.can_terminator   | Bitmask which switch can terminators (0 - both off, 1 - enables second, 2 - enables first, 3 - enables both). Works only for v3. |
-| system.name             | Defines custom node name. If empty, the node will use the default name. |
-| system.protocol         | Auto, Cyphal/CAN or DroneCAN |
 | system.log_level        | Log level. See [debug.LogLevel](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#loglevel) and [diagnostic.Severity](https://github.com/OpenCyphal/public_regulated_data_types/blob/master/uavcan/diagnostic/Severity.1.0.dsdl). </br> 0 - Log everything (DEBUG, INFO, WARNING, ERROR) </br> 1 - Log at least INFO level </br> 2 - Log at least WARNING level </br> 3 - Log at least ERROR level </br> 4 - Disable logging </br> By default 3 to show only realy important messages. |
+| system.name             | Defines custom node name. If empty, the node will use the default name. |
+| system.reserved1        | Reservew for parameters crc calculation |
+| system.can_terminator   | Bitmask which switch can terminators (0 - both off, 1 - enables second, 2 - enables first, 3 - enables both). Works only for v3. |
+| system.reserved3        | Auto, Cyphal/CAN or DroneCAN |
+| system.reserved4        | Reserved |
 | pwm.cmd_ttl_ms          | TTL of specified by pwm.cmd_type commands [ms]. |
 | pwm.frequency           | PWM frequency [Hz]. |
 | pwm1.ch                 | Index of setpoint channel. [-1; 255]. -1 means disabled, |
