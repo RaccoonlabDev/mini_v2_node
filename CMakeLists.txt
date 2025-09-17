@@ -81,6 +81,15 @@ include(${LIBPARAMS_PATH}/${LIBPARAMS_CMAKE})
 list(APPEND APPLICATION_HEADERS ${ROOT_DIR}/Src ${APPLICATION_DIR})
 include(${APPLICATION_DIR}/CMakeLists.txt)
 
+# Set compile options
+set(WARNING_FLAGS "-Wall -Wextra -Wfloat-equal -Werror -Wundef -Wshadow -Wpointer-arith -Wunreachable-code -Wstrict-overflow=5 -Wwrite-strings -Wswitch-default")
+set(CMAKE_C_FLAGS "${CMAKE_DEBUG_FLAGS} ${CMAKE_C_FLAGS} ${WARNING_FLAGS}")
+set(CMAKE_CXX_FLAGS "-g ${CMAKE_CXX_FLAGS} ${WARNING_FLAGS} -Wno-volatile")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNING_FLAGS} -Wno-volatile")
+# set(CMAKE_C_FLAGS_DEBUG "-g -DDEBUG")
+# set(CMAKE_CXX_FLAGS_DEBUG "-g -DDEBUG")
+set(CMAKE_CXX_STANDARD 20)
+
 # Prebuild
 include(${CMAKE_DIR}/params.cmake)
 include(${CMAKE_DIR}/git.cmake)
