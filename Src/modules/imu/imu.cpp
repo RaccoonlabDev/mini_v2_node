@@ -12,18 +12,12 @@
 REGISTER_MODULE(ImuModule)
 
 void ImuModule::init() {
-<<<<<<< HEAD
-    bool imu_initialized = imu.initialize();
-    set_mode(Mode::STANDBY);
-    initialized = imu_initialized;
-=======
     initialized = imu.initialize();
-    mode = Module::Mode::STANDBY;
+    set_mode(Mode::STANDBY);
     fft_accel.init(256, 3, 256);
     fft_accel.fft_min_freq = 20;
     fft_gyro.init(256, 3, 256);
     fft_gyro.fft_min_freq = 20;
->>>>>>> pr-add-imu-fft
 }
 
 /// @brief To know what module initialised and what not
@@ -62,8 +56,6 @@ void ImuModule::spin_once() {
         
         std::array<int16_t, 3>  accel_raw = {0, 0, 0};
         std::array<int16_t, 3>  gyro_raw  = {0, 0, 0};
-        std::array<float, 3>    gyro      = {0.0f, 0.0f, 0.0f};
-        std::array<float, 3>    accel     = {0.0f, 0.0f, 0.0f};
 
         
         if (imu.read_gyroscope(&gyro_raw) >= 0) {
@@ -89,6 +81,7 @@ void ImuModule::spin_once() {
             pub.msg.accelerometer_latest[2] = accel[2];
             updated[1] = true;
             update_accel_fft();
+        }
     
     } else {
         updated[0] = true;
