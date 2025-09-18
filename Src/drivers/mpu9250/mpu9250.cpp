@@ -85,6 +85,6 @@ int8_t Mpu9250::read_temperature (int16_t& temperature) const {
         logger.log_error(msg);
         return res;
     }
-    temperature = ((uint16_t)buffer[0] << 8 | (uint16_t)buffer[1]);
+    temperature = static_cast<int16_t>((uint16_t)buffer[0] << 8 | (uint16_t)buffer[1]);
     return 0;
 }
