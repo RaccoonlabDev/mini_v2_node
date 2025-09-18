@@ -88,7 +88,6 @@ void ImuModule::spin_once() {
             // Send logging data to dronecan every second
             perform_logging_dronecan();
         }
-        
     }
 }
 

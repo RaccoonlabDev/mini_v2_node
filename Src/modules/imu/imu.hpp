@@ -75,7 +75,7 @@ private:
     }
     constexpr int16_t raw_temp_convert_to_celsius (int16_t raw_temp){
         // IMPORTANT: this temperature is "die" (iternal) temperature of the MPU9250. It DOES NOT refer to ambient temperature
-        // 21 is from Room Temp Offset 
+        // 21 derived from Room Temp Offset 
         temp = (float)raw_temp / 333.87f + 21.0;
         // Simple and low cost rounding
         return (static_cast<int16_t>(temp + (temp >= 0 ? 0.5f : -0.5f)));
