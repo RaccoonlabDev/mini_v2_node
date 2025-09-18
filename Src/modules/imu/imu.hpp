@@ -64,6 +64,7 @@ private:
     uint16_t pub_timeout_ms{0};
     std::array<float, 3> gyro  = {0.0f, 0.0f, 0.0f};
     std::array<float, 3> accel = {0.0f, 0.0f, 0.0f};
+    float temp{0};
     static constexpr float raw_gyro_to_rad_per_second(int16_t raw_gyro) {
         return raw_gyro * std::numbers::pi_v<float> / 131.0f / 180.0f;
     }
@@ -71,6 +72,12 @@ private:
     static constexpr float raw_accel_to_meter_per_square_second(int16_t raw_accel) {
         return raw_accel * 9.80665f / 16384.0f;
     }
+    constexpr int16_t raw_temp_convert_to_celsius (int16_t raw_temp){
+        temp = raw_temp / 333.87f + 21.0f;
+        // Simple and low cost rounding
+        return (static_cast<int16_t>(temp + (temp >= 0 ? 0.5f : -0.5f)));
+    }
+
 };
 
 #ifdef __cplusplus

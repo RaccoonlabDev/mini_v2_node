@@ -33,7 +33,7 @@ imu.status:
 
 imu.synthetic_accel_gyro:
   type: Integer
-  note: "Turns on synthetic data of accelerometer, which will be a stream of randomised values. 0 - turn on, 1 - turn off"
+  note: "Turns on synthetic data of accelerometer and gyroscope, which will be a stream of randomised values. 0 - turn on, 1 - turn off"
   enum: SYNTHETIC_ACCEL_GYRO
   flags: mutable
   default: 1

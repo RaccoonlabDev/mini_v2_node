@@ -21,7 +21,7 @@ void ImuModule::init() {
 }
 
 /// @brief To know what module initialised and what not
-/// @param  
+/// @param
 /// @return initialised parameter
 bool ImuModule::isInitialised(void) {
     return initialized;
@@ -34,30 +34,28 @@ void ImuModule::update_params() {
     bitmask = static_cast<uint8_t>(paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_MODE_BITMASK));
     set_health((!bitmask || initialized) ? Module::Status::OK : Module::Status::MAJOR_FAILURE);
     // 0 is success, 1 is fail
-    paramsSetIntegerValue(IntParamsIndexes::IMU_STATUS, (get_health() == Module::Status::OK ? (int16_t)0 : (int16_t)1));
+    paramsSetIntegerValue(IntParamsIndexes::IMU_STATUS,
+        (get_health() == Module::Status::OK ? (int16_t)0 : (int16_t)1));
     if (bitmask) {
         set_mode(initialized ? Mode::STANDBY : Mode::INITIALIZATION);
     }
 }
 
 void ImuModule::spin_once() {
-    bool generateRandom = ((0 == static_cast<uint16_t>(paramsGetIntegerValue(IntParamsIndexes::SYNTHETIC_ACCEL_GYRO)))  ? true : false);
-    
+    bool generateRandom = ((0 == static_cast<uint16_t>
+        (paramsGetIntegerValue(IntParamsIndexes::SYNTHETIC_ACCEL_GYRO)))  ? true : false);
     bool updated[2]{false, false};
     // If synthetic accel is turned on (value is 0) then we need to go further to data generation
     if (!generateRandom && (!bitmask || !initialized)) {
         return;
-    } else if (!generateRandom) { 
+    } else if (!generateRandom) {
         // Usual reading routine
         std::array<int16_t, 3> mag_raw;
         if (imu.read_magnetometer(&mag_raw) >= 0) {
             mag.publish();
         }
-        
         std::array<int16_t, 3>  accel_raw = {0, 0, 0};
         std::array<int16_t, 3>  gyro_raw  = {0, 0, 0};
-
-        
         if (imu.read_gyroscope(&gyro_raw) >= 0) {
             gyro = {
                     raw_gyro_to_rad_per_second(gyro_raw[0]),
@@ -69,7 +67,6 @@ void ImuModule::spin_once() {
             updated[0] = true;
             update_gyro_fft();
         }
-
         if (imu.read_accelerometer(&accel_raw) >= 0) {
             accel = {
                     raw_accel_to_meter_per_square_second(accel_raw[0]),
@@ -82,12 +79,10 @@ void ImuModule::spin_once() {
             updated[1] = true;
             update_accel_fft();
         }
-    
     } else {
         updated[0] = true;
         updated[1] = true;
         // Here we generate random values
-        
         pub.msg.rate_gyro_latest[0] = (dist(rng)/20.0f);
         pub.msg.rate_gyro_latest[1] = (dist(rng)/20.0f);
         pub.msg.rate_gyro_latest[2] = (dist(rng)/20.0f);
@@ -96,15 +91,21 @@ void ImuModule::spin_once() {
         pub.msg.accelerometer_latest[1] = (dist(rng)/10.0f);
         pub.msg.accelerometer_latest[2] = (dist(rng)/10.0f);
     }
-    
-
     if (pub_timeout_ms != 0 && HAL_GetTick() - pub.msg.timestamp / 1000 > pub_timeout_ms) {
         if (updated[0] && updated[1]) {
             pub.msg.timestamp = HAL_GetTick() * 1000;
             pub.publish();
         }
+        int16_t raw_temp{0};
+        if (imu.read_temperature (raw_temp) >= 0) {
+            static char buffer[40];
+            // Put %d instead of %f in logger to safe memory for sprintf
+            snprintf(buffer, sizeof(buffer), "temperature %d",
+                raw_temp_convert_to_celsius(raw_temp));
+            static Logging logger{"IMU"};
+            logger.log_info(buffer);
+        }
     }
-    
 }
 
 void ImuModule::get_vibration(std::array<float, 3> data) {

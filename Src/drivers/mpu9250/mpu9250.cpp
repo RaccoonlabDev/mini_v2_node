@@ -13,6 +13,7 @@
 enum class Mpu9250Resgiter : uint8_t {
     ACCEL_XOUT_H = 0x3B,
     GYRO_XOUT_H = 0x43,
+    TEMP_OUT_H = 0x41,
     WHO_AM_I = 0x75,
 };
 
@@ -32,7 +33,7 @@ bool Mpu9250::initialize() {
 }
 
 int8_t Mpu9250::read_accelerometer(std::array<int16_t, 3>* accel) const {
-    static Logging logger("Mpu9250::read_gyroscope");
+    static Logging logger("Mpu9250::read_accelerometer");
     std::array<std::byte, 6> buffer;
     auto reg = std::byte(Mpu9250Resgiter::ACCEL_XOUT_H);
     if (auto res = HAL::SPI::read_registers(reg, buffer.data(), 6); res < 0) {
@@ -72,4 +73,18 @@ int8_t Mpu9250::read_magnetometer(std::array<int16_t, 3>* mag) const {
     (*mag)[1] = 0.0;
     (*mag)[2] = 0.0;
     return -1;  // not supported yet
+}
+
+int8_t Mpu9250::read_temperature (int16_t& temperature) const {
+    static Logging logger("Mpu9250::temperature");
+    std::array<std::byte, 2> buffer;
+    auto reg = std::byte(Mpu9250Resgiter::TEMP_OUT_H);
+    if (auto res = HAL::SPI::read_registers(reg, buffer.data(), buffer.size()); res < 0) {
+        char msg[12];
+        snprintf(msg, sizeof(msg), "temp: %d", res);
+        logger.log_error(msg);
+        return res;
+    }
+    temperature = ((uint16_t)buffer[0] << 8 | (uint16_t)buffer[1]);
+    return 0;
 }
