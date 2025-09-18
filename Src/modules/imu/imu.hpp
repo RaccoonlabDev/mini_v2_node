@@ -21,6 +21,7 @@
 #include "drivers/mpu9250/mpu9250.hpp"
 #include <random>
 #include "common/FFT.hpp"
+#include "common/logging.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,7 +43,6 @@ public:
     };
     ImuModule() : Module(256, Protocol::DRONECAN) {}
     void init() override;
-    bool isInitialised (void);
 
 protected:
     void spin_once() override;
@@ -54,6 +54,7 @@ protected:
 private:
     DronecanPublisher<AhrsRawImu> pub;
     DronecanPublisher<MagneticFieldStrength2> mag;
+    Logging logger{"IMU"};
     Mpu9250 imu;
     FFT fft_accel;
     FFT fft_gyro;
@@ -79,6 +80,7 @@ private:
         // Simple and low cost rounding
         return (static_cast<int16_t>(temp + (temp >= 0 ? 0.5f : -0.5f)));
     }
+    void perform_logging_dronecan ();
 
 };
 

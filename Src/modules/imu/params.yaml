@@ -22,15 +22,6 @@ imu.pub_frequency:
   min: 0
   max: 400
 
-imu.status:
-  type: Integer
-  note: "Shows if IMU is healthy. 1 - unhealthy (something wrong), 0 - success"
-  enum: IMU_STATUS
-  flags: mutable
-  default: 0
-  min: 0
-  max: 1
-
 imu.synthetic_accel_gyro:
   type: Integer
   note: "Turns on synthetic data of accelerometer and gyroscope, which will be a stream of randomised values. 0 - turn on, 1 - turn off"

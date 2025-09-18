@@ -20,22 +20,12 @@ void ImuModule::init() {
     fft_gyro.fft_min_freq = 20;
 }
 
-/// @brief To know what module initialised and what not
-/// @param
-/// @return initialised parameter
-bool ImuModule::isInitialised(void) {
-    return initialized;
-}
-
 void ImuModule::update_params() {
     auto pub_frequency = static_cast<uint16_t>(
                                 paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_PUB_FREQUENCY));
     pub_timeout_ms = pub_frequency == 0 ? 0 : 1000 / pub_frequency;
     bitmask = static_cast<uint8_t>(paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_MODE_BITMASK));
     set_health((!bitmask || initialized) ? Module::Status::OK : Module::Status::MAJOR_FAILURE);
-    // 0 is success, 1 is fail
-    paramsSetIntegerValue(IntParamsIndexes::IMU_STATUS,
-        (get_health() == Module::Status::OK ? (int16_t)0 : (int16_t)1));
     if (bitmask) {
         set_mode(initialized ? Mode::STANDBY : Mode::INITIALIZATION);
     }
@@ -46,9 +36,10 @@ void ImuModule::spin_once() {
         (paramsGetIntegerValue(IntParamsIndexes::SYNTHETIC_ACCEL_GYRO)))  ? true : false);
     bool updated[2]{false, false};
     // If synthetic accel is turned on (value is 0) then we need to go further to data generation
-    if (!generateRandom && (!bitmask || !initialized)) {
-        return;
-    } else if (!generateRandom) {
+    if (!generateRandom) {
+        if (!bitmask || !initialized) {
+            return;
+        }
         // Usual reading routine
         std::array<int16_t, 3> mag_raw;
         if (imu.read_magnetometer(&mag_raw) >= 0) {
@@ -80,31 +71,44 @@ void ImuModule::spin_once() {
             update_accel_fft();
         }
     } else {
-        updated[0] = true;
-        updated[1] = true;
         // Here we generate random values
         pub.msg.rate_gyro_latest[0] = (dist(rng)/20.0f);
         pub.msg.rate_gyro_latest[1] = (dist(rng)/20.0f);
         pub.msg.rate_gyro_latest[2] = (dist(rng)/20.0f);
-
+        updated[0] = true;
         pub.msg.accelerometer_latest[0] = (dist(rng)/10.0f);
         pub.msg.accelerometer_latest[1] = (dist(rng)/10.0f);
         pub.msg.accelerometer_latest[2] = (dist(rng)/10.0f);
+        updated[1] = true;
     }
     if (pub_timeout_ms != 0 && HAL_GetTick() - pub.msg.timestamp / 1000 > pub_timeout_ms) {
         if (updated[0] && updated[1]) {
             pub.msg.timestamp = HAL_GetTick() * 1000;
             pub.publish();
+            // Send logging data to dronecan every second
+            perform_logging_dronecan();
         }
-        int16_t raw_temp{0};
-        if (imu.read_temperature (raw_temp) >= 0) {
-            static char buffer[40];
-            // Put %d instead of %f in logger to safe memory for sprintf
-            snprintf(buffer, sizeof(buffer), "temperature %d",
-                raw_temp_convert_to_celsius(raw_temp));
-            static Logging logger{"IMU"};
-            logger.log_info(buffer);
-        }
+        
+    }
+}
+
+void ImuModule::perform_logging_dronecan (void)  {
+    // Log temperature
+    int16_t raw_temp{0};
+    char buffer[40];
+    if (imu.read_temperature (raw_temp) >= 0) {
+        // Put %d instead of %f in logger to safe memory for sprintf
+        snprintf(buffer, sizeof(buffer), "temperature %d",
+            raw_temp_convert_to_celsius(raw_temp));
+        logger.log_info(buffer);
+    }
+    // Log condition of MPU9250
+    if (!initialized) {
+        snprintf(buffer, sizeof(buffer), "MPU9250 is not initialised!");
+        logger.log_error(buffer);
+    } else {
+        snprintf(buffer, sizeof(buffer), "MPU9250 is initialised!");
+        logger.log_info(buffer);
     }
 }
 
