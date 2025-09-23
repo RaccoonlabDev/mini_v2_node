@@ -13,7 +13,7 @@ typedef double real_t;
 #include <iostream>
 #include <vector>
 #include <complex>
-
+#include <cstdint>
 #define M_2PI           6.28318530717958647692
 namespace rfft {
     /*

@@ -2,6 +2,9 @@
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 cmake_minimum_required(VERSION 3.15.3)
 
+# Project
+project(node CXX C ASM)
+
 # Pathes
 set(ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
 set(SRC_DIR ${ROOT_DIR}/Src)
@@ -98,9 +101,6 @@ include(${CMAKE_DIR}/git.cmake)
 # Hardware version is not supported at the momemnt, let's hardcode it for a while
 add_definitions(-DHW_VERSION_MAJOR=2)
 add_definitions(-DHW_VERSION_MINOR=1)
-
-# Project
-project(node CXX C ASM)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)

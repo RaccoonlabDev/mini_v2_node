@@ -8,7 +8,7 @@
 #include <cstring>
 #include <cstdio>
 #include "FFT.hpp"
-#include "common/logging.hpp"
+#include "logging.hpp"
 
 bool FFT::init(uint16_t window_size, uint16_t num_axes, float sample_rate_hz) {
     if (window_size > FFT_MAX_SIZE) {
@@ -27,8 +27,8 @@ bool FFT::init(uint16_t window_size, uint16_t num_axes, float sample_rate_hz) {
 void FFT::update(float *input) {
     std::array<real_t, MAX_NUM_AXES> conv_input;
     rfft::convert_float_to_real_t(input, conv_input.data(), n_axes);
-    static Logging logger{"FFT"};
-    static char buffer[30];
+    //static Logging logger{"FFT"};
+    //static char buffer[30];
     for (uint8_t axis = 0; axis < n_axes; axis++) {
         uint16_t &buffer_index = _fft_buffer_index[axis];
 
@@ -45,9 +45,9 @@ void FFT::update(float *input) {
         rfft::rfft_one_cycle(rfft_spec, _fft_input_buffer.data(), _fft_output_buffer.data());
         find_peaks(axis);
 
-        snprintf(buffer, sizeof(buffer), "%d, %d %d", axis, (int)_fft_buffer_index[axis],
-                                                                            (int)is_updated());
-        logger.log_info(buffer);
+        //snprintf(buffer, sizeof(buffer), "%d, %d %d", axis, (int)_fft_buffer_index[axis],
+        //                                                                    (int)is_updated());
+        //logger.log_info(buffer);
         // shift buffer (3/4 overlap) as sliding window for input data
         const int overlap_start = size / 4;
         memmove(&data_buffer[axis][0], &data_buffer[axis][overlap_start],
@@ -105,10 +105,10 @@ void FFT::_find_dominant() {
             }
         }
     }
-    static char buffer[30];
-    snprintf(buffer, sizeof(buffer), "updated dominant %d", size);
-    static Logging logger{"FFT"};
-    logger.log_info(buffer);
+    //static char buffer[30];
+    //snprintf(buffer, sizeof(buffer), "updated dominant %d", size);
+    //static Logging logger{"FFT"};
+    //logger.log_info(buffer);
 }
 
 void FFT::_identify_peaks_bins(float peak_magnitude[MAX_NUM_PEAKS],
