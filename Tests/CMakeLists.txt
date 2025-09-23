@@ -16,7 +16,7 @@ endif()
 
 enable_testing()
 find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIR})
+# REMOVED: include_directories(${GTEST_INCLUDE_DIR})  # This line causes the error because of old varibles for modern cmake
 
 find_package(PkgConfig REQUIRED)
 pkg_search_module(FFTW REQUIRED fftw3)

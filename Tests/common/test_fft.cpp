@@ -18,7 +18,8 @@ template <typename T>
 auto IsInRange(T lo, T hi) {
     return AllOf(Ge((lo)), Le((hi)));
 }
-::testing::AssertionResult IsBetweenInclusive(int val, int a, int b)
+// FIX: previously assumed int type in input which trunckated float part
+::testing::AssertionResult IsBetweenInclusive(double val, double a, double b)
 {
     if((val >= a) && (val <= b))
         return ::testing::AssertionSuccess();
@@ -333,17 +334,15 @@ public:
     }
 
     void check_axis(int axis) {
-        bool heat_peak;
+        bool heat_peak = false;
         auto signal_generator = signals_generator[axis];
         auto n_dominants = signal_generator.dominant_sig.size();
         auto n_signals = signal_generator.n_signals;
-        for (auto dominant : signal_generator.dominant_sig) {
-        }
         for (int peak_index = 0; peak_index < MAX_NUM_PEAKS; peak_index++) {
             for (auto dominant : signal_generator.dominant_sig) {
                 if (IsBetweenInclusive(fft.peak_frequencies[axis][peak_index],
-                            (int)std::get<1>(dominant) - abs_error,
-                            (int)std::get<1>(dominant) + abs_error)) {
+                            std::get<1>(dominant) - abs_error,
+                            std::get<1>(dominant) + abs_error)) {
                     heat_peak = true;
                     break;
                 }
