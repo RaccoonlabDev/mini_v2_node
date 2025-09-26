@@ -28,7 +28,7 @@ SinSignalGenerator::SinSignalGenerator(float sample_rate, float freq, float ampl
 float SinSignalGenerator::get_next_sample() {
     auto sin = sinf(2 * M_PI * freq_hz * secs + phase);
     float sample = amplitude * sin;
-    secs += 1 / sample_rate_hz;
+    secs += 1.0f / sample_rate_hz;
     return sample;
 }
 

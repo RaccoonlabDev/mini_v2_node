@@ -71,16 +71,24 @@ void ImuModule::spin_once() {
             update_accel_fft();
         }
     } else {
-        // Here we generate random values
+    // Here we generate random values    
+        auto s = gyro_signals_generator.get_next_sample();
         for (int j = 0; j < NUM_AXES; j++) {
-            gyro[j] = gyro_signal_generator.get_next_sample();
+            gyro[j] = s;
         }
+        pub.msg.rate_gyro_latest[0] = gyro[0];
+        pub.msg.rate_gyro_latest[1] = gyro[1];
+        pub.msg.rate_gyro_latest[2] = gyro[2];
         updated[0] = true;
         update_gyro_fft();
 
+        s = gyro_signals_generator.get_next_sample();
         for (int j = 0; j < NUM_AXES; j++) {
-            accel[j] = accel_signal_generator.get_next_sample();
+            accel[j] = s;
         }
+        pub.msg.accelerometer_latest[0] = accel[0];
+        pub.msg.accelerometer_latest[1] = accel[1];
+        pub.msg.accelerometer_latest[2] = accel[2];
         updated[1] = true;
         update_accel_fft();
     }

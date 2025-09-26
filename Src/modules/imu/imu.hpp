@@ -8,14 +8,15 @@
 #ifndef SRC_MODULES_IMU_HPP_
 #define SRC_MODULES_IMU_HPP_
 
-#define FFT_MIN_FREQ 20
-#define WINDOW_SIZE 256
+#define FFT_MIN_FREQ 5
+#define WINDOW_SIZE 64
 #define NUM_AXES 3
-#define SAMPLE_RATE_HZ 256
+#define SAMPLE_RATE_HZ 64
 
-#define GENERATOR_SAMPLE_HZ 256
-#define GENERATOR_FREQ_HZ 200
-#define GENERATOR_AMPLITUDE 1
+
+#define GENERATOR_SAMPLE_HZ 64
+#define GENERATOR_FREQ_HZ   20
+#define GENERATOR_AMPLITUDE 10
 
 #include <numbers>
 #include <random>
@@ -56,10 +57,14 @@ private:
     Mpu9250 imu;
     FFT fft_accel;
     FFT fft_gyro;
-    // TODO: probably too expensive to make two distinct generators
+    // TODO: probably too expensive to make 6 distinct generators
     // May be mathematical solution to derive from one generator two different frequencies
-    SinSignalGenerator accel_signal_generator {GENERATOR_SAMPLE_HZ, GENERATOR_FREQ_HZ, GENERATOR_AMPLITUDE};
-    SinSignalGenerator gyro_signal_generator {GENERATOR_SAMPLE_HZ, GENERATOR_FREQ_HZ, GENERATOR_AMPLITUDE};
+    /*{SinSignalGenerator{GENERATOR_SAMPLE_HZ, GENERATOR_FREQ_HZ, GENERATOR_AMPLITUDE},
+                                                                    SinSignalGenerator{GENERATOR_SAMPLE_HZ, GENERATOR_FREQ_HZ, GENERATOR_AMPLITUDE},
+                                                                    SinSignalGenerator{GENERATOR_SAMPLE_HZ, GENERATOR_FREQ_HZ, GENERATOR_AMPLITUDE}} */
+    SinSignalGenerator accel_signals_generator {GENERATOR_SAMPLE_HZ, GENERATOR_FREQ_HZ, GENERATOR_AMPLITUDE};
+
+    SinSignalGenerator  gyro_signals_generator {GENERATOR_SAMPLE_HZ, GENERATOR_FREQ_HZ, GENERATOR_AMPLITUDE};
     float vibration = 0.0f;
     bool initialized{false};
     bool enabled{false};
