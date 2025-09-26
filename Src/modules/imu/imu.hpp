@@ -8,27 +8,24 @@
 #ifndef SRC_MODULES_IMU_HPP_
 #define SRC_MODULES_IMU_HPP_
 
-// IMPORTANT: use some seed like "2345" here
-#define RANDOM_SEED 2345
-
-// Basically range can be any as it's just syntetic data and won't be near to something realistic
-#define MAX_RND_RANGE 100
-#define MIN_RND_RANGE 0
+#define FFT_MIN_FREQ 20
+#define WINDOW_SIZE 256
+#define NUM_AXES 3
+#define SAMPLE_RATE_HZ 256
 
 #include <numbers>
+#include <random>
 #include "module.hpp"
 #include "publisher.hpp"
 #include "drivers/mpu9250/mpu9250.hpp"
-#include <random>
 #include "common/FFT.hpp"
 #include "common/logging.hpp"
+#include "common/oscillation_generator.hpp"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// Much less memory and computing power consumption compared to the std::mt19937
-std::minstd_rand rng(RANDOM_SEED);
 
 std::uniform_int_distribution<int> dist(MIN_RND_RANGE, MAX_RND_RANGE);
 
@@ -58,6 +55,10 @@ private:
     Mpu9250 imu;
     FFT fft_accel;
     FFT fft_gyro;
+    // TODO: probably too expensive to make two distinct generators
+    // May be mathematical solution to derive from one generator two different frequencies
+    SinSignalGenerator accel_signals_generator;
+    SinSignalGenerator gyro_signals_generator;
     float vibration = 0.0f;
     bool initialized{false};
     bool enabled{false};

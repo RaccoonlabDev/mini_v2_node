@@ -14,10 +14,10 @@ REGISTER_MODULE(ImuModule)
 void ImuModule::init() {
     initialized = imu.initialize();
     set_mode(Mode::STANDBY);
-    fft_accel.init(256, 3, 256);
-    fft_accel.fft_min_freq = 20;
-    fft_gyro.init(256, 3, 256);
-    fft_gyro.fft_min_freq = 20;
+    fft_accel.init(WINDOW_SIZE, NUM_AXES, SAMPLE_RATE_HZ);
+    fft_accel.fft_min_freq = FFT_MIN_FREQ;
+    fft_gyro.init(WINDOW_SIZE, NUM_AXES, SAMPLE_RATE_HZ);
+    fft_gyro.fft_min_freq = FFT_MIN_FREQ;
 }
 
 void ImuModule::update_params() {
@@ -72,13 +72,14 @@ void ImuModule::spin_once() {
         }
     } else {
         // Here we generate random values
-        pub.msg.rate_gyro_latest[0] = (dist(rng)/20.0f);
-        pub.msg.rate_gyro_latest[1] = (dist(rng)/20.0f);
-        pub.msg.rate_gyro_latest[2] = (dist(rng)/20.0f);
+        for (int i = 0; i < fft_parameters.window_size + 10; i++) {
+            for (int j = 0; j < fft_parameters.n_axes; j++) {
+                input[j] = signals_generator[j].get_next_samples();
+            }
+            fft.update(input.data()); 
+        }
         updated[0] = true;
-        pub.msg.accelerometer_latest[0] = (dist(rng)/10.0f);
-        pub.msg.accelerometer_latest[1] = (dist(rng)/10.0f);
-        pub.msg.accelerometer_latest[2] = (dist(rng)/10.0f);
+    
         updated[1] = true;
     }
     if (pub_timeout_ms != 0 && HAL_GetTick() - pub.msg.timestamp / 1000 > pub_timeout_ms) {

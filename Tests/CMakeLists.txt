@@ -21,7 +21,10 @@ find_package(GTest REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_search_module(FFTW REQUIRED fftw3)
 include_directories(${FFTW_INCLUDE_DIRS})
-FILE(GLOB commonSources       ${ROOT_DIR}/Src/common/FFT.cpp)
+FILE(GLOB commonSources 
+    ${ROOT_DIR}/Src/common/FFT.cpp
+    ${ROOT_DIR}/Src/common/oscillation_generator.cpp
+)
 
 function(gen_test app_name test_file)
     add_executable(${app_name}

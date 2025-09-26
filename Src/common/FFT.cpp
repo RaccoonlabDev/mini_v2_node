@@ -46,7 +46,7 @@ void FFT::update(float *input) {
         find_peaks(axis);
 
         //snprintf(buffer, sizeof(buffer), "%d, %d %d", axis, (int)_fft_buffer_index[axis],
-        //                                                                    (int)is_updated());
+        //                                                                   (int)is_updated());
         //logger.log_info(buffer);
         // shift buffer (3/4 overlap) as sliding window for input data
         const int overlap_start = size / 4;
