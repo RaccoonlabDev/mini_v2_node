@@ -41,12 +41,12 @@ void ImuModule::spin_once() {
             return;
         }
         // Usual reading routine
-        std::array<int16_t, 3> mag_raw;
+        std::array<int16_t, NUM_AXES> mag_raw;
         if (imu.read_magnetometer(&mag_raw) >= 0) {
             mag.publish();
         }
-        std::array<int16_t, 3>  accel_raw = {0, 0, 0};
-        std::array<int16_t, 3>  gyro_raw  = {0, 0, 0};
+        std::array<int16_t, NUM_AXES>  accel_raw = {0, 0, 0};
+        std::array<int16_t, NUM_AXES>  gyro_raw  = {0, 0, 0};
         if (imu.read_gyroscope(&gyro_raw) >= 0) {
             gyro = {
                     raw_gyro_to_rad_per_second(gyro_raw[0]),
@@ -72,15 +72,17 @@ void ImuModule::spin_once() {
         }
     } else {
         // Here we generate random values
-        for (int i = 0; i < fft_parameters.window_size + 10; i++) {
-            for (int j = 0; j < fft_parameters.n_axes; j++) {
-                input[j] = signals_generator[j].get_next_samples();
-            }
-            fft.update(input.data()); 
+        for (int j = 0; j < NUM_AXES; j++) {
+            gyro[j] = gyro_signal_generator.get_next_sample();
         }
         updated[0] = true;
-    
+        update_gyro_fft();
+
+        for (int j = 0; j < NUM_AXES; j++) {
+            accel[j] = accel_signal_generator.get_next_sample();
+        }
         updated[1] = true;
+        update_accel_fft();
     }
     if (pub_timeout_ms != 0 && HAL_GetTick() - pub.msg.timestamp / 1000 > pub_timeout_ms) {
         if (updated[0] && updated[1]) {
@@ -139,7 +141,7 @@ void ImuModule::update_gyro_fft() {
     if (!(bitmask & static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_FFT_GYR))) {
         return;
     }
-    // fft_gyro.update(gyro.data());
+    fft_gyro.update(gyro.data());
     pub.msg.rate_gyro_integral[0] = fft_gyro.dominant_frequency;
     pub.msg.rate_gyro_integral[1] = fft_gyro.dominant_mag * 1000;
     pub.msg.rate_gyro_integral[2] = fft_gyro.dominant_snr;

@@ -253,8 +253,8 @@ public:
         for (int peak_index = 0; peak_index < MAX_NUM_PEAKS; peak_index++) {
             for (auto dominant : signal_generator.dominant_sig) {
                 if (IsBetweenInclusive(fft.peak_frequencies[axis][peak_index],
-                            (int)std::get<1>(dominant) - abs_error,
-                            (int)std::get<1>(dominant) + abs_error)) {
+                            (int)(dominant.second) - abs_error,
+                            (int)(dominant.second) + abs_error)) {
                     heat_peak = true;
                     break;
                 }

@@ -13,6 +13,10 @@
 #define NUM_AXES 3
 #define SAMPLE_RATE_HZ 256
 
+#define GENERATOR_SAMPLE_HZ 256
+#define GENERATOR_FREQ_HZ 200
+#define GENERATOR_AMPLITUDE 1
+
 #include <numbers>
 #include <random>
 #include "module.hpp"
@@ -25,9 +29,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-
-std::uniform_int_distribution<int> dist(MIN_RND_RANGE, MAX_RND_RANGE);
 
 class ImuModule : public Module {
 public:
@@ -57,15 +58,15 @@ private:
     FFT fft_gyro;
     // TODO: probably too expensive to make two distinct generators
     // May be mathematical solution to derive from one generator two different frequencies
-    SinSignalGenerator accel_signals_generator;
-    SinSignalGenerator gyro_signals_generator;
+    SinSignalGenerator accel_signal_generator {GENERATOR_SAMPLE_HZ, GENERATOR_FREQ_HZ, GENERATOR_AMPLITUDE};
+    SinSignalGenerator gyro_signal_generator {GENERATOR_SAMPLE_HZ, GENERATOR_FREQ_HZ, GENERATOR_AMPLITUDE};
     float vibration = 0.0f;
     bool initialized{false};
     bool enabled{false};
     uint8_t bitmask{0};
     uint16_t pub_timeout_ms{0};
-    std::array<float, 3> gyro  = {0.0f, 0.0f, 0.0f};
-    std::array<float, 3> accel = {0.0f, 0.0f, 0.0f};
+    std::array<float, NUM_AXES> gyro  = {0.0f, 0.0f, 0.0f};
+    std::array<float, NUM_AXES> accel = {0.0f, 0.0f, 0.0f};
     float temp{0};
     static constexpr float raw_gyro_to_rad_per_second(int16_t raw_gyro) {
         return raw_gyro * std::numbers::pi_v<float> / 131.0f / 180.0f;

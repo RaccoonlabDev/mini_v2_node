@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <vector>
 
-extern std::random_device rd; // will ne reused in CheckOnFewWindows tests
+extern std::mt19937 rd; // will ne reused in CheckOnFewWindows tests
 struct InitOneSignParamType   {
     float sample_rate_hz = 0;
     float freq_hz = 0;
@@ -40,7 +40,7 @@ public:
     uint16_t min_freq = 0;
     uint16_t sample_rate_hz;
     std::vector<SinSignalGenerator> signals_generator;
-    std::vector<std::tuple<uint16_t, uint16_t>> dominant_sig;
+    std::vector<std::pair<uint16_t, uint16_t>> dominant_sig;
 
     void init();
 

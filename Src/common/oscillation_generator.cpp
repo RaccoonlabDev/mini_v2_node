@@ -1,3 +1,4 @@
+#include "main.h" // For HAL
 #include <random>
 #include <algorithm>  // For std::clamp
 #include <cstdlib>
@@ -6,15 +7,24 @@
 
 #include "oscillation_generator.hpp"
 
-std::random_device rd;
+// TODO: make rd for tests random and for HAL make HAL_RNG_GenerateRandomNumber
+std::mt19937 rd(12345); // Temp solution!
+
+//uint32_t get_hw_random() {
+//    uint32_t random_number;
+//    HAL_RNG_GenerateRandomNumber(&hrng, &random_number);
+//    return random_number;
+//}
+
 SinSignalGenerator::SinSignalGenerator(InitOneSignParamType signal_parameters) :
-                                    sample_rate_hz(signal_parameters.sample_rate_hz),
                                     freq_hz(signal_parameters.freq_hz),
-                                    amplitude(signal_parameters.amplitude) {}
-SinSignalGenerator::SinSignalGenerator(float sample_rate_hz, float freq_hz, float amplitude) :
-                                    sample_rate_hz(sample_rate_hz),
-                                    freq_hz(freq_hz),
-                                    amplitude(amplitude) {}
+                                    amplitude(signal_parameters.amplitude),
+                                    sample_rate_hz(signal_parameters.sample_rate_hz) {};
+                                    
+SinSignalGenerator::SinSignalGenerator(float sample_rate, float freq, float ampl) :
+                                    freq_hz(freq),
+                                    amplitude(ampl),
+                                    sample_rate_hz(sample_rate) {};
 float SinSignalGenerator::get_next_sample() {
     auto sin = sinf(2 * M_PI * freq_hz * secs + phase);
     float sample = amplitude * sin;
@@ -34,25 +44,28 @@ void MultiSignalsSinGenerator::init() {
         signals_generator[j] = SinSignalGenerator(sample_rate_hz, freq_hz, amplitude);
         if (amplitude > max_amplitude) {
             max_amplitude = amplitude;
-            dominant_sig.insert(dominant_sig.begin(), std::make_tuple(amplitude, freq_hz));
+            dominant_sig.insert(dominant_sig.begin(), {amplitude, freq_hz});
         }
     }
-    // sort by amplitude value
-    std::sort(dominant_sig.begin(), dominant_sig.end());
+    // sort by amplitude value. Usual sort returned warning -Werror=strict-overflow, so i changed it on safer approach
+    std::stable_sort(dominant_sig.begin(), dominant_sig.end(), 
+    [](const std::pair<uint16_t, uint16_t>& a, const std::pair<uint16_t, uint16_t>& b) {
+        return a.first < b.first;  
+    });
 }
 
 
-MultiSignalsSinGenerator::MultiSignalsSinGenerator(uint8_t n_signals, uint16_t sample_rate_hz, uint16_t max_freq) :
-                                            n_signals(n_signals),
-                                            sample_rate_hz(sample_rate_hz),
-                                            max_freq(max_freq) {
+MultiSignalsSinGenerator::MultiSignalsSinGenerator(uint8_t n_sig, uint16_t sample_rate, uint16_t max_f) :
+                                            max_freq(max_f),
+                                            n_signals(n_sig),
+                                            sample_rate_hz(sample_rate) {
     init();
 }
 
 MultiSignalsSinGenerator::MultiSignalsSinGenerator(InitMultiSignalsParamType parameters) :
+                                            max_freq(parameters.max_freq),
                                             n_signals(parameters.n_signals),
-                                            sample_rate_hz(parameters.sample_rate_hz),
-                                            max_freq(parameters.max_freq) {
+                                            sample_rate_hz(parameters.sample_rate_hz) {
     init();
 }
 
