@@ -71,26 +71,37 @@ void ImuModule::spin_once() {
             update_accel_fft();
         }
     } else {
-    // Here we generate random values    
-        auto s = gyro_signals_generator.get_next_sample();
-        for (int j = 0; j < NUM_AXES; j++) {
-            gyro[j] = s;
-        }
-        pub.msg.rate_gyro_latest[0] = gyro[0];
-        pub.msg.rate_gyro_latest[1] = gyro[1];
-        pub.msg.rate_gyro_latest[2] = gyro[2];
-        updated[0] = true;
-        update_gyro_fft();
+    // Here we generate random values
+        static uint64_t last_sample_time_ms = 0;
+        // FFT excpects data to be given in certain rate
+        // as spin once called with unknowm frequency i made this interval
+        uint64_t sample_interval_ms = 1000 / GENERATOR_SAMPLE_HZ;
+        
+        uint64_t current_time = HAL_GetTick();
+        if (current_time - last_sample_time_ms >= sample_interval_ms) {
+            last_sample_time_ms = current_time;
 
-        s = gyro_signals_generator.get_next_sample();
-        for (int j = 0; j < NUM_AXES; j++) {
-            accel[j] = s;
+            // For future multiwave generation
+            // auto s = gyro_signals_generator.get_next_sample();
+            // for (int j = 0; j < NUM_AXES; j++) {
+            //     gyro[j] = s;
+            // }
+            pub.msg.rate_gyro_latest[0] = 0;
+            pub.msg.rate_gyro_latest[1] = 0;
+            pub.msg.rate_gyro_latest[2] = 0;
+            updated[0] = true;
+            update_gyro_fft();
+
+            accel[0] = accel_signals_generator.get_next_sample();
+
+            get_vibration(accel);
+            pub.msg.accelerometer_latest[0] = accel[0];
+            // Other axis are redundant if we want to simulate one wave
+            pub.msg.accelerometer_latest[1] = 0;
+            pub.msg.accelerometer_latest[2] = 0;
+            updated[1] = true;
+            update_accel_fft();
         }
-        pub.msg.accelerometer_latest[0] = accel[0];
-        pub.msg.accelerometer_latest[1] = accel[1];
-        pub.msg.accelerometer_latest[2] = accel[2];
-        updated[1] = true;
-        update_accel_fft();
     }
     if (pub_timeout_ms != 0 && HAL_GetTick() - pub.msg.timestamp / 1000 > pub_timeout_ms) {
         if (updated[0] && updated[1]) {
