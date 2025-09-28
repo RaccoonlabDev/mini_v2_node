@@ -9,15 +9,15 @@
 #define SRC_MODULES_IMU_HPP_
 
 #define FFT_MIN_FREQ 0.1f
-#define WINDOW_SIZE 128
+#define WINDOW_SIZE 64
 #define NUM_AXES 3
-#define SAMPLE_RATE_HZ 128
+#define SAMPLE_RATE_HZ 8
 
 // IMPORTANT NOTE: 
 // If you want to see oscilation data itself in a way that program sees it then
 // set imu.pub_frequency to the GENERATOR_SAMPLE_HZ frequency, so publisher would be able to publish data on time
-#define GENERATOR_SAMPLE_HZ 128 
-#define GENERATOR_FREQ_HZ   8
+#define GENERATOR_SAMPLE_HZ 8
+#define GENERATOR_FREQ_HZ   2
 #define GENERATOR_AMPLITUDE 20
 
 #include <numbers>

@@ -71,12 +71,21 @@ void ImuModule::spin_once() {
             update_accel_fft();
         }
     } else {
-    // Here we generate random values
+        // TODO(ilyha_dev): ideally implement it's own message type for synthetic data
+        // Motivation: relevant idea iff we want to generate only one oscilating axis
+        // i.e. put on dronecan only one axis which is used for oscilations - others are redundant
+        // Otherwise (if motivation is not relevant): make lots of params for dronecan for each axis
+        // i.e.
+        // GENERATOR_SAMPLE_HZ for 3 gyro and 3 accel axis
+        // GENERATOR_FREQ_HZ   for 3 gyro and 3 accel axis
+        // GENERATOR_AMPLITUDE for 3 gyro and 3 accel axis
+
+
+        // Here we generate random values
         static uint64_t last_sample_time_ms = 0;
         // FFT excpects data to be given in certain rate
         // as spin once called with unknowm frequency i made this interval
         uint64_t sample_interval_ms = 1000 / GENERATOR_SAMPLE_HZ;
-        
         uint64_t current_time = HAL_GetTick();
         if (current_time - last_sample_time_ms >= sample_interval_ms) {
             last_sample_time_ms = current_time;

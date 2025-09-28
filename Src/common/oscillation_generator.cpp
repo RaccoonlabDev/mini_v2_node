@@ -7,7 +7,7 @@
 
 #include "oscillation_generator.hpp"
 
-// TODO: make rd for tests random and for HAL make HAL_RNG_GenerateRandomNumber
+// TODO(ilyha_dev): make rd for tests random and for HAL make HAL_RNG_GenerateRandomNumber
 std::mt19937 rd(12345); // Temp solution!
 
 //uint32_t get_hw_random() {
