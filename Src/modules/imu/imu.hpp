@@ -18,7 +18,7 @@
 // set imu.pub_frequency to the GENERATOR_SAMPLE_HZ frequency, so publisher would be able to publish data on time
 #define GENERATOR_SAMPLE_HZ 8
 #define GENERATOR_FREQ_HZ   2
-#define GENERATOR_AMPLITUDE 20
+#define GENERATOR_AMPLITUDE 20 
 
 #include <numbers>
 #include <random>
@@ -59,14 +59,7 @@ private:
     Mpu9250 imu;
     FFT fft_accel;
     FFT fft_gyro;
-    // TODO: probably too expensive to make 6 distinct generators
-    // May be mathematical solution to derive from one generator two different frequencies
-    /*{SinSignalGenerator{GENERATOR_SAMPLE_HZ, GENERATOR_FREQ_HZ, GENERATOR_AMPLITUDE},
-                                                                    SinSignalGenerator{GENERATOR_SAMPLE_HZ, GENERATOR_FREQ_HZ, GENERATOR_AMPLITUDE},
-                                                                    SinSignalGenerator{GENERATOR_SAMPLE_HZ, GENERATOR_FREQ_HZ, GENERATOR_AMPLITUDE}} */
     SinSignalGenerator accel_signals_generator {GENERATOR_SAMPLE_HZ, GENERATOR_FREQ_HZ, GENERATOR_AMPLITUDE};
-
-    SinSignalGenerator  gyro_signals_generator {GENERATOR_SAMPLE_HZ, GENERATOR_FREQ_HZ, GENERATOR_AMPLITUDE};
     float vibration = 0.0f;
     bool initialized{false};
     bool enabled{false};

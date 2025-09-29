@@ -3,7 +3,13 @@
 #include <cstdint>
 #include <vector>
 
-extern std::mt19937 rd; // will ne reused in CheckOnFewWindows tests
+// will ne reused in CheckOnFewWindows tests
+#ifndef FIXED_SEED
+extern std::mt19937 rd; 
+#else
+extern std::random_device rd;
+#endif
+
 struct InitOneSignParamType   {
     float sample_rate_hz = 0;
     float freq_hz = 0;

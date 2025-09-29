@@ -90,11 +90,6 @@ void ImuModule::spin_once() {
         if (current_time - last_sample_time_ms >= sample_interval_ms) {
             last_sample_time_ms = current_time;
 
-            // For future multiwave generation
-            // auto s = gyro_signals_generator.get_next_sample();
-            // for (int j = 0; j < NUM_AXES; j++) {
-            //     gyro[j] = s;
-            // }
             pub.msg.rate_gyro_latest[0] = 0;
             pub.msg.rate_gyro_latest[1] = 0;
             pub.msg.rate_gyro_latest[2] = 0;
