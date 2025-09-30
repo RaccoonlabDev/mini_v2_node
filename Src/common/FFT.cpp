@@ -106,7 +106,7 @@ void FFT::_find_dominant() {
         }
     }
     //static char buffer[30];
-    //snprintf(buffer, sizeof(buffer), "updated dominant %d", size);
+    //snprintf(buffer, sizeof(buffer), "updated dominant %d", (int)dominant_frequency);
     //static Logging logger{"FFT"};
     //logger.log_info(buffer);
 }
@@ -149,8 +149,9 @@ uint16_t FFT::_estimate_peaks(float* peak_magnitude,
         if (raw_peak_index[peak_new] == 0) {
             continue;
         }
-        float adjusted_bin = 0.5f *
-                        _estimate_peak_freq(fft, 2 * raw_peak_index[peak_new]);
+        // Why to multiply by 2 raw_peak index and then divide retulsting peak freq on 2?
+        // Is it for better quality of result?
+        float adjusted_bin = _estimate_peak_freq(fft, raw_peak_index[peak_new]);
         if (adjusted_bin > size || adjusted_bin < 0) {
             continue;
         }
@@ -242,5 +243,6 @@ float FFT::_estimate_peak_freq(float fft[], int peak_index) {
     float d = (dp + dm) / 2.f + tau(dp * dp) - tau(dm * dm);
 
     // k’ = k + d
-    return peak_index + 2.f * d;
+    return peak_index + d; // removed *2.f from "d" as it didn't correspond to mathematica formula 
+                           //(even wrote right formula on past prev line)
 }

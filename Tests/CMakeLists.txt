@@ -7,9 +7,10 @@ set(UNIT_TESTS_DIR ${ROOT_DIR}/Tests)
 
 # Note! arm compiler doesn't support random device, so turning it OFF will lead to errors if compile dronecan_v3 
 option(FIXED_SEED "Enable true random for FFT testing" OFF)
-if(FIXED_SEED)
+if(FIXED_SEED EQUAL ON)
     message(STATUS "FFT testing mode: FIXED SEED")
 else()
+    add_compile_options(-DFIXED_SEED)
     message(STATUS "FFT testing mode: NON FIXED SEED")
 endif()
 

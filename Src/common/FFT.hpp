@@ -49,6 +49,10 @@ private:
     uint16_t size;
     std::array<bool, MAX_NUM_AXES>          _fft_updated{false};
     std::array<real_t, FFT_MAX_SIZE>        _hanning_window;
+    
+    // Will have double size as consist of complex numbers
+    // i.e. The input array is packed with all the real numbers. 
+    // The output array is for the complex numbers without length reduced
     std::array<real_t, FFT_MAX_SIZE * 2>    _fft_output_buffer;
     std::array<real_t, FFT_MAX_SIZE>        _fft_input_buffer;
     std::array<float, NUMBER_OF_SAMPLES>    _peak_magnitudes_all;

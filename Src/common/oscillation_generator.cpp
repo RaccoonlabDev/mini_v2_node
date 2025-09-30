@@ -8,7 +8,7 @@
 #include "oscillation_generator.hpp"
 
 // TODO(ilyha_dev): make rd for tests random and for HAL make HAL_RNG_GenerateRandomNumber
-// Note! arm compiler doesn't support random device, so turning it OFF will lead to errors if compile dronecan_v3 
+// Note! arm compiler doesn't support random device, so defining it in dronecan_vX will lead to errors
 #ifndef FIXED_SEED
 std::mt19937 rd(12345);
 #else

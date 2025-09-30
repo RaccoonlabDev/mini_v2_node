@@ -9,16 +9,15 @@
 #define SRC_MODULES_IMU_HPP_
 
 #define FFT_MIN_FREQ 0.1f
-#define WINDOW_SIZE 64
+#define WINDOW_SIZE 256
 #define NUM_AXES 3
-#define SAMPLE_RATE_HZ 8
-
+#define SAMPLE_RATE_HZ 64
 // IMPORTANT NOTE: 
 // If you want to see oscilation data itself in a way that program sees it then
 // set imu.pub_frequency to the GENERATOR_SAMPLE_HZ frequency, so publisher would be able to publish data on time
-#define GENERATOR_SAMPLE_HZ 8
-#define GENERATOR_FREQ_HZ   2
-#define GENERATOR_AMPLITUDE 20 
+#define GENERATOR_SAMPLE_HZ 64
+#define GENERATOR_FREQ_HZ   8
+#define GENERATOR_AMPLITUDE 20
 
 #include <numbers>
 #include <random>
@@ -67,7 +66,7 @@ private:
     uint16_t pub_timeout_ms{0};
     std::array<float, NUM_AXES> gyro  = {0.0f, 0.0f, 0.0f};
     std::array<float, NUM_AXES> accel = {0.0f, 0.0f, 0.0f};
-    float temp{0};
+    float temperature{0};
     static constexpr float raw_gyro_to_rad_per_second(int16_t raw_gyro) {
         return raw_gyro * std::numbers::pi_v<float> / 131.0f / 180.0f;
     }
@@ -78,9 +77,9 @@ private:
     constexpr int16_t raw_temp_convert_to_celsius (int16_t raw_temp){
         // IMPORTANT: this temperature is "die" (iternal) temperature of the MPU9250. It DOES NOT refer to ambient temperature
         // 21 derived from Room Temp Offset 
-        temp = (float)raw_temp / 333.87f + 21.0;
+        temperature = (float)raw_temp / 333.87f + 21.0;
         // Simple and low cost rounding
-        return (static_cast<int16_t>(temp + (temp >= 0 ? 0.5f : -0.5f)));
+        return (static_cast<int16_t>(temperature + (temperature >= 0 ? 0.5f : -0.5f)));
     }
     void perform_logging_dronecan ();
 

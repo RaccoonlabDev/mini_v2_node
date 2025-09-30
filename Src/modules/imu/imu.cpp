@@ -84,25 +84,27 @@ void ImuModule::spin_once() {
         // Here we generate random values
         static uint64_t last_sample_time_ms = 0;
         // FFT excpects data to be given in certain rate
-        // as spin once called with unknowm frequency i made this interval
+        // as spin once called with unknown (really high) frequency i made this interval
         uint64_t sample_interval_ms = 1000 / GENERATOR_SAMPLE_HZ;
         uint64_t current_time = HAL_GetTick();
         if (current_time - last_sample_time_ms >= sample_interval_ms) {
-            last_sample_time_ms = current_time;
-
+            last_sample_time_ms = HAL_GetTick();
+            
+            
             pub.msg.rate_gyro_latest[0] = 0;
             pub.msg.rate_gyro_latest[1] = 0;
             pub.msg.rate_gyro_latest[2] = 0;
             updated[0] = true;
             update_gyro_fft();
-
-            accel[0] = accel_signals_generator.get_next_sample();
-
+            auto temp =  accel_signals_generator.get_next_sample();
+            accel[0] = temp;
+            accel[1] = temp;
+            accel[2] = temp;
             get_vibration(accel);
             pub.msg.accelerometer_latest[0] = accel[0];
             // Other axis are redundant if we want to simulate one wave
-            pub.msg.accelerometer_latest[1] = 0;
-            pub.msg.accelerometer_latest[2] = 0;
+            pub.msg.accelerometer_latest[1] = accel[1];
+            pub.msg.accelerometer_latest[2] = accel[2];
             updated[1] = true;
             update_accel_fft();
         }
