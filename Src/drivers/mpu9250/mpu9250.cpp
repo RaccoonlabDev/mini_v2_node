@@ -31,7 +31,7 @@ bool Mpu9250::initialize() {
     // Power-on delay
     // This delay is main problem solver, 
     // when MPU returned error on initialisation if just connect CAN to node
-    HAL_Delay(100);
+    //HAL_Delay(100);
     // Disable I2C interface to enable SPI mode
     std::byte disable_i2c = std::byte(0x10);  // I2C_IF_DIS bit
     auto user_ctrl_reg = std::byte(Mpu9250Register::USER_CTRL);
@@ -44,13 +44,13 @@ bool Mpu9250::initialize() {
     if (HAL::SPI::write_register(pwr_mgmt1_reg, reset_pwr)) {
         return false;
     }
-    HAL_Delay(100);  // Wait for reset to complete
+    //HAL_Delay(100);  // Wait for reset to complete
     // Only after necessary steps check who am i
     std::byte who_am_i_value{0};
     auto reg = std::byte(Mpu9250Register::WHO_AM_I);
     HAL::SPI::read_register(reg, &who_am_i_value);
-    initialized = who_am_i_value == MPU9250_WHO_AM_I_ID;
-    return initialized;
+
+    return who_am_i_value == MPU9250_WHO_AM_I_ID;
 }
 
 int8_t Mpu9250::read_accelerometer(std::array<int16_t, 3>* accel) const {

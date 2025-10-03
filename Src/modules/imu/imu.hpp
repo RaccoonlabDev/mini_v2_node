@@ -11,13 +11,12 @@
 #define FFT_MIN_FREQ 0.1f
 #define WINDOW_SIZE 256
 #define NUM_AXES 3
-#define SAMPLE_RATE_HZ 64
+#define SAMPLE_RATE_HZ 256
 // IMPORTANT NOTE: 
 // If you want to see oscilation data itself in a way that program sees it then
 // set imu.pub_frequency to the GENERATOR_SAMPLE_HZ frequency, so publisher would be able to publish data on time
-#define GENERATOR_SAMPLE_HZ 64
-#define GENERATOR_FREQ_HZ   8
-#define GENERATOR_AMPLITUDE 20
+#define GENERATOR_SAMPLE_HZ 256
+
 
 #include <numbers>
 #include <random>
@@ -31,7 +30,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+// TODO (ilyha_dev): make lazy FFTs and generator initialisation as it's big classes
 class ImuModule : public Module {
 public:
     enum class Bitmask : uint8_t {
@@ -58,7 +57,9 @@ private:
     Mpu9250 imu;
     FFT fft_accel;
     FFT fft_gyro;
-    SinSignalGenerator accel_signals_generator {GENERATOR_SAMPLE_HZ, GENERATOR_FREQ_HZ, GENERATOR_AMPLITUDE};
+    SinSignalGenerator accel_signals_generator {GENERATOR_SAMPLE_HZ};
+    uint16_t gen_freq{0};
+    uint16_t gen_amplitude{0};
     float vibration = 0.0f;
     bool initialized{false};
     bool enabled{false};

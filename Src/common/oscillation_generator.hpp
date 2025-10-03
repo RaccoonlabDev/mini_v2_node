@@ -11,9 +11,9 @@ extern std::random_device rd;
 #endif
 
 struct InitOneSignParamType   {
-    float sample_rate_hz = 0;
-    float freq_hz = 0;
-    float amplitude = 0;
+    uint16_t sample_rate_hz = 0;
+    uint16_t freq_hz = 0;
+    uint16_t amplitude = 0;
 };
 
 struct InitMultiSignalsParamType   {
@@ -26,15 +26,17 @@ class SinSignalGenerator {
 public:
     SinSignalGenerator(){}
     explicit SinSignalGenerator(InitOneSignParamType signal_parameters);
-
-    SinSignalGenerator(float sample_rate_hz, float freq_hz, float amplitude);
+    SinSignalGenerator(uint16_t sample_rate_hz);
+    SinSignalGenerator(uint16_t sample_rate_hz, uint16_t freq_hz, uint16_t amplitude);
+    void setFreq (uint16_t freq);
+    void setAmpl (uint16_t ampl);
     float get_next_sample();
 
-    float freq_hz;
-    float amplitude;
+    uint16_t freq_hz;
+    uint16_t amplitude;
 
 private:
-    float sample_rate_hz;
+    uint16_t sample_rate_hz;
     float phase = 0;
     float secs = 0;
 };

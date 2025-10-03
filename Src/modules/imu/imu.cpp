@@ -26,6 +26,8 @@ void ImuModule::update_params() {
     pub_timeout_ms = pub_frequency == 0 ? 0 : 1000 / pub_frequency;
     bitmask = static_cast<uint8_t>(paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_MODE_BITMASK));
     set_health((!bitmask || initialized) ? Module::Status::OK : Module::Status::MAJOR_FAILURE);
+    gen_amplitude = static_cast<uint16_t>(paramsGetIntegerValue(IntParamsIndexes::SYNTHETIC_AMPLITUDE));
+    gen_freq = static_cast<uint16_t>(paramsGetIntegerValue(IntParamsIndexes::SYNTHETIC_FREQ_GEN));
     if (bitmask) {
         set_mode(initialized ? Mode::STANDBY : Mode::INITIALIZATION);
     }
@@ -33,7 +35,8 @@ void ImuModule::update_params() {
 
 void ImuModule::spin_once() {
     bool generateRandom = ((0 == static_cast<uint16_t>
-        (paramsGetIntegerValue(IntParamsIndexes::SYNTHETIC_ACCEL_GYRO)))  ? true : false);
+        (paramsGetIntegerValue(IntParamsIndexes::SYNTHETIC_GEN)))  ? true : false);
+
     bool updated[2]{false, false};
     // If synthetic accel is turned on (value is 0) then we need to go further to data generation
     if (!generateRandom) {
@@ -80,8 +83,10 @@ void ImuModule::spin_once() {
         // GENERATOR_FREQ_HZ   for 3 gyro and 3 accel axis
         // GENERATOR_AMPLITUDE for 3 gyro and 3 accel axis
 
-
-        // Here we generate random values
+        // Set values for to generate
+        accel_signals_generator.setAmpl(gen_amplitude);
+        accel_signals_generator.setFreq(gen_freq);
+        // Here we generate random value for oscilations on acceleration OX axis.
         static uint64_t last_sample_time_ms = 0;
         // FFT excpects data to be given in certain rate
         // as spin once called with unknown (really high) frequency i made this interval
@@ -89,22 +94,25 @@ void ImuModule::spin_once() {
         uint64_t current_time = HAL_GetTick();
         if (current_time - last_sample_time_ms >= sample_interval_ms) {
             last_sample_time_ms = HAL_GetTick();
-            
-            
-            pub.msg.rate_gyro_latest[0] = 0;
+            /*pub.msg.rate_gyro_latest[0] = 0;
             pub.msg.rate_gyro_latest[1] = 0;
-            pub.msg.rate_gyro_latest[2] = 0;
+            pub.msg.rate_gyro_latest[2] = 0;*/
+            // Set whole array to 0 using memset
+            memset(pub.msg.rate_gyro_latest, 0, sizeof(pub.msg.rate_gyro_latest)*sizeof(pub.msg.rate_gyro_latest[0]));
             updated[0] = true;
-            update_gyro_fft();
-            auto temp =  accel_signals_generator.get_next_sample();
-            accel[0] = temp;
-            accel[1] = temp;
-            accel[2] = temp;
-            get_vibration(accel);
-            pub.msg.accelerometer_latest[0] = accel[0];
+
+            auto curr_accel =  accel_signals_generator.get_next_sample();
+            accel[0] = curr_accel;
+            accel[1] = 0;
+            accel[2] = 0;
+            // Set dafault values to vibration
+            get_vibration({curr_accel,0,0}); 
+            pub.msg.accelerometer_latest[0] = curr_accel;
+            //pub.msg.accelerometer_latest[1] = 0;
+            //pub.msg.accelerometer_latest[2] = 0
             // Other axis are redundant if we want to simulate one wave
-            pub.msg.accelerometer_latest[1] = accel[1];
-            pub.msg.accelerometer_latest[2] = accel[2];
+            // Set them from 2nd element as 1st is used
+            memset(pub.msg.accelerometer_latest + 1, 0, sizeof(pub.msg.accelerometer_latest)*sizeof(pub.msg.accelerometer_latest[0]));
             updated[1] = true;
             update_accel_fft();
         }

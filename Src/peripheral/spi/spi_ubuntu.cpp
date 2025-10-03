@@ -27,5 +27,10 @@ int8_t SPI::transaction(std::byte* tx, std::byte* rx, uint8_t size) {
     memset(rx, 0x00, size);
     return -1;
 }
-
+#pragma GCC diagnostic push // Save current warning state
+#pragma GCC diagnostic ignored "-Wunused-parameter"// Disable specific warnings
+int8_t SPI::write_register(std::byte& reg_address, std::byte& reg_value) {
+    return -1;
+}
+#pragma GCC diagnostic pop
 }  // namespace HAL

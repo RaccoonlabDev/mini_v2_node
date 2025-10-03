@@ -59,14 +59,15 @@ namespace rfft {
     inline T get_real_by_index(T* in, uint16_t index) {
         return in[index];
     }
-
+    #pragma GCC diagnostic push // Save current warning state
+    #pragma GCC diagnostic ignored "-Wunused-parameter"// Disable specific warnings
     // For FFTW_R2HC kind the imaginary part is zero
     // due to symmetries of the real-input DFT, and is not stored
     template<typename T>
     inline T get_imag_by_index(T* in, uint16_t index) {
-        return 0;
+        return *in;
     }
-
+    #pragma GCC diagnostic pop
     /*
     The function written based on fftw3 library.
     @param plan: The plan for the r2c transform.

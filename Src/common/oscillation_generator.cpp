@@ -26,17 +26,28 @@ SinSignalGenerator::SinSignalGenerator(InitOneSignParamType signal_parameters) :
                                     amplitude(signal_parameters.amplitude),
                                     sample_rate_hz(signal_parameters.sample_rate_hz) {};
                                     
-SinSignalGenerator::SinSignalGenerator(float sample_rate, float freq, float ampl) :
+SinSignalGenerator::SinSignalGenerator(uint16_t sample_rate, uint16_t freq, uint16_t ampl) :
                                     freq_hz(freq),
                                     amplitude(ampl),
                                     sample_rate_hz(sample_rate) {};
+SinSignalGenerator::SinSignalGenerator(uint16_t sample_rate) :
+                                    sample_rate_hz(sample_rate) {
+                                        freq_hz = 0;
+                                        amplitude = 0;
+                                    };
 float SinSignalGenerator::get_next_sample() {
     volatile auto sin = sinf(2 * M_PI * freq_hz * secs + phase);
     float sample = amplitude * sin;
     secs += 1.0f / sample_rate_hz;
     return sample;
 }
+void SinSignalGenerator::setFreq (uint16_t freq) {
+    this->freq_hz = freq;
+}
 
+void SinSignalGenerator::setAmpl (uint16_t ampl) {
+    this->amplitude = ampl;
+}
 
 void MultiSignalsSinGenerator::init() {
     signals_generator.resize(n_signals);
