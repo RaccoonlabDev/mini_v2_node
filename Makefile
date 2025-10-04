@@ -45,6 +45,8 @@ dronecan_v2: checks
 	cd ${BUILD_DIR}/dronecan_v2/obj && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_NODE_V2=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -G "Unix Makefiles" ../../.. && make
 sitl_dronecan: checks
 	mkdir -p ${BUILD_DIR}/dronecan_sitl/obj
+# Prevents bug when last modified dir is not sitl so script looks into build/release in run
+	touch ${BUILD_DIR}/dronecan_sitl
 	cd ${BUILD_DIR}/dronecan_sitl/obj && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_UBUNTU=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -G "Unix Makefiles" ../../.. && make
 dronecan_v3: checks
 	mkdir -p ${BUILD_DIR}/dronecan_v3/obj

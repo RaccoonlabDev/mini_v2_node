@@ -26,7 +26,8 @@ void ImuModule::update_params() {
     pub_timeout_ms = pub_frequency == 0 ? 0 : 1000 / pub_frequency;
     bitmask = static_cast<uint8_t>(paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_MODE_BITMASK));
     set_health((!bitmask || initialized) ? Module::Status::OK : Module::Status::MAJOR_FAILURE);
-    gen_amplitude = static_cast<uint16_t>(paramsGetIntegerValue(IntParamsIndexes::SYNTHETIC_AMPLITUDE));
+    gen_amplitude = static_cast<uint16_t>
+        (paramsGetIntegerValue(IntParamsIndexes::SYNTHETIC_AMPLITUDE));
     gen_freq = static_cast<uint16_t>(paramsGetIntegerValue(IntParamsIndexes::SYNTHETIC_FREQ_GEN));
     if (bitmask) {
         set_mode(initialized ? Mode::STANDBY : Mode::INITIALIZATION);
@@ -98,21 +99,22 @@ void ImuModule::spin_once() {
             pub.msg.rate_gyro_latest[1] = 0;
             pub.msg.rate_gyro_latest[2] = 0;*/
             // Set whole array to 0 using memset
-            memset(pub.msg.rate_gyro_latest, 0, sizeof(pub.msg.rate_gyro_latest)*sizeof(pub.msg.rate_gyro_latest[0]));
+            memset(pub.msg.rate_gyro_latest, 0,
+                sizeof(pub.msg.rate_gyro_latest)*sizeof(pub.msg.rate_gyro_latest[0]));
             updated[0] = true;
-
             auto curr_accel =  accel_signals_generator.get_next_sample();
             accel[0] = curr_accel;
             accel[1] = 0;
             accel[2] = 0;
             // Set dafault values to vibration
-            get_vibration({curr_accel,0,0}); 
+            get_vibration({curr_accel, 0, 0});
             pub.msg.accelerometer_latest[0] = curr_accel;
-            //pub.msg.accelerometer_latest[1] = 0;
-            //pub.msg.accelerometer_latest[2] = 0
+            // pub.msg.accelerometer_latest[1] = 0;
+            // pub.msg.accelerometer_latest[2] = 0
             // Other axis are redundant if we want to simulate one wave
             // Set them from 2nd element as 1st is used
-            memset(pub.msg.accelerometer_latest + 1, 0, sizeof(pub.msg.accelerometer_latest)*sizeof(pub.msg.accelerometer_latest[0]));
+            memset(pub.msg.accelerometer_latest + 1, 0,
+                sizeof(pub.msg.accelerometer_latest)*sizeof(pub.msg.accelerometer_latest[0]));
             updated[1] = true;
             update_accel_fft();
         }
