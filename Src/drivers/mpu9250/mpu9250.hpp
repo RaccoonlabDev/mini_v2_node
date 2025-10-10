@@ -39,8 +39,33 @@ public:
      * @return 0 on success, negative otherwise
      */
     int8_t read_temperature (int16_t& temperature) const;
+
+    /**
+     * @return 0 on success, negative otherwise
+     */
+    int8_t FIFO_reset () const;
+
+    /**
+     * @return 0 on success, negative otherwise
+     */
+    int8_t FIFO_init ();
+
+    /**
+     * @return 0 on success, negative otherwise
+     * @brief it's programmer responsobility to provide correct data which correspond to given bitmask in set_resolution
+     * Note: By default bitmask is 0b11111000
+     */
+    int8_t FIFO_read (int16_t* raw_temperature, int16_t* raw_gyro, int16_t* raw_accel) const;
+    /**
+     * @param bitmask is TEMP_FIFO_EN GYRO_XOUT GYRO_YOUT GYRO_ZOUT ACCEL SLV2 SLV1 SLV0 (8 bits)
+     * @return 0 on success, negative otherwise
+     */
+    int8_t FIFO_set_resolution (std::byte bitmask);
 private:
     bool initialized{false};
+    uint8_t fifo_entities = 0;
+    // Default: enable reading for all
+    std::byte bitmask {0b11111000};
 };
 
 #endif  // SRC_DRIVERS_MPU9250_MPU9250_HPP_
