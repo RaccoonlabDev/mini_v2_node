@@ -44,35 +44,37 @@ void ImuModule::spin_once() {
         if (!bitmask || !initialized) {
             return;
         }
-        // Usual reading routine
-        std::array<int16_t, NUM_AXES> mag_raw;
-        if (imu.read_magnetometer(&mag_raw) >= 0) {
-            mag.publish();
-        }
-        std::array<int16_t, NUM_AXES>  accel_raw = {0, 0, 0};
-        std::array<int16_t, NUM_AXES>  gyro_raw  = {0, 0, 0};
-        if (imu.read_gyroscope(&gyro_raw) >= 0) {
-            gyro = {
-                    raw_gyro_to_rad_per_second(gyro_raw[0]),
-                    raw_gyro_to_rad_per_second(gyro_raw[1]),
-                    raw_gyro_to_rad_per_second(gyro_raw[2])};
-            pub.msg.rate_gyro_latest[0] = gyro[0];
-            pub.msg.rate_gyro_latest[1] = gyro[1];
-            pub.msg.rate_gyro_latest[2] = gyro[2];
-            updated[0] = true;
-            update_gyro_fft();
-        }
-        if (imu.read_accelerometer(&accel_raw) >= 0) {
-            accel = {
-                    raw_accel_to_meter_per_square_second(accel_raw[0]),
-                    raw_accel_to_meter_per_square_second(accel_raw[1]),
-                    raw_accel_to_meter_per_square_second(accel_raw[2])};
-            get_vibration(accel);
-            pub.msg.accelerometer_latest[0] = accel[0];
-            pub.msg.accelerometer_latest[1] = accel[1];
-            pub.msg.accelerometer_latest[2] = accel[2];
-            updated[1] = true;
-            update_accel_fft();
+        static uint32_t last_read = 0;
+        uint32_t current_time = HAL_GetTick();
+    
+
+        if (current_time - last_read >= 100) {
+            std::array<int16_t, NUM_AXES> mag_raw;
+            if (imu.read_magnetometer(&mag_raw) >= 0) {
+                mag.publish();
+            }
+            
+            std::array<int16_t, NUM_AXES> accel_raw = {0, 0, 0};
+            std::array<int16_t, NUM_AXES> gyro_raw = {0, 0, 0};
+            int16_t temp_raw;
+            
+            if (imu.FIFO_read(&temp_raw, &gyro_raw, &accel_raw) == 0) {
+                // Only process if FIFO read was successful
+                pub.msg.rate_gyro_latest[0] = gyro_raw[0];
+                pub.msg.rate_gyro_latest[1] = gyro_raw[1];
+                pub.msg.rate_gyro_latest[2] = gyro_raw[2];
+                
+                pub.msg.accelerometer_latest[0] = accel_raw[0];
+                pub.msg.accelerometer_latest[1] = accel_raw[1];
+                pub.msg.accelerometer_latest[2] = accel_raw[2];
+                
+                updated[0] = true;
+                updated[1] = true;
+                update_gyro_fft();
+                update_accel_fft();
+            }
+            
+            last_read = current_time;
         }
     } else {
         // TODO(ilyha_dev): ideally implement it's own message type for synthetic data

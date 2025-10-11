@@ -9,7 +9,7 @@
 
 #include <cstdint>
 #include <array>
-
+#include "common/logging.hpp"
 class Mpu9250 {
 public:
     Mpu9250() = default;
@@ -43,7 +43,7 @@ public:
     /**
      * @return 0 on success, negative otherwise
      */
-    int8_t FIFO_reset () const;
+    int8_t FIFO_reset ();
 
     /**
      * @return 0 on success, negative otherwise
@@ -55,12 +55,13 @@ public:
      * @brief it's programmer responsobility to provide correct data which correspond to given bitmask in set_resolution
      * Note: By default bitmask is 0b11111000
      */
-    int8_t FIFO_read (int16_t* raw_temperature, int16_t* raw_gyro, int16_t* raw_accel) const;
+    int8_t FIFO_read (int16_t* raw_temperature, std::array<int16_t, 3>*  raw_gyro, std::array<int16_t, 3>*  raw_accel);
     /**
      * @param bitmask is TEMP_FIFO_EN GYRO_XOUT GYRO_YOUT GYRO_ZOUT ACCEL SLV2 SLV1 SLV0 (8 bits)
      * @return 0 on success, negative otherwise
      */
-    int8_t FIFO_set_resolution (std::byte bitmask);
+
+    uint16_t FIFO_count ();
 private:
     bool initialized{false};
     uint8_t fifo_entities = 0;
