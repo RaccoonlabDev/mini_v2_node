@@ -10,7 +10,7 @@
 #include <vector>
 #include "main.h"
 
-static constexpr uint32_t TRANSMIT_DELAY = 100; // 100 is experimental value. Need to prove it
+static constexpr uint32_t TRANSMIT_DELAY = 100;  // 100 is experimental value. Need to prove it
 static constexpr std::byte SPI_READ{0x80};
 
 extern SPI_HandleTypeDef hspi2;
@@ -71,7 +71,6 @@ int8_t SPI::transaction(std::byte* tx, std::byte* rx, uint8_t size) {
     }
 
     spi_set_nss(false);
-    for(volatile int i = 0; i < 10; i++);
     memset(rx, 0x00, size);
     auto status = HAL_SPI_TransmitReceive(hspi,
                                           reinterpret_cast<uint8_t*>(tx),
@@ -79,7 +78,6 @@ int8_t SPI::transaction(std::byte* tx, std::byte* rx, uint8_t size) {
                                           size,
                                           TRANSMIT_DELAY
     );
-    for(volatile int i = 0; i < 10; i++);
     spi_set_nss(true);
 
     return (status == HAL_OK) ? 0 : -status;

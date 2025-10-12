@@ -38,6 +38,9 @@ public:
         ENABLE_VIB_ESTIM            = 2,
         ENABLE_FFT_ACC              = 4,
         ENABLE_FFT_GYR              = 8,
+        ENABLE_SYNTH_GEN            = 16,
+        ENABLE_FIFO_READINGS        = 32,
+        ENABLE_REG_READINGS         = 64,
         ENABLE_ALL_BY_DEFAULT       = 15,
     };
     ImuModule() : Module(256, Protocol::DRONECAN) {}
@@ -68,6 +71,9 @@ private:
     std::array<float, NUM_AXES> gyro  = {0.0f, 0.0f, 0.0f};
     std::array<float, NUM_AXES> accel = {0.0f, 0.0f, 0.0f};
     float temperature{0};
+    void process_random_gen (std::array<bool, 2>& updated);
+    void process_real_fifo (std::array<bool, 2>& updated);
+    void process_real_register (std::array<bool, 2>& updated);
     static constexpr float raw_gyro_to_rad_per_second(int16_t raw_gyro) {
         return raw_gyro * std::numbers::pi_v<float> / 131.0f / 180.0f;
     }
@@ -82,7 +88,7 @@ private:
         // Simple and low cost rounding
         return (static_cast<int16_t>(temperature + (temperature >= 0 ? 0.5f : -0.5f)));
     }
-    void perform_logging_dronecan ();
+    void perform_logging_dronecan (bool is_real_data_read);
 
 };
 

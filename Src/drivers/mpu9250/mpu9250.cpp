@@ -10,7 +10,7 @@
 #include "peripheral/spi/spi.hpp"
 #include "common/logging.hpp"
 #include "main.h"
-#include <string>
+#include <vector>
 // Register Map for Gyroscope and Accelerometer
 enum class AccelGyroRegisters : uint8_t {
     ACCEL_XOUT_H = 0x3B,
@@ -29,7 +29,7 @@ enum class Mpu9250Registers : uint8_t {
     FIFO_COUNT_H = 0x72,
     FIFO_R_W = 0x74,
     CONFIG = 0x1A,
-    SMPLRT_DIV = 0x19,
+    SMPLRT_DIV = 0x19,    
     ACCEL_CONFIG2 = 0x1D
 };
 
@@ -100,6 +100,45 @@ int8_t Mpu9250::read_temperature (int16_t& temperature) const {
     return 0;
 }
 
+int8_t Mpu9250::FIFO_create () {
+    // Set sample rate divider
+    auto smprt_div_reg = std::byte(Mpu9250Registers::SMPLRT_DIV);
+    std::byte smprt_div = std::byte{0x03}; // 200Hz: 1000/(1+4) = 250Hz
+    if (HAL::SPI::write_register(smprt_div_reg, smprt_div)) {
+        return false;
+    }
+    
+    // Set ACCEL_CONFIG2 for accelerometer sample rate
+    auto accel_config2_reg = std::byte(Mpu9250Registers::ACCEL_CONFIG2);
+    std::byte accel_config2_val{0x03};  // 44Hz filter, matches gyro
+    if (HAL::SPI::write_register(accel_config2_reg, accel_config2_val)) {
+        return false;
+    }
+    
+    // Wait for accel config to take effect  
+    HAL_Delay(1);
+    // Reset FIFO before configuration
+    if (FIFO_reset() != 0) {
+        return false;
+    }
+    
+    // Wait after FIFO reset
+    HAL_Delay(1);
+    // Configure FIFO for accelerometer only
+    FIFO_set_resolution(bitmask);
+    
+    // Wait before enabling FIFO
+    HAL_Delay(1);
+    // Enable FIFO
+    if (FIFO_init() != 0) {
+        return false;
+    }
+    
+    // Wait for FIFO to stabilize
+    HAL_Delay(1);
+    return 0;
+}
+
 bool Mpu9250::initialize() {
     // Reset device
     std::byte reset_pwr = std::byte(0x80);
@@ -108,9 +147,8 @@ bool Mpu9250::initialize() {
         return false;
     }
     
-    // Wait for reset to complete (critical!)
-    for(volatile int i = 0; i < 100000; i++); // ~10ms delay
-    
+    // Wait for reset to complete
+    HAL_Delay(10);
     // Wake up with proper clock source
     std::byte pwr_mgmt1 = std::byte(0x01);
     if (HAL::SPI::write_register(pwr_mgmt1_reg, pwr_mgmt1)) {
@@ -118,9 +156,8 @@ bool Mpu9250::initialize() {
     }
     
     // Wait for clock stabilization
-    for(volatile int i = 0; i < 20000; i++); // ~2ms delay
-    
-    // Disable I2C (critical for SPI mode)
+    HAL_Delay(2);
+    // Disable I2C
     std::byte disable_i2c = std::byte(0x10);
     auto user_ctrl_reg = std::byte(Mpu9250Registers::USER_CTRL);
     if (HAL::SPI::write_register(user_ctrl_reg, disable_i2c)) {
@@ -128,63 +165,13 @@ bool Mpu9250::initialize() {
     }
     
     // Wait for I2C disable to take effect
-    for(volatile int i = 0; i < 10000; i++); // ~1ms delay
-    
-    // *** CRITICAL: Set CONFIG register for DLPF and internal sample rate ***
+    HAL_Delay(1);
+    // Set CONFIG register for DLPF and internal sample rate ***
     auto config_reg = std::byte(Mpu9250Registers::CONFIG);
     std::byte config_val{0x03};  // DLPF=44Hz, enables 1kHz internal rate
     if (HAL::SPI::write_register(config_reg, config_val)) {
         return false;
     }
-    
-    // Wait for CONFIG to take effect
-    for(volatile int i = 0; i < 5000; i++); // ~500us delay
-    
-    // *** Now SMPLRT_DIV will work! Set sample rate divider ***
-    auto smprt_div_reg = std::byte(Mpu9250Registers::SMPLRT_DIV);
-    std::byte smprt_div = std::byte{0x04}; // 200Hz: 1000/(1+4) = 200Hz
-    if (HAL::SPI::write_register(smprt_div_reg, smprt_div)) {
-        return false;
-    }
-    
-    // *** CRITICAL: Set ACCEL_CONFIG2 for accelerometer sample rate ***
-    auto accel_config2_reg = std::byte(Mpu9250Registers::ACCEL_CONFIG2);
-    std::byte accel_config2_val{0x03};  // 44Hz filter, matches gyro
-    if (HAL::SPI::write_register(accel_config2_reg, accel_config2_val)) {
-        return false;
-    }
-    
-    // Wait for accel config to take effect  
-    for(volatile int i = 0; i < 5000; i++); // ~500us delay
-    
-    // Reset FIFO before configuration
-    if (FIFO_reset() != 0) {
-        return false;
-    }
-    
-    // Wait after FIFO reset
-    for(volatile int i = 0; i < 5000; i++); // ~500us delay
-    
-    // Configure FIFO for accelerometer only
-    auto fifo_enable_reg = std::byte(Mpu9250Registers::FIFO_ENABLE);
-    std::byte accel_bitmask{0x08};
-    if (HAL::SPI::write_register(fifo_enable_reg, accel_bitmask)) {
-        return false;
-    }
-    
-    fifo_entities = 3; // 3 axes for accelerometer
-    
-    // Wait before enabling FIFO
-    for(volatile int i = 0; i < 5000; i++); // ~500us delay
-    
-    // Enable FIFO
-    if (FIFO_init() != 0) {
-        return false;
-    }
-    
-    // Wait for FIFO to stabilize
-    for(volatile int i = 0; i < 5000; i++); // ~500us delay
-    
     // Verify device ID
     std::byte who_am_i_value{0};
     auto reg = std::byte(Mpu9250Registers::WHO_AM_I);
@@ -197,6 +184,24 @@ bool Mpu9250::initialize() {
 #else
     return true;
 #endif
+}
+
+int8_t Mpu9250::FIFO_set_resolution (std::byte set_bitmask) {
+    // No need to safe data from FIFO_ENABLE as it will be new every time
+    // See docs to change value
+    auto fifo_enable_reg = std::byte(Mpu9250Registers::FIFO_ENABLE);
+    if (HAL::SPI::write_register(fifo_enable_reg, set_bitmask)) {
+        return -1;
+    }
+
+    fifo_frame_bytes = __builtin_popcount(static_cast<uint8_t>(set_bitmask));
+    if (static_cast<uint8_t>(set_bitmask & std::byte{0x08})) {
+        // Check on ACCEL bit. If turned on then will be 2 more entities
+        fifo_frame_bytes += 2;
+    }
+    fifo_frame_bytes *= 2;
+    bitmask = set_bitmask;
+    return 0;
 }
 
 int8_t Mpu9250::FIFO_reset() {
@@ -214,20 +219,20 @@ int8_t Mpu9250::FIFO_reset() {
     if (HAL::SPI::write_register(fifo_enable_reg, disable_all)) return -1;
     
     // 3. Wait for FIFO to settle
-    for(volatile int i = 0; i < 1000; i++); // ~100us
+    HAL_Delay(1);
     
     // 4. Issue FIFO_RST pulse
     std::byte rst = data | std::byte{0x04}; // set bit 2 (FIFO_RST)
     if (HAL::SPI::write_register(user_ctrl_reg, rst)) return -1;
     
     // 5. Wait for reset to complete
-    for(volatile int i = 0; i < 1000; i++); // ~100us
+    HAL_Delay(1);
     
     // 6. Clear the FIFO_RST bit
     if (HAL::SPI::write_register(user_ctrl_reg, data)) return -1;
     
     // 7. Wait before next operation
-    for(volatile int i = 0; i < 1000; i++); // ~100us
+    HAL_Delay(1);
     
     // 8. Verify FIFO count is zero
     uint16_t count = FIFO_count();
@@ -311,12 +316,7 @@ int8_t Mpu9250::FIFO_read(int16_t* raw_temperature, std::array<int16_t, 3>* raw_
         logger.log_error(msg);
 
         // Re-enable accelerometer FIFO
-        auto fifo_enable_reg = std::byte(Mpu9250Registers::FIFO_ENABLE);
-        std::byte accel_bitmask{0x08};
-        for(volatile int i = 0; i < 1000; i++);
-        if (HAL::SPI::write_register(fifo_enable_reg, accel_bitmask)) {
-            return -1;
-        }
+        FIFO_set_resolution(bitmask);
         snprintf(msg, sizeof(msg), "FIFO overflow detected, configured");
         logger.log_error(msg);
         // Re-enable FIFO
@@ -333,28 +333,61 @@ int8_t Mpu9250::FIFO_read(int16_t* raw_temperature, std::array<int16_t, 3>* raw_
     
     // Get FIFO count
     
-    
     // Only read if we have complete frames (6 bytes per accel sample)
-    if (fifo_count < 6) {
+    if (fifo_count < fifo_frame_bytes) {
         return -3; // Not enough data
     }
     
     // Read only one complete frame to avoid timing issues
-    std::byte raw_data[6];
+    std::byte raw_data[fifo_frame_bytes];
     auto fifo_reg = std::byte(Mpu9250Registers::FIFO_R_W);
-    if (HAL::SPI::read_registers(fifo_reg, raw_data, 6) != 0) {
+    if (HAL::SPI::read_registers(fifo_reg, raw_data, fifo_frame_bytes) != 0) {
         logger.log_error("Failed to read FIFO data");
         return -1;
     }
     
     // Parse accelerometer data (big-endian format)
-    (*raw_accel)[0] = (int16_t)((uint16_t(raw_data[0]) << 8) | uint16_t(raw_data[1]));
-    (*raw_accel)[1] = (int16_t)((uint16_t(raw_data[2]) << 8) | uint16_t(raw_data[3]));
-    (*raw_accel)[2] = (int16_t)((uint16_t(raw_data[4]) << 8) | uint16_t(raw_data[5]));
+    if (static_cast<uint8_t>(bitmask & std::byte{0x08})){
+        // Parse accelerometer data (big-endian format)
+        (*raw_accel)[0] = static_cast<int16_t>((uint16_t(raw_data[0]) << 8) | uint16_t(raw_data[1]));
+        (*raw_accel)[1] = static_cast<int16_t>((uint16_t(raw_data[2]) << 8) | uint16_t(raw_data[3]));
+        (*raw_accel)[2] = static_cast<int16_t>((uint16_t(raw_data[4]) << 8) | uint16_t(raw_data[5]));
+    }
+    if (static_cast<uint8_t>(bitmask & std::byte{0x80})) {
+        *raw_temperature = static_cast<int16_t>((uint16_t)raw_data[6] << 8 | (uint16_t)raw_data[7]);
+    }
     
+    if (static_cast<uint8_t>(bitmask & std::byte{0x40})) {
+            (*raw_gyro)[0] = static_cast<int16_t>((uint16_t)raw_data[8] << 8 | (uint16_t)raw_data[9]);
+    }
+    if (static_cast<uint8_t>(bitmask & std::byte{0x20})) {
+            (*raw_gyro)[1] = static_cast<int16_t>((uint16_t)raw_data[10] << 8 | (uint16_t)raw_data[11]);
+    }
+    if (static_cast<uint8_t>(bitmask & std::byte{0x10})) {
+            (*raw_gyro)[2] = static_cast<int16_t>((uint16_t)raw_data[12] << 8 | (uint16_t)raw_data[13]);
+    }
+
     snprintf(msg, sizeof(msg), "Accel: %d, %d, %d", 
              (int)(*raw_accel)[0], (int)(*raw_accel)[1], (int)(*raw_accel)[2]);
     logger.log_info(msg);
     
     return 0;
 }
+
+/*if (static_cast<uint8_t>(bitmask & std::byte{0x08})){
+            // Parse accelerometer data (big-endian format)
+            (*raw_accel)[0] = (int16_t)((uint16_t(raw_data[0]) << 8) | uint16_t(raw_data[1]));
+            (*raw_accel)[1] = (int16_t)((uint16_t(raw_data[2]) << 8) | uint16_t(raw_data[3]));
+            (*raw_accel)[2] = (int16_t)((uint16_t(raw_data[4]) << 8) | uint16_t(raw_data[5]));
+        }
+        if (static_cast<uint8_t>(bitmask & std::byte{0x80}))
+            *raw_temperature = static_cast<int16_t>((uint16_t)raw_data[6] << 8 | (uint16_t)raw_data[7]);
+        
+        if (static_cast<uint8_t>(bitmask & std::byte{0x40}))
+            (*raw_gyro)[0] = (uint16_t)raw_data[8] << 8 | (uint16_t)raw_data[9];
+        
+        if (static_cast<uint8_t>(bitmask & std::byte{0x20}))
+            (*raw_gyro)[1] = (uint16_t)raw_data[10] << 8 | (uint16_t)raw_data[11];
+
+        if (static_cast<uint8_t>(bitmask & std::byte{0x10}))
+            (*raw_gyro)[2] = (uint16_t)raw_data[12] << 8 | (uint16_t)raw_data[13];*/

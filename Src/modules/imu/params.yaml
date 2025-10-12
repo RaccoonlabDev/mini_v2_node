@@ -6,12 +6,16 @@ imu.mode:
     </br> Bit 2 - enable vibration metric publishing to RawImu.integration_interval,
     </br> Bit 3 - enable FFT acceleration publishing to RawImu.accelerometer_integral,
     </br> Bit 4 - enable FFT acceleration publishing to RawImu.rate_gyro_integral,
-    </br> By default 15 that mean enable all publishers."
+    </br> Bit 5 - enable synthetic data generation. Has priority over real readings,
+    </br> Bit 6 - use FIFO for real data readings (sample rate = 250Hz, Bandwidth (gyro/accel) = 41/~44.8Hz). Has priority over register readings,
+    </br> Bit 7 - use forward register adressing for data readings,
+    </br> 15 - enable all publishers,
+    Note: synthetic generation, FIFO and register readings should be used mutually exclusively."
   enum: PARAM_IMU_MODE_BITMASK
   flags: mutable
   default: 0
   min: 0
-  max: 15
+  max: 79
 
 imu.pub_frequency:
   type: Integer
@@ -21,15 +25,6 @@ imu.pub_frequency:
   default: 1
   min: 0
   max: 400
-
-imu.synthetic_gen:
-  type: Integer
-  note: "Turns on synthetic wave generation on OX axis acceleration, which will be a stream of oscilations. 0 - turn on, 1 - turn off."
-  enum: SYNTHETIC_GEN
-  flags: mutable
-  default: 1
-  min: 0
-  max: 1
 
 imu.synthetic_frequency:
   type: Integer

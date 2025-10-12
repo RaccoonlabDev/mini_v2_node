@@ -13,6 +13,7 @@ REGISTER_MODULE(ImuModule)
 
 void ImuModule::init() {
     initialized = imu.initialize();
+    imu.FIFO_create();
     set_mode(Mode::STANDBY);
     fft_accel.init(WINDOW_SIZE, NUM_AXES, SAMPLE_RATE_HZ);
     fft_accel.fft_min_freq = FFT_MIN_FREQ;
@@ -34,124 +35,38 @@ void ImuModule::update_params() {
     }
 }
 
-void ImuModule::spin_once() {
-    bool generateRandom = ((0 == static_cast<uint16_t>
-        (paramsGetIntegerValue(IntParamsIndexes::SYNTHETIC_GEN)))  ? true : false);
 
-    bool updated[2]{false, false};
+void ImuModule::spin_once() {
+    std::array<bool,2> updated {false, false};
+    bool is_real_data_read = true;
     // If synthetic accel is turned on (value is 0) then we need to go further to data generation
-    if (!generateRandom) {
+    if (!static_cast<uint8_t>(bitmask & static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_SYNTH_GEN))) {
         if (!bitmask || !initialized) {
             return;
         }
-        static uint32_t last_read = 0;
-        uint32_t current_time = HAL_GetTick();
-        
-        // Increase read frequency to prevent FIFO overflow
-        // Changed from 50ms to 20ms (50Hz to match reduced sample rate)
-        if (current_time - last_read >= 20) {
-            std::array<int16_t, NUM_AXES> mag_raw;
-            if (imu.read_magnetometer(&mag_raw) >= 0) {
-                mag.publish();
-            }
-
-            std::array<int16_t, 3> accel_raw = {0, 0, 0};
-            std::array<int16_t, 3> gyro_raw = {0, 0, 0};
-            int16_t temp_raw;
-
-            int8_t result = imu.FIFO_read(&temp_raw, &gyro_raw, &accel_raw);
-            
-            if (result == 0) {
-                // Success - process data
-                pub.msg.rate_gyro_latest[0] = gyro_raw[0];
-                pub.msg.rate_gyro_latest[1] = gyro_raw[1];
-                pub.msg.rate_gyro_latest[2] = gyro_raw[2];
-                
-                pub.msg.accelerometer_latest[0] = accel_raw[0];
-                pub.msg.accelerometer_latest[1] = accel_raw[1];
-                pub.msg.accelerometer_latest[2] = accel_raw[2];
-                
-                updated[0] = true;
-                updated[1] = true;
-                
-                update_gyro_fft();
-                update_accel_fft();
-                
-            } else if (result == -2) {
-                // Overflow handled, continue without updating
-                char buffer[25];
-                snprintf(buffer, sizeof(buffer), "FIFO overflow handled");
-                logger.log_info(buffer);
-                
-            } else if (result == -3) {
-                // Not enough data, normal condition
-                // Don't log this as error
-                
-            } else {
-                // Error condition
-                char buffer[25];
-                snprintf(buffer, sizeof(buffer), "FIFO read error: %d", result);
-                logger.log_error(buffer);
-            }
-
-            last_read = current_time;
+        if (static_cast<uint8_t>(bitmask & static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_FIFO_READINGS))) {
+            process_real_fifo(updated);
+        } else if (static_cast<uint8_t>(bitmask & static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_REG_READINGS))) {
+            process_real_register(updated);
+        } else {
+            is_real_data_read = false;
         }
+
     } else {
-        // TODO(ilyha_dev): ideally implement it's own message type for synthetic data
-        // Motivation: relevant idea iff we want to generate only one oscilating axis
-        // i.e. put on dronecan only one axis which is used for oscilations - others are redundant
-        // Otherwise (if motivation is not relevant): make lots of params for dronecan for each axis
-        // i.e.
-        // GENERATOR_SAMPLE_HZ for 3 gyro and 3 accel axis
-        // GENERATOR_FREQ_HZ   for 3 gyro and 3 accel axis
-        // GENERATOR_AMPLITUDE for 3 gyro and 3 accel axis
-
-        // Set values for to generate
-        accel_signals_generator.setAmpl(gen_amplitude);
-        accel_signals_generator.setFreq(gen_freq);
-        // Here we generate random value for oscilations on acceleration OX axis.
-        static uint64_t last_sample_time_ms = 0;
-        // FFT excpects data to be given in certain rate
-        // as spin once called with unknown (really high) frequency i made this interval
-        uint64_t sample_interval_ms = 1000 / GENERATOR_SAMPLE_HZ;
-        uint64_t current_time = HAL_GetTick();
-        if (current_time - last_sample_time_ms >= sample_interval_ms) {
-            last_sample_time_ms = HAL_GetTick();
-            /*pub.msg.rate_gyro_latest[0] = 0;
-            pub.msg.rate_gyro_latest[1] = 0;
-            pub.msg.rate_gyro_latest[2] = 0;*/
-            // Set whole array to 0 using memset
-            memset(pub.msg.rate_gyro_latest, 0,
-                sizeof(pub.msg.rate_gyro_latest)*sizeof(pub.msg.rate_gyro_latest[0]));
-            updated[0] = true;
-            auto curr_accel =  accel_signals_generator.get_next_sample();
-            accel[0] = curr_accel;
-            accel[1] = 0;
-            accel[2] = 0;
-            // Set dafault values to vibration
-            get_vibration({curr_accel, 0, 0});
-            pub.msg.accelerometer_latest[0] = curr_accel;
-            // pub.msg.accelerometer_latest[1] = 0;
-            // pub.msg.accelerometer_latest[2] = 0
-            // Other axis are redundant if we want to simulate one wave
-            // Set them from 2nd element as 1st is used
-            memset(pub.msg.accelerometer_latest + 1, 0,
-                sizeof(pub.msg.accelerometer_latest)*sizeof(pub.msg.accelerometer_latest[0]));
-            updated[1] = true;
-            update_accel_fft();
-        }
+        process_random_gen(updated);
+        is_real_data_read = false;
     }
     if (pub_timeout_ms != 0 && HAL_GetTick() - pub.msg.timestamp / 1000 > pub_timeout_ms) {
         if (updated[0] && updated[1]) {
             pub.msg.timestamp = HAL_GetTick() * 1000;
             pub.publish();
             // Send logging data to dronecan every second
-            perform_logging_dronecan();
+            perform_logging_dronecan(is_real_data_read);
         }
     }
 }
 
-void ImuModule::perform_logging_dronecan (void)  {
+void ImuModule::perform_logging_dronecan (bool is_real_data_read)  {
     // Log temperature
     int16_t raw_temp{0};
     char buffer[40];
@@ -167,6 +82,11 @@ void ImuModule::perform_logging_dronecan (void)  {
         logger.log_error(buffer);
     } else {
         snprintf(buffer, sizeof(buffer), "MPU9250 is initialised!");
+        logger.log_info(buffer);
+    }
+
+    if (!is_real_data_read) {
+        snprintf(buffer, sizeof(buffer), "No real reading was specified");
         logger.log_info(buffer);
     }
 }
@@ -188,6 +108,9 @@ void ImuModule::update_accel_fft() {
     if (!(bitmask & static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_FFT_ACC))) {
         return;
     }
+    char buffer[40];
+    snprintf(buffer, sizeof(buffer), "in fft accel");
+    logger.log_info(buffer);
     fft_accel.update(accel.data());
     pub.msg.accelerometer_integral[0] = fft_accel.dominant_frequency;
     pub.msg.accelerometer_integral[1] = fft_accel.dominant_mag * 1000;
@@ -202,4 +125,144 @@ void ImuModule::update_gyro_fft() {
     pub.msg.rate_gyro_integral[0] = fft_gyro.dominant_frequency;
     pub.msg.rate_gyro_integral[1] = fft_gyro.dominant_mag * 1000;
     pub.msg.rate_gyro_integral[2] = fft_gyro.dominant_snr;
+}
+
+
+// Process reading functions
+
+void ImuModule::process_random_gen (std::array<bool, 2>& updated){
+    // TODO(ilyha_dev): ideally implement it's own message type for synthetic data
+    // Motivation: relevant idea iff we want to generate only one oscilating axis
+    // i.e. put on dronecan only one axis which is used for oscilations - others are redundant
+    // Otherwise (if motivation is not relevant): make lots of params for dronecan for each axis
+    // i.e.
+    // GENERATOR_SAMPLE_HZ for 3 gyro and 3 accel axis
+    // GENERATOR_FREQ_HZ   for 3 gyro and 3 accel axis
+    // GENERATOR_AMPLITUDE for 3 gyro and 3 accel axis
+
+    // Set values for to generate
+    accel_signals_generator.setAmpl(gen_amplitude);
+    accel_signals_generator.setFreq(gen_freq);
+
+    static uint64_t last_sample_time_ms = 0;
+    // FFT excpects data to be given in certain rate
+    // as spin once called with unknown (really high) frequency i made this interval
+    uint64_t sample_interval_ms = 1000 / GENERATOR_SAMPLE_HZ;
+    uint64_t current_time = HAL_GetTick();
+    if (current_time - last_sample_time_ms >= sample_interval_ms) {
+        last_sample_time_ms = HAL_GetTick();
+        // Set whole array to 0 using memset
+        memset(pub.msg.rate_gyro_latest, 0,
+            sizeof(pub.msg.rate_gyro_latest)*sizeof(pub.msg.rate_gyro_latest[0]));
+        updated[0] = true;
+        auto curr_accel =  accel_signals_generator.get_next_sample();
+        accel[0] = curr_accel;
+        accel[1] = 0;
+        accel[2] = 0;
+        // Set dafault values to vibration
+        get_vibration({curr_accel, 0, 0});
+        pub.msg.accelerometer_latest[0] = curr_accel;
+        // Other axis are redundant if we want to simulate one wave
+        // Set them from 2nd element as 1st is used
+        memset(pub.msg.accelerometer_latest + 1, 0,
+            sizeof(pub.msg.accelerometer_latest)*sizeof(pub.msg.accelerometer_latest[0]));
+        updated[1] = true;
+        update_accel_fft();
+    }
+}
+
+void ImuModule::process_real_fifo (std::array<bool, 2>& updated){
+    static uint32_t last_read = 0;
+    uint32_t current_time = HAL_GetTick();
+
+    if (current_time - last_read >= 5) {
+
+        std::array<int16_t, NUM_AXES> mag_raw;
+        if (imu.read_magnetometer(&mag_raw) >= 0) {
+            mag.publish();
+        }
+        std::array<int16_t, 3> accel_raw = {0, 0, 0};
+        std::array<int16_t, 3> gyro_raw = {0, 0, 0};
+        int16_t temp_raw;
+
+        int8_t result = imu.FIFO_read(&temp_raw, &gyro_raw, &accel_raw);
+        if (result == 0) {
+            // Success - process data
+            gyro = {
+                raw_gyro_to_rad_per_second(gyro_raw[0]),
+                raw_gyro_to_rad_per_second(gyro_raw[1]),
+                raw_gyro_to_rad_per_second(gyro_raw[2])};
+            pub.msg.rate_gyro_latest[0] = gyro[0];
+            pub.msg.rate_gyro_latest[1] = gyro[1];
+            pub.msg.rate_gyro_latest[2] = gyro[2];
+
+            accel = {
+                    raw_accel_to_meter_per_square_second(accel_raw[0]),
+                    raw_accel_to_meter_per_square_second(accel_raw[1]),
+                    raw_accel_to_meter_per_square_second(accel_raw[2])};
+            get_vibration(accel);
+            pub.msg.accelerometer_latest[0] = accel[0];
+            pub.msg.accelerometer_latest[1] = accel[1];
+            pub.msg.accelerometer_latest[2] = accel[2];
+            updated[0] = true;
+            updated[1] = true;
+
+            update_gyro_fft();
+            update_accel_fft();
+
+        } else if (result == -2) {
+            // Overflow handled, continue without updating
+            char buffer[25];
+            snprintf(buffer, sizeof(buffer), "FIFO overflow handled");
+            logger.log_info(buffer);
+
+        } else if (result == -3) {
+            // Not enough data, normal condition
+            // Don't log this as error
+
+        } else {
+            // Error condition
+            char buffer[25];
+            snprintf(buffer, sizeof(buffer), "FIFO read error: %d", result);
+            logger.log_error(buffer);
+        }
+
+        last_read = current_time;
+    }
+}
+
+void ImuModule::process_real_register (std::array<bool, 2>& updated) {
+    // Usual reading routine
+    std::array<int16_t, 3> mag_raw;
+    if (imu.read_magnetometer(&mag_raw) >= 0) {
+        mag.publish();
+    }
+        
+    std::array<int16_t, 3>  accel_raw = {0, 0, 0};
+    std::array<int16_t, 3>  gyro_raw  = {0, 0, 0};
+
+    if (imu.read_gyroscope(&gyro_raw) >= 0) {
+        gyro = {
+                raw_gyro_to_rad_per_second(gyro_raw[0]),
+                raw_gyro_to_rad_per_second(gyro_raw[1]),
+                raw_gyro_to_rad_per_second(gyro_raw[2])};
+        pub.msg.rate_gyro_latest[0] = gyro[0];
+        pub.msg.rate_gyro_latest[1] = gyro[1];
+        pub.msg.rate_gyro_latest[2] = gyro[2];
+        updated[0] = true;
+        update_gyro_fft();
+    }
+
+    if (imu.read_accelerometer(&accel_raw) >= 0) {
+        accel = {
+                raw_accel_to_meter_per_square_second(accel_raw[0]),
+                raw_accel_to_meter_per_square_second(accel_raw[1]),
+                raw_accel_to_meter_per_square_second(accel_raw[2])};
+        get_vibration(accel);
+        pub.msg.accelerometer_latest[0] = accel[0];
+        pub.msg.accelerometer_latest[1] = accel[1];
+        pub.msg.accelerometer_latest[2] = accel[2];
+        updated[1] = true;
+        update_accel_fft();
+    }
 }
