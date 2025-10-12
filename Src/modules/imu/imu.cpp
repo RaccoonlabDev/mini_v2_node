@@ -46,20 +46,23 @@ void ImuModule::spin_once() {
         }
         static uint32_t last_read = 0;
         uint32_t current_time = HAL_GetTick();
-    
-
-        if (current_time - last_read >= 100) {
+        
+        // Increase read frequency to prevent FIFO overflow
+        // Changed from 50ms to 20ms (50Hz to match reduced sample rate)
+        if (current_time - last_read >= 20) {
             std::array<int16_t, NUM_AXES> mag_raw;
             if (imu.read_magnetometer(&mag_raw) >= 0) {
                 mag.publish();
             }
-            
-            std::array<int16_t, NUM_AXES> accel_raw = {0, 0, 0};
-            std::array<int16_t, NUM_AXES> gyro_raw = {0, 0, 0};
+
+            std::array<int16_t, 3> accel_raw = {0, 0, 0};
+            std::array<int16_t, 3> gyro_raw = {0, 0, 0};
             int16_t temp_raw;
+
+            int8_t result = imu.FIFO_read(&temp_raw, &gyro_raw, &accel_raw);
             
-            if (imu.FIFO_read(&temp_raw, &gyro_raw, &accel_raw) == 0) {
-                // Only process if FIFO read was successful
+            if (result == 0) {
+                // Success - process data
                 pub.msg.rate_gyro_latest[0] = gyro_raw[0];
                 pub.msg.rate_gyro_latest[1] = gyro_raw[1];
                 pub.msg.rate_gyro_latest[2] = gyro_raw[2];
@@ -70,10 +73,27 @@ void ImuModule::spin_once() {
                 
                 updated[0] = true;
                 updated[1] = true;
+                
                 update_gyro_fft();
                 update_accel_fft();
+                
+            } else if (result == -2) {
+                // Overflow handled, continue without updating
+                char buffer[25];
+                snprintf(buffer, sizeof(buffer), "FIFO overflow handled");
+                logger.log_info(buffer);
+                
+            } else if (result == -3) {
+                // Not enough data, normal condition
+                // Don't log this as error
+                
+            } else {
+                // Error condition
+                char buffer[25];
+                snprintf(buffer, sizeof(buffer), "FIFO read error: %d", result);
+                logger.log_error(buffer);
             }
-            
+
             last_read = current_time;
         }
     } else {
