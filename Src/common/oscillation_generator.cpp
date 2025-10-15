@@ -52,16 +52,13 @@ void SinSignalGenerator::setAmpl (uint16_t ampl) {
 void MultiSignalsSinGenerator::init() {
     signals_generator.resize(n_signals);
     uint16_t max_amplitude = 0;
-    std::uniform_int_distribution<int> dist(0, static_cast<int>(max_freq));
 
     for (int j = 0; j < n_signals; j++) {
-        int range = static_cast<int>(max_freq) - static_cast<int>(min_freq);
-        if (range < 0) range = 0;
-        int freq_hz_val = static_cast<int>(min_freq) + (dist(rd) % range);
-        int amplitude_val = 1 + (dist(rd) % 100);
+        std::uniform_int_distribution<uint16_t> freq_dist(min_freq, max_freq);
+        std::uniform_int_distribution<uint16_t> amp_dist(1, 100);
         
-        uint16_t freq_hz = static_cast<uint16_t>(freq_hz_val);
-        uint16_t amplitude = static_cast<uint16_t>(amplitude_val);
+        uint16_t freq_hz = freq_dist(rd);
+        uint16_t amplitude = amp_dist(rd);
 
         signals_generator[j] = SinSignalGenerator(sample_rate_hz, freq_hz, amplitude);
         if (amplitude > max_amplitude) {
@@ -69,7 +66,6 @@ void MultiSignalsSinGenerator::init() {
             dominant_sig.insert(dominant_sig.begin(), {amplitude, freq_hz});
         }
     }
-    // sort by amplitude value. Usual sort returned warning -Werror=strict-overflow, so i changed it on safer approach
     std::stable_sort(dominant_sig.begin(), dominant_sig.end(), 
     [](const std::pair<uint16_t, uint16_t>& a, const std::pair<uint16_t, uint16_t>& b) {
         return std::less<uint16_t>{}(a.first, b.first);  
