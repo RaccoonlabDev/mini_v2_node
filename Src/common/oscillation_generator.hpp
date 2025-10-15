@@ -44,7 +44,7 @@ private:
 class MultiSignalsSinGenerator {
 public:
     uint16_t max_freq;
-    uint8_t n_signals;
+    size_t n_signals;
     uint16_t min_freq = 0;
     uint16_t sample_rate_hz;
     std::vector<SinSignalGenerator> signals_generator;
@@ -54,7 +54,7 @@ public:
 
     MultiSignalsSinGenerator() = default;
 
-    MultiSignalsSinGenerator(uint8_t n_signals, uint16_t sample_rate_hz, uint16_t max_freq);
+    MultiSignalsSinGenerator(size_t n_signals, uint16_t sample_rate_hz, uint16_t max_freq);
 
     explicit MultiSignalsSinGenerator(InitMultiSignalsParamType parameters);
 
