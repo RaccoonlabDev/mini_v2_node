@@ -37,16 +37,19 @@ void ImuModule::update_params() {
 
 
 void ImuModule::spin_once() {
-    std::array<bool,2> updated {false, false};
+    std::array<bool, 2> updated {false, false};
     bool is_real_data_read = true;
     // If synthetic accel is turned on (value is 0) then we need to go further to data generation
-    if (!static_cast<uint8_t>(bitmask & static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_SYNTH_GEN))) {
+    if (!static_cast<uint8_t>(bitmask &
+        static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_SYNTH_GEN))) {
         if (!bitmask || !initialized) {
             return;
         }
-        if (static_cast<uint8_t>(bitmask & static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_FIFO_READINGS))) {
+        if (static_cast<uint8_t>(bitmask &
+            static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_FIFO_READINGS))) {
             process_real_fifo(updated);
-        } else if (static_cast<uint8_t>(bitmask & static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_REG_READINGS))) {
+        } else if (static_cast<uint8_t>(bitmask &
+                    static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_REG_READINGS))) {
             process_real_register(updated);
         } else {
             is_real_data_read = false;
@@ -174,9 +177,7 @@ void ImuModule::process_random_gen (std::array<bool, 2>& updated){
 void ImuModule::process_real_fifo (std::array<bool, 2>& updated){
     static uint32_t last_read = 0;
     uint32_t current_time = HAL_GetTick();
-
     if (current_time - last_read >= 5) {
-
         std::array<int16_t, NUM_AXES> mag_raw;
         if (imu.read_magnetometer(&mag_raw) >= 0) {
             mag.publish();
@@ -237,7 +238,7 @@ void ImuModule::process_real_register (std::array<bool, 2>& updated) {
     if (imu.read_magnetometer(&mag_raw) >= 0) {
         mag.publish();
     }
-        
+
     std::array<int16_t, 3>  accel_raw = {0, 0, 0};
     std::array<int16_t, 3>  gyro_raw  = {0, 0, 0};
 
