@@ -55,7 +55,8 @@ void MultiSignalsSinGenerator::init() {
     std::uniform_int_distribution<int> dist(0, max_freq);
 
     for (int j = 0; j < n_signals; j++) {
-        uint16_t freq_hz = dist(rd) % (max_freq - min_freq) + min_freq;
+        uint16_t range = (max_freq >= min_freq) ? (max_freq - min_freq) : 0;
+        uint16_t freq_hz = min_freq + (dist(rd) % range);
         uint16_t amplitude = 1 + dist(rd) % 100;
         signals_generator[j] = SinSignalGenerator(sample_rate_hz, freq_hz, amplitude);
         if (amplitude > max_amplitude) {
