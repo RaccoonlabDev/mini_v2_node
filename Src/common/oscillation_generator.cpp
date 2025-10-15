@@ -52,12 +52,17 @@ void SinSignalGenerator::setAmpl (uint16_t ampl) {
 void MultiSignalsSinGenerator::init() {
     signals_generator.resize(n_signals);
     uint16_t max_amplitude = 0;
-    std::uniform_int_distribution<int> dist(0, max_freq);
+    std::uniform_int_distribution<int> dist(0, static_cast<int>(max_freq));
 
     for (int j = 0; j < n_signals; j++) {
-        uint16_t range = (max_freq >= min_freq) ? (max_freq - min_freq) : 0;
-        uint16_t freq_hz = min_freq + (dist(rd) % range);
-        uint16_t amplitude = 1 + dist(rd) % 100;
+        int range = static_cast<int>(max_freq) - static_cast<int>(min_freq);
+        if (range < 0) range = 0;
+        int freq_hz_val = static_cast<int>(min_freq) + (dist(rd) % range);
+        int amplitude_val = 1 + (dist(rd) % 100);
+        
+        uint16_t freq_hz = static_cast<uint16_t>(freq_hz_val);
+        uint16_t amplitude = static_cast<uint16_t>(amplitude_val);
+
         signals_generator[j] = SinSignalGenerator(sample_rate_hz, freq_hz, amplitude);
         if (amplitude > max_amplitude) {
             max_amplitude = amplitude;
