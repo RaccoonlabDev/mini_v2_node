@@ -51,11 +51,11 @@ void SinSignalGenerator::setAmpl (uint16_t ampl) {
 
 void MultiSignalsSinGenerator::init() {
     signals_generator.resize(n_signals);
-    uint16_t max_amplitude = 0;
+    //uint16_t max_amplitude = 0;
     
     for (size_t j = 0; j < n_signals; j++) {
-        /*std::uniform_int_distribution<uint16_t> freq_dist(min_freq, max_freq);
-        std::uniform_int_distribution<uint16_t> amp_dist(1, 100);*/
+        std::uniform_int_distribution<uint16_t> freq_dist(min_freq, max_freq);
+        std::uniform_int_distribution<uint16_t> amp_dist(1, 100);
         
         uint16_t freq_hz = 3;//freq_dist(rd);
         uint16_t amplitude = 4;//amp_dist(rd);
@@ -68,10 +68,10 @@ void MultiSignalsSinGenerator::init() {
         }*/
     }
     
-    /*std::stable_sort(dominant_sig.begin(), dominant_sig.end(),
+    std::stable_sort(dominant_sig.begin(), dominant_sig.end(),
         [](const std::pair<uint16_t, uint16_t>& a, const std::pair<uint16_t, uint16_t>& b) {
             return std::less<uint16_t>{}(a.first, b.first);
-        });*/
+        });
 }
 
 
