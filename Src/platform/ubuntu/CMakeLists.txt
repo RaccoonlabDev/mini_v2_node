@@ -22,7 +22,7 @@ add_executable(${EXECUTABLE}
 
 find_package(PkgConfig REQUIRED)
 pkg_search_module(FFTW REQUIRED fftw3)
-
+include_directories(${FFTW_INCLUDE_DIRS})
 target_include_directories(${EXECUTABLE} PRIVATE
     ${BUILD_SRC_DIR}
     ${APPLICATION_HEADERS}
