@@ -18,7 +18,7 @@ struct InitOneSignParamType   {
 
 struct InitMultiSignalsParamType   {
     uint16_t sample_rate_hz;
-    uint8_t n_signals;
+    size_t n_signals;
     uint16_t max_freq;
 };
 

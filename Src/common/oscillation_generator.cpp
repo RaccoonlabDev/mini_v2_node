@@ -75,7 +75,7 @@ void MultiSignalsSinGenerator::init() {
 }
 
 
-MultiSignalsSinGenerator::MultiSignalsSinGenerator(uint8_t n_sig, uint16_t sample_rate, uint16_t max_f) :
+MultiSignalsSinGenerator::MultiSignalsSinGenerator(size_t n_sig, uint16_t sample_rate, uint16_t max_f) :
                                             max_freq(max_f),
                                             n_signals(n_sig),
                                             sample_rate_hz(sample_rate) {
@@ -91,7 +91,7 @@ MultiSignalsSinGenerator::MultiSignalsSinGenerator(InitMultiSignalsParamType par
 
 float MultiSignalsSinGenerator::get_next_samples() {
     float sample = 0;
-    for (int j = 0; j < n_signals; j++) {
+    for (size_t j = 0; j < n_signals; j++) {
         sample +=signals_generator[j].get_next_sample();
     }
     return sample;
