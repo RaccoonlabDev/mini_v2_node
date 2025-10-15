@@ -67,7 +67,7 @@ void MultiSignalsSinGenerator::init() {
     // sort by amplitude value. Usual sort returned warning -Werror=strict-overflow, so i changed it on safer approach
     std::stable_sort(dominant_sig.begin(), dominant_sig.end(), 
     [](const std::pair<uint16_t, uint16_t>& a, const std::pair<uint16_t, uint16_t>& b) {
-        return a.first < b.first;  
+        return std::less<uint16_t>{}(a.first, b.first);  
     });
 }
 
