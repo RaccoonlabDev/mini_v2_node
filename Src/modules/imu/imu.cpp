@@ -70,15 +70,14 @@ void ImuModule::spin_once() {
     }
     // Publish message
     if (pub_timeout_ms != 0 && HAL_GetTick() - pub.msg.timestamp / 1000 > pub_timeout_ms) {
-        
         if (updated[0] && updated[1]) {
             pub.publish();
             pub.msg.timestamp = HAL_GetTick() * 1000;
-        } 
+        }
     }
 
     // Create separate timer for log, which doesn't depend on fact if data was updated
-    static uint64_t log_timestamp = 0; 
+    static uint64_t log_timestamp = 0;
     if (pub_timeout_ms != 0 && HAL_GetTick() - log_timestamp / 1000 > pub_timeout_ms) {
         char buffer[40];
         if (!is_data_source) {
@@ -87,7 +86,6 @@ void ImuModule::spin_once() {
         }
         log_timestamp = HAL_GetTick() * 1000;
     }
-
 }
 
 void ImuModule::get_vibration(std::array<float, 3> data) {
