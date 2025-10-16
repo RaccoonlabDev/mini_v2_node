@@ -7,7 +7,7 @@ imu.mode:
     </br> Bit 3 - enable FFT acceleration publishing to RawImu.accelerometer_integral,
     </br> Bit 4 - enable FFT acceleration publishing to RawImu.rate_gyro_integral,
     </br> Bit 5 - enable synthetic data generation. Has priority over real readings,
-    </br> Bit 6 - use FIFO for real data readings (sample rate = 250Hz, Bandwidth (gyro/accel) = 41/~44.8Hz). Has priority over register readings,
+    </br> Bit 6 - use FIFO for real data readings (sample rate = 100Hz, Bandwidth (gyro/accel) = 41/~44.8Hz). Has priority over register readings,
     </br> Bit 7 - use forward register adressing for data readings,
     </br> 15 - enable all publishers,
     Note: synthetic generation, FIFO and register readings should be used mutually exclusively."

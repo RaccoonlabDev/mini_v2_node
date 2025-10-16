@@ -12,7 +12,7 @@
 REGISTER_MODULE(ImuModule)
 
 void ImuModule::init() {
-    initialized = imu.initialize();
+    set_initialize(imu.initialize());
     imu.FIFO_create();
     set_mode(Mode::STANDBY);
     fft_accel.init(WINDOW_SIZE, NUM_AXES, SAMPLE_RATE_HZ);
@@ -20,7 +20,17 @@ void ImuModule::init() {
     fft_gyro.init(WINDOW_SIZE, NUM_AXES, SAMPLE_RATE_HZ);
     fft_gyro.fft_min_freq = FFT_MIN_FREQ;
 }
-
+void ImuModule::set_initialize (bool new_initialized) {
+    char buffer[40];
+    if (!new_initialized) {
+        snprintf(buffer, sizeof(buffer), "MPU9250 is not initialised!");
+        logger.log_error(buffer);
+    } else {
+        snprintf(buffer, sizeof(buffer), "MPU9250 is initialised!");
+        logger.log_info(buffer);
+    }
+    this->initialized = new_initialized;
+}
 void ImuModule::update_params() {
     auto pub_frequency = static_cast<uint16_t>(
                                 paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_PUB_FREQUENCY));
@@ -38,8 +48,7 @@ void ImuModule::update_params() {
 
 void ImuModule::spin_once() {
     std::array<bool, 2> updated {false, false};
-    bool is_real_data_read = true;
-    // If synthetic accel is turned on (value is 0) then we need to go further to data generation
+    bool is_data_source = false;
     if (!static_cast<uint8_t>(bitmask &
         static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_SYNTH_GEN))) {
         if (!bitmask || !initialized) {
@@ -48,50 +57,37 @@ void ImuModule::spin_once() {
         if (static_cast<uint8_t>(bitmask &
             static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_FIFO_READINGS))) {
             process_real_fifo(updated);
+            is_data_source = true;
         } else if (static_cast<uint8_t>(bitmask &
                     static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_REG_READINGS))) {
             process_real_register(updated);
-        } else {
-            is_real_data_read = false;
+            is_data_source = true;
         }
-
-    } else {
+    } else if (static_cast<uint8_t>(bitmask &
+            static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_SYNTH_GEN))){
         process_random_gen(updated);
-        is_real_data_read = false;
+        is_data_source = true;
     }
+    // Publish message
     if (pub_timeout_ms != 0 && HAL_GetTick() - pub.msg.timestamp / 1000 > pub_timeout_ms) {
+        
         if (updated[0] && updated[1]) {
-            pub.msg.timestamp = HAL_GetTick() * 1000;
             pub.publish();
-            // Send logging data to dronecan every second
-            perform_logging_dronecan(is_real_data_read);
+            pub.msg.timestamp = HAL_GetTick() * 1000;
+        } 
+    }
+
+    // Create separate timer for log, which doesn't depend on fact if data was updated
+    static uint64_t log_timestamp = 0; 
+    if (pub_timeout_ms != 0 && HAL_GetTick() - log_timestamp / 1000 > pub_timeout_ms) {
+        char buffer[40];
+        if (!is_data_source) {
+            snprintf(buffer, sizeof(buffer), "No data source reading specified");
+            logger.log_warn(buffer);
         }
-    }
-}
-
-void ImuModule::perform_logging_dronecan (bool is_real_data_read)  {
-    // Log temperature
-    int16_t raw_temp{0};
-    char buffer[40];
-    if (imu.read_temperature (raw_temp) >= 0) {
-        // Put %d instead of %f in logger to safe memory for sprintf
-        snprintf(buffer, sizeof(buffer), "temperature %d",
-            raw_temp_convert_to_celsius(raw_temp));
-        logger.log_info(buffer);
-    }
-    // Log condition of MPU9250
-    if (!initialized) {
-        snprintf(buffer, sizeof(buffer), "MPU9250 is not initialised!");
-        logger.log_error(buffer);
-    } else {
-        snprintf(buffer, sizeof(buffer), "MPU9250 is initialised!");
-        logger.log_info(buffer);
+        log_timestamp = HAL_GetTick() * 1000;
     }
 
-    if (!is_real_data_read) {
-        snprintf(buffer, sizeof(buffer), "No real reading was specified");
-        logger.log_info(buffer);
-    }
 }
 
 void ImuModule::get_vibration(std::array<float, 3> data) {
@@ -111,9 +107,6 @@ void ImuModule::update_accel_fft() {
     if (!(bitmask & static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_FFT_ACC))) {
         return;
     }
-    char buffer[40];
-    snprintf(buffer, sizeof(buffer), "in fft accel");
-    logger.log_info(buffer);
     fft_accel.update(accel.data());
     pub.msg.accelerometer_integral[0] = fft_accel.dominant_frequency;
     pub.msg.accelerometer_integral[1] = fft_accel.dominant_mag * 1000;
@@ -213,9 +206,9 @@ void ImuModule::process_real_fifo (std::array<bool, 2>& updated){
 
         } else if (result == -2) {
             // Overflow handled, continue without updating
-            char buffer[25];
-            snprintf(buffer, sizeof(buffer), "FIFO overflow handled");
-            logger.log_info(buffer);
+            char buffer[40];
+            snprintf(buffer, sizeof(buffer), "FIFO overflow handled. Improve timings?");
+            logger.log_warn(buffer);
 
         } else if (result == -3) {
             // Not enough data, normal condition

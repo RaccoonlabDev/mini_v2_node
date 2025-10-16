@@ -103,7 +103,9 @@ int8_t Mpu9250::read_temperature (int16_t& temperature) const {
 int8_t Mpu9250::FIFO_create () {
     // Set sample rate divider
     auto smprt_div_reg = std::byte(Mpu9250Registers::SMPLRT_DIV);
-    std::byte smprt_div = std::byte{0x03}; // 200Hz: 1000/(1+4) = 250Hz
+    // NOTE: setting too big value in sample rate may cause frequent overflows
+    // Consider the frequency in which FIFO is being read in your main loop 
+    std::byte smprt_div = std::byte{0x09}; // 100Hz: 1000/(1+9) = 100Hz
     if (HAL::SPI::write_register(smprt_div_reg, smprt_div)) {
         return false;
     }
@@ -209,45 +211,30 @@ int8_t Mpu9250::FIFO_reset() {
     auto fifo_enable_reg = std::byte(Mpu9250Registers::FIFO_ENABLE);
     std::byte data;
 
-    // 1. Disable FIFO_EN in USER_CTRL
+    // Disable FIFO_EN in USER_CTRL
     if (HAL::SPI::read_register(user_ctrl_reg, &data)) return -1;
     data &= std::byte{0xBF}; // clear bit 6 (FIFO_EN)
     if (HAL::SPI::write_register(user_ctrl_reg, data)) return -1;
     
-    // 2. Disable all FIFO sources
+    // Disable all FIFO sources
     std::byte disable_all{0x00};
     if (HAL::SPI::write_register(fifo_enable_reg, disable_all)) return -1;
     
-    // 3. Wait for FIFO to settle
+    // Wait for FIFO to settle
     HAL_Delay(1);
     
-    // 4. Issue FIFO_RST pulse
+    // Issue FIFO_RST pulse
     std::byte rst = data | std::byte{0x04}; // set bit 2 (FIFO_RST)
     if (HAL::SPI::write_register(user_ctrl_reg, rst)) return -1;
     
-    // 5. Wait for reset to complete
+    // Wait for reset to complete
     HAL_Delay(1);
     
-    // 6. Clear the FIFO_RST bit
+    // Clear the FIFO_RST bit
     if (HAL::SPI::write_register(user_ctrl_reg, data)) return -1;
     
-    // 7. Wait before next operation
+    // Wait before next operation
     HAL_Delay(1);
-    
-    // 8. Verify FIFO count is zero
-    uint16_t count = FIFO_count();
-    if (count != 0) {
-        char msg[45];
-        Logging logger{"FIFO"};
-        snprintf(msg, sizeof(msg), "FIFO reset failed, count: %d", count);
-        logger.log_error(msg);
-        return -1;
-    }
-    
-    char msg[30];
-    Logging logger{"FIFO"};
-    snprintf(msg, sizeof(msg), "FIFO reset successful");
-    logger.log_error(msg);
     return 0;
 }
 
@@ -274,19 +261,12 @@ uint16_t Mpu9250::FIFO_count() {
     HAL::SPI::read_registers(count_h_reg, buf, 2);
     uint16_t high = uint8_t(buf[0]);
     uint16_t low  = uint8_t(buf[1]);
-    char msg[30];
-    Logging logger{"MY_FIFO"};
-    snprintf(msg, sizeof(msg), "FIFO COUNT h %d, l %d", (int)high, (int)low);
-    logger.log_error(msg);
     return (high << 8) | low;
 }
 
-
-int8_t Mpu9250::FIFO_read(int16_t* raw_temperature, std::array<int16_t, 3>* raw_gyro,
-                          std::array<int16_t, 3>* raw_accel) {
-    
-    Logging logger{"FIFO_READ"};
-    char msg[38];
+// __restrict keyword guarantees that none of pointers are intervined toghether and helps compiler
+int8_t Mpu9250::FIFO_read(int16_t* __restrict raw_temperature, std::array<int16_t, 3>* __restrict raw_gyro,
+                          std::array<int16_t, 3>* __restrict raw_accel) {
 
     // Initialize output with safe values
     (*raw_gyro)[0] = 0; (*raw_gyro)[1] = 0; (*raw_gyro)[2] = 0;
@@ -298,10 +278,7 @@ int8_t Mpu9250::FIFO_read(int16_t* raw_temperature, std::array<int16_t, 3>* raw_
     auto int_status_reg = std::byte(Mpu9250Registers::INT_STATUS);
     uint16_t fifo_count = FIFO_count();
     
-    snprintf(msg, sizeof(msg), "FIFO count: %d", (int)fifo_count);
-    logger.log_error(msg);
     if (HAL::SPI::read_register(int_status_reg, &int_status) != 0) {
-        logger.log_error("Failed to read INT_STATUS");
         return -1;
     }
     
@@ -312,22 +289,16 @@ int8_t Mpu9250::FIFO_read(int16_t* raw_temperature, std::array<int16_t, 3>* raw_
         if (FIFO_reset() != 0) {
             return -1;
         }
-        snprintf(msg, sizeof(msg), "FIFO overflow detected, reseted");
-        logger.log_error(msg);
+
 
         // Re-enable accelerometer FIFO
         FIFO_set_resolution(bitmask);
-        snprintf(msg, sizeof(msg), "FIFO overflow detected, configured");
-        logger.log_error(msg);
         // Re-enable FIFO
         for(volatile int i = 0; i < 1000; i++);
         if (FIFO_init() != 0) {
             
             return -1;
         }
-        
-        snprintf(msg, sizeof(msg), "FIFO overflow detected, reinit");
-        logger.log_error(msg);
         return -2; // Signal overflow handled
     }
     
@@ -342,7 +313,6 @@ int8_t Mpu9250::FIFO_read(int16_t* raw_temperature, std::array<int16_t, 3>* raw_
     std::byte raw_data[fifo_frame_bytes];
     auto fifo_reg = std::byte(Mpu9250Registers::FIFO_R_W);
     if (HAL::SPI::read_registers(fifo_reg, raw_data, fifo_frame_bytes) != 0) {
-        logger.log_error("Failed to read FIFO data");
         return -1;
     }
     
@@ -366,28 +336,6 @@ int8_t Mpu9250::FIFO_read(int16_t* raw_temperature, std::array<int16_t, 3>* raw_
     if (static_cast<uint8_t>(bitmask & std::byte{0x10})) {
             (*raw_gyro)[2] = static_cast<int16_t>((uint16_t)raw_data[12] << 8 | (uint16_t)raw_data[13]);
     }
-
-    snprintf(msg, sizeof(msg), "Accel: %d, %d, %d", 
-             (int)(*raw_accel)[0], (int)(*raw_accel)[1], (int)(*raw_accel)[2]);
-    logger.log_info(msg);
     
     return 0;
 }
-
-/*if (static_cast<uint8_t>(bitmask & std::byte{0x08})){
-            // Parse accelerometer data (big-endian format)
-            (*raw_accel)[0] = (int16_t)((uint16_t(raw_data[0]) << 8) | uint16_t(raw_data[1]));
-            (*raw_accel)[1] = (int16_t)((uint16_t(raw_data[2]) << 8) | uint16_t(raw_data[3]));
-            (*raw_accel)[2] = (int16_t)((uint16_t(raw_data[4]) << 8) | uint16_t(raw_data[5]));
-        }
-        if (static_cast<uint8_t>(bitmask & std::byte{0x80}))
-            *raw_temperature = static_cast<int16_t>((uint16_t)raw_data[6] << 8 | (uint16_t)raw_data[7]);
-        
-        if (static_cast<uint8_t>(bitmask & std::byte{0x40}))
-            (*raw_gyro)[0] = (uint16_t)raw_data[8] << 8 | (uint16_t)raw_data[9];
-        
-        if (static_cast<uint8_t>(bitmask & std::byte{0x20}))
-            (*raw_gyro)[1] = (uint16_t)raw_data[10] << 8 | (uint16_t)raw_data[11];
-
-        if (static_cast<uint8_t>(bitmask & std::byte{0x10}))
-            (*raw_gyro)[2] = (uint16_t)raw_data[12] << 8 | (uint16_t)raw_data[13];*/

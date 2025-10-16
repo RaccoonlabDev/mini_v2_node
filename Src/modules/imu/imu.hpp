@@ -45,6 +45,7 @@ public:
     };
     ImuModule() : Module(256, Protocol::DRONECAN) {}
     void init() override;
+    void set_initialize (bool initialize);
 
 protected:
     void spin_once() override;
@@ -58,19 +59,24 @@ private:
     DronecanPublisher<MagneticFieldStrength2> mag;
     Logging logger{"IMU"};
     Mpu9250 imu;
+
     FFT fft_accel;
     FFT fft_gyro;
+
     SinSignalGenerator accel_signals_generator {GENERATOR_SAMPLE_HZ};
     uint16_t gen_freq{0};
     uint16_t gen_amplitude{0};
+
     float vibration = 0.0f;
     bool initialized{false};
     bool enabled{false};
     uint8_t bitmask{0};
     uint16_t pub_timeout_ms{0};
+
     std::array<float, NUM_AXES> gyro  = {0.0f, 0.0f, 0.0f};
     std::array<float, NUM_AXES> accel = {0.0f, 0.0f, 0.0f};
     float temperature{0};
+
     void process_random_gen (std::array<bool, 2>& updated);
     void process_real_fifo (std::array<bool, 2>& updated);
     void process_real_register (std::array<bool, 2>& updated);
@@ -88,7 +94,6 @@ private:
         // Simple and low cost rounding
         return (static_cast<int16_t>(temperature + (temperature >= 0 ? 0.5f : -0.5f)));
     }
-    void perform_logging_dronecan (bool is_real_data_read);
 
 };
 
