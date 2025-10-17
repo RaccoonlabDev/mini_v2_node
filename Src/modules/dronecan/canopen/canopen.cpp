@@ -5,7 +5,7 @@
  */
 
 #include "canopen.hpp"
-#include "can_driver.h"
+#include "libdcnode/can_driver.h"
 #include "common/algorithms.hpp"
 
 REGISTER_MODULE(CanopenModule)
