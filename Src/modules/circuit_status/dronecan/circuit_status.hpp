@@ -9,7 +9,7 @@
 #define SRC_MODULES_CIRCUIT_STATUS_DRONECAN_CIRCUIT_STATUS_HPP_
 
 #include "common/module.hpp"
-#include "publisher.hpp"
+#include "libdcnode/publisher.hpp"
 #include "common/logging.hpp"
 
 class DronecanCircuitStatus : public Module {

@@ -9,7 +9,7 @@
 
 #include <numbers>
 #include "module.hpp"
-#include "publisher.hpp"
+#include "libdcnode/publisher.hpp"
 #include "drivers/mpu9250/mpu9250.hpp"
 
 #ifdef __cplusplus

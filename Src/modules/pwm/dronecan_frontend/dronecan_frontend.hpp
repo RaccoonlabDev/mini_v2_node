@@ -7,9 +7,9 @@
 #ifndef SRC_MODULES_PWM_DRONECAN_FRONTEND_HPP_
 #define SRC_MODULES_PWM_DRONECAN_FRONTEND_HPP_
 
-#include "dronecan.h"
-#include "publisher.hpp"
-#include "subscriber.hpp"
+#include "libdcnode/dronecan.h"
+#include "libdcnode/publisher.hpp"
+#include "libdcnode/subscriber.hpp"
 #include "modules/pwm/main.hpp"
 
 enum class CommandType: uint8_t {
