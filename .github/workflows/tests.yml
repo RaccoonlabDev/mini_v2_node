@@ -14,6 +14,11 @@ jobs:
       - name: Install gtest
         run: |
           wget https://gist.githubusercontent.com/Ponomarevda/d970c24de8deab5d6ccfee8f5f719bcc/raw/install_gtest_ubuntu.sh && chmod +x install_gtest_ubuntu.sh && ./install_gtest_ubuntu.sh
+          sudo apt-get install -y make gcc-arm-none-eabi
+
+      - name: Install fftw3
+        run: |
+          wget https://gist.githubusercontent.com/AsiiaPine/89276529c5b13be04264f2fe8b4e6c4f/raw/f200b348b1a8e04b2cdf6cc09c619e6520ce0562/install_fftw3.sh && chmod +x install_fftw3.sh && ./install_fftw3.sh
 
       - name: Build and run tests
         run: make tests

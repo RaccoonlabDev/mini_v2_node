@@ -24,6 +24,7 @@ def main():
     if system_name == "windows":
         print("Detected Windows. Installing packages...")
         run_command("choco install -y gcc-arm-embedded make cmake")
+        run_command("vcpkg install fftw3")
     
     elif system_name == "linux":
         try:
@@ -34,10 +35,12 @@ def main():
             if "ubuntu" in os_info or "debian" in os_info:
                 print("Detected Ubuntu/Debian. Installing packages...")
                 run_command("sudo apt-get install -y gcc-arm-none-eabi")
+                run_command("sudo apt-get install -y libfftw3-dev")
             
             elif "manjaro" in os_info:
                 print("Detected Manjaro. Installing packages...")
                 run_command("sudo pacman -S python-pip cmake arm-none-eabi-gcc arm-none-eabi-binutils arm-none-eabi-newlib")
+                run_command("sudo pacman -S --noconfirm fftw")
 
             else:
                 print("Unknown Linux distribution.")

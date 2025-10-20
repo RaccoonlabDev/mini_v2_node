@@ -2,6 +2,9 @@
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 cmake_minimum_required(VERSION 3.15.3)
 
+# Project
+project(node CXX C ASM)
+
 # Pathes
 set(ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
 set(SRC_DIR ${ROOT_DIR}/Src)
@@ -21,6 +24,7 @@ if(USE_PLATFORM_UBUNTU)
     set(APP_PLATFORM ubuntu)
     set(PLATFORM_NAME sitl)
     include(${CMAKE_DIR}/toolchain-ubuntu.cmake)
+    add_compile_definitions(USE_PLATFORM_UBUNTU=1)
 elseif(USE_PLATFORM_NODE_V2)
     set(LIBPARAMS_PLATFORM stm32f103)
     set(CAN_PLATFORM bxcan)
@@ -46,7 +50,8 @@ elseif(USE_PLATFORM_NODE_V3)
     set(stm32cubeMxProjectPath  ${ROOT_DIR}/Libs/mini-v3-ioc)
     FILE(GLOB ldFile            ${stm32cubeMxProjectPath}/*_FLASH.ld)
     FILE(GLOB coreSources       ${stm32cubeMxProjectPath}/Core/Src/*)
-    FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c)
+    FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c
+                            ${stm32cubeMxProjectPath}/Drivers/*/*/*/*.c)
     FILE(GLOB startupFile       ${stm32cubeMxProjectPath}/*.s
                                 ${stm32cubeMxProjectPath}/Core/Startup/*.s
     )
@@ -81,6 +86,15 @@ include(${LIBPARAMS_PATH}/${LIBPARAMS_CMAKE})
 list(APPEND APPLICATION_HEADERS ${ROOT_DIR}/Src ${APPLICATION_DIR})
 include(${APPLICATION_DIR}/CMakeLists.txt)
 
+# Set compile options
+set(WARNING_FLAGS "-Wall -Wextra -Wfloat-equal -Werror -Wundef -Wshadow -Wpointer-arith -Wunreachable-code -Wstrict-overflow=5 -Wwrite-strings -Wswitch-default")
+set(CMAKE_C_FLAGS "${CMAKE_DEBUG_FLAGS} ${CMAKE_C_FLAGS} ${WARNING_FLAGS}")
+set(CMAKE_CXX_FLAGS "-g ${CMAKE_CXX_FLAGS} ${WARNING_FLAGS} -Wno-volatile")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNING_FLAGS} -Wno-volatile")
+# set(CMAKE_C_FLAGS_DEBUG "-g -DDEBUG")
+# set(CMAKE_CXX_FLAGS_DEBUG "-g -DDEBUG")
+set(CMAKE_CXX_STANDARD 20)
+
 # Prebuild
 include(${CMAKE_DIR}/params.cmake)
 include(${CMAKE_DIR}/git.cmake)
@@ -88,9 +102,6 @@ include(${CMAKE_DIR}/git.cmake)
 # Hardware version is not supported at the momemnt, let's hardcode it for a while
 add_definitions(-DHW_VERSION_MAJOR=2)
 add_definitions(-DHW_VERSION_MINOR=1)
-
-# Project
-project(node CXX C ASM)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)

@@ -6,6 +6,7 @@ cmake_path(GET MODULES_DIR PARENT_PATH SRC_DIR)
 
 list(APPEND APPLICATION_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/imu.cpp
+    ${SRC_DIR}/common/oscillation_generator.cpp
 )
 
 list(APPEND LIBPARAMS_PARAMS

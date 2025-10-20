@@ -22,7 +22,7 @@ __attribute__((noreturn)) void platformSpecificRebootForce();
 bool platformSpecificRequestRestart();
 
 uint32_t platformSpecificGetTimeMs();
-
+void HAL_Delay(uint64_t time);
 #ifdef __cplusplus
 }
 #endif
