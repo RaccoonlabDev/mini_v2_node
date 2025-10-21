@@ -91,13 +91,7 @@ include(${CMAKE_DIR}/git.cmake)
 # Hardware version is not supported at the momemnt, let's hardcode it for a while
 add_definitions(-DHW_VERSION_MAJOR=2)
 add_definitions(-DHW_VERSION_MINOR=1)
-# Set compile options
-set(WARNING_FLAGS "-Wall -Wextra -Wfloat-equal -Werror -Wundef -Wshadow -Wpointer-arith -Wunreachable-code -Wstrict-overflow=5 -Wwrite-strings -Wswitch-default")
-set(CMAKE_C_FLAGS "${CMAKE_DEBUG_FLAGS} ${CMAKE_C_FLAGS} ${WARNING_FLAGS}")
-set(CMAKE_CXX_FLAGS "-g ${CMAKE_CXX_FLAGS} ${WARNING_FLAGS} -Wno-volatile")
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNING_FLAGS} -Wno-volatile")
-# set(CMAKE_C_FLAGS_DEBUG "-g -DDEBUG")
-# set(CMAKE_CXX_FLAGS_DEBUG "-g -DDEBUG")
+
 set(CMAKE_CXX_STANDARD 20)
 # Project
 project(node CXX C ASM)
