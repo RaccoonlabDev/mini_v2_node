@@ -31,7 +31,7 @@ target_include_directories(${EXECUTABLE} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}
 )
 # Add fftw library for FFT execution
-target_link_libraries(${EXECUTABLE} ${FFTW_LIBRARIES}) 
+target_link_libraries(${EXECUTABLE} PRIVATE ${FFTW_LIBRARIES})
 
 if(CAN_PROTOCOL STREQUAL "dronecan" OR CAN_PROTOCOL STREQUAL "both")
     target_link_libraries(${EXECUTABLE} PRIVATE libdcnode::libdcnode)

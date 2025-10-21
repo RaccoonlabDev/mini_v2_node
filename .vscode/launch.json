@@ -29,7 +29,7 @@
             "target/stm32g0x.cfg"
         ],
         "showDevDebugOutput": "raw",
-        "cwd": "/home/ilia/Desktop/vsCode/Embedded-work/mini_v2_node", // Add this
+        "cwd": "/home/ilia/Desktop/vsCode/Embedded-work/mini_v2_node",
         "overrideLaunchCommands": [
         "interpreter-exec console \"monitor reset halt\"",
         "-enable-pretty-printing"
