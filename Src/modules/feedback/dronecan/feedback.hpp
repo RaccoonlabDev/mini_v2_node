@@ -10,10 +10,10 @@
 
 #include "common/module.hpp"
 
-#include "dronecan.h"
-#include "logger.hpp"
-#include "publisher.hpp"
-#include "subscriber.hpp"
+#include "libdcnode/dronecan.h"
+#include "libdcnode/logger.hpp"
+#include "libdcnode/publisher.hpp"
+#include "libdcnode/subscriber.hpp"
 
 class DronecanFeedbackModule : public Module {
 public:

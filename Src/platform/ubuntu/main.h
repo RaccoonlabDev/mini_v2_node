@@ -21,6 +21,7 @@ uint32_t HAL_GetTick();
 __attribute__((noreturn)) void platformSpecificRebootForce();
 bool platformSpecificRequestRestart();
 
+void platformSpecificReadUniqueID(uint8_t out_uid[4]);
 uint32_t platformSpecificGetTimeMs();
 void HAL_Delay(uint64_t time);
 #ifdef __cplusplus

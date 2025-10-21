@@ -12,7 +12,7 @@
 #ifndef CONFIG_USE_DRONECAN
 #define CONFIG_USE_DRONECAN 0
 #elif defined(CONFIG_USE_DRONECAN) && CONFIG_USE_DRONECAN == 1
-#include "logger.hpp"
+#include "libdcnode/logger.hpp"
 #endif
 
 #ifndef CONFIG_USE_CYPHAL

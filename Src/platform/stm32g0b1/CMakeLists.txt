@@ -42,6 +42,10 @@ target_include_directories(${EXECUTABLE} PRIVATE
     ${stm32cubeMxProjectPath}/Drivers/STM32G0xx_HAL_Driver/Inc/Legacy
 )
 
+if(CAN_PROTOCOL STREQUAL "dronecan" OR CAN_PROTOCOL STREQUAL "both")
+    target_link_libraries(${EXECUTABLE} PRIVATE libdcnode::libdcnode)
+endif()
+
 # Post-build
 add_custom_command(TARGET ${EXECUTABLE}
     POST_BUILD

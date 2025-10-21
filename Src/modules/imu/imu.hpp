@@ -21,7 +21,7 @@
 #include <numbers>
 #include <random>
 #include "module.hpp"
-#include "publisher.hpp"
+#include "libdcnode/publisher.hpp"
 #include "drivers/mpu9250/mpu9250.hpp"
 #include "common/FFT.hpp"
 #include "common/logging.hpp"
