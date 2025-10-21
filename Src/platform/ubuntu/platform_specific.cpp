@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <chrono>  // NOLINT [build/c++11]
 #include <cstdlib>
+#include <thread>
 #include <iostream>
 #include "main.h"
 #include "application.hpp"
@@ -61,4 +62,8 @@ uint32_t HAL_GetTick() {
     static auto start_time = std::chrono::high_resolution_clock::now();
     auto crnt_time = std::chrono::high_resolution_clock::now();
     return std::chrono::duration_cast<std::chrono::milliseconds>(crnt_time - start_time).count();
+}
+
+void HAL_Delay(uint64_t time) {
+     std::this_thread::sleep_for(std::chrono::milliseconds(time));
 }

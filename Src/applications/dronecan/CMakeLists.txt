@@ -14,6 +14,6 @@ include(${SRC_DIR}/modules/circuit_status/dronecan/CMakeLists.txt)
 include(${SRC_DIR}/modules/feedback/dronecan/CMakeLists.txt)
 include(${SRC_DIR}/modules/pwm/CMakeLists.txt)
 
-if(USE_PLATFORM_NODE_V3)
+if(USE_PLATFORM_NODE_V3 OR USE_PLATFORM_UBUNTU)
     include(${SRC_DIR}/modules/imu/CMakeLists.txt)
 endif()
