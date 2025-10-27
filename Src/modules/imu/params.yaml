@@ -34,7 +34,7 @@ imu.pub_frequency:
   flags: mutable
   default: 1
   min: 0
-  max: 400
+  max: 256
 
 imu.synthetic_frequency:
   type: Integer

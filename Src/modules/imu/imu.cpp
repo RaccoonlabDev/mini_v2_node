@@ -50,9 +50,14 @@ void ImuModule::update_params() {
     auto pub_frequency = static_cast<uint16_t>(
                                 paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_PUB_FREQUENCY));
     pub_timeout_ms = pub_frequency == 0 ? 0 : 1000 / pub_frequency;
-    publisher_bitmask = static_cast<uint8_t>(paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_PUBLISHERS_BITMASK));
-    data_bitmask = static_cast<uint8_t>(paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_DATA_BITMASK));
-    set_health((!publisher_bitmask || initialized) ? Module::Status::OK : Module::Status::MAJOR_FAILURE);
+    publisher_bitmask = static_cast<uint8_t>
+        (paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_PUBLISHERS_BITMASK));
+
+    data_bitmask = static_cast<uint8_t>
+        (paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_DATA_BITMASK));
+
+    set_health((!publisher_bitmask || initialized) ?
+        Module::Status::OK : Module::Status::MAJOR_FAILURE);
     gen_amplitude = static_cast<uint16_t>
         (paramsGetIntegerValue(IntParamsIndexes::SYNTHETIC_AMPLITUDE));
     gen_freq = static_cast<uint16_t>(paramsGetIntegerValue(IntParamsIndexes::SYNTHETIC_FREQ_GEN));
@@ -100,7 +105,6 @@ void ImuModule::spin_once() {
 }
 
 void ImuModule::get_vibration(std::array<float, 3> data) {
-    
     if (!has_bit(publisher_bitmask, Publisher_bitmask::ENABLE_VIB_ESTIM)) {
         return;
     }
@@ -114,7 +118,6 @@ void ImuModule::get_vibration(std::array<float, 3> data) {
 }
 
 void ImuModule::update_accel_fft() {
-    
     if (!has_bit(publisher_bitmask, Publisher_bitmask::ENABLE_FFT_ACC)) {
         return;
     }
