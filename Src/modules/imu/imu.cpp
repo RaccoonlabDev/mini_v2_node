@@ -68,24 +68,20 @@ void ImuModule::update_params() {
 
 
 void ImuModule::spin_once() {
-    if (!publisher_bitmask || !initialized || pub_timeout_ms == 0) {
+    if (!data_bitmask || !publisher_bitmask || !initialized || pub_timeout_ms == 0) {
             return;
     }
 
     std::array<bool, 2> updated {false, false};
-    bool is_data_source = false;
 
     if (has_bit(data_bitmask, Data_bitmast::ENABLE_REG_READINGS)) {
         process_real_register(updated);
-        is_data_source = true;
     }
     if (has_bit(data_bitmask, Data_bitmast::ENABLE_FIFO_READINGS)) {
         process_real_fifo(updated);
-        is_data_source = true;
     }
     if (has_bit(data_bitmask, Data_bitmast::ENABLE_SYNTH_GEN)){
         process_random_gen(updated);
-        is_data_source = true;
     }
 
     // Publish message
@@ -94,17 +90,6 @@ void ImuModule::spin_once() {
             pub.publish();
             pub.msg.timestamp = HAL_GetTick() * 1000;
         }
-    }
-
-    // Create separate timer for log, which doesn't depend on fact if data was updated
-    static uint64_t log_timestamp = 0;
-    if (pub_timeout_ms != 0 && HAL_GetTick() - log_timestamp / 1000 > pub_timeout_ms) {
-        char buffer[40];
-        if (!is_data_source) {
-            snprintf(buffer, sizeof(buffer), "No data source reading specified");
-            logger.log_warn(buffer);
-        }
-        log_timestamp = HAL_GetTick() * 1000;
     }
 }
 
@@ -191,8 +176,6 @@ void ImuModule::process_real_fifo (std::array<bool, 2>& updated){
             pub.msg.rate_gyro_latest[1] = gyro[1];
             pub.msg.rate_gyro_latest[2] = gyro[2];
             updated[0] = true;
-            
-
             accel = {
                     raw_accel_to_meter_per_square_second(accel_raw[0]),
                     raw_accel_to_meter_per_square_second(accel_raw[1]),
@@ -202,8 +185,6 @@ void ImuModule::process_real_fifo (std::array<bool, 2>& updated){
             pub.msg.accelerometer_latest[1] = accel[1];
             pub.msg.accelerometer_latest[2] = accel[2];
             updated[1] = true;
-            
-
         } else if (result == -2) {
             // Overflow handled, continue without updating
             char buffer[40];

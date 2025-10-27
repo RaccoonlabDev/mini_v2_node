@@ -16,7 +16,8 @@
 #define MAX(channel) IntParamsIndexes::PARAM_PWM_##channel##_MAX
 #define DEF(channel) IntParamsIndexes::PARAM_PWM_##channel##_DEF
 
-std::array<Driver::RcpwmChannel, static_cast<uint8_t>(HAL::PwmPin::PWM_AMOUNT)> Driver::RCPWM::channels = {{
+std::array<Driver::RcpwmChannel, static_cast<uint8_t>(HAL::PwmPin::PWM_AMOUNT)>
+    Driver::RCPWM::channels = {{
     {{.min = MIN(1), .max = MAX(1), .def = DEF(1), .ch = CH(1)}, HAL::PwmPin::PWM_1},
     {{.min = MIN(2), .max = MAX(2), .def = DEF(2), .ch = CH(2)}, HAL::PwmPin::PWM_2},
     {{.min = MIN(3), .max = MAX(3), .def = DEF(3), .ch = CH(3)}, HAL::PwmPin::PWM_3},
@@ -53,7 +54,8 @@ uint8_t Driver::RCPWM::get_pin_percent(uint8_t pin_idx) {
         return 0;
     }
 
-    return HAL::Pwm::get_percent(channels[pin_idx].pin, channels[pin_idx].min, channels[pin_idx].max);
+    return HAL::Pwm::get_percent
+        (channels[pin_idx].pin, channels[pin_idx].min, channels[pin_idx].max);
 }
 
 int8_t Driver::RCPWM::get_pin_channel(uint8_t pin_idx) {
