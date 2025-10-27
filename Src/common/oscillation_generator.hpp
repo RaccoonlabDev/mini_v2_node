@@ -42,24 +42,4 @@ private:
     float secs = 0;
 };
 
-class MultiSignalsSinGenerator {
-public:
-    uint16_t max_freq;
-    size_t n_signals;
-    uint16_t min_freq = 0;
-    uint16_t sample_rate_hz;
-    std::vector<SinSignalGenerator> signals_generator;
-    std::vector<std::pair<uint16_t, uint16_t>> dominant_sig;
-
-    void init();
-
-    MultiSignalsSinGenerator() = default;
-
-    MultiSignalsSinGenerator(size_t n_signals, uint16_t sample_rate_hz, uint16_t max_freq);
-
-    explicit MultiSignalsSinGenerator(InitMultiSignalsParamType parameters);
-
-    float get_next_samples();
-};
-
 #endif  // SRC_COMMON_OSCILATION_GENERATOR_H_
