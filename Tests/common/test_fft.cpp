@@ -304,7 +304,7 @@ public:
     }
 
     void check_axis(int axis) {
-        bool heat_peak;
+        bool heat_peak {false};
         auto signal_generator = signals_generator[axis];
         auto n_dominants = signal_generator.dominant_sig.size();
         auto n_signals = signal_generator.n_signals;

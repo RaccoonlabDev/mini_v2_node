@@ -163,8 +163,9 @@ void ImuModule::process_random_gen (std::array<bool, 2>& updated){
         last_sample_time_ms = HAL_GetTick();
         // Set whole array to 0 using memset
         memset(pub.msg.rate_gyro_latest, 0,
-            sizeof(pub.msg.rate_gyro_latest)*sizeof(pub.msg.rate_gyro_latest[0]));
+            sizeof(pub.msg.rate_gyro_latest));
         updated[0] = true;
+
         auto curr_accel =  accel_signals_generator.get_next_sample();
         accel[0] = curr_accel;
         accel[1] = 0;
@@ -175,7 +176,7 @@ void ImuModule::process_random_gen (std::array<bool, 2>& updated){
         // Other axis are redundant if we want to simulate one wave
         // Set them from 2nd element as 1st is used
         memset(pub.msg.accelerometer_latest + 1, 0,
-            sizeof(pub.msg.accelerometer_latest)*sizeof(pub.msg.accelerometer_latest[0]));
+            sizeof(pub.msg.accelerometer_latest) - sizeof(pub.msg.accelerometer_latest[0]));
         updated[1] = true;
         update_accel_fft();
     }

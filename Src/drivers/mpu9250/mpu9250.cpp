@@ -295,7 +295,7 @@ int8_t Mpu9250::FIFO_read(int16_t* __restrict raw_temperature, std::array<int16_
         // Re-enable accelerometer FIFO
         FIFO_set_resolution(bitmask);
         // Re-enable FIFO
-        for(volatile int i = 0; i < 1000; i++);
+        HAL_Delay(1);
         if (FIFO_init() != 0) {
             
             return -1;
