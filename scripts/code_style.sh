@@ -13,6 +13,7 @@ SOURCE_PATTERNS=(
     "${REPOSITORY_PATH}/Src/modules/*/*.cpp"
     "${REPOSITORY_PATH}/Src/peripheral/*/*.cpp"
     "${REPOSITORY_PATH}/Src/platform/*/*.cpp"
+    "${REPOSITORY_PATH}/Src/common/*.cpp"
 )
 
 # Expand wildcards to get the actual list of files
