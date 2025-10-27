@@ -8,15 +8,20 @@
 #ifndef SRC_MODULES_IMU_HPP_
 #define SRC_MODULES_IMU_HPP_
 
+
+
 #define FFT_MIN_FREQ 0.1f
 #define WINDOW_SIZE 256
 #define NUM_AXES 3
 #define SAMPLE_RATE_HZ 256
 // IMPORTANT NOTE: 
 // If you want to see oscilation data itself in a way that program sees it then
-// set imu.pub_frequency to the GENERATOR_SAMPLE_HZ frequency, so publisher would be able to publish data on time
-#define GENERATOR_SAMPLE_HZ 256
+// set imu.pub_frequency to the MODULE_FREQ_HZ frequency, so publisher would be able to publish data on time
+// For convenience module frequency and wave gen sample rate correspond
+#define MODULE_FREQ_HZ 256
 
+// When changing please pay special attention to the MPU sample rate (see MPU9250 driver FIFO create)
+#define FIFO_READING_RATE_MS 2
 
 #include <numbers>
 #include <random>
@@ -48,7 +53,7 @@ public:
         ENABLE_REG_READINGS         = 4,
     };
 
-    ImuModule() : Module(256, Protocol::DRONECAN) {}
+    ImuModule() : Module(MODULE_FREQ_HZ, Protocol::DRONECAN) {}
     void init() override;
     void set_initialize (bool initialize);
 
@@ -68,7 +73,7 @@ private:
     FFT fft_accel;
     FFT fft_gyro;
 
-    SinSignalGenerator accel_signals_generator {GENERATOR_SAMPLE_HZ};
+    SinSignalGenerator accel_signals_generator {MODULE_FREQ_HZ};
     uint16_t gen_freq{0};
     uint16_t gen_amplitude{0};
 
