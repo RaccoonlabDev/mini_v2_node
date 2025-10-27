@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2024 Stepanova Anastasiia <asiiapine@gmail.com>
  * This Source Code Form is subject to the terms of the Mozilla Public

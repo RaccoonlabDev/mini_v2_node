@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2024 Stepanova Anastasiia <asiiapine@gmail.com>
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ * Preprocess on random seed collaborator Ilia Kliantsevich <iliawork112005@gmail.com>
+ */
+
 #include "main.h" // For HAL
 #include <random>
 #include <algorithm>  // For std::clamp
