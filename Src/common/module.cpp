@@ -49,9 +49,9 @@ void ModuleManager::init() {
     for (auto app_module : active_modules) {
         if (app_module->is_enabled()) {
             app_module->init();
-            if (app_module->get_health() > Module::Status::OK) { // is health bad
+            if (app_module->get_health() > Module::Status::OK) {  // is health bad
                 app_module->init();
-            } 
+            }
         }
     }
 }

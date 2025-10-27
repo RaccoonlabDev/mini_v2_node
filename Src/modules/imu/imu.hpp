@@ -33,16 +33,21 @@ extern "C" {
 // TODO (ilyha_dev): make lazy FFTs and generator initialisation as it's big classes
 class ImuModule : public Module {
 public:
-    enum class Bitmask : uint8_t {
+    enum class Publisher_bitmask : uint8_t {
         DISABLED                    = 0,
         ENABLE_VIB_ESTIM            = 2,
         ENABLE_FFT_ACC              = 4,
         ENABLE_FFT_GYR              = 8,
-        ENABLE_SYNTH_GEN            = 16,
-        ENABLE_FIFO_READINGS        = 32,
-        ENABLE_REG_READINGS         = 64,
         ENABLE_ALL_BY_DEFAULT       = 15,
     };
+
+    enum class Data_bitmast : uint8_t {
+        DISABLED                    = 0,
+        ENABLE_SYNTH_GEN            = 1,
+        ENABLE_FIFO_READINGS        = 2,
+        ENABLE_REG_READINGS         = 4,
+    };
+
     ImuModule() : Module(256, Protocol::DRONECAN) {}
     void init() override;
     void set_initialize (bool initialize);
@@ -70,7 +75,8 @@ private:
     float vibration = 0.0f;
     bool initialized{false};
     bool enabled{false};
-    uint8_t bitmask{0};
+    uint8_t publisher_bitmask{0};
+    uint8_t data_bitmask{0};
     uint16_t pub_timeout_ms{0};
 
     std::array<float, NUM_AXES> gyro  = {0.0f, 0.0f, 0.0f};

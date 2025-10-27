@@ -6,11 +6,25 @@
  */
 
 #include <math.h>
+#include <concepts>
 #include "imu.hpp"
 #include "params.hpp"
 #include "common/logging.hpp"
 
 REGISTER_MODULE(ImuModule)
+
+// Helper functions
+template <typename Enum>
+constexpr auto to_underlying(Enum value) -> std::underlying_type_t<Enum> {
+    static_assert(std::is_enum_v<Enum>, "Enum must be an enum type");
+    return static_cast<std::underlying_type_t<Enum>>(value);
+}
+
+template <typename Enum>
+constexpr bool has_bit(uint8_t bitmask, Enum bit) {
+    static_assert(std::is_enum_v<Enum>, "Enum must be an enum type");
+    return (bitmask & to_underlying(bit)) != 0;
+}
 
 void ImuModule::init() {
     set_initialize(imu.initialize());
@@ -36,38 +50,34 @@ void ImuModule::update_params() {
     auto pub_frequency = static_cast<uint16_t>(
                                 paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_PUB_FREQUENCY));
     pub_timeout_ms = pub_frequency == 0 ? 0 : 1000 / pub_frequency;
-    bitmask = static_cast<uint8_t>(paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_MODE_BITMASK));
-    set_health((!bitmask || initialized) ? Module::Status::OK : Module::Status::MAJOR_FAILURE);
+    publisher_bitmask = static_cast<uint8_t>(paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_PUBLISHERS_BITMASK));
+    data_bitmask = static_cast<uint8_t>(paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_DATA_BITMASK));
+    set_health((!publisher_bitmask || initialized) ? Module::Status::OK : Module::Status::MAJOR_FAILURE);
     gen_amplitude = static_cast<uint16_t>
         (paramsGetIntegerValue(IntParamsIndexes::SYNTHETIC_AMPLITUDE));
     gen_freq = static_cast<uint16_t>(paramsGetIntegerValue(IntParamsIndexes::SYNTHETIC_FREQ_GEN));
-    if (bitmask) {
+    if (publisher_bitmask) {
         set_mode(initialized ? Mode::STANDBY : Mode::INITIALIZATION);
     }
 }
 
 
 void ImuModule::spin_once() {
+    if (!publisher_bitmask || !initialized) {
+            return;
+    }
+
     std::array<bool, 2> updated {false, false};
     bool is_data_source = false;
-    if (!static_cast<uint8_t>(bitmask &
-        static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_SYNTH_GEN))) {
-        if (!bitmask || !initialized) {
-            return;
-        }
-        if (static_cast<uint8_t>(bitmask &
-            static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_FIFO_READINGS))) {
+        if (has_bit(data_bitmask, Data_bitmast::ENABLE_FIFO_READINGS)) {
             process_real_fifo(updated);
             is_data_source = true;
-        } else if (static_cast<uint8_t>(bitmask &
-                    static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_REG_READINGS))) {
+        } else if (has_bit(data_bitmask, Data_bitmast::ENABLE_FIFO_READINGS)) {
             process_real_register(updated);
             is_data_source = true;
-        }
-    } else if (static_cast<uint8_t>(bitmask &
-            static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_SYNTH_GEN))){
-        process_random_gen(updated);
-        is_data_source = true;
+        } else if (has_bit(data_bitmask, Data_bitmast::ENABLE_SYNTH_GEN)){
+            process_random_gen(updated);
+            is_data_source = true;
     }
     // Publish message
     if (pub_timeout_ms != 0 && HAL_GetTick() - pub.msg.timestamp / 1000 > pub_timeout_ms) {
@@ -90,7 +100,8 @@ void ImuModule::spin_once() {
 }
 
 void ImuModule::get_vibration(std::array<float, 3> data) {
-    if (!(bitmask & static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_VIB_ESTIM))) {
+    
+    if (!has_bit(publisher_bitmask, Publisher_bitmask::ENABLE_VIB_ESTIM)) {
         return;
     }
     float diff_magnitude = 0.0f;
@@ -103,7 +114,8 @@ void ImuModule::get_vibration(std::array<float, 3> data) {
 }
 
 void ImuModule::update_accel_fft() {
-    if (!(bitmask & static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_FFT_ACC))) {
+    
+    if (!has_bit(publisher_bitmask, Publisher_bitmask::ENABLE_FFT_ACC)) {
         return;
     }
     fft_accel.update(accel.data());
@@ -113,7 +125,7 @@ void ImuModule::update_accel_fft() {
 }
 
 void ImuModule::update_gyro_fft() {
-    if (!(bitmask & static_cast<std::underlying_type_t<Bitmask>>(Bitmask::ENABLE_FFT_GYR))) {
+    if (!has_bit(publisher_bitmask, Publisher_bitmask::ENABLE_FFT_GYR)) {
         return;
     }
     fft_gyro.update(gyro.data());
@@ -259,3 +271,5 @@ void ImuModule::process_real_register (std::array<bool, 2>& updated) {
         update_accel_fft();
     }
 }
+
+

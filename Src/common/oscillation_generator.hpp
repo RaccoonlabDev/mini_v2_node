@@ -2,6 +2,7 @@
 #define SRC_COMMON_OSCILATION_GENERATOR_H_
 #include <cstdint>
 #include <vector>
+#include <random>
 
 // will ne reused in CheckOnFewWindows tests
 #ifndef FIXED_SEED
