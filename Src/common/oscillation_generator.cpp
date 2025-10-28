@@ -23,12 +23,6 @@ std::mt19937 rd(12345);
 std::random_device rd;
 #endif
 
-//  uint32_t get_hw_random() {
-//      uint32_t random_number;
-//      HAL_RNG_GenerateRandomNumber(&hrng, &random_number);
-//      return random_number;
-//  }
-
 SinSignalGenerator::SinSignalGenerator(InitOneSignParamType signal_parameters) :
                                     freq_hz(signal_parameters.freq_hz),
                                     amplitude(signal_parameters.amplitude),

@@ -11,8 +11,6 @@ add_executable(${EXECUTABLE}
     ${ROOT_DIR}/Src/common/logging.cpp
     ${ROOT_DIR}/Src/common/application.cpp
     ${ROOT_DIR}/Src/common/module.cpp
-    ${ROOT_DIR}/Src/common/oscillation_generator.cpp
-    ${ROOT_DIR}/Src/common/FFT.cpp
 
     ${ROOT_DIR}/Src/peripheral/adc/circuit_periphery.cpp
     ${CMAKE_CURRENT_LIST_DIR}/pwm.cpp

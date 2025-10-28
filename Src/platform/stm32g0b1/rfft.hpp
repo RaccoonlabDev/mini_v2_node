@@ -115,7 +115,7 @@ namespace rfft {
 
     template<class T>
     inline T get_imag_by_index(T* in, int index) {
-        if (index == 0) return 0;     // DC has no imaginary part
+        if (index == 0) return 0;  // DC has no imaginary part
         return in[2 * index + 1];
     }
 
