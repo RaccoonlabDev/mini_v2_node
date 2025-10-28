@@ -13,7 +13,7 @@
 #define FFT_MIN_FREQ 0.1f
 #define WINDOW_SIZE 256
 #define NUM_AXES 3
-#define SAMPLE_RATE_HZ 256
+#define FFT_SAMPLE_RATE_HZ 256
 // IMPORTANT NOTE: 
 // If you want to see oscilation data itself in a way that program sees it then
 // set imu.pub_frequency to the MODULE_FREQ_HZ frequency, so publisher would be able to publish data on time

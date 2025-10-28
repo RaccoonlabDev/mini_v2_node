@@ -30,9 +30,9 @@ void ImuModule::init() {
     set_initialize(imu.initialize());
     imu.FIFO_create();
     set_mode(Mode::STANDBY);
-    fft_accel.init(WINDOW_SIZE, NUM_AXES, SAMPLE_RATE_HZ);
+    fft_accel.init(WINDOW_SIZE, NUM_AXES, FFT_SAMPLE_RATE_HZ);
     fft_accel.fft_min_freq = FFT_MIN_FREQ;
-    fft_gyro.init(WINDOW_SIZE, NUM_AXES, SAMPLE_RATE_HZ);
+    fft_gyro.init(WINDOW_SIZE, NUM_AXES, FFT_SAMPLE_RATE_HZ);
     fft_gyro.fft_min_freq = FFT_MIN_FREQ;
 }
 void ImuModule::set_initialize (bool new_initialized) {

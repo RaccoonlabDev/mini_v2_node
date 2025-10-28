@@ -41,6 +41,23 @@ enum class MagnetometerResgiter : uint8_t {
     REG_MAG_XOUT_L = 0x03,
 };
 
+enum class MpuSampleRate : uint8_t {
+    SMAPLE_RATE_500HZ = 0x01,
+    SAMPLE_RATE_250HZ = 0x03,
+    SAMPLE_RATE_200HZ = 0x04,
+    SAMPLE_RATE_125HZ = 0x07,
+    SAMPLE_RATE_100HZ = 0x09,
+    SAMPLE_RATE_50HZ = 0x13
+};
+
+enum class FIFOEnableBitmask : uint8_t {
+    ACCEL = 0x08,
+    GYRO_X = 0x40,
+    GYRO_Y = 0x20,
+    GYRO_Z = 0x10,
+    TEMPERATURE = 0x80
+};
+
 constexpr auto MPU9250_WHO_AM_I_ID = std::byte(0x71);   // REG_WHO_AM_I expected value
 
 
@@ -108,7 +125,7 @@ int8_t Mpu9250::FIFO_create () {
     auto smprt_div_reg = std::byte(Mpu9250Registers::SMPLRT_DIV);
     // NOTE: setting too big value in sample rate may cause frequent overflows
     // Consider the frequency in which FIFO is being read in your main loop
-    std::byte smprt_div = std::byte{0x09};  // 100Hz: 1000/(1+9) = 100Hz
+    std::byte smprt_div = std::byte(MpuSampleRate::SAMPLE_RATE_100HZ);  // 100Hz: 1000/(1+9) = 100Hz
     if (HAL::SPI::write_register(smprt_div_reg, smprt_div)) {
         return false;
     }
@@ -313,7 +330,7 @@ int8_t Mpu9250::FIFO_read(int16_t* __restrict raw_temperature,
 
     // Parse accelerometer data (big-endian format)
     // TODO(ilyha_dev) : make enum for bitmask usage to improve code readability
-    if (static_cast<uint8_t>(bitmask & std::byte{0x08})){
+    if (static_cast<uint8_t>(bitmask & std::byte(FIFOEnableBitmask::ACCEL))){
         // Parse accelerometer data (big-endian format)
         (*raw_accel)[0] = static_cast<int16_t>(
             (uint16_t(raw_data[0]) << 8) | uint16_t(raw_data[1]));
@@ -322,20 +339,20 @@ int8_t Mpu9250::FIFO_read(int16_t* __restrict raw_temperature,
         (*raw_accel)[2] = static_cast<int16_t>(
             (uint16_t(raw_data[4]) << 8) | uint16_t(raw_data[5]));
     }
-    if (static_cast<uint8_t>(bitmask & std::byte{0x80})) {
+    if (static_cast<uint8_t>(bitmask & std::byte(FIFOEnableBitmask::TEMPERATURE))) {
         *raw_temperature = static_cast<int16_t>(
             (uint16_t)raw_data[6] << 8 | (uint16_t)raw_data[7]);
     }
 
-    if (static_cast<uint8_t>(bitmask & std::byte{0x40})) {
+    if (static_cast<uint8_t>(bitmask & std::byte(FIFOEnableBitmask::GYRO_X))) {
             (*raw_gyro)[0] = static_cast<int16_t>(
                 (uint16_t)raw_data[8] << 8 | (uint16_t)raw_data[9]);
     }
-    if (static_cast<uint8_t>(bitmask & std::byte{0x20})) {
+    if (static_cast<uint8_t>(bitmask & std::byte(FIFOEnableBitmask::GYRO_Y))) {
             (*raw_gyro)[1] = static_cast<int16_t>(
                 (uint16_t)raw_data[10] << 8 | (uint16_t)raw_data[11]);
     }
-    if (static_cast<uint8_t>(bitmask & std::byte{0x10})) {
+    if (static_cast<uint8_t>(bitmask & std::byte(FIFOEnableBitmask::GYRO_Z))) {
             (*raw_gyro)[2] = static_cast<int16_t>(
                 (uint16_t)raw_data[12] << 8 | (uint16_t)raw_data[13]);
     }
