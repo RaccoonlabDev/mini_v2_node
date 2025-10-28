@@ -29,19 +29,18 @@ static void spi_set_nss(bool nss_state) {
 }
 
 int8_t SPI::read_registers(std::byte& reg_address, std::byte* reg_values, uint8_t size) {
-    if (reg_values == nullptr) {
+    if (reg_values == nullptr || size > MAX_SPI_REGISTERS_READ) {
         return -1;
     }
-    std::vector<std::byte> tx_buffer(size + 1);
-    std::vector<std::byte> rx_buffer(size + 1);
+    std::array<std::byte, MAX_SPI_REGISTERS_READ + 1> tx_buffer = {};
+    std::array<std::byte, MAX_SPI_REGISTERS_READ + 1> rx_buffer = {};
     tx_buffer[0] = reg_address | SPI_READ;
-    // Fill rest with dummy bytes
-    std::fill(tx_buffer.begin() + 1, tx_buffer.end(), std::byte{0x00});
+
     auto result = transaction(tx_buffer.data(), rx_buffer.data(), size + 1);
     if (result == 0) {
         // Copy actual data (skip first dummy byte)
         // analog from just read_register where we start reading actual data from 2nd byte
-        std::copy(rx_buffer.begin() + 1, rx_buffer.end(), reg_values);
+        std::copy(rx_buffer.begin() + 1, rx_buffer.begin() + size + 1, reg_values);
     }
     return result;
 }

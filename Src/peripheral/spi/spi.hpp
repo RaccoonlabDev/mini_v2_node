@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <cstddef>
 
+#define MAX_SPI_REGISTERS_READ 128
 namespace HAL {
 
 class SPI {
