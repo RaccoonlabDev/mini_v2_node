@@ -58,8 +58,9 @@ public:
      * @brief It's programmer responsobility to provide correct data which correspond to given bitmask in set_resolution
      * Note: By default bitmask is 0b11111000
      */
-    int8_t FIFO_read (int16_t* raw_temperature, std::array<int16_t, 3>*  raw_gyro, std::array<int16_t, 3>*  raw_accel);
-    
+    int8_t FIFO_read (int16_t* raw_temperature, std::array<int16_t, 3>*  raw_gyro,
+        std::array<int16_t, 3>*  raw_accel);
+
     /**
      * @return fifo_count registers content
      */
@@ -77,6 +78,7 @@ public:
      * @param bitmask is TEMP_FIFO_EN GYRO_XOUT GYRO_YOUT GYRO_ZOUT ACCEL SLV2 SLV1 SLV0 (8 bits)
      */
     int8_t FIFO_set_resolution (std::byte set_bitmask);
+
 private:
     bool initialized{false};
     uint8_t fifo_frame_bytes = 0;

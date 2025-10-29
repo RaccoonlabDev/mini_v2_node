@@ -6,7 +6,7 @@
 
 // will ne reused in CheckOnFewWindows tests
 #ifndef FIXED_SEED
-extern std::mt19937 rd; 
+extern std::mt19937 rd;
 #else
 extern std::random_device rd;
 #endif
@@ -27,7 +27,7 @@ class SinSignalGenerator {
 public:
     SinSignalGenerator(){}
     explicit SinSignalGenerator(InitOneSignParamType signal_parameters);
-    SinSignalGenerator(uint16_t sample_rate_hz);
+    explicit SinSignalGenerator(uint16_t sample_rate_hz);
     SinSignalGenerator(uint16_t sample_rate_hz, uint16_t freq_hz, uint16_t amplitude);
     void setFreq (uint16_t freq);
     void setAmpl (uint16_t ampl);

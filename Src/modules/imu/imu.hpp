@@ -13,13 +13,14 @@
 #define FFT_MIN_FREQ 0.1f
 #define WINDOW_SIZE 256
 #define NUM_AXES 3
-// IMPORTANT NOTE: 
+// IMPORTANT NOTE:
 // If you want to see oscilation data itself in a way that program sees it then
-// set imu.pub_frequency to the MODULE_FREQ_HZ frequency, so publisher would be able to publish data on time
+// set imu.pub_frequency to the MODULE_FREQ_HZ frequency,
+// so publisher would be able to publish data on time
 // For convenience module frequency and wave gen sample rate correspond
 #define MODULE_FREQ_HZ 256
 
-// When changing please pay special attention to the MPU sample rate (see MPU9250 driver FIFO create)
+// When changing pay special attention to the MPU sample rate (see MPU9250 driver FIFO create)
 #define FIFO_READING_RATE_MS 2
 
 #include <numbers>
@@ -34,7 +35,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-// TODO (ilyha_dev): make lazy FFTs and generator initialisation as it's big classes
+// TODO(ilyha_dev): make lazy FFTs and generator initialisation as it's big classes
 class ImuModule : public Module {
 public:
     enum class Publisher_bitmask : uint8_t {
@@ -98,13 +99,13 @@ private:
         return raw_accel * 9.80665f / 16384.0f;
     }
     constexpr int16_t raw_temp_convert_to_celsius (int16_t raw_temp){
-        // IMPORTANT: this temperature is "die" (iternal) temperature of the MPU9250. It DOES NOT refer to ambient temperature
-        // 21 derived from Room Temp Offset 
+        // IMPORTANT: this temperature is "die" (iternal) temperature of the MPU9250.
+        // It DOES NOT refer to ambient temperature
+        // 21 derived from Room Temp Offset
         temperature = (float)raw_temp / 333.87f + 21.0;
         // Simple and low cost rounding
         return (static_cast<int16_t>(temperature + (temperature >= 0 ? 0.5f : -0.5f)));
     }
-
 };
 
 #ifdef __cplusplus
