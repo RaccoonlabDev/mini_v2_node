@@ -104,9 +104,6 @@ namespace rfft {
         out[1] = in[2 * index + 1];
     }
 
-    // About my fix:
-    // Forgot about FFT output buffer order?
-    // It is still: X = { real[0], imag[0], real[1], imag[1], real[2], imag[2] ... real[(N/2)-1], imag[(N/2)-1 }
     template<class T>
     inline T get_real_by_index(T* in, int index) {
         if (index == 0) return in[0];  // DC component
