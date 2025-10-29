@@ -13,7 +13,6 @@
 #define FFT_MIN_FREQ 0.1f
 #define WINDOW_SIZE 256
 #define NUM_AXES 3
-#define FFT_SAMPLE_RATE_HZ 256
 // IMPORTANT NOTE: 
 // If you want to see oscilation data itself in a way that program sees it then
 // set imu.pub_frequency to the MODULE_FREQ_HZ frequency, so publisher would be able to publish data on time
@@ -61,8 +60,6 @@ protected:
     void spin_once() override;
     void update_params() override;
     void get_vibration(std::array<float, 3> data);
-    void update_accel_fft();
-    void update_gyro_fft();
 
 private:
     DronecanPublisher<AhrsRawImu> pub;
@@ -72,8 +69,10 @@ private:
 
     FFT fft_accel;
     FFT fft_gyro;
+    void update_accel_fft();
+    void update_gyro_fft();
 
-    SinSignalGenerator accel_signals_generator {MODULE_FREQ_HZ};
+    SinSignalGenerator accel_signal_generator {MODULE_FREQ_HZ};
     uint16_t gen_freq{0};
     uint16_t gen_amplitude{0};
 

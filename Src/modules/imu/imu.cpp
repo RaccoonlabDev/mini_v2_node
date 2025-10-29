@@ -30,9 +30,10 @@ void ImuModule::init() {
     set_initialize(imu.initialize());
     imu.FIFO_create();
     set_mode(Mode::STANDBY);
-    fft_accel.init(WINDOW_SIZE, NUM_AXES, FFT_SAMPLE_RATE_HZ);
+    // Module frequency must be the same as FFT frequency for correct FFT work
+    fft_accel.init(WINDOW_SIZE, NUM_AXES, MODULE_FREQ_HZ);
     fft_accel.fft_min_freq = FFT_MIN_FREQ;
-    fft_gyro.init(WINDOW_SIZE, NUM_AXES, FFT_SAMPLE_RATE_HZ);
+    fft_gyro.init(WINDOW_SIZE, NUM_AXES, MODULE_FREQ_HZ);
     fft_gyro.fft_min_freq = FFT_MIN_FREQ;
 }
 void ImuModule::set_initialize (bool new_initialized) {
@@ -131,13 +132,13 @@ void ImuModule::update_gyro_fft() {
 
 void ImuModule::process_random_gen (std::array<bool, 2>& updated){
     // Set values for to generate
-    accel_signals_generator.setAmpl(gen_amplitude);
-    accel_signals_generator.setFreq(gen_freq);
+    accel_signal_generator.setAmpl(gen_amplitude);
+    accel_signal_generator.setFreq(gen_freq);
     memset(pub.msg.rate_gyro_latest, 0,
         sizeof(pub.msg.rate_gyro_latest));
     updated[0] = true;
 
-    auto curr_accel =  accel_signals_generator.get_next_sample();
+    auto curr_accel =  accel_signal_generator.get_next_sample();
     accel[0] = curr_accel;
     accel[1] = 0;
     accel[2] = 0;
