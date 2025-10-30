@@ -327,14 +327,14 @@ public:
             }
         }
         if (result) {
-            for (int peak_index = 0; peak_index < MAX_NUM_PEAKS; peak_index++) {
+            for (int peak_index = 0; peak_index < fft_parameters.n_axes; peak_index++) {
                 printf("peak freq: %f\n", fft.peak_frequencies[axis][peak_index]);
                 printf("peak snr: %f\n", fft.peak_snr[axis][peak_index]);
                 printf("peak mag: %f\n", fft.peak_magnitudes[axis][peak_index]);
             }
             EXPECT_TRUE(heat_peak);
         } else {
-            for (int peak_index = 0; peak_index < MAX_NUM_PEAKS; peak_index++) {
+            for (int peak_index = 0; peak_index < fft_parameters.n_axes; peak_index++) {
                 printf("peak freq: %f\n", fft.peak_frequencies[axis][peak_index]);
                 printf("peak snr: %f\n", fft.peak_snr[axis][peak_index]);
                 printf("peak mag: %f\n", fft.peak_magnitudes[axis][peak_index]);
