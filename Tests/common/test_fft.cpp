@@ -194,8 +194,8 @@ public:
             signals_parameters[i] = init_parameters.signals_parameters;
         }
         // To print FFT parameters for debug uncomment the following line
-        // print_signal_parameters();
-        // print_fft_parameters();
+        print_signal_parameters();
+        print_fft_parameters();
         init();
     }
 };
@@ -298,8 +298,8 @@ public:
             signals_parameters[i] = init_parameters.signals_parameters;
         }
         // To print FFT parameters for debug uncomment the following line
-        // print_signal_parameters();
-        // print_fft_parameters();
+        print_signal_parameters();
+        print_fft_parameters();
         init();
     }
 
@@ -365,7 +365,7 @@ const std::array<InitParamMultiSignalWithRes, 9> MultiSignalTestParams = {
       InitMultiSignalsParamType{ .sample_rate_hz = 512, .n_signals  = 10,   .max_freq   = 256}},
       true},
     // 8 <- my. Simplified one
-    {{InitFFTParamType{          .sample_rate_hz = 512, .n_axes     = 3,   .window_size = 22},
+    {{InitFFTParamType{          .sample_rate_hz = 512, .n_axes     = 3,   .window_size = 128},
       InitMultiSignalsParamType{ .sample_rate_hz = 512, .n_signals  = 10,   .max_freq   = 256}},
       true},
 }

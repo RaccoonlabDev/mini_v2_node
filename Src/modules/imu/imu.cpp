@@ -246,5 +246,3 @@ void ImuModule::process_real_register (std::array<bool, 2>& updated) {
         update_accel_fft();
     }
 }
-
-
