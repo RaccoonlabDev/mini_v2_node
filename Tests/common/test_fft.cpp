@@ -20,7 +20,7 @@ public:
     uint16_t min_freq = 0;
     uint16_t sample_rate_hz;
     std::vector<SinSignalGenerator> signals_generator;
-    std::vector<std::pair<uint16_t, uint16_t>> dominant_sig;
+    std::vector<std::pair<float, float>> dominant_sig;
 
     void init() {
         signals_generator.resize(n_signals);
@@ -303,12 +303,15 @@ public:
         init();
     }
 
+    
     void check_axis(int axis) {
         bool heat_peak {false};
         auto signal_generator = signals_generator[axis];
         auto n_dominants = signal_generator.dominant_sig.size();
         auto n_signals = signal_generator.n_signals;
+        printf("n dominants: %d n signals: %d\n", n_dominants, n_signals);
         for (auto dominant : signal_generator.dominant_sig) {
+            printf("dominant.first: %f dominant.second: %f\n", dominant.first, dominant.second);
         }
         for (int peak_index = 0; peak_index < MAX_NUM_PEAKS; peak_index++) {
             for (auto dominant : signal_generator.dominant_sig) {
@@ -324,11 +327,22 @@ public:
             }
         }
         if (result) {
+            for (int peak_index = 0; peak_index < MAX_NUM_PEAKS; peak_index++) {
+                printf("peak freq: %f\n", fft.peak_frequencies[axis][peak_index]);
+                printf("peak snr: %f\n", fft.peak_snr[axis][peak_index]);
+                printf("peak mag: %f\n", fft.peak_magnitudes[axis][peak_index]);
+            }
             EXPECT_TRUE(heat_peak);
         } else {
+            for (int peak_index = 0; peak_index < MAX_NUM_PEAKS; peak_index++) {
+                printf("peak freq: %f\n", fft.peak_frequencies[axis][peak_index]);
+                printf("peak snr: %f\n", fft.peak_snr[axis][peak_index]);
+                printf("peak mag: %f\n", fft.peak_magnitudes[axis][peak_index]);
+            }
             ASSERT_FALSE(heat_peak);
         }
     }
+
 };
 
 const std::array<InitParamMultiSignalWithRes, 9> MultiSignalTestParams = {
