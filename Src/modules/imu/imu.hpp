@@ -83,6 +83,7 @@ private:
     uint8_t publisher_bitmask{0};
     uint8_t data_bitmask{0};
     uint16_t pub_timeout_ms{0};
+    uint16_t log_timeout_ms = 2000;
 
     std::array<float, NUM_AXES> gyro  = {0.0f, 0.0f, 0.0f};
     std::array<float, NUM_AXES> accel = {0.0f, 0.0f, 0.0f};

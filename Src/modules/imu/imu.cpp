@@ -69,16 +69,19 @@ void ImuModule::update_params() {
 
 
 void ImuModule::spin_once() {
-    if (!data_bitmask || !publisher_bitmask || !initialized || pub_timeout_ms == 0) {
+
+
+    // In those cases spin_once meaningless
+    if (!data_bitmask || !publisher_bitmask || pub_timeout_ms == 0) {
             return;
     }
 
     std::array<bool, 2> updated {false, false};
 
-    if (has_bit(data_bitmask, Data_bitmast::ENABLE_REG_READINGS)) {
+    if (initialized && has_bit(data_bitmask, Data_bitmast::ENABLE_REG_READINGS)) {
         process_real_register(updated);
     }
-    if (has_bit(data_bitmask, Data_bitmast::ENABLE_FIFO_READINGS)) {
+    if (initialized && has_bit(data_bitmask, Data_bitmast::ENABLE_FIFO_READINGS)) {
         process_real_fifo(updated);
     }
     if (has_bit(data_bitmask, Data_bitmast::ENABLE_SYNTH_GEN)){
@@ -86,11 +89,18 @@ void ImuModule::spin_once() {
     }
 
     // Publish message
-    if (pub_timeout_ms != 0 && HAL_GetTick() - pub.msg.timestamp / 1000 > pub_timeout_ms) {
+    if ((initialized || has_bit(data_bitmask, Data_bitmast::ENABLE_SYNTH_GEN)) &&
+            HAL_GetTick() - pub.msg.timestamp / 1000 > pub_timeout_ms){
         if (updated[0] && updated[1]) {
             pub.publish();
             pub.msg.timestamp = HAL_GetTick() * 1000;
         }
+    }
+    // Publish logs
+    static uint64_t log_timestamp = 0;
+    if (!initialized && (HAL_GetTick() - log_timestamp / 1000 > log_timeout_ms)) {
+        logger.log_warn("IMU is not initialised only synthetic read is possible");
+        log_timestamp = HAL_GetTick() * 1000;
     }
 }
 
