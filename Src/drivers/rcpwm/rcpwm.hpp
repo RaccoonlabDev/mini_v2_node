@@ -9,8 +9,8 @@
 #define SRC_DRIVERS_RCPWM_RCPWM_HPP_
 
 #include <cstdint>
-#include "peripheral/pwm/pwm.hpp"
 #include <array>
+#include "peripheral/pwm/pwm.hpp"
 
 namespace Driver {
 

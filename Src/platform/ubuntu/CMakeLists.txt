@@ -13,11 +13,16 @@ add_executable(${EXECUTABLE}
     ${ROOT_DIR}/Src/common/logging.cpp
     ${ROOT_DIR}/Src/common/application.cpp
     ${ROOT_DIR}/Src/common/module.cpp
+    ${ROOT_DIR}/Src/common/oscillation_generator.cpp
+    ${ROOT_DIR}/Src/common/FFT.cpp
 
     ${ROOT_DIR}/Src/peripheral/adc/circuit_periphery.cpp
     ${CMAKE_CURRENT_LIST_DIR}/platform_specific.cpp
 )
 
+find_package(PkgConfig REQUIRED)
+pkg_search_module(FFTW REQUIRED fftw3)
+include_directories(${FFTW_INCLUDE_DIRS})
 target_include_directories(${EXECUTABLE} PRIVATE
     ${BUILD_SRC_DIR}
     ${APPLICATION_HEADERS}
@@ -25,6 +30,8 @@ target_include_directories(${EXECUTABLE} PRIVATE
 
     ${CMAKE_CURRENT_LIST_DIR}
 )
+# Add fftw library for FFT execution
+target_link_libraries(${EXECUTABLE} PRIVATE ${FFTW_LIBRARIES})
 
 if(CAN_PROTOCOL STREQUAL "dronecan" OR CAN_PROTOCOL STREQUAL "both")
     target_link_libraries(${EXECUTABLE} PRIVATE libdcnode::libdcnode)

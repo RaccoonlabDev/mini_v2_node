@@ -5,8 +5,8 @@
  * Author: Anastasiia Stepanova <asiiapine@gmail.com>
  */
 
-#include "common/logging.hpp"
-#include "common/module.hpp"
+#include "logging.hpp"
+#include "module.hpp"
 #include "params.hpp"
 
 #ifndef CONFIG_USE_DRONECAN

@@ -45,11 +45,13 @@ public:
         : _c1(c1), _c2(c2) {}
 
     auto begin() {
-        return zip_iterator<decltype(std::begin(_c1)), decltype(std::begin(_c2))>(std::begin(_c1), std::begin(_c2));
+        return zip_iterator<decltype(std::begin(_c1)),
+            decltype(std::begin(_c2))>(std::begin(_c1), std::begin(_c2));
     }
 
     auto end() {
-        return zip_iterator<decltype(std::end(_c1)), decltype(std::end(_c2))>(std::end(_c1), std::end(_c2));
+        return zip_iterator<decltype(std::end(_c1)),
+            decltype(std::end(_c2))>(std::end(_c1), std::end(_c2));
     }
 
 private:

@@ -13,7 +13,17 @@ jobs:
 
       - name: Install gtest
         run: |
-          wget https://gist.githubusercontent.com/Ponomarevda/d970c24de8deab5d6ccfee8f5f719bcc/raw/install_gtest_ubuntu.sh && chmod +x install_gtest_ubuntu.sh && ./install_gtest_ubuntu.sh
+          sudo apt install googletest libgtest-dev libgmock-dev
+
+      - name: Install arm compiler
+        run: |
+          sudo apt-get install -y make gcc-arm-none-eabi
+
+      - name: Install fftw3
+        run: |
+          sudo apt-get install -y libfftw3-dev
 
       - name: Build and run tests
-        run: make tests
+        run: |
+          cd Tests
+          make coverage
