@@ -15,13 +15,7 @@
 #include "main.h"     // For HAL
 
 // TODO(ilyha_dev): make seed for mt19937 be chosen by HAL_RNG
-// Note! arm compiler doesn't support random device,
-// so defining it in dronecan_vX will lead to errors
-#ifndef FIXED_SEED
 std::mt19937 rd(12345);
-#else
-std::random_device rd;
-#endif
 
 SinSignalGenerator::SinSignalGenerator(InitOneSignParamType signal_parameters) :
                                     freq_hz(signal_parameters.freq_hz),

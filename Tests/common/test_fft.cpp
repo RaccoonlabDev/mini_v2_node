@@ -11,8 +11,9 @@
 #include <cmath>  // For std::fabs
 #include <tuple>  // for tuple
 #include "FFT.hpp"
-#include "oscillation_generator.hpp" 
+#include "oscillation_generator.hpp"
 
+std::random_device rd;
 class MultiSignalsSinGenerator {
 public:
     uint16_t max_freq;
