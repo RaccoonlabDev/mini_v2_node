@@ -69,8 +69,6 @@ void ImuModule::update_params() {
 
 
 void ImuModule::spin_once() {
-
-
     // In those cases spin_once meaningless
     if (!data_bitmask || !publisher_bitmask || pub_timeout_ms == 0) {
             return;
