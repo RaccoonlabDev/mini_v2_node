@@ -16,10 +16,10 @@
 std::random_device rd;
 class MultiSignalsSinGenerator {
 public:
-    uint16_t max_freq;
-    size_t n_signals;
+    uint16_t max_freq = 0;
+    size_t n_signals = 0;
     uint16_t min_freq = 0;
-    uint16_t sample_rate_hz;
+    uint16_t sample_rate_hz = 0;
     std::vector<SinSignalGenerator> signals_generator;
     std::vector<std::pair<float, float>> dominant_sig;
 
@@ -48,16 +48,16 @@ public:
     }
 
     MultiSignalsSinGenerator() = default;
-    
+
     MultiSignalsSinGenerator
-        (size_t n_sig, uint16_t sample_rate, uint16_t max_f) :
-                                                max_freq(max_f),
+        (size_t n_sig, uint16_t sample_rate, uint16_t max_frequency) :
+                                                max_freq(max_frequency),
                                                 n_signals(n_sig),
                                                 sample_rate_hz(sample_rate) {
         init();
     }
 
-    MultiSignalsSinGenerator(InitMultiSignalsParamType parameters) :
+    explicit MultiSignalsSinGenerator(InitMultiSignalsParamType parameters) :
                                                 max_freq(parameters.max_freq),
                                                 n_signals(parameters.n_signals),
                                                 sample_rate_hz(parameters.sample_rate_hz) {
