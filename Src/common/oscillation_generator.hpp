@@ -4,13 +4,6 @@
 #include <vector>
 #include <random>
 
-// will ne reused in CheckOnFewWindows tests
-#ifndef FIXED_SEED
-extern std::mt19937 rd;
-#else
-extern std::random_device rd;
-#endif
-
 struct InitOneSignParamType   {
     uint16_t sample_rate_hz = 0;
     uint16_t freq_hz = 0;

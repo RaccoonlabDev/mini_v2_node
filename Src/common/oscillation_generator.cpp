@@ -3,7 +3,7 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- * Preprocess on random seed collaborator Ilia Kliantsevich <iliawork112005@gmail.com>
+ * Refactor collaborator Ilia Kliantsevich <iliawork112005@gmail.com>
  */
 #include "oscillation_generator.hpp"
 
@@ -14,8 +14,6 @@
 
 #include "main.h"     // For HAL
 
-// TODO(ilyha_dev): make seed for mt19937 be chosen by HAL_RNG
-std::mt19937 rd(12345);
 
 SinSignalGenerator::SinSignalGenerator(InitOneSignParamType signal_parameters) :
                                     freq_hz(signal_parameters.freq_hz),

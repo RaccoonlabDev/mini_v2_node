@@ -5,15 +5,6 @@ set(TESTS_DIR ${CMAKE_CURRENT_LIST_DIR})
 cmake_path(GET TESTS_DIR PARENT_PATH ROOT_DIR)
 set(UNIT_TESTS_DIR ${ROOT_DIR}/Tests)
 
-# Note! arm compiler doesn't support random device, so turning it OFF will lead to errors if compile dronecan_v3 
-option(FIXED_SEED "Enable true random for FFT testing" OFF)
-if(FIXED_SEED EQUAL ON)
-    message(STATUS "FFT testing mode: FIXED SEED")
-else()
-    add_compile_options(-DFIXED_SEED)
-    message(STATUS "FFT testing mode: NON FIXED SEED")
-endif()
-
 # Check if the COVERAGE flag is set
 option(COVERAGE "Enable coverage flags" OFF)
 option(TEST_NUM "Enable test num" OFF)
