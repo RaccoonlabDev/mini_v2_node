@@ -298,8 +298,8 @@ public:
             signals_parameters[i] = init_parameters.signals_parameters;
         }
         // To print FFT parameters for debug uncomment the following line
-        print_signal_parameters();
-        print_fft_parameters();
+        // print_signal_parameters();
+        // print_fft_parameters();
         init();
     }
 
@@ -309,10 +309,6 @@ public:
         auto signal_generator = signals_generator[axis];
         auto n_dominants = signal_generator.dominant_sig.size();
         auto n_signals = signal_generator.n_signals;
-        printf("n dominants: %d n signals: %d\n", n_dominants, n_signals);
-        for (auto dominant : signal_generator.dominant_sig) {
-            printf("dominant.first: %f dominant.second: %f\n", dominant.first, dominant.second);
-        }
         for (int peak_index = 0; peak_index < MAX_NUM_PEAKS; peak_index++) {
             for (auto dominant : signal_generator.dominant_sig) {
                 if (IsBetweenInclusive(fft.peak_frequencies[axis][peak_index],
@@ -327,25 +323,15 @@ public:
             }
         }
         if (result) {
-            for (int peak_index = 0; peak_index < fft_parameters.n_axes; peak_index++) {
-                printf("peak freq: %f\n", fft.peak_frequencies[axis][peak_index]);
-                printf("peak snr: %f\n", fft.peak_snr[axis][peak_index]);
-                printf("peak mag: %f\n", fft.peak_magnitudes[axis][peak_index]);
-            }
             EXPECT_TRUE(heat_peak);
         } else {
-            for (int peak_index = 0; peak_index < fft_parameters.n_axes; peak_index++) {
-                printf("peak freq: %f\n", fft.peak_frequencies[axis][peak_index]);
-                printf("peak snr: %f\n", fft.peak_snr[axis][peak_index]);
-                printf("peak mag: %f\n", fft.peak_magnitudes[axis][peak_index]);
-            }
             ASSERT_FALSE(heat_peak);
         }
     }
 
 };
 
-const std::array<InitParamMultiSignalWithRes, 9> MultiSignalTestParams = {
+const std::array<InitParamMultiSignalWithRes, 8> MultiSignalTestParams = {
     // 0
     {{{InitFFTParamType{          .sample_rate_hz = 24,   .n_axes    = 1,   .window_size = 24},
       InitMultiSignalsParamType{ .sample_rate_hz = 24,   .n_signals = 2,   .max_freq    = 12}},
@@ -377,11 +363,7 @@ const std::array<InitParamMultiSignalWithRes, 9> MultiSignalTestParams = {
     // 7
     {{InitFFTParamType{          .sample_rate_hz = 512, .n_axes     = 3,   .window_size = 512},
       InitMultiSignalsParamType{ .sample_rate_hz = 512, .n_signals  = 10,   .max_freq   = 256}},
-      true},
-    // 8 <- my. Simplified one
-    {{InitFFTParamType{          .sample_rate_hz = 512, .n_axes     = 3,   .window_size = 128},
-      InitMultiSignalsParamType{ .sample_rate_hz = 512, .n_signals  = 10,   .max_freq   = 256}},
-      true},
+      true}
 }
 };
 
