@@ -30,7 +30,7 @@ void FFT::update(float *input) {
 
         if (buffer_index < size) {
             // convert int16_t -> real_t (scaling isn't relevant)
-            data_buffer[axis][buffer_index] = conv_input[axis] / 2;
+            data_buffer[axis][buffer_index] = conv_input[axis];
             buffer_index++;
             _fft_updated[axis] = false;
             continue;
