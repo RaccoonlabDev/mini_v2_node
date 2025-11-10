@@ -9,7 +9,7 @@
 #include "FFT.hpp"
 
 bool FFT::init(uint16_t window_size, uint16_t num_axes, float sample_rate_hz) {
-    if (window_size > FFT_MAX_SIZE) {
+    if (window_size > FFT_MAX_SIZE || window_size == 0) {
         return false;
     }
     n_axes = num_axes;
@@ -19,6 +19,7 @@ bool FFT::init(uint16_t window_size, uint16_t num_axes, float sample_rate_hz) {
     _sample_rate_hz = sample_rate_hz;
     _resolution_hz =  sample_rate_hz / size;
     fft_max_freq = _sample_rate_hz / 2;
+    _fft_buffer_index.fill(0);
     return true;
 }
 
@@ -53,15 +54,15 @@ void FFT::update(float *input) {
 void FFT::find_peaks(uint8_t axis) {
     std::array<float, NUMBER_OF_SAMPLES> fft_output_buffer_float;
     rfft::convert_real_t_to_float(_fft_output_buffer.data(), fft_output_buffer_float.data(), size);
-
+    memset(_peak_magnitudes_all.data(), 0, _peak_magnitudes_all.size() * sizeof(float));
     // sum total energy across all used buckets for SNR
     float bin_mag_sum = 0;
     // calculate magnitudes for each fft bin
     for (uint16_t fft_index = 0; fft_index < size/2; fft_index ++) {
         auto real = rfft::get_real_by_index(fft_output_buffer_float.data(), fft_index);
         auto imag = rfft::get_imag_by_index(fft_output_buffer_float.data(), fft_index);
-        const float fft_magnitude = sqrtf(real * real + imag * imag);
-        _peak_magnitudes_all[fft_index] = fft_magnitude;
+        const float fft_magnitude = (real * real + imag * imag);
+        _peak_magnitudes_all[fft_index] = sqrtf(fft_magnitude);
         bin_mag_sum += fft_magnitude;
     }
     std::array<float, MAX_NUM_PEAKS> peak_magnitude;
@@ -72,13 +73,10 @@ void FFT::find_peaks(uint8_t axis) {
                                                 fft_output_buffer_float.data(), bin_mag_sum, axis);
     // reset values if no peaks found
     _fft_updated[axis] = true;
-    if (num_peaks_found == 0) {
-        for (int peak_new = 0; peak_new < MAX_NUM_PEAKS; peak_new++) {
-            peak_frequencies[axis][peak_new] = 0;
-            peak_snr[axis][peak_new] = 0;
-            peak_magnitudes[axis][peak_new] = 0;
-        }
-        return;
+    for (uint8_t empty_peak = num_peaks_found; empty_peak < MAX_NUM_PEAKS; empty_peak++) {
+        peak_frequencies[axis][empty_peak] = 0;
+        peak_snr[axis][empty_peak] = 0;
+        peak_magnitudes[axis][empty_peak] = 0;
     }
 }
 
@@ -145,9 +143,9 @@ uint16_t FFT::_estimate_peaks(float* peak_magnitude,
         float freq_adjusted = _resolution_hz * adjusted_bin;
         // check if we already found the peak
         bool peak_close = false;
-        for (int peak_prev = 0; peak_prev < peak_new; peak_prev++) {
+        for (int peak_prev = 0; peak_prev < num_peaks_found; peak_prev++) {
             peak_close = (fabsf(freq_adjusted - peak_frequencies[axis][peak_prev])
-                                            < (_resolution_hz * 10.0f));
+                                            < (_resolution_hz * 0.25f));
             if (peak_close) {
                 break;
             }
@@ -155,6 +153,7 @@ uint16_t FFT::_estimate_peaks(float* peak_magnitude,
         if (peak_close) {
             continue;
         }
+
         // snr is in dB
         float snr;
         if (magnitudes_sum - peak_magnitude[peak_new] < 1.0e-19f) {
@@ -164,13 +163,15 @@ uint16_t FFT::_estimate_peaks(float* peak_magnitude,
                 snr = 0.0f;
             }
         } else {
+            // SNR = 10* log10(signal_power/noize_power)
             snr = 10.f * log10f((size - 1) * peak_magnitude[peak_new] /
-                            (magnitudes_sum - peak_magnitude[peak_new]));
+                        sqrtf(magnitudes_sum - peak_magnitude[peak_new]*peak_magnitude[peak_new]));
         }
         // keep if SNR satisfies the requirement and the frequency is within the range
         if ((snr < MIN_SNR)
             || (freq_adjusted < fft_min_freq)
             || (freq_adjusted > fft_max_freq)) {
+                peak_frequencies[axis][peak_new] = 0;
                 continue;
         }
         peak_frequencies[axis][num_peaks_found] = freq_adjusted;
