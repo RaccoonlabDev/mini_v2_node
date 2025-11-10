@@ -1,7 +1,6 @@
 #ifndef SRC_COMMON_OSCILATION_GENERATOR_H_
 #define SRC_COMMON_OSCILATION_GENERATOR_H_
 #include <cstdint>
-#include <vector>
 #include <random>
 
 struct InitOneSignParamType   {

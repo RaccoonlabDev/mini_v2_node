@@ -7,7 +7,6 @@
 #include "peripheral/spi/spi.hpp"
 #include <array>
 #include <cstring>
-#include <vector>
 #include "main.h"
 
 static constexpr uint32_t TRANSMIT_DELAY = 100;  // 100 is experimental value. Need to prove it
@@ -58,7 +57,7 @@ int8_t SPI::read_register(std::byte& reg_address, std::byte* reg_value) {
     return result;
 }
 
-int8_t SPI::write_register(std::byte& reg_address, std::byte& reg_value) {
+int8_t SPI::write_register(std::byte& reg_address, std::byte reg_value) {
     std::array<std::byte, 2> tx_buffer = {reg_address, reg_value};
     std::array<std::byte, 2> rx_buffer = {std::byte{0}, std::byte{0}};
     return HAL::SPI::transaction(tx_buffer.data(), rx_buffer.data(), tx_buffer.size());

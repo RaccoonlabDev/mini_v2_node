@@ -27,8 +27,7 @@ constexpr bool has_bit(uint8_t bitmask, Enum bit) {
 }
 
 void ImuModule::init() {
-    set_initialize(imu.initialize());
-    imu.FIFO_create();
+    set_initialize(imu.initialize(is_fifo_created));
     set_mode(Mode::STANDBY);
     // Module frequency must be the same as FFT frequency for correct FFT work
     fft_accel.init(WINDOW_SIZE, NUM_AXES, MODULE_FREQ_HZ);
@@ -36,6 +35,7 @@ void ImuModule::init() {
     fft_gyro.init(WINDOW_SIZE, NUM_AXES, MODULE_FREQ_HZ);
     fft_gyro.fft_min_freq = FFT_MIN_FREQ;
 }
+
 void ImuModule::set_initialize (bool new_initialized) {
     char buffer[40];
     if (!new_initialized) {
@@ -47,6 +47,7 @@ void ImuModule::set_initialize (bool new_initialized) {
     }
     this->initialized = new_initialized;
 }
+
 void ImuModule::update_params() {
     auto pub_frequency = static_cast<uint16_t>(
                                 paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_PUB_FREQUENCY));
@@ -69,6 +70,7 @@ void ImuModule::update_params() {
 
 
 void ImuModule::spin_once() {
+    bool isFifoReinitBroken = false;
     // In those cases spin_once meaningless
     if (!data_bitmask || !publisher_bitmask || pub_timeout_ms == 0) {
             return;
@@ -78,12 +80,31 @@ void ImuModule::spin_once() {
 
     if (initialized && has_bit(data_bitmask, Data_bitmast::ENABLE_REG_READINGS)) {
         process_real_register(updated);
+        if (fifo_state) {
+            imu.FIFO_reset();
+            fifo_state = false;
+        }
     }
     if (initialized && has_bit(data_bitmask, Data_bitmast::ENABLE_FIFO_READINGS)) {
+        // Need to check if fifo was created in first place as in creation
+        // essential sample rate initialised
+        if (!fifo_state && is_fifo_created) {
+            if (imu.FIFO_init() && imu.FIFO_set_resolution(FIFOEnableBitmask::ENABLE_ALL)) {
+                fifo_state = true;
+                isFifoReinitBroken = false;
+            } else {
+                // set error in fifo reinit
+                isFifoReinitBroken = true;
+            }
+        }
         process_real_fifo(updated);
     }
     if (has_bit(data_bitmask, Data_bitmast::ENABLE_SYNTH_GEN)){
         process_random_gen(updated);
+        if (fifo_state) {
+            imu.FIFO_reset();
+            fifo_state = false;
+        }
     }
 
     // Publish message
@@ -94,11 +115,14 @@ void ImuModule::spin_once() {
             pub.msg.timestamp = HAL_GetTick() * 1000;
         }
     }
-    // Publish logs
+    // Publish normal logs
     static uint64_t log_timestamp = 0;
     if (!initialized && (HAL_GetTick() - log_timestamp / 1000 > log_timeout_ms)) {
         logger.log_warn("IMU is not initialised only synthetic read is possible");
         log_timestamp = HAL_GetTick() * 1000;
+        if (isFifoReinitBroken) {
+            logger.log_error("FIFO reinitialisation failed!");
+        }
     }
 }
 

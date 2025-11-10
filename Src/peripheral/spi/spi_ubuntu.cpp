@@ -29,7 +29,7 @@ int8_t SPI::transaction(std::byte* tx, std::byte* rx, uint8_t size) {
     return 0;
 }
 
-int8_t SPI::write_register(std::byte& reg_address, std::byte& reg_value) {
+int8_t SPI::write_register(std::byte& reg_address, std::byte reg_value) {
     (void) reg_address;
     (void) reg_value;
     return 0;

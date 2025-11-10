@@ -89,9 +89,13 @@ private:
     std::array<float, NUM_AXES> accel = {0.0f, 0.0f, 0.0f};
     float temperature{0};
 
+    bool is_fifo_created = true;
+    bool fifo_state = is_fifo_created;
+
     void process_random_gen (std::array<bool, 2>& updated);
     void process_real_fifo (std::array<bool, 2>& updated);
     void process_real_register (std::array<bool, 2>& updated);
+
     static constexpr float raw_gyro_to_rad_per_second(int16_t raw_gyro) {
         return raw_gyro * std::numbers::pi_v<float> / 131.0f / 180.0f;
     }

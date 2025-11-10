@@ -34,7 +34,7 @@ public:
      */
     static int8_t read_registers(std::byte& reg_address, std::byte* reg_values, uint8_t size);
 
-    static int8_t write_register(std::byte& reg_address, std::byte& reg_value);
+    static int8_t write_register(std::byte& reg_address, std::byte reg_value);
 
     /**
      * @brief This function automatically controls the NSS pin

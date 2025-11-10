@@ -11,7 +11,6 @@
 typedef double real_t;
 #include <fftw3.h>
 #include <iostream>
-#include <vector>
 #include <complex>
 #include <cstdint>
 #define M_2PI           6.28318530717958647692
