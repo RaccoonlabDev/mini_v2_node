@@ -25,7 +25,7 @@ imu.data_source:
   flags: mutable
   default: 0
   min: 0
-  max: 4
+  max: 3
 
 imu.pub_frequency:
   type: Integer

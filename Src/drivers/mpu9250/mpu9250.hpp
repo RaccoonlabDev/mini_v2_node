@@ -22,11 +22,13 @@ enum class FIFOEnableBitmask : uint8_t {
 constexpr uint8_t operator&(FIFOEnableBitmask lhs, FIFOEnableBitmask rhs) {
     return static_cast<uint8_t>(lhs) & static_cast<uint8_t>(rhs);
 }
+using SensorAccel = std::array<int16_t, 3>;
+using SensorGyro = std::array<int16_t, 3>;
+using SensorMag = std::array<int16_t, 3>;
 
 class Mpu9250 {
 public:
     Mpu9250() = default;
-    
     /**
      * @brief Check if the device is connected by reading the WHO_AM_I register
      * @return true on success, false otherwise

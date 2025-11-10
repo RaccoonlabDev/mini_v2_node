@@ -15,7 +15,7 @@
 #include "peripheral/spi/spi.hpp"
 
 
-int8_t Mpu9250::read_accelerometer(std::array<int16_t, 3>* accel) const {
+int8_t Mpu9250::read_accelerometer(SensorAccel* accel) const {
     static Logging logger("Mpu9250::read_accelerometer");
     std::array<std::byte, 6> buffer = {};
     auto reg = std::byte(AccelGyroRegisters::ACCEL_XOUT_H);
@@ -30,7 +30,7 @@ int8_t Mpu9250::read_accelerometer(std::array<int16_t, 3>* accel) const {
     return 0;
 }
 
-int8_t Mpu9250::read_gyroscope(std::array<int16_t, 3>* gyro) const {
+int8_t Mpu9250::read_gyroscope(SensorGyro* gyro) const {
     static Logging logger("Mpu9250::read_gyroscope");
     std::array<std::byte, 6> buffer = {};
     auto reg = std::byte(AccelGyroRegisters::GYRO_XOUT_H);
@@ -45,7 +45,7 @@ int8_t Mpu9250::read_gyroscope(std::array<int16_t, 3>* gyro) const {
     return 0;
 }
 
-int8_t Mpu9250::read_magnetometer(std::array<int16_t, 3>* mag) const {
+int8_t Mpu9250::read_magnetometer(SensorGyro* mag) const {
     (*mag)[0] = 0.0;
     (*mag)[1] = 0.0;
     (*mag)[2] = 0.0;
@@ -144,7 +144,7 @@ bool Mpu9250::initialize(bool useFifo = false) {
         return false;
     }
     // Create FIFO
-    if (useFifo) 
+    if (useFifo)
         if (FIFO_create())
             return false;
 
@@ -233,7 +233,7 @@ uint16_t Mpu9250::FIFO_count() {
 
 // __restrict keyword guarantees that none of pointers are intervined toghether and helps compiler
 int8_t Mpu9250::FIFO_read(int16_t* __restrict raw_temperature,
-        std::array<int16_t, 3>* __restrict raw_gyro, std::array<int16_t, 3>* __restrict raw_accel) {
+        SensorGyro* __restrict raw_gyro, SensorAccel* __restrict raw_accel) {
     // Initialize output with safe values
     (*raw_gyro)[0] = 0; (*raw_gyro)[1] = 0; (*raw_gyro)[2] = 0;
     *raw_temperature = 0;

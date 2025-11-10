@@ -195,8 +195,8 @@ public:
             signals_parameters[i] = init_parameters.signals_parameters;
         }
         // To print FFT parameters for debug uncomment the following line
-        print_signal_parameters();
-        print_fft_parameters();
+        // print_signal_parameters();
+        // print_fft_parameters();
         init();
     }
 };

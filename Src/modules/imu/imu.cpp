@@ -72,7 +72,8 @@ void ImuModule::update_params() {
 void ImuModule::spin_once() {
     bool isFifoReinitBroken = false;
     // In those cases spin_once meaningless
-    if (data_source == Data_source::DISABLED || publisher_bitmask == Publisher_bitmask::DISABLED || pub_timeout_ms == 0) {
+    if (data_source == Data_source::DISABLED || publisher_bitmask == Publisher_bitmask::DISABLED
+        || pub_timeout_ms == 0) {
             return;
     }
 
@@ -227,7 +228,6 @@ void ImuModule::process_real_fifo (std::array<bool, 2>& updated){
         } else if (result == -3) {
             // Not enough data, normal condition
             // Don't log this as error
-
         } else {
             // Error condition
             char buffer[25];
