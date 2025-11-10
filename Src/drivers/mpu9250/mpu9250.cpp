@@ -16,7 +16,6 @@
 
 
 int8_t Mpu9250::read_accelerometer(SensorAccel* accel) const {
-    static Logging logger("Mpu9250::read_accelerometer");
     std::array<std::byte, 6> buffer = {};
     auto reg = std::byte(AccelGyroRegisters::ACCEL_XOUT_H);
     if (auto res = HAL::SPI::read_registers(reg, buffer.data(), 6); res < 0) {
@@ -31,7 +30,6 @@ int8_t Mpu9250::read_accelerometer(SensorAccel* accel) const {
 }
 
 int8_t Mpu9250::read_gyroscope(SensorGyro* gyro) const {
-    static Logging logger("Mpu9250::read_gyroscope");
     std::array<std::byte, 6> buffer = {};
     auto reg = std::byte(AccelGyroRegisters::GYRO_XOUT_H);
     if (auto res = HAL::SPI::read_registers(reg, buffer.data(), buffer.size()); res < 0) {
@@ -53,7 +51,6 @@ int8_t Mpu9250::read_magnetometer(SensorGyro* mag) const {
 }
 
 int8_t Mpu9250::read_temperature (int16_t& temperature) const {
-    static Logging logger("Mpu9250::temperature");
     std::array<std::byte, 2> buffer = {};
     auto reg = std::byte(TemperatureRegister::TEMP_OUT_H);
     if (auto res = HAL::SPI::read_registers(reg, buffer.data(), buffer.size()); res < 0) {
