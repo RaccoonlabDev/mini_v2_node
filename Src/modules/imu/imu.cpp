@@ -90,7 +90,8 @@ void ImuModule::spin_once() {
         // Need to check if fifo was created in first place as in creation
         // essential sample rate initialised
         if (!fifo_state && is_fifo_created) {
-            if (imu.FIFO_init() && imu.FIFO_set_resolution(FIFOEnableBitmask::ENABLE_ALL)) {
+            if (imu.FIFO_init() == 0 &&
+                    imu.FIFO_set_resolution(FIFOEnableBitmask::ENABLE_ALL) == 0) {
                 fifo_state = true;
                 isFifoReinitBroken = false;
             } else {
