@@ -46,11 +46,11 @@ public:
         ENABLE_ALL_BY_DEFAULT       = 15,
     };
 
-    enum class Data_bitmast : uint8_t {
+    enum class Data_source : uint8_t {
         DISABLED                    = 0,
         ENABLE_SYNTH_GEN            = 1,
         ENABLE_FIFO_READINGS        = 2,
-        ENABLE_REG_READINGS         = 4,
+        ENABLE_REG_READINGS         = 3,
     };
 
     ImuModule() : Module(MODULE_FREQ_HZ, Protocol::DRONECAN) {}
@@ -80,8 +80,8 @@ private:
     float vibration = 0.0f;
     bool initialized{false};
     bool enabled{false};
-    uint8_t publisher_bitmask{0};
-    uint8_t data_bitmask{0};
+    Publisher_bitmask publisher_bitmask{0};
+    Data_source data_source{0};
     uint16_t pub_timeout_ms{0};
     uint16_t log_timeout_ms = 2000;
 

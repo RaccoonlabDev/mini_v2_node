@@ -21,9 +21,9 @@ constexpr auto to_underlying(Enum value) -> std::underlying_type_t<Enum> {
 }
 
 template <typename Enum>
-constexpr bool has_bit(uint8_t bitmask, Enum bit) {
+constexpr bool has_bit(Enum bitmask, Enum bit) {
     static_assert(std::is_enum_v<Enum>, "Enum must be an enum type");
-    return (bitmask & to_underlying(bit)) != 0;
+    return (to_underlying(bitmask) & to_underlying(bit)) != 0;
 }
 
 void ImuModule::init() {
@@ -52,18 +52,18 @@ void ImuModule::update_params() {
     auto pub_frequency = static_cast<uint16_t>(
                                 paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_PUB_FREQUENCY));
     pub_timeout_ms = pub_frequency == 0 ? 0 : 1000 / pub_frequency;
-    publisher_bitmask = static_cast<uint8_t>
+    publisher_bitmask = static_cast<Publisher_bitmask>
         (paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_PUBLISHERS_BITMASK));
 
-    data_bitmask = static_cast<uint8_t>
-        (paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_DATA_BITMASK));
+    data_source = static_cast<Data_source>
+        (paramsGetIntegerValue(IntParamsIndexes::PARAM_IMU_DATA_SOURCE));
 
-    set_health((!publisher_bitmask || initialized) ?
+    set_health((publisher_bitmask == Publisher_bitmask::DISABLED || initialized) ?
         Module::Status::OK : Module::Status::MAJOR_FAILURE);
     gen_amplitude = static_cast<uint16_t>
         (paramsGetIntegerValue(IntParamsIndexes::SYNTHETIC_AMPLITUDE));
     gen_freq = static_cast<uint16_t>(paramsGetIntegerValue(IntParamsIndexes::SYNTHETIC_FREQ_GEN));
-    if (publisher_bitmask) {
+    if (publisher_bitmask != Publisher_bitmask::DISABLED) {
         set_mode(initialized ? Mode::STANDBY : Mode::INITIALIZATION);
     }
 }
@@ -72,20 +72,20 @@ void ImuModule::update_params() {
 void ImuModule::spin_once() {
     bool isFifoReinitBroken = false;
     // In those cases spin_once meaningless
-    if (!data_bitmask || !publisher_bitmask || pub_timeout_ms == 0) {
+    if (data_source == Data_source::DISABLED || publisher_bitmask == Publisher_bitmask::DISABLED || pub_timeout_ms == 0) {
             return;
     }
 
     std::array<bool, 2> updated {false, false};
 
-    if (initialized && has_bit(data_bitmask, Data_bitmast::ENABLE_REG_READINGS)) {
+    if (initialized && data_source == Data_source::ENABLE_REG_READINGS) {
         process_real_register(updated);
         if (fifo_state) {
             imu.FIFO_reset();
             fifo_state = false;
         }
     }
-    if (initialized && has_bit(data_bitmask, Data_bitmast::ENABLE_FIFO_READINGS)) {
+    if (initialized && data_source == Data_source::ENABLE_FIFO_READINGS) {
         // Need to check if fifo was created in first place as in creation
         // essential sample rate initialised
         if (!fifo_state && is_fifo_created) {
@@ -99,7 +99,7 @@ void ImuModule::spin_once() {
         }
         process_real_fifo(updated);
     }
-    if (has_bit(data_bitmask, Data_bitmast::ENABLE_SYNTH_GEN)){
+    if (data_source == Data_source::ENABLE_SYNTH_GEN){
         process_random_gen(updated);
         if (fifo_state) {
             imu.FIFO_reset();
@@ -108,7 +108,7 @@ void ImuModule::spin_once() {
     }
 
     // Publish message
-    if ((initialized || has_bit(data_bitmask, Data_bitmast::ENABLE_SYNTH_GEN)) &&
+    if ((initialized || data_source == Data_source::ENABLE_SYNTH_GEN) &&
             HAL_GetTick() - pub.msg.timestamp / 1000 > pub_timeout_ms){
         if (updated[0] && updated[1]) {
             pub.publish();

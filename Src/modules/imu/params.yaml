@@ -16,12 +16,12 @@ imu.publishers:
 imu.data_source:
   type: Integer
   note: 
-      "Bit mask to enable IMU data source readings:
-    </br> Bit 1 - enable synthetic data generation. Has priority over real readings,
-    </br> Bit 2 - use FIFO for real data readings (sample rate = 100Hz, Bandwidth (gyro/accel) = 41/~44.8Hz). Has priority over register readings,
-    </br> Bit 3 - use forward register adressing for data readings,
-    Note: synthetic generation, FIFO and register readings should be used mutually exclusively."
-  enum: PARAM_IMU_DATA_BITMASK
+      "Values to enable IMU data source readings:
+    </br> 0 - use nothing,
+    </br> 1 - enable synthetic data generation,
+    </br> 2 - use FIFO for real data readings (sample rate = 100Hz, Bandwidth (gyro/accel) = 41/~44.8Hz),
+    </br> 3 - use forward register adressing for data readings."
+  enum: PARAM_IMU_DATA_SOURCE
   flags: mutable
   default: 0
   min: 0
