@@ -9,12 +9,6 @@ struct InitOneSignParamType   {
     uint16_t amplitude = 0;
 };
 
-struct InitMultiSignalsParamType   {
-    uint16_t sample_rate_hz;
-    size_t n_signals;
-    uint16_t max_freq;
-};
-
 class SinSignalGenerator {
 public:
     SinSignalGenerator(){}

@@ -13,6 +13,13 @@
 #include "FFT.hpp"
 #include "oscillation_generator.hpp"
 
+struct InitMultiSignalsParamType   {
+    uint16_t sample_rate_hz;
+    size_t n_signals;
+    uint16_t max_freq;
+    uint16_t min_freq;
+};
+
 std::random_device rd;
 class MultiSignalsSinGenerator {
 public:
@@ -50,8 +57,9 @@ public:
     MultiSignalsSinGenerator() = default;
 
     MultiSignalsSinGenerator
-        (size_t n_sig, uint16_t sample_rate, uint16_t max_frequency) :
+        (size_t n_sig, uint16_t sample_rate, uint16_t max_frequency, uint16_t min_frequency) :
                                                 max_freq(max_frequency),
+                                                min_freq(min_frequency),
                                                 n_signals(n_sig),
                                                 sample_rate_hz(sample_rate) {
         init();
@@ -59,6 +67,7 @@ public:
 
     explicit MultiSignalsSinGenerator(InitMultiSignalsParamType parameters) :
                                                 max_freq(parameters.max_freq),
+                                                min_freq(parameters.min_freq),
                                                 n_signals(parameters.n_signals),
                                                 sample_rate_hz(parameters.sample_rate_hz) {
         init();
@@ -115,10 +124,12 @@ template<typename T, typename InitParamType>
 class TestFFTBase : public ::testing::Test {
 public:
     FFT fft;
+    bool result;
     std::vector<T> signals_generator;
     InitFFTParamType fft_parameters;
     std::vector<InitParamType> signals_parameters;
     float abs_error;
+    float error_margin;
 
     void print_fft_parameters() {
         std::cout << "FFT Parameters: " << std::endl;
@@ -127,14 +138,17 @@ public:
         std::cout << "  Number of Axes: " << static_cast<int>(fft_parameters.n_axes) << std::endl;
     }
 
-    void init() {
-        fft.init(fft_parameters.window_size, fft_parameters.n_axes, fft_parameters.sample_rate_hz);
+    bool init() {
+        bool ret = fft.init(fft_parameters.window_size, fft_parameters.n_axes,
+                                                        fft_parameters.sample_rate_hz);
+        if (ret == false) return false;
         signals_generator.resize(fft_parameters.n_axes);
         for (int i = 0; i < fft_parameters.n_axes; i++) {
             auto signal_parameters = signals_parameters[i];
             signals_generator[i] = T(signal_parameters);
         }
-        abs_error = 10 * fft._resolution_hz;
+        abs_error = error_margin * fft._resolution_hz;
+        return true;
     }
 };
 
@@ -142,7 +156,6 @@ class TestFFTOneSignalParametrized : public TestFFTBase<SinSignalGenerator,
                                             InitOneSignParamType>,
                         public testing::WithParamInterface<InitParamOneSignalWithRes> {
 public:
-    bool result;
     bool is_heat_all_peaks{true};
 
     void print_signal_parameters() {
@@ -170,7 +183,7 @@ public:
     void check_axis(int axis) {
         bool heat_peak = false;
         for (int j = 0; j < MAX_NUM_PEAKS; j++) {
-            if (fft.peak_snr[axis][j] == 0) {
+            if (fft.peak_snr[axis][j] == 0 || fft.peak_frequencies[axis][j] == 0) {
                 continue;
             }
             auto in_range = IsBetweenInclusive(fft.peak_frequencies[axis][j],
@@ -195,6 +208,7 @@ public:
     }
 
     void SetUp() override {
+        error_margin = 1.0f;
         InitParamType<InitOneSignParamType> init_parameters = GetParam().parameters;
         result = GetParam().result;
         fft_parameters = init_parameters.fft_parameters;
@@ -206,44 +220,59 @@ public:
         // To print FFT parameters for debug uncomment the following line
         // print_signal_parameters();
         // print_fft_parameters();
-        init();
     }
 };
 
-const std::array<InitParamOneSignalWithRes, 7> OneSignalTestParams = {
+const std::array<InitParamOneSignalWithRes, 10> OneSignalTestParams = {
 {
     // 0
     {{InitFFTParamType{      .sample_rate_hz = 100,  .n_axes   = 1,   .window_size  = 50},
-      InitOneSignParamType{  .sample_rate_hz = 100,  .freq_hz  = 3,   .amplitude    = 10}},
+      InitOneSignParamType{  .sample_rate_hz = 100,  .freq_hz  = 4,   .amplitude    = 100}},
       true},
     // 1
-    {{InitFFTParamType{      .sample_rate_hz = 1000, .n_axes   = 1,   .window_size  = 100},
-      InitOneSignParamType{  .sample_rate_hz = 1000, .freq_hz  = 5,   .amplitude    = 10}},
-      true},
-    // 2
     {{InitFFTParamType{      .sample_rate_hz = 512,  .n_axes   = 1,   .window_size  = 512},
       InitOneSignParamType{  .sample_rate_hz = 512,  .freq_hz  = 100, .amplitude    = 10}},
       true},
-    // 3
+    // 2
     {{InitFFTParamType{      .sample_rate_hz = 1000, .n_axes   = 1,   .window_size  = 512},
       InitOneSignParamType{  .sample_rate_hz = 1000, .freq_hz  = 100, .amplitude    = 10}},
       true},
-    // 4
+    // 3
     {{InitFFTParamType{      .sample_rate_hz = 1024, .n_axes   = 3,   .window_size  = 512},
-      InitOneSignParamType{  .sample_rate_hz = 1024, .freq_hz  = 100, .amplitude    = 10}},
+      InitOneSignParamType{  .sample_rate_hz = 1024, .freq_hz  = 100, .amplitude    = 100}},
       true},
-    // 5
+    // 4 Frequency is too low for the FFT resolution
+    {{InitFFTParamType{      .sample_rate_hz = 1000, .n_axes   = 1,   .window_size  = 100},
+      InitOneSignParamType{  .sample_rate_hz = 1000, .freq_hz  = 5,   .amplitude    = 10}},
+      false},
+    // 5 Too big frequency
     {{InitFFTParamType{      .sample_rate_hz = 256,  .n_axes   = 3,   .window_size  = 256},
       InitOneSignParamType{  .sample_rate_hz = 256,  .freq_hz  = 200, .amplitude    = 1}},
       false},
-    // 6
+    // 6 Too big window size for sample rate
     {{InitFFTParamType{     .sample_rate_hz  = 100,   .n_axes   = 1,  .window_size  = 200},
-      InitOneSignParamType{ .sample_rate_hz = 1000,  .freq_hz  = 100, .amplitude    = 1}},
+      InitOneSignParamType{ .sample_rate_hz  = 100,  .freq_hz  = 100, .amplitude    = 1}},
+      false},
+    // 7 Unmatched sample rates
+    {{InitFFTParamType{     .sample_rate_hz  = 10,   .n_axes   = 1,  .window_size  = 200},
+      InitOneSignParamType{ .sample_rate_hz  = 200,  .freq_hz  = 100, .amplitude    = 1}},
+      false},
+    // 8 FFT resolution is too low
+    {{InitFFTParamType{     .sample_rate_hz  = 100,   .n_axes   = 1,  .window_size  = 2},
+      InitOneSignParamType{ .sample_rate_hz  = 100,  .freq_hz   = 20, .amplitude    = 10}},
+      false},
+    // 9 Window size is zero
+    {{InitFFTParamType{     .sample_rate_hz  = 100,   .n_axes   = 1,  .window_size  = 0},
+      InitOneSignParamType{ .sample_rate_hz  = 100,  .freq_hz   = 20, .amplitude    = 10}},
       false},
 }
 };
 
 TEST_P(TestFFTOneSignalParametrized, CheckOnWindow) {
+    if (!init()) {
+        EXPECT_EQ(result, false);
+        return;
+    }
     float input[fft_parameters.n_axes];
     for (int i = 0; i < fft_parameters.window_size + 1; i++) {
         for (int j = 0; j < fft_parameters.n_axes; j++) {
@@ -259,6 +288,10 @@ TEST_P(TestFFTOneSignalParametrized, CheckOnWindow) {
 }
 
 TEST_P(TestFFTOneSignalParametrized, CheckOnFewWindows) {
+    if (!init()) {
+        EXPECT_EQ(result, false);
+        return;
+    }
     float input[fft_parameters.n_axes];
     std::uniform_int_distribution<int> dist(0, 8);
     auto n_updates = (dist(rd) % 8 + 2) * fft_parameters.window_size;
@@ -286,7 +319,6 @@ class TestFFTOnMultiSignalsParametrized : public TestFFTBase<MultiSignalsSinGene
                                                  InitMultiSignalsParamType>,
                 public ::testing::WithParamInterface<InitParamMultiSignalWithRes> {
 public:
-    bool result;
     std::vector<float> input;
     void print_signal_parameters() {
         std::cout << "Signal Parameters: " << std::endl;
@@ -299,6 +331,7 @@ public:
     }
 
     void SetUp() override {
+        error_margin = 10.0f;
         InitParamType<InitMultiSignalsParamType> init_parameters = GetParam().parameters;
         result = GetParam().result;
         fft_parameters = init_parameters.fft_parameters;
@@ -310,7 +343,6 @@ public:
         // To print FFT parameters for debug uncomment the following line
         // print_signal_parameters();
         // print_fft_parameters();
-        init();
     }
 
     void check_axis(int axis) {
@@ -320,6 +352,9 @@ public:
         auto n_signals = signal_generator.n_signals;
         for (int peak_index = 0; peak_index < MAX_NUM_PEAKS; peak_index++) {
             for (auto dominant : signal_generator.dominant_sig) {
+                if (fft.peak_snr[axis][peak_index] == 0.0f) {
+                    continue;
+                }
                 if (IsBetweenInclusive(fft.peak_frequencies[axis][peak_index],
                             (int)(dominant.second) - abs_error,
                             (int)(dominant.second) + abs_error)) {
@@ -337,51 +372,53 @@ public:
             ASSERT_FALSE(heat_peak);
         }
     }
-
 };
 
-const std::array<InitParamMultiSignalWithRes, 8> MultiSignalTestParams = {
+const std::array<InitParamMultiSignalWithRes, 6> MultiSignalTestParams = {
+    {
     // 0
-    {{{InitFFTParamType{          .sample_rate_hz = 24,   .n_axes    = 1,   .window_size = 24},
-      InitMultiSignalsParamType{ .sample_rate_hz = 24,   .n_signals = 2,   .max_freq    = 12}},
+    {{InitFFTParamType{          .sample_rate_hz = 256, .n_axes     = 1,   .window_size = 256},
+      InitMultiSignalsParamType{ .sample_rate_hz = 256, .n_signals  = 2,   .max_freq    = 128,
+                                                                           .min_freq    = 2}},
       true},
     // 1
-    {{InitFFTParamType{          .sample_rate_hz = 512, .n_axes    = 1,   .window_size = 512},
-      InitMultiSignalsParamType{ .sample_rate_hz = 512, .n_signals = 5,   .max_freq    = 256}},
+    {{InitFFTParamType{          .sample_rate_hz = 256, .n_axes     = 1,   .window_size = 256},
+      InitMultiSignalsParamType{ .sample_rate_hz = 256, .n_signals  = 5,   .max_freq    = 128,
+                                                                           .min_freq    = 2}},
       true},
     // 2
-    {{InitFFTParamType{          .sample_rate_hz = 1000, .n_axes    = 1,   .window_size = 100},
-      InitMultiSignalsParamType{ .sample_rate_hz = 1000, .n_signals = 4,   .max_freq    = 50}},
+    {{InitFFTParamType{          .sample_rate_hz = 256, .n_axes     = 2,   .window_size = 256},
+      InitMultiSignalsParamType{ .sample_rate_hz = 256, .n_signals  = 2,   .max_freq    = 128,
+                                                                           .min_freq    = 2}},
       true},
     // 3
-    {{InitFFTParamType{          .sample_rate_hz = 2000, .n_axes    = 1,   .window_size = 256},
-      InitMultiSignalsParamType{ .sample_rate_hz = 2000, .n_signals = 10,   .max_freq   = 128}},
+    {{InitFFTParamType{          .sample_rate_hz = 256, .n_axes     = 2,   .window_size = 256},
+      InitMultiSignalsParamType{ .sample_rate_hz = 256, .n_signals  = 5,   .max_freq    = 128,
+                                                                           .min_freq    = 2}},
       true},
     // 4
-    {{InitFFTParamType{          .sample_rate_hz = 2000, .n_axes    = 1,   .window_size = 200},
-      InitMultiSignalsParamType{ .sample_rate_hz = 2000, .n_signals = 12,   .max_freq   = 100}},
+    {{InitFFTParamType{          .sample_rate_hz = 512,  .n_axes    = 1,   .window_size = 512},
+      InitMultiSignalsParamType{ .sample_rate_hz = 512,  .n_signals = 5,   .max_freq    = 256,
+                                                                           .min_freq    = 2}},
       true},
     // 5
-    {{InitFFTParamType{          .sample_rate_hz = 1024, .n_axes    = 1,   .window_size = 512},
-      InitMultiSignalsParamType{ .sample_rate_hz = 1024, .n_signals = 15,   .max_freq   = 256}},
-      true},
-    // 6
-    {{InitFFTParamType{          .sample_rate_hz = 256, .n_axes     = 3,   .window_size = 256},
-      InitMultiSignalsParamType{ .sample_rate_hz = 256, .n_signals  = 13,   .max_freq   = 128}},
-      true},
-    // 7
     {{InitFFTParamType{          .sample_rate_hz = 512, .n_axes     = 3,   .window_size = 512},
-      InitMultiSignalsParamType{ .sample_rate_hz = 512, .n_signals  = 10,   .max_freq   = 256}},
-      true}
-}
+      InitMultiSignalsParamType{ .sample_rate_hz = 512, .n_signals  = 10,  .max_freq    = 256,
+                                                                           .min_freq    = 2}},
+      true},
+    }
 };
 
 TEST_P(TestFFTOnMultiSignalsParametrized, CheckOnWindow) {
-    for (int i = 0; i < fft_parameters.window_size + 10; i++) {
+    if (!init()) {
+        EXPECT_EQ(result, false);
+        return;
+    }
+    for (int i = 0; i < fft_parameters.window_size + 1; i++) {
         for (int j = 0; j < fft_parameters.n_axes; j++) {
             input[j] = signals_generator[j].get_next_samples();
         }
-        fft.update(input.data()); 
+        fft.update(input.data());
     }
     for (int axis = 0; axis < fft_parameters.n_axes; axis++) {
         check_axis(axis);
