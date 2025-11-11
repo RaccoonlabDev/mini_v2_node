@@ -91,7 +91,23 @@
         "interpreter-exec console \"monitor reset halt\"",
         "-enable-pretty-printing"
         ],
+    },
+    {
+        "type": "midas-rr",
+        "request": "attach",
+        "name": "Start RR replay",
+        "cwd": "${workspaceFolder}",
+        "setupCommands": [ "set sysroot /", "set debuginfod enabled off", "set auto-load safe-path /" ]
+    },
+    {
+        "name": "rr",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/build/Tests/fft",
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "environment": [],
+        "externalConsole": true,
     }
     ],
-
 }
