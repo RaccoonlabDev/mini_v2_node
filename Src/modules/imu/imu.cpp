@@ -63,7 +63,7 @@ void ImuModule::update_params() {
     gen_amplitude = static_cast<uint16_t>
         (paramsGetIntegerValue(IntParamsIndexes::SYNTHETIC_AMPLITUDE));
     gen_freq = static_cast<uint16_t>(paramsGetIntegerValue(IntParamsIndexes::SYNTHETIC_FREQ_GEN));
-    if (publisher_bitmask != Publisher_bitmask::DISABLED) {
+    if (has_bit(publisher_bitmask, Publisher_bitmask::ENABLED)) {
         set_mode(initialized ? Mode::STANDBY : Mode::INITIALIZATION);
     }
 }
@@ -72,8 +72,13 @@ void ImuModule::update_params() {
 void ImuModule::spin_once() {
     bool isFifoReinitBroken = false;
     // In those cases spin_once meaningless
-    if (data_source == Data_source::DISABLED || publisher_bitmask == Publisher_bitmask::DISABLED
-        || pub_timeout_ms == 0) {
+    if (data_source == Data_source::DISABLED ||
+        !has_bit(publisher_bitmask, Publisher_bitmask::ENABLED) || pub_timeout_ms == 0) {
+            // If conds for spin once are not met then it's logical to turn off FIFO
+            if (fifo_state && is_fifo_created) {
+                imu.FIFO_reset();
+                fifo_state = false;
+            }
             return;
     }
 
@@ -81,7 +86,7 @@ void ImuModule::spin_once() {
 
     if (initialized && data_source == Data_source::ENABLE_REG_READINGS) {
         process_real_register(updated);
-        if (fifo_state) {
+        if (fifo_state && is_fifo_created) {
             imu.FIFO_reset();
             fifo_state = false;
         }
@@ -103,7 +108,7 @@ void ImuModule::spin_once() {
     }
     if (data_source == Data_source::ENABLE_SYNTH_GEN){
         process_random_gen(updated);
-        if (fifo_state) {
+        if (fifo_state && is_fifo_created) {
             imu.FIFO_reset();
             fifo_state = false;
         }

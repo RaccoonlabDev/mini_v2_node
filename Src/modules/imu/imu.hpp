@@ -40,6 +40,7 @@ class ImuModule : public Module {
 public:
     enum class Publisher_bitmask : uint8_t {
         DISABLED                    = 0,
+        ENABLED                     = 1,
         ENABLE_VIB_ESTIM            = 2,
         ENABLE_FFT_ACC              = 4,
         ENABLE_FFT_GYR              = 8,
