@@ -21,6 +21,7 @@ if(USE_PLATFORM_UBUNTU)
     set(APP_PLATFORM ubuntu)
     set(PLATFORM_NAME sitl)
     include(${CMAKE_DIR}/toolchain-ubuntu.cmake)
+    add_compile_definitions(USE_PLATFORM_UBUNTU=1)
 elseif(USE_PLATFORM_NODE_V2)
     set(LIBPARAMS_PLATFORM stm32f103)
     set(CAN_PLATFORM bxcan)
@@ -30,7 +31,8 @@ elseif(USE_PLATFORM_NODE_V2)
     set(stm32cubeMxProjectPath  ${ROOT_DIR}/Libs/stm32-cube-project)
     FILE(GLOB ldFile            ${stm32cubeMxProjectPath}/*_FLASH.ld)
     FILE(GLOB coreSources       ${stm32cubeMxProjectPath}/Core/Src/*)
-    FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c)
+    FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c
+                                ${stm32cubeMxProjectPath}/Drivers/*/*/*/*.c)
     FILE(GLOB startupFile       ${stm32cubeMxProjectPath}/*.s
                                 ${stm32cubeMxProjectPath}/Core/Startup/*.s
     )
@@ -46,7 +48,8 @@ elseif(USE_PLATFORM_NODE_V3)
     set(stm32cubeMxProjectPath  ${ROOT_DIR}/Libs/mini-v3-ioc)
     FILE(GLOB ldFile            ${stm32cubeMxProjectPath}/*_FLASH.ld)
     FILE(GLOB coreSources       ${stm32cubeMxProjectPath}/Core/Src/*)
-    FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c)
+    FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c
+                                ${stm32cubeMxProjectPath}/Drivers/*/*/*/*.c)
     FILE(GLOB startupFile       ${stm32cubeMxProjectPath}/*.s
                                 ${stm32cubeMxProjectPath}/Core/Startup/*.s
     )
@@ -89,6 +92,7 @@ include(${CMAKE_DIR}/git.cmake)
 add_definitions(-DHW_VERSION_MAJOR=2)
 add_definitions(-DHW_VERSION_MINOR=1)
 
+set(CMAKE_CXX_STANDARD 20)
 # Project
 project(node CXX C ASM)
 

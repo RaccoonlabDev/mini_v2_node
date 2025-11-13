@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <cstddef>
 
+#define MAX_SPI_REGISTERS_READ 128
 namespace HAL {
 
 class SPI {
@@ -21,7 +22,7 @@ public:
      * @return 0 on success, negative error otherwise
      * @note The function automatically adds SPI_READ flag
      */
-    static int8_t read_register(std::byte reg_address, std::byte* reg_value);
+    static int8_t read_register(std::byte& reg_address, std::byte* reg_value);
 
     /**
      * @brief Read multiple registers
@@ -31,9 +32,9 @@ public:
      * @return 0 on success, negative error otherwise
      * @note The function automatically adds SPI_READ flag
      */
-    static int8_t read_registers(std::byte reg_address, std::byte* reg_values, uint8_t size);
+    static int8_t read_registers(std::byte& reg_address, std::byte* reg_values, uint8_t size);
 
-    static int8_t write_register(std::byte reg_address, std::byte reg_value);
+    static int8_t write_register(std::byte& reg_address, std::byte reg_value);
 
     /**
      * @brief This function automatically controls the NSS pin

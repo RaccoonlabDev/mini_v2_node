@@ -9,7 +9,7 @@
 #include <cstring>
 #include "main.h"
 
-static constexpr uint32_t TRANSMIT_DELAY = 10;
+static constexpr uint32_t TRANSMIT_DELAY = 100;  // 100 is experimental value. Need to prove it
 static constexpr std::byte SPI_READ{0x80};
 
 extern SPI_HandleTypeDef hspi2;
@@ -27,26 +27,37 @@ static void spi_set_nss(bool nss_state) {
 #endif
 }
 
-int8_t SPI::read_registers(std::byte reg_address, std::byte* reg_values, uint8_t size) {
-    if (reg_values == nullptr) {
+int8_t SPI::read_registers(std::byte& reg_address, std::byte* reg_values, uint8_t size) {
+    if (reg_values == nullptr || size > MAX_SPI_REGISTERS_READ) {
         return -1;
     }
+    std::array<std::byte, MAX_SPI_REGISTERS_READ + 1> tx_buffer = {};
+    std::array<std::byte, MAX_SPI_REGISTERS_READ + 1> rx_buffer = {};
+    tx_buffer[0] = reg_address | SPI_READ;
 
-    auto tx_byte = reg_address | SPI_READ;
-    return HAL::SPI::transaction(&tx_byte, &reg_values[-1], size + 1);
+    auto result = transaction(tx_buffer.data(), rx_buffer.data(), size + 1);
+    if (result == 0) {
+        // Copy actual data (skip first dummy byte)
+        // analog from just read_register where we start reading actual data from 2nd byte
+        std::copy(rx_buffer.begin() + 1, rx_buffer.begin() + size + 1, reg_values);
+    }
+    return result;
 }
 
-int8_t SPI::read_register(std::byte reg_address, std::byte* reg_value) {
+int8_t SPI::read_register(std::byte& reg_address, std::byte* reg_value) {
     if (reg_value == nullptr) {
         return -1;
     }
-
-    auto tx_byte = reg_address | SPI_READ;
-    return HAL::SPI::transaction(&tx_byte, &reg_value[-1], 2);
+    std::array <std::byte, 2> tx_buffer = {reg_address | SPI_READ, std::byte{0}};
+    std::array <std::byte, 2> rx_buffer = {std::byte{0}, std::byte{0}};
+    auto result = transaction(tx_buffer.data(), rx_buffer.data(), 2);
+    if (result == 0) {
+        *reg_value = rx_buffer[1];
+    }
+    return result;
 }
 
-int8_t SPI::write_register(std::byte reg_address, std::byte reg_value) {
-    HAL_Delay(10);
+int8_t SPI::write_register(std::byte& reg_address, std::byte reg_value) {
     std::array<std::byte, 2> tx_buffer = {reg_address, reg_value};
     std::array<std::byte, 2> rx_buffer = {std::byte{0}, std::byte{0}};
     return HAL::SPI::transaction(tx_buffer.data(), rx_buffer.data(), tx_buffer.size());

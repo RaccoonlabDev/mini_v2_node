@@ -10,9 +10,11 @@ if [[ "$1" == "--quiet" ]]; then
 fi
 
 SOURCE_PATTERNS=(
-    "${REPOSITORY_PATH}/Src/modules/*/*.cpp"
-    "${REPOSITORY_PATH}/Src/peripheral/*/*.cpp"
-    "${REPOSITORY_PATH}/Src/platform/*/*.cpp"
+    "${REPOSITORY_PATH}/Src/modules/*/*.*pp"
+    "${REPOSITORY_PATH}/Src/peripheral/*/*.*pp"
+    "${REPOSITORY_PATH}/Src/platform/*/*.*pp"
+    "${REPOSITORY_PATH}/Src/common/*.*pp"
+    "${REPOSITORY_PATH}/Src/drivers/*/*.*pp"
 )
 
 # Expand wildcards to get the actual list of files

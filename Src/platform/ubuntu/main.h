@@ -23,7 +23,7 @@ bool platformSpecificRequestRestart();
 
 void platformSpecificReadUniqueID(uint8_t out_uid[4]);
 uint32_t platformSpecificGetTimeMs();
-
+void HAL_Delay(uint64_t time);
 #ifdef __cplusplus
 }
 #endif

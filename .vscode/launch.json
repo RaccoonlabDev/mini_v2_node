@@ -22,13 +22,14 @@
         "servertype": "openocd",
         "runToEntryPoint": "main",
         "executable": "build/dronecan_v3/obj/Src/platform/stm32g0b1/node",
-
+        "gdbPath": "/usr/bin/gdb-multiarch",
         "device": "STM32G0B1CEU6",
         "configFiles": [
             "interface/stlink.cfg",
             "target/stm32g0x.cfg"
         ],
         "showDevDebugOutput": "raw",
+        "cwd": "${workspaceFolder}",
         "overrideLaunchCommands": [
         "interpreter-exec console \"monitor reset halt\"",
         "-enable-pretty-printing"

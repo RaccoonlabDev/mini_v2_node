@@ -64,4 +64,4 @@ public:
 
 }  // namespace Driver
 
-#endif // SRC_DRIVERS_AS5600_AS5600_HPP_
+#endif  // SRC_DRIVERS_AS5600_AS5600_HPP_
