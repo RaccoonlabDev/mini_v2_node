@@ -159,3 +159,12 @@ pwm4.def:
   default: 1000
   min: 1000
   max: 2000
+
+pwm.output_type:
+  type: Integer
+  note: 0 - PWM, 1 - GPIO Push-pull output
+  enum: PARAM_OUTPUT_TYPE
+  flags: mutable
+  default: 0
+  min: 0
+  max: 0

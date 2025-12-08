@@ -14,30 +14,51 @@
 
 namespace Driver {
 
-struct RcpwmChannel {
-    struct RcpwmChannelParamsIndexes {
+struct RcoutChannel {
+    struct RcoutParamsIndexes {
         uint8_t min;
         uint8_t max;
         uint8_t def;
         uint8_t ch;
     };
+    const RcoutParamsIndexes idx;
 
-    const RcpwmChannelParamsIndexes names;
     HAL::PwmPin pin;
+    uint16_t    ch{0};
     uint16_t    min{0};
     uint16_t    max{0};
     uint16_t    def{0};
     int16_t     channel{-1};
 
-    /**
-     * @brief Set output as us [1000 .. 2000]
-     */
-    void set_us(uint16_t duration_us) const;
+    RcoutChannel(uint8_t min_, uint8_t max_, uint8_t def_, uint8_t ch_, HAL::PwmPin pin_)
+        : idx{RcoutParamsIndexes{min_, max_, def_, ch_}},
+          pin{pin_},
+          ch{ch_},
+          min{min_},
+          max{max_},
+          def{def_}
+    {
+    }
 
     /**
-     * @brief Set output as percentage [0 .. 100]
+     * @brief The default PWM duration withing [1000; 2000] us
      */
-    void set_percent(uint8_t percent);
+    void set_default() const;
+
+    /**
+     * @brief Set output as percentage [0 .. 100], -1 to set default value
+     */
+    virtual void set_percent(int8_t percent) const = 0;
+};
+
+struct RcpwmChannel: public RcoutChannel {
+    RcpwmChannel(uint8_t min_, uint8_t max_, uint8_t def_, uint8_t ch_, HAL::PwmPin pin_)
+        : RcoutChannel(min_, max_, def_, ch_, pin_) {}
+
+    /**
+     * @brief Set output as percentage [0 .. 100], -1 to set default value
+     */
+    void set_percent(int8_t percent) const override;
 
     /**
      * @brief Set output value as a normalized signed float [-1.0 .. +1.0]
@@ -57,9 +78,9 @@ struct RcpwmChannel {
     void set_int14(uint16_t cmd_int14) const;
 
     /**
-     * @brief The default PWM duration withing [1000; 2000] us
+     * @brief Set output as us [1000 .. 2000]
      */
-    void set_default() const;
+    void _set_us(uint16_t duration_us) const;
 };
 
 class RCPWM {

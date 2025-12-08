@@ -18,9 +18,9 @@
  * - ENGAGED:   There is a fresh command to apply a non-default state.
  *              Or there is a default command but the engaged deadline has not been reached yet.
  */
-class SetpointTimings {
+class ActuatorTtl {
 public:
-    SetpointTimings() = default;
+    ActuatorTtl() = default;
 
     inline void set_cmd_ttl(uint32_t new_cmd_ttl) {
         cmd_ttl = new_cmd_ttl;

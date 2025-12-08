@@ -10,12 +10,12 @@
 
 #include <algorithm>
 #include "params.hpp"
-#include "common/ttl.hpp"
 #include "peripheral/pwm/pwm.hpp"
 #include "common/algorithms.hpp"
 #include "common/module.hpp"
 #include "common/logging.hpp"
 #include "drivers/rcpwm/rcpwm.hpp"
+#include "modules/pwm/ttl.hpp"
 
 
 class PWMModule : public Module {
@@ -26,7 +26,7 @@ public:
     static inline uint16_t cmd_ttl{500};
     static inline Logging logger{"PWM"};
 
-    static inline std::array<SetpointTimings, Driver::RCPWM::get_pins_amount()> timings{};
+    static inline std::array<ActuatorTtl, Driver::RCPWM::get_pins_amount()> timings{};
 
 protected:
     void update_params() override;

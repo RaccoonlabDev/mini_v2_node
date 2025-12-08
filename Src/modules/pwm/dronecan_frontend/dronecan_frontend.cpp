@@ -7,11 +7,9 @@
 
 #include "dronecan_frontend.hpp"
 #include "modules/pwm/main.hpp"
-#include "common/zip.hpp"
+#include "modules/pwm/router.hpp"
 
-void DronecanPwmFrontend::init(PWMModule* backend_) {
-    backend = backend_;
-
+void DronecanPwmFrontend::init() {
     raw_command_sub.init(raw_command_callback);
     array_command_sub.init(array_command_callback);
     hardpoint_sub.init(hardpoint_callback);
@@ -19,88 +17,53 @@ void DronecanPwmFrontend::init(PWMModule* backend_) {
 }
 
 void DronecanPwmFrontend::update_params() {
-    pwm_cmd_type = (CommandType)paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_CMD_TYPE);
+    pwm_cmd_type = (CommandType)paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_INPUT_TYPE);
     if (pwm_cmd_type >= CommandType::NUMBER_OF_COMMANDS) {
         pwm_cmd_type = CommandType::RAW_COMMAND;
     }
 }
 
 void DronecanPwmFrontend::raw_command_callback(const RawCommand_t& msg) {
-    logger.log_debug("rc_cb");
+    if (pwm_cmd_type != CommandType::RAW_COMMAND) return;
 
-    if (pwm_cmd_type != CommandType::RAW_COMMAND) {
-        return;
-    }
+    for (uint8_t idx = 0; idx < msg.size; idx++) {
+        ActuatorCommand cmd{};
+        cmd.actuator_id = idx;
+        cmd.kind = CommandKind::SIGNED_INT14;
 
-    for (auto&& [pwm, timing] : zip(Driver::RCPWM::channels, PWMModule::timings)) {
-        if (pwm.channel >= msg.size || pwm.channel < 0) {
-            continue;
-        }
-
-        auto cmd_int14 = msg.raw_cmd[pwm.channel];
-
+        auto cmd_int14 = msg.raw_cmd[idx];
         if (cmd_int14 < 0) {
-            timing.set_standby_state();
-            pwm.set_default();
-        } else if (cmd_int14 == 0) {
-            timing.set_default_state();
-            pwm.set_percent(0);
+            cmd.force_default = true;
         } else {
-            timing.set_engaged_state();
-            pwm.set_int14(cmd_int14);
+            cmd.value = static_cast<float>(cmd_int14);
         }
+
+        pwm_router.apply(cmd);
     }
 }
 
-
 void DronecanPwmFrontend::array_command_callback(const ArrayCommand_t& msg) {
-    logger.log_debug("ac_cb");
+    if (pwm_cmd_type != CommandType::ARRAY_COMMAND) return;
 
-    if (pwm_cmd_type != CommandType::ARRAY_COMMAND) {
-        return;
-    }
-
-    for (auto&& [pwm, timing] : zip(Driver::RCPWM::channels, PWMModule::timings)) {
-        if (pwm.channel < 0 || pwm.channel > 255) {
-            continue;
-        }
-
-        for (uint8_t array_command_idx = 0; array_command_idx < msg.size; array_command_idx++) {
-            if (msg.commads[array_command_idx].actuator_id != pwm.channel) {
-                continue;
-            }
-
-            auto command = msg.commads[array_command_idx].command_value;
-
-            if (auto is_engaged = command < -0.001f || command >  0.001f; is_engaged) {
-                timing.set_engaged_state();
-            } else {
-                timing.set_default_state();
-            }
-
-            pwm.set_normalized_signed(command);
-        }
+    for (uint8_t array_command_idx = 0; array_command_idx < msg.size; array_command_idx++) {
+        ActuatorCommand cmd{};
+        cmd.actuator_id = msg.commads[array_command_idx].actuator_id;
+        cmd.kind = CommandKind::NORMALIZED_SIGNED;
+        cmd.value = msg.commads[array_command_idx].command_value;
+        pwm_router.apply(cmd);
     }
 }
 
 void DronecanPwmFrontend::hardpoint_callback(const HardpointCommand& msg) {
-    logger.log_debug("hp_cb");
+    if (pwm_cmd_type != CommandType::HARDPOINT_COMMAND) return;
 
-    if (pwm_cmd_type != CommandType::HARDPOINT_COMMAND) {
-        return;
-    }
+    ActuatorCommand cmd{};
+    cmd.actuator_id = msg.hardpoint_id;
+    cmd.kind = CommandKind::BOOL;
+    cmd.value = msg.command;
+    cmd.engage_forever = true;
 
-    for (auto&& [pwm, timing] : zip(Driver::RCPWM::channels, PWMModule::timings)) {
-        if (msg.hardpoint_id != pwm.channel) {
-            continue;
-        }
-
-        auto cmd = msg.command;
-
-        timing.set_engage_forever();  // TTL has no effect on Hardpoint Command
-
-        pwm.set_percent(cmd == 1 ? 100 : 0);
-    }
+    pwm_router.apply(cmd);
 }
 
 void DronecanPwmFrontend::arming_status_callback(const SafetyArmingStatus& msg) {

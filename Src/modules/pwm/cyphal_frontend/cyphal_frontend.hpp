@@ -7,15 +7,11 @@
 #ifndef SRC_MODULES_PWM_CYPHAL_FRONTEND_HPP_
 #define SRC_MODULES_PWM_CYPHAL_FRONTEND_HPP_
 
-#include "modules/pwm/main.hpp"
-
 class CyphalPwmFrontend {
 public:
     CyphalPwmFrontend() = default;
-    void init(PWMModule* backend_);
-
-private:
-    PWMModule* backend;
+    void init();
+    void update_params();
 };
 
 #endif  // SRC_MODULES_PWM_CYPHAL_FRONTEND_HPP_

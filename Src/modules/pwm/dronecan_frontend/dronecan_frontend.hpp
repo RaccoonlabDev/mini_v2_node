@@ -10,7 +10,7 @@
 #include "libdcnode/dronecan.h"
 #include "libdcnode/publisher.hpp"
 #include "libdcnode/subscriber.hpp"
-#include "modules/pwm/main.hpp"
+#include "common/logging.hpp"
 
 enum class CommandType: uint8_t {
     RAW_COMMAND,
@@ -24,7 +24,7 @@ class DronecanPwmFrontend {
 public:
     DronecanPwmFrontend() = default;
 
-    void init(PWMModule* backend_);
+    void init();
 
     void update_params();
 
@@ -43,7 +43,6 @@ public:
     static inline DronecanSubscriber<SafetyArmingStatus> arming_status_sub;
 
 private:
-    PWMModule* backend;
     static inline Logging logger{"DPWM"};
 };
 
