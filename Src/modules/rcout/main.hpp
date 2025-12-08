@@ -15,16 +15,16 @@
 #include "common/module.hpp"
 #include "common/logging.hpp"
 #include "drivers/rcpwm/rcpwm.hpp"
-#include "modules/pwm/ttl.hpp"
+#include "modules/rcout/ttl.hpp"
 
 
-class PWMModule : public Module {
+class RcoutModule : public Module {
 public:
-    PWMModule() : Module(50, Protocol::CYPHAL_AND_DRONECAN) {}
+    RcoutModule() : Module(50, Protocol::CYPHAL_AND_DRONECAN) {}
     void init() override;
 
     static inline uint16_t cmd_ttl{500};
-    static inline Logging logger{"PWM"};
+    static inline Logging logger{"RCOUT"};
 
     static inline std::array<ActuatorTtl, Driver::RCPWM::get_pins_amount()> timings{};
 

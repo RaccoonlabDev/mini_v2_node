@@ -8,7 +8,7 @@
 #include "rcpwm.hpp"
 #include <array>
 #include "params.hpp"
-#include "modules/pwm/main.hpp"
+#include "modules/rcout/main.hpp"
 
 
 #define CH(channel) IntParamsIndexes::PARAM_PWM_##channel##_CH

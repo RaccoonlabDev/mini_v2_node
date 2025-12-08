@@ -4,7 +4,7 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#include "modules/pwm/router.hpp"
+#include "modules/rcout/router.hpp"
 #include <cmath>
 
 PwmRouter pwm_router;
@@ -25,20 +25,20 @@ void PwmRouter::apply(const ActuatorCommand& cmd) {
         return;
     }
 
-    auto& pwm = Driver::RCPWM::channels[channel_idx];
-    auto& timing = PWMModule::timings[channel_idx];
+    auto& rcout = Driver::RCPWM::channels[channel_idx];
+    auto& timing = RcoutModule::timings[channel_idx];
 
     switch (cmd.kind) {
     case CommandKind::SIGNED_INT14:
         if (cmd.force_default) {
             timing.set_standby_state();
-            pwm.set_default();
+            rcout.set_default();
             return;
         }
 
         if (std::fabs(cmd.value) < 0.5f) {
             timing.set_default_state();
-            pwm.set_percent(0);
+            rcout.set_percent(0);
             return;
         }
 
@@ -47,7 +47,7 @@ void PwmRouter::apply(const ActuatorCommand& cmd) {
         } else {
             timing.set_engaged_state();
         }
-        pwm.set_int14(static_cast<uint16_t>(cmd.value));
+        rcout.set_int14(static_cast<uint16_t>(cmd.value));
         return;
 
     case CommandKind::NORMALIZED_SIGNED:
@@ -60,7 +60,7 @@ void PwmRouter::apply(const ActuatorCommand& cmd) {
         } else {
             timing.set_default_state();
         }
-        pwm.set_normalized_signed(cmd.value);
+        rcout.set_normalized_signed(cmd.value);
         return;
 
     case CommandKind::NORMALIZED_UNSIGNED:
@@ -73,7 +73,7 @@ void PwmRouter::apply(const ActuatorCommand& cmd) {
         } else {
             timing.set_default_state();
         }
-        pwm.set_normalized_unsigned(cmd.value);
+        rcout.set_normalized_unsigned(cmd.value);
         return;
 
     case CommandKind::BOOL:
@@ -84,7 +84,7 @@ void PwmRouter::apply(const ActuatorCommand& cmd) {
         } else {
             timing.set_default_state();
         }
-        pwm.set_percent(cmd.value > 0.5f ? 100 : 0);
+        rcout.set_percent(cmd.value > 0.5f ? 100 : 0);
         return;
 
     case CommandKind::PERCENT:
@@ -97,7 +97,7 @@ void PwmRouter::apply(const ActuatorCommand& cmd) {
         } else {
             timing.set_default_state();
         }
-        pwm.set_percent(static_cast<int8_t>(cmd.value));
+        rcout.set_percent(static_cast<int8_t>(cmd.value));
         return;
 
     default:

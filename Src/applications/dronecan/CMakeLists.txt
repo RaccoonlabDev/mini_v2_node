@@ -12,7 +12,7 @@ include(${SRC_DIR}/modules/system/CMakeLists.txt)
 include(${SRC_DIR}/modules/dronecan/arming/CMakeLists.txt)
 include(${SRC_DIR}/modules/circuit_status/dronecan/CMakeLists.txt)
 include(${SRC_DIR}/modules/feedback/dronecan/CMakeLists.txt)
-include(${SRC_DIR}/modules/pwm/CMakeLists.txt)
+include(${SRC_DIR}/modules/rcout/CMakeLists.txt)
 
 if(USE_PLATFORM_NODE_V3 OR USE_PLATFORM_UBUNTU)
     include(${SRC_DIR}/modules/imu/CMakeLists.txt)
