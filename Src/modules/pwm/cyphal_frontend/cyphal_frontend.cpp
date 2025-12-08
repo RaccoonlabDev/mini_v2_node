@@ -6,8 +6,7 @@
 
 #include "cyphal_frontend.hpp"
 #include "reg/udral/service/actuator/common/sp/Vector31_0_1.h"
-#include "common/algorithms.hpp"
-#include "common/zip.hpp"
+#include "modules/pwm/router.hpp"
 
 #include "cyphalNode/cyphal.hpp"
 
@@ -21,8 +20,7 @@ private:
 static SetpointSubscriber setpoint_sub;
 
 
-void CyphalPwmFrontend::init(PWMModule* backend_) {
-    backend = backend_;
+void CyphalPwmFrontend::init() {
     setpoint_sub.init();
 }
 
@@ -47,19 +45,14 @@ void SetpointSubscriber::callback(const cyphal::CanardRxTransfer& transfer) {
 
     int16_t number_of_setpoints = len / 2;
 
-    for (auto&& [pwm, timing] : zip(Driver::RCPWM::channels, PWMModule::timings)) {
-        if (pwm.channel >= number_of_setpoints) {
-            continue;
-        }
-
-        auto normalized_motor_value = msg.value[pwm.channel];
-
-        if (normalized_motor_value > 0) {
-            timing.set_engaged_state();
-        } else {
-            timing.set_default_state();
-        }
-
-        pwm.set_normalized_unsigned(normalized_motor_value);
+    for (uint8_t setpoint_idx = 0; setpoint_idx < number_of_setpoints; setpoint_idx++) {
+        ActuatorCommand cmd{};
+        cmd.actuator_id = setpoint_idx;
+        cmd.kind = CommandKind::NORMALIZED_UNSIGNED;
+        cmd.value = msg.value[setpoint_idx];
+        pwm_router.apply(cmd);
     }
+}
+
+void CyphalPwmFrontend::update_params() {
 }

@@ -1,7 +1,7 @@
-pwm.cmd_type:
+pwm.input_type:
   type: Integer
   note: 0 means RawCommand, 1 means ArrayCommand, 2 is reserved for hardpoint.Command.
-  enum: PARAM_PWM_CMD_TYPE
+  enum: PARAM_PWM_INPUT_TYPE
   flags: mutable
   default: 0
   min: 0

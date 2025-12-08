@@ -30,21 +30,21 @@
 
 REGISTER_MODULE(PWMModule)
 
+template <typename Fn>
+static inline void for_active_frontend(Fn&& fn) {
+    auto proto = ModuleManager::get_active_protocol();
+#if CONFIG_USE_DRONECAN == 1
+    if (proto == Module::Protocol::DRONECAN) fn(dronecan_frontend);
+#endif
+#if CONFIG_USE_CYPHAL == 1
+    if (proto == Module::Protocol::CYPHAL) fn(cyphal_frontend);
+#endif
+}
+
 void PWMModule::init() {
     Driver::RCPWM::init();
     logger.log_debug("init");
-
-#if CONFIG_USE_DRONECAN == 1
-    if (ModuleManager::get_active_protocol() == Protocol::DRONECAN) {
-        dronecan_frontend.init(this);
-    }
-#endif  // CONFIG_USE_DRONECAN
-
-#if CONFIG_USE_CYPHAL == 1
-    if (ModuleManager::get_active_protocol() == Protocol::CYPHAL) {
-        cyphal_frontend.init(this);
-    }
-#endif  // CONFIG_USE_CYPHAL
+    for_active_frontend([this](auto& fe) { fe.init(); });
 }
 
 /**
@@ -103,11 +103,6 @@ void PWMModule::update_params() {
     auto frequency = static_cast<uint16_t>(param_frequency);
     Driver::RCPWM::set_frequency(frequency);
 
-#if CONFIG_USE_DRONECAN == 1
-    if (ModuleManager::get_active_protocol() == Protocol::DRONECAN) {
-        dronecan_frontend.update_params();
-    }
-#endif  // CONFIG_USE_DRONECAN
-
+    for_active_frontend([](auto& fe) { fe.update_params(); });
     Driver::RCPWM::update_params();
 }
