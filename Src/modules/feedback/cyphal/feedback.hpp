@@ -11,7 +11,7 @@
 #include <array>
 #include "cyphalNode/udral/feedback.hpp"
 #include "cyphalNode/zubax/compact_feedback.hpp"
-#include "modules/pwm/main.hpp"
+#include "modules/rcout/main.hpp"
 #include "module.hpp"
 #include "drivers/rcpwm/rcpwm.hpp"
 

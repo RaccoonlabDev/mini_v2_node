@@ -8,7 +8,7 @@
 #define SRC_MODULES_PWM_ROUTER_HPP_
 
 #include <cstdint>
-#include "modules/pwm/main.hpp"
+#include "modules/rcout/main.hpp"
 
 enum class CommandKind: uint8_t {
     BOOL,

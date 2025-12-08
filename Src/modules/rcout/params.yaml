@@ -1,6 +1,6 @@
 pwm.cmd_ttl_ms:
   type: Integer
-  note: TTL of specified by pwm.cmd_type commands [ms].
+  note: TTL of specified by pwm.input_type commands [ms].
   enum: PARAM_PWM_CMD_TTL_MS
   flags: mutable
   default: 500

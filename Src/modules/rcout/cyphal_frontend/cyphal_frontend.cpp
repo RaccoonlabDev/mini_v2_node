@@ -6,7 +6,7 @@
 
 #include "cyphal_frontend.hpp"
 #include "reg/udral/service/actuator/common/sp/Vector31_0_1.h"
-#include "modules/pwm/router.hpp"
+#include "modules/rcout/router.hpp"
 
 #include "cyphalNode/cyphal.hpp"
 

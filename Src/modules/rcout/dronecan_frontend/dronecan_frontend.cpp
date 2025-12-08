@@ -6,8 +6,8 @@
  */
 
 #include "dronecan_frontend.hpp"
-#include "modules/pwm/main.hpp"
-#include "modules/pwm/router.hpp"
+#include "modules/rcout/main.hpp"
+#include "modules/rcout/router.hpp"
 
 void DronecanPwmFrontend::init() {
     raw_command_sub.init(raw_command_callback);

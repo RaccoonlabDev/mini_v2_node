@@ -5,7 +5,7 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#include "modules/pwm/main.hpp"
+#include "modules/rcout/main.hpp"
 #include <limits>
 #include "common/algorithms.hpp"
 #include "common/zip.hpp"
@@ -28,7 +28,7 @@
     static inline CyphalPwmFrontend cyphal_frontend;
 #endif  // CONFIG_USE_CYPHAL
 
-REGISTER_MODULE(PWMModule)
+REGISTER_MODULE(RcoutModule)
 
 template <typename Fn>
 static inline void for_active_frontend(Fn&& fn) {
@@ -41,7 +41,7 @@ static inline void for_active_frontend(Fn&& fn) {
 #endif
 }
 
-void PWMModule::init() {
+void RcoutModule::init() {
     Driver::RCPWM::init();
     logger.log_debug("init");
     for_active_frontend([this](auto& fe) { fe.init(); });
@@ -56,11 +56,11 @@ void PWMModule::init() {
  * 2. INFO message once Node is ENGAGED (armed)
  * 3. INFO message once Node is STANDBY (disarmed)
  */
-void PWMModule::spin_once() {
+void RcoutModule::spin_once() {
     bool at_least_one_channel_is_engaged = false;
     bool at_least_one_ttl_detected = false;
 
-    for (auto&& [pwm, timing] : zip(Driver::RCPWM::channels, PWMModule::timings)) {
+    for (auto&& [rcout, timing] : zip(Driver::RCPWM::channels, RcoutModule::timings)) {
         if (timing.is_engaged()) {
             at_least_one_channel_is_engaged = true;
             continue;
@@ -74,7 +74,7 @@ void PWMModule::spin_once() {
             at_least_one_ttl_detected = true;
         }
 
-        pwm.set_default();
+        rcout.set_default();
         timing.set_sleep_state();
     }
 
@@ -93,7 +93,7 @@ void PWMModule::spin_once() {
     set_mode(at_least_one_channel_is_engaged ? Mode::ENGAGED : Module::Mode::STANDBY);
 }
 
-void PWMModule::update_params() {
+void RcoutModule::update_params() {
     cmd_ttl = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_CMD_TTL_MS);
     for (auto& timing : timings) {
         timing.set_cmd_ttl(cmd_ttl);
