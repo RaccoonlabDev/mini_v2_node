@@ -18,6 +18,7 @@ add_executable(${EXECUTABLE}
 
     ${ROOT_DIR}/Src/peripheral/adc/circuit_periphery.cpp
     ${CMAKE_CURRENT_LIST_DIR}/platform_specific.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/rcpwm_channels.cpp
 )
 
 find_package(PkgConfig REQUIRED)

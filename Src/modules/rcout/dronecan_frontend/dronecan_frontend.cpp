@@ -6,7 +6,6 @@
  */
 
 #include "dronecan_frontend.hpp"
-#include "modules/rcout/main.hpp"
 #include "modules/rcout/router.hpp"
 
 void DronecanPwmFrontend::init() {
