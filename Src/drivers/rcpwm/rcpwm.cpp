@@ -12,7 +12,7 @@
 #include "common/algorithms.hpp"
 
 int8_t Driver::RCPWM::init() {
-    for (auto param : channels) {
+    for (const auto& param : channels) {
         HAL::Pwm::init(param.pin);
     }
 
@@ -74,7 +74,7 @@ void Driver::RcpwmChannel::set_normalized_signed(float normalized_signed_value) 
 
 void Driver::RcpwmChannel::set_normalized_unsigned(float normalized_unsigned_value) const {
     normalized_unsigned_value = std::clamp(normalized_unsigned_value, 0.0f, 1.0f);
-    uint8_t percent = static_cast<uint8_t>(100 * normalized_unsigned_value);
+    auto percent = static_cast<uint8_t>(100 * normalized_unsigned_value);
     set_percent(percent);
 }
 

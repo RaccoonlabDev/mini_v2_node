@@ -30,8 +30,7 @@ void DronecanPwmFrontend::raw_command_callback(const RawCommand_t& msg) {
         cmd.actuator_id = idx;
         cmd.kind = CommandKind::SIGNED_INT14;
 
-        auto cmd_int14 = msg.raw_cmd[idx];
-        if (cmd_int14 < 0) {
+        if (auto cmd_int14 = msg.raw_cmd[idx]; cmd_int14 < 0) {
             cmd.force_default = true;
         } else {
             cmd.value = static_cast<float>(cmd_int14);

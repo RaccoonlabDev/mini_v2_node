@@ -30,7 +30,7 @@ class PwmRouter {
 public:
     void apply(const ActuatorCommand& cmd);
 private:
-    int8_t find_channel_idx(int16_t actuator_id);
+    int8_t find_channel_idx(int16_t actuator_id) const;
 };
 
 extern PwmRouter pwm_router;
