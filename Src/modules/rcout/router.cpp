@@ -9,7 +9,7 @@
 
 PwmRouter pwm_router;
 
-int8_t PwmRouter::find_channel_idx(int16_t actuator_id) {
+int8_t PwmRouter::find_channel_idx(int16_t actuator_id) const {
     for (uint8_t idx = 0; idx < Driver::RCPWM::get_pins_amount(); idx++) {
         if (Driver::RCPWM::channels[idx].channel == actuator_id) {
             return idx;
