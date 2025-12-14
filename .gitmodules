@@ -1,6 +1,3 @@
-[submodule "Libs/Cyphal"]
-	path = Libs/Cyphal
-	url = https://github.com/RaccoonlabDev/cyphal_application.git
 [submodule "Libs/Dronecan"]
 	path = Libs/Dronecan
 	url = https://github.com/PonomarevDA/dronecan_application.git

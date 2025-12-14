@@ -51,21 +51,21 @@ REGISTER_MODULE(DronecanModule)
 DronecanModule::DronecanModule() : Module(0, Protocol::DRONECAN) {
 }
 
-bool paramsIsInteger(ParamIndex_t param_idx) {
+static bool paramsIsInteger(ParamIndex_t param_idx) {
     return paramsGetType(param_idx) == PARAM_TYPE_INTEGER;
 }
-bool paramsIsString(ParamIndex_t param_idx) {
+static bool paramsIsString(ParamIndex_t param_idx) {
     return paramsGetType(param_idx) == PARAM_TYPE_STRING;
 }
-IntegerParamValue_t paramsGetIntegerMin(ParamIndex_t param_idx) {
+static IntegerParamValue_t paramsGetIntegerMin(ParamIndex_t param_idx) {
     auto desc = paramsGetIntegerDesc(param_idx);
     return desc != nullptr ? desc->min : 0;
 }
-IntegerParamValue_t paramsGetIntegerMax(ParamIndex_t param_idx) {
+static IntegerParamValue_t paramsGetIntegerMax(ParamIndex_t param_idx) {
     auto desc = paramsGetIntegerDesc(param_idx);
     return desc != nullptr ? desc->max : 0;
 }
-IntegerParamValue_t paramsGetIntegerDef(ParamIndex_t param_idx) {
+static IntegerParamValue_t paramsGetIntegerDef(ParamIndex_t param_idx) {
     auto desc = paramsGetIntegerDesc(param_idx);
     return desc != nullptr ? desc->def : 0;
 }

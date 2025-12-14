@@ -7,10 +7,10 @@
 #ifndef SRC_CYPHAL_APPLICATION_FEEDBACK_HPP_
 #define SRC_CYPHAL_APPLICATION_FEEDBACK_HPP_
 
-#include "cyphalNode/cyphal.hpp"
+#include "libcpnode/cyphal.hpp"
 #include <array>
-#include "cyphalNode/udral/feedback.hpp"
-#include "cyphalNode/zubax/compact_feedback.hpp"
+#include "libcpnode/udral/feedback.hpp"
+#include "libcpnode/zubax/compact_feedback.hpp"
 #include "modules/rcout/main.hpp"
 #include "module.hpp"
 #include "drivers/rcpwm/rcpwm.hpp"

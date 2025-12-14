@@ -8,14 +8,14 @@
 #include "reg/udral/service/actuator/common/sp/Vector31_0_1.h"
 #include "modules/rcout/router.hpp"
 
-#include "cyphalNode/cyphal.hpp"
+#include "libcpnode/cyphal.hpp"
 
-class SetpointSubscriber: public cyphal::CyphalSubscriber {
+class SetpointSubscriber: public libcpnode::CyphalSubscriber {
 public:
-    SetpointSubscriber() : CyphalSubscriber(cyphal::Cyphal::get_instance(), 65535) {}
+    SetpointSubscriber() : CyphalSubscriber(libcpnode::Cyphal::get_instance(), 65535) {}
     int8_t init();
 private:
-    void callback(const cyphal::CanardRxTransfer& transfer) override;
+    void callback(const libcpnode::CanardRxTransfer& transfer) override;
 };
 static SetpointSubscriber setpoint_sub;
 
@@ -28,14 +28,14 @@ int8_t SetpointSubscriber::init() {
     port_id = static_cast<uint16_t>(paramsGetIntegerValue(IntParamsIndexes::PARAM_SUB_SETPOINT_ID));
     if (driver->subscribe(this,
                 reg_udral_service_actuator_common_sp_Vector31_0_1_EXTENT_BYTES_,
-                cyphal::CanardTransferKindMessage) < 0) {
+                libcpnode::CanardTransferKindMessage) < 0) {
         return -1;
     }
 
     return 0;
 }
 
-void SetpointSubscriber::callback(const cyphal::CanardRxTransfer& transfer) {
+void SetpointSubscriber::callback(const libcpnode::CanardRxTransfer& transfer) {
     auto payload = static_cast<const uint8_t*>(transfer.payload);
     size_t len = transfer.payload_size;
     reg_udral_service_actuator_common_sp_Vector31_0_1 msg;

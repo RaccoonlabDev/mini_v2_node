@@ -6,7 +6,7 @@
 
 #include "feedback.hpp"
 #include <algorithm>
-#include "cyphalNode/cyphal.hpp"
+#include "libcpnode/cyphal.hpp"
 #include "params.hpp"
 #include "peripheral/adc/circuit_periphery.hpp"
 

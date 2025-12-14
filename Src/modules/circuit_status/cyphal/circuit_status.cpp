@@ -6,7 +6,7 @@
 
 #include "circuit_status.hpp"
 #include <algorithm>
-#include "cyphalNode/cyphal.hpp"
+#include "libcpnode/cyphal.hpp"
 #include "params.hpp"
 
 #include "uavcan/si/sample/electric_current/Scalar_1_0.h"
