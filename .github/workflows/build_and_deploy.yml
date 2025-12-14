@@ -8,19 +8,20 @@ jobs:
         include:
           - runner: ubuntu-22.04
             image: "" # Let's use a GitHub-hosted virtual machine itself
-            target: all
-
           - runner: windows-2022
             image: ""  # Containers on Windows runners are not supported
-            target: dronecan_v2
-
+    timeout-minutes: 10
     runs-on: ${{ matrix.runner }}
     container:
       image: ${{ matrix.image }}
 
-    timeout-minutes: 10
+    # GitHub Actions does not allow the secrets context inside if expression
+    # So, let's copy the secret into env
+    env:
+      LIBCPNODE_DEPLOY_KEY: ${{ secrets.LIBCPNODE_DEPLOY_KEY }}
+
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: recursive
           fetch-depth: 0
@@ -32,13 +33,24 @@ jobs:
         shell: bash
 
       - name: Setup SSH
+        if: ${{ matrix.runner == 'ubuntu-22.04' && env.LIBCPNODE_DEPLOY_KEY != '' }}
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: |
             ${{ secrets.LIBCPNODE_DEPLOY_KEY }}
 
+      - name: Set build target
+        shell: bash
+        run: |
+          if [[ "${{ matrix.runner }}" == "ubuntu-22.04" && -n "${{ secrets.LIBCPNODE_DEPLOY_KEY }}" ]]; then
+            echo "BUILD_TARGET=all" >> "$GITHUB_ENV"
+          else
+            echo "BUILD_TARGET=dronecan_v2 dronecan_v3" >> "$GITHUB_ENV"
+          fi
+
       - name: Build
-        run: make ${{ matrix.target }}
+        shell: bash
+        run: make $BUILD_TARGET
 
       - name: Deploy binaries to Telegram
         if: >
