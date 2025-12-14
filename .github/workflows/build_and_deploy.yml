@@ -31,6 +31,12 @@ jobs:
           python scripts/install.py
         shell: bash
 
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: |
+            ${{ secrets.LIBCPNODE_DEPLOY_KEY }}
+
       - name: Build
         run: make ${{ matrix.target }}
 

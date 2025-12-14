@@ -67,6 +67,8 @@ if(NOT (EXISTS ${APPLICATION_DIR} AND IS_DIRECTORY ${APPLICATION_DIR}))
     message(FATAL_ERROR "CAN_PROTOCOL '${CAN_PROTOCOL}' is unknown.")
 endif()
 
+include(${CMAKE_DIR}/git.cmake)
+
 # Set build dir based on hardware version and protocol
 set(BUILD_ROOT_DIR ${ROOT_DIR}/build)
 set(BUILD_TARGET_DIR ${BUILD_ROOT_DIR}/${CAN_PROTOCOL}_${PLATFORM_NAME})
@@ -86,7 +88,6 @@ include(${APPLICATION_DIR}/CMakeLists.txt)
 
 # Prebuild
 include(${CMAKE_DIR}/params.cmake)
-include(${CMAKE_DIR}/git.cmake)
 
 # Hardware version is not supported at the momemnt, let's hardcode it for a while
 add_definitions(-DHW_VERSION_MAJOR=2)

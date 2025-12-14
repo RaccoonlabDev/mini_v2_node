@@ -7,8 +7,8 @@
 #ifndef SRC_CYPHAL_APPLICATION_CIRCUIT_STATUS_CIRCUIT_STATUS_HPP_
 #define SRC_CYPHAL_APPLICATION_CIRCUIT_STATUS_CIRCUIT_STATUS_HPP_
 
-#include "cyphalNode/cyphal.hpp"
-#include "cyphalNode/udral/circuit_status.hpp"
+#include "libcpnode/cyphal.hpp"
+#include "libcpnode/udral/circuit_status.hpp"
 #include "peripheral/adc/circuit_periphery.hpp"
 #include "module.hpp"
 
@@ -27,13 +27,13 @@ protected:
 
 private:
     RaccoonLab::CircuitStatusVoltagePublisher voltage_5v_pub{
-        cyphal::Cyphal::get_instance(), 65535};
+        libcpnode::Cyphal::get_instance(), 65535};
 
     RaccoonLab::CircuitStatusVoltagePublisher voltage_vin_pub{
-        cyphal::Cyphal::get_instance(), 65535};
+        libcpnode::Cyphal::get_instance(), 65535};
 
     RaccoonLab::CircuitStatusTemperaturePublisher temperature_pub{
-        cyphal::Cyphal::get_instance(), 65535};
+        libcpnode::Cyphal::get_instance(), 65535};
 };
 
 #ifdef __cplusplus
