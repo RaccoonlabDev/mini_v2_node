@@ -1,8 +1,21 @@
 # Copyright (C) 2023-2024 Dmitry Ponomarev <ponomarevda96@gmail.com>
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
+.PHONY: require_target all checks code_style tests upload run clean_releases clean distclean cyphal cyphal_v2 cyphal_v3 dronecan dronecan_v2 dronecan_v3 v2 v3 sitl_dronecan sitl_cyphal
+.DEFAULT_GOAL := require_target
 
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BUILD_DIR:=$(ROOT_DIR)/build
+
+
+require_target:
+ifeq ($(strip $(MAKECMDGOALS)),)
+	@echo "Error: target is not specified."
+	@echo "Use: make <target>"
+	@echo "Targets: all cyphal_v2 cyphal_v3 sitl_cyphal dronecan_v2 dronecan_v3 sitl_dronecan v2 v3 code_style tests clean clean_releases distclean"
+	@exit 2
+else
+	@:
+endif
 
 all: clean_releases cyphal_v2 cyphal_v3 dronecan_v2 dronecan_v3 v3 sitl_dronecan sitl_cyphal
 
@@ -15,7 +28,7 @@ sitl_cyphal: checks
 	cd ${BUILD_DIR}/cyphal_sitl/obj && cmake -DCAN_PROTOCOL=cyphal -DUSE_PLATFORM_UBUNTU=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -G "Unix Makefiles" ../../.. && make
 cyphal_v3: checks
 	mkdir -p ${BUILD_DIR}/cyphal_v3/obj
-	cd ${BUILD_DIR}/cyphal_v3/obj && cmake -DCAN_PROTOCOL=cyphal -DUSE_PLATFORM_NODE_V3=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}-G "Unix Makefiles" ../../.. && make
+	cd ${BUILD_DIR}/cyphal_v3/obj && cmake -DCAN_PROTOCOL=cyphal -DUSE_PLATFORM_NODE_V3=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -G "Unix Makefiles" ../../.. && make
 
 # Dronecan:
 dronecan: dronecan_v2

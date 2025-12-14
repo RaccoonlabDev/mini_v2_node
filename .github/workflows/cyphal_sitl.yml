@@ -5,21 +5,42 @@ jobs:
   sitl:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
+    # GitHub Actions does not allow the secrets context inside if expression
+    # So, let's copy the secret into env
+    env:
+      LIBCPNODE_DEPLOY_KEY: ${{ secrets.LIBCPNODE_DEPLOY_KEY }}
+
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+        if: ${{ env.LIBCPNODE_DEPLOY_KEY != '' }}
         with:
           submodules: recursive
           fetch-depth: 0
 
       - name: Install dependencies
+        if: ${{ env.LIBCPNODE_DEPLOY_KEY != '' }}
         run: |
           pip install -r requirements-cyphal.txt
           pip install pytest
+          sudo apt-get update
           sudo apt-get install -y gcc-arm-none-eabi linux-modules-extra-$(uname -r)
           sudo apt-get install -y libfftw3-dev
 
-      - run: make sitl_cyphal
-      - run: |
+      - name: Setup SSH
+        if: ${{ env.LIBCPNODE_DEPLOY_KEY != '' }}
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: |
+            ${{ secrets.LIBCPNODE_DEPLOY_KEY }}
+
+      - name: Build SITL Cyphal
+        if: ${{ env.LIBCPNODE_DEPLOY_KEY != '' }}
+        run: make sitl_cyphal
+
+      - name: Run SITL
+        if: ${{ env.LIBCPNODE_DEPLOY_KEY != '' }}
+        run: |
+          export REG_DATA_TYPE_PATH="$PWD/build/downloads/libcpnode/Libs/public_regulated_data_types/uavcan $PWD/build/downloads/libcpnode/Libs/public_regulated_data_types/reg"
           make run &
           cd scripts/tools/cyphal
           source init.sh -i slcan0 -n 127 -v
