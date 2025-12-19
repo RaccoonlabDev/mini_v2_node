@@ -137,8 +137,11 @@ uint16_t FFT::_estimate_peaks(float* peak_magnitude,
             continue;
         }
         float adjusted_bin = _estimate_peak_freq(fft, raw_peak_index[peak_new]);
-        if (adjusted_bin > size || adjusted_bin < 0) {
+        if (adjusted_bin > size) {
             continue;
+        }
+        if (adjusted_bin < 0) {
+            adjusted_bin = raw_peak_index[peak_new];
         }
         float freq_adjusted = _resolution_hz * adjusted_bin;
         // check if we already found the peak
