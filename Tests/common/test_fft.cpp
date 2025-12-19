@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <cmath>  // For std::fabs
 #include <tuple>  // for tuple
+#include <ranges>
 #include "FFT.hpp"
 #include "oscillation_generator.hpp"
 
@@ -25,12 +26,20 @@ std::random_device rd;
 class MultiSignalsSinGenerator {
 public:
     uint16_t max_freq = 0;
-    size_t n_signals = 0;
     uint16_t min_freq = 0;
+    size_t n_signals = 0;
     uint16_t sample_rate_hz = 0;
     std::vector<SinSignalGenerator> signals_generator;
     std::vector<std::pair<float, float>> dominant_sig;
-    float abs_error;
+    float abs_error = 0;
+    bool is_frequency_close(float freq_hz, int idx) {
+        for (size_t i = 0; i < idx; i++) {
+            if (abs(signals_generator[i].freq_hz - freq_hz) < abs_error) {
+                return  true;
+            }
+        }
+        return false;
+    }
 
     void init() {
         signals_generator.resize(n_signals);
@@ -39,23 +48,15 @@ public:
             std::uniform_int_distribution<uint16_t> amp_dist(1, 100);
             uint16_t freq_hz = 0;
             // generate freq_hz until it is not close to any other freq_hz,
-            // otherwise the estimated frequency will be doubled, no way to avoid that
-            while (true) {
-                bool is_close = false;
+            // otherwise the estimated frequency will be doubled, no way to avoid that in fft
+            do {
                 freq_hz = freq_dist(rd);
-                for (size_t i = 0; i < j; i++) {
-                    if (abs(signals_generator[i].freq_hz - freq_hz) < abs_error) {
-                        is_close = true;
-                        break;
-                    }
-                }
-                if (!is_close) break;
-            }
+            } while (is_frequency_close(freq_hz, j));
             uint16_t amplitude = amp_dist(rd);
 
             signals_generator[j] = SinSignalGenerator(sample_rate_hz, freq_hz, amplitude);
         }
-        std::stable_sort(signals_generator.begin(), signals_generator.end(),
+        std::ranges::stable_sort(signals_generator.begin(), signals_generator.end(),
             [](const SinSignalGenerator& a, const SinSignalGenerator& b) {
                 return a.amplitude > b.amplitude;
                 });
@@ -234,12 +235,9 @@ public:
         for (int i = 0; i < fft_parameters.n_axes; i++) {
             signals_parameters[i] = init_parameters.signals_parameters;
         }
-        // To print FFT parameters for debug uncomment the following line
-        // print_signal_parameters();
-        // print_fft_parameters();
     }
  protected:
-    typedef TestFFTBase<SinSignalGenerator, InitOneSignParamType> super;
+    using super = TestFFTBase<SinSignalGenerator, InitOneSignParamType>;
 };
 
 const std::array<InitParamOneSignalWithRes, 10> OneSignalTestParams = {
@@ -295,8 +293,6 @@ TEST_P(TestFFTOneSignalParametrized, CheckOnWindow) {
         }
         fft.update(input);
     }
-    // To print FFT results for debug uncomment the following line
-    // print_fft_results();
     for (int axis = 0; axis < fft_parameters.n_axes; axis++) {
         check_axis(axis);
     }
@@ -311,13 +307,11 @@ TEST_P(TestFFTOneSignalParametrized, CheckOnFewWindows) {
     std::uniform_int_distribution<int> dist(0, 8);
     auto n_updates = (dist(rd) % 8 + 2) * fft_parameters.window_size;
     for (int i = 0; i < n_updates + 10; i++) {
-        for (int j = 0; j < fft_parameters.n_axes; j++) {
+        for (int j = 0; j < sizeof(input) / sizeof(float); j++) {
             input[j] = signals_generator[j].get_next_sample();
         }
         fft.update(input);
     }
-    // To print FFT results for debug uncomment the following line
-    // print_fft_results();
     for (int axis = 0; axis < fft_parameters.n_axes; axis++) {
         check_axis(axis);
     }
@@ -355,9 +349,6 @@ public:
         for (int i = 0; i < fft_parameters.n_axes; i++) {
             signals_parameters[i] = init_parameters.signals_parameters;
         }
-        // To print FFT parameters for debug uncomment the following line
-        // print_signal_parameters();
-        // print_fft_parameters();
     }
     bool init() override {
         if (!super::init()) {
@@ -400,7 +391,7 @@ public:
     }
 
  protected:
-    typedef TestFFTBase<MultiSignalsSinGenerator, InitMultiSignalsParamType> super;
+    using super = TestFFTBase<MultiSignalsSinGenerator, InitMultiSignalsParamType>;
 };
 
 const std::array<InitParamMultiSignalWithRes, 6> MultiSignalTestParams = {
