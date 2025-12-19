@@ -56,7 +56,7 @@ public:
 
             signals_generator[j] = SinSignalGenerator(sample_rate_hz, freq_hz, amplitude);
         }
-        std::ranges::stable_sort(signals_generator.begin(), signals_generator.end(),
+        std::ranges::stable_sort(signals_generator,
             [](const SinSignalGenerator& a, const SinSignalGenerator& b) {
                 return a.amplitude > b.amplitude;
                 });
@@ -303,14 +303,15 @@ TEST_P(TestFFTOneSignalParametrized, CheckOnFewWindows) {
         EXPECT_EQ(result, false);
         return;
     }
-    float input[fft_parameters.n_axes];
+    std::vector<float> input;  // Use std::array
+    input.resize(fft_parameters.n_axes);
     std::uniform_int_distribution<int> dist(0, 8);
     auto n_updates = (dist(rd) % 8 + 2) * fft_parameters.window_size;
     for (int i = 0; i < n_updates + 10; i++) {
-        for (int j = 0; j < sizeof(input) / sizeof(float); j++) {
+        for (int j = 0; j < std::ranges::size(input); j++) {
             input[j] = signals_generator[j].get_next_sample();
         }
-        fft.update(input);
+        fft.update(input.data());
     }
     for (int axis = 0; axis < fft_parameters.n_axes; axis++) {
         check_axis(axis);
