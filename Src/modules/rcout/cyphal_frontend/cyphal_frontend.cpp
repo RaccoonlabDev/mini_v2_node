@@ -5,53 +5,32 @@
  */
 
 #include "cyphal_frontend.hpp"
-#include "reg/udral/service/actuator/common/sp/Vector31_0_1.h"
-#include "modules/rcout/router.hpp"
-
+#include <algorithm>
 #include "libcpnode/cyphal.hpp"
+#include "modules/rcout/router.hpp"
+#include "params.hpp"
+#include "drivers/rcpwm/rcpwm.hpp"
 
-class SetpointSubscriber: public libcpnode::CyphalSubscriber {
-public:
-    SetpointSubscriber() : CyphalSubscriber(libcpnode::Cyphal::get_instance(), 65535) {}
-    int8_t init();
-private:
-    void callback(const libcpnode::CanardRxTransfer& transfer) override;
-};
-static SetpointSubscriber setpoint_sub;
-
-
-void CyphalPwmFrontend::init() {
-    setpoint_sub.init();
-}
-
-int8_t SetpointSubscriber::init() {
-    port_id = static_cast<uint16_t>(paramsGetIntegerValue(IntParamsIndexes::PARAM_SUB_SETPOINT_ID));
-    if (driver->subscribe(this,
-                reg_udral_service_actuator_common_sp_Vector31_0_1_EXTENT_BYTES_,
-                libcpnode::CanardTransferKindMessage) < 0) {
-        return -1;
-    }
-
-    return 0;
-}
-
-void SetpointSubscriber::callback(const libcpnode::CanardRxTransfer& transfer) {
-    auto payload = static_cast<const uint8_t*>(transfer.payload);
-    size_t len = transfer.payload_size;
-    reg_udral_service_actuator_common_sp_Vector31_0_1 msg;
-    if (reg_udral_service_actuator_common_sp_Vector31_0_1_deserialize_(&msg, payload, &len) < 0) {
-        return;
-    }
-
-    int16_t number_of_setpoints = len / 2;
-
-    for (uint8_t setpoint_idx = 0; setpoint_idx < number_of_setpoints; setpoint_idx++) {
+namespace {
+void setpointCallback(reg_udral_service_actuator_common_sp_Vector31_0_1* msg) {
+    const size_t max_setpoints = std::min<size_t>(Driver::RCPWM::get_pins_amount(), 31U);
+    for (size_t setpoint_idx = 0; setpoint_idx < max_setpoints; setpoint_idx++) {
         ActuatorCommand cmd{};
-        cmd.actuator_id = setpoint_idx;
+        cmd.actuator_id = static_cast<int16_t>(setpoint_idx);
         cmd.kind = CommandKind::NORMALIZED_UNSIGNED;
-        cmd.value = msg.value[setpoint_idx];
+        cmd.value = msg->value[setpoint_idx];
         pwm_router.apply(cmd);
     }
+}
+}  // namespace
+
+void CyphalPwmFrontend::init() {
+    auto cyphal = libcpnode::Cyphal::get_instance();
+    static auto setpoint_sub = cyphal->makeSubscriber<reg_udral_service_actuator_common_sp_Vector31_0_1>(
+        setpointCallback,
+        static_cast<uint16_t>(paramsGetIntegerValue(PARAM_SUB_SETPOINT_ID))
+    );
+    (void)setpoint_sub;
 }
 
 void CyphalPwmFrontend::update_params() {

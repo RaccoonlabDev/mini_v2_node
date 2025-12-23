@@ -10,7 +10,7 @@ include(cmake/use_external_github_library.cmake)
 #
 add_definitions(-DBXCAN_MAX_IFACE_INDEX=0)
 use_external_github_library(libcpnode
-    source PonomarevDA/libcpnode v0.10.0
+    source PonomarevDA/libcpnode v0.11.1 # Jan 25, 2026
 )
 
 #

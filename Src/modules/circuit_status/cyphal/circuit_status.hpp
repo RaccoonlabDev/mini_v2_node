@@ -8,9 +8,9 @@
 #define SRC_CYPHAL_APPLICATION_CIRCUIT_STATUS_CIRCUIT_STATUS_HPP_
 
 #include "libcpnode/cyphal.hpp"
-#include "libcpnode/udral/circuit_status.hpp"
-#include "peripheral/adc/circuit_periphery.hpp"
 #include "module.hpp"
+#include "uavcan/si/unit/temperature/Scalar_1_0.h"
+#include "uavcan/si/unit/voltage/Scalar_1_0.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,14 +26,9 @@ protected:
     void spin_once() override;
 
 private:
-    RaccoonLab::CircuitStatusVoltagePublisher voltage_5v_pub{
-        libcpnode::Cyphal::get_instance(), 65535};
-
-    RaccoonLab::CircuitStatusVoltagePublisher voltage_vin_pub{
-        libcpnode::Cyphal::get_instance(), 65535};
-
-    RaccoonLab::CircuitStatusTemperaturePublisher temperature_pub{
-        libcpnode::Cyphal::get_instance(), 65535};
+    libcpnode::Cyphal::Publisher<libcpnode::SubjectTraits<uavcan_si_unit_voltage_Scalar_1_0>> voltage_5v_pub;
+    libcpnode::Cyphal::Publisher<libcpnode::SubjectTraits<uavcan_si_unit_voltage_Scalar_1_0>> voltage_vin_pub;
+    libcpnode::Cyphal::Publisher<libcpnode::SubjectTraits<uavcan_si_unit_temperature_Scalar_1_0>> temperature_pub;
 };
 
 #ifdef __cplusplus
