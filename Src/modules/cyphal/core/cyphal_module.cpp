@@ -113,33 +113,31 @@ libcpnode::AppInfo buildCyphalAppInfo() {
 }
 
 CyphalModule::CyphalModule()
-    : Module(0, Protocol::CYPHAL),
-      cyphal(buildCyphalPlatformApi(), buildCyphalAppInfo()) {
+    : Module(0, Protocol::CYPHAL) {
 }
 
 void CyphalModule::init() {
-    auto node_name_param_idx = static_cast<ParamIndex_t>(IntParamsIndexes::INTEGER_PARAMS_AMOUNT);
-    const auto& [board_name, name_length] = CircuitPeriphery::get_board_name();
-    paramsSetStringValue(node_name_param_idx, name_length, (const uint8_t*)board_name);
-
     int param_node_id_value = paramsGetIntegerValue(IntParamsIndexes::PARAM_UAVCAN_NODE_ID);
     auto node_id = std::clamp(param_node_id_value, 1, 126);
 
-    int8_t res = cyphal.init(node_id);
-
-    libcpnode::NodeGetInfoSubscriber::setHardwareVersion(2, 1);
+    cyphal.emplace(buildCyphalPlatformApi(), buildCyphalAppInfo());
+    int8_t res = cyphal->init(node_id);
 
     set_health(res >= 0 ? Status::OK : Status::FATAL_MALFANCTION);
     set_mode(Mode::STANDBY);
 }
 
 void CyphalModule::spin_once() {
-    cyphal.setNodeHealth(uavcan_node_Health_1_0{(uint8_t)(ModuleManager::get_global_status())});
+    if (!cyphal.has_value()) {
+        return;
+    }
+
+    cyphal->setNodeHealth(uavcan_node_Health_1_0{(uint8_t)(ModuleManager::get_global_status())});
     auto global_mode = (uint8_t)(ModuleManager::get_global_mode());
     if (global_mode > 0 ) {
         global_mode -= 1;
     }
-    cyphal.setNodeMode(uavcan_node_Mode_1_0{global_mode});
-    cyphal.setVSSC(ModuleManager::get_vssc());
-    cyphal.process();
+    cyphal->setNodeMode(uavcan_node_Mode_1_0{global_mode});
+    cyphal->setVSSC(ModuleManager::get_vssc());
+    cyphal->process();
 }

@@ -7,6 +7,7 @@
 #ifndef SRC_CYPHAL_APPLICATION_CYPHAL_CYPHAL_MODULE_HPP_
 #define SRC_CYPHAL_APPLICATION_CYPHAL_CYPHAL_MODULE_HPP_
 
+#include <optional>
 #include "module.hpp"
 #include "libcpnode/cyphal.hpp"
 
@@ -24,7 +25,7 @@ protected:
     void spin_once() override;
 
 private:
-    libcpnode::Cyphal cyphal;
+    std::optional<libcpnode::Cyphal> cyphal;
 };
 
 #ifdef __cplusplus

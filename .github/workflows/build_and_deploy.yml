@@ -6,7 +6,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - runner: ubuntu-22.04
+          - runner: ubuntu-24.04
             image: "" # Let's use a GitHub-hosted virtual machine itself
           # - runner: windows-2022
           #   image: ""  # Containers on Windows runners are not supported
@@ -33,7 +33,7 @@ jobs:
         shell: bash
 
       - name: Setup SSH
-        if: ${{ matrix.runner == 'ubuntu-22.04' && env.LIBCPNODE_DEPLOY_KEY != '' }}
+        if: ${{ matrix.runner == 'ubuntu-24.04' && env.LIBCPNODE_DEPLOY_KEY != '' }}
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: |
@@ -42,7 +42,7 @@ jobs:
       - name: Set build target
         shell: bash
         run: |
-          if [[ "${{ matrix.runner }}" == "ubuntu-22.04" && -n "${{ secrets.LIBCPNODE_DEPLOY_KEY }}" ]]; then
+          if [[ "${{ matrix.runner }}" == "ubuntu-24.04" && -n "${{ secrets.LIBCPNODE_DEPLOY_KEY }}" ]]; then
             echo "BUILD_TARGET=all" >> "$GITHUB_ENV"
           else
             echo "BUILD_TARGET=dronecan_v2 dronecan_v3" >> "$GITHUB_ENV"
@@ -54,7 +54,7 @@ jobs:
 
       - name: Deploy binaries to Telegram
         if: >
-          matrix.runner == 'ubuntu-22.04' &&
+          matrix.runner == 'ubuntu-24.04' &&
           github.ref_name == github.event.repository.default_branch &&
           github.repository == 'RaccoonlabDev/mini_v2_node'
         uses: PonomarevDA/telegram-upload@v1
