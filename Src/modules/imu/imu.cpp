@@ -116,10 +116,10 @@ void ImuModule::spin_once() {
 
     // Publish message
     if ((initialized || data_source == Data_source::ENABLE_SYNTH_GEN) &&
-            HAL_GetTick() - pub.msg.timestamp / 1000 > pub_timeout_ms){
+            HAL_GetTick() - pub.msg.timestamp.usec / 1000 > pub_timeout_ms){
         if (updated[0] && updated[1]) {
             pub.publish();
-            pub.msg.timestamp = HAL_GetTick() * 1000;
+            pub.msg.timestamp.usec = HAL_GetTick() * 1000;
         }
     }
     // Publish normal logs

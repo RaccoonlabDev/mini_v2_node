@@ -7,7 +7,7 @@
 #include "dronecan_module.hpp"
 #include <algorithm>
 #include "params.hpp"
-#include "libdcnode/dronecan.h"
+#include "libdcnode/dronecan.hpp"
 #include "libdcnode/can_driver.h"
 #include "peripheral/adc/circuit_periphery.hpp"
 

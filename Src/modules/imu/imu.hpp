@@ -26,7 +26,7 @@
 #include <numbers>
 #include <random>
 #include "module.hpp"
-#include "libdcnode/publisher.hpp"
+#include "libdcnode/pub.hpp"
 #include "drivers/mpu9250/mpu9250.hpp"
 #include "common/FFT.hpp"
 #include "common/logging.hpp"
@@ -64,8 +64,9 @@ protected:
     void get_vibration(std::array<float, 3> data);
 
 private:
-    DronecanPublisher<AhrsRawImu> pub;
-    DronecanPublisher<MagneticFieldStrength2> mag;
+    libdcnode::DronecanPub<uavcan_equipment_ahrs_RawIMU> pub;
+    libdcnode::DronecanPub<uavcan_equipment_ahrs_MagneticFieldStrength2> mag;
+
     Logging logger{"IMU"};
     Mpu9250 imu;
 
