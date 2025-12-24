@@ -18,7 +18,7 @@ pwm.frequency:
 
 pwm1.ch:
   type: Integer
-  note: Index of setpoint channel. [-1; 255]. -1 means disabled, # -2 means GPIO SET.
+  note: Index of setpoint channel. [-1; 255]. -1 means disabled, indexes 0-2 are reserved for 3 servo motors in gimbal # -2 means GPIO SET.
   enum: PARAM_PWM_1_CH
   flags: mutable
   default: -1

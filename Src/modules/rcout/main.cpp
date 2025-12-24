@@ -91,6 +91,17 @@ void RcoutModule::spin_once() {
     }
 
     set_mode(at_least_one_channel_is_engaged ? Mode::ENGAGED : Module::Mode::STANDBY);
+
+    static uint32_t last_gimbal_pub_ms = 0;
+    uint32_t now = HAL_GetTick();
+    if (now - last_gimbal_pub_ms >= 1000) {
+        last_gimbal_pub_ms = now;
+        #if CONFIG_USE_DRONECAN == 1
+        if (ModuleManager::get_active_protocol() == Protocol::DRONECAN) {
+            dronecan_frontend.publish_gimbal_status();
+        }
+        #endif
+    }
 }
 
 void RcoutModule::update_params() {
@@ -98,7 +109,7 @@ void RcoutModule::update_params() {
     for (auto& timing : timings) {
         timing.set_cmd_ttl(cmd_ttl);
     }
-
+    servo_coefficient = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_INPUT_TYPE);
     auto param_frequency = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_FREQUENCY);
     auto frequency = static_cast<uint16_t>(param_frequency);
     Driver::RCPWM::set_frequency(frequency);
