@@ -109,7 +109,11 @@ void RcoutModule::update_params() {
     for (auto& timing : timings) {
         timing.set_cmd_ttl(cmd_ttl);
     }
+
+    #if CONFIG_USE_DRONECAN == 1
     servo_coefficient = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_INPUT_TYPE);
+    #endif
+
     auto param_frequency = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_FREQUENCY);
     auto frequency = static_cast<uint16_t>(param_frequency);
     Driver::RCPWM::set_frequency(frequency);
@@ -117,3 +121,4 @@ void RcoutModule::update_params() {
     for_active_frontend([](auto& fe) { fe.update_params(); });
     Driver::RCPWM::update_params();
 }
+

@@ -17,7 +17,6 @@
 #include "drivers/rcpwm/rcpwm.hpp"
 #include "modules/rcout/ttl.hpp"
 
-
 class RcoutModule : public Module {
 public:
     RcoutModule() : Module(50, Protocol::CYPHAL_AND_DRONECAN) {}

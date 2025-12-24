@@ -87,6 +87,7 @@ void DronecanPwmFrontend::angular_command_callback(
 
 		
 void DronecanPwmFrontend::publish_gimbal_status() {
+
     gimbal_status_pub.msg.gimbal_id = 0;
     gimbal_status_pub.msg.mode.command_mode = 1; // example
     
@@ -109,7 +110,7 @@ void DronecanPwmFrontend::publish_gimbal_status() {
         
         // 1000-2000us = 100 degrees total = +/- 50 degrees
         float angle_deg = normalized * 50.0f;
-        if (ch.channel == 0) roll_deg = angle_deg;
+        if (ch.channel == 0) gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[0] = angle_deg;
         if (ch.channel == 1) pitch_deg = angle_deg;
         if (ch.channel == 2) yaw_deg = angle_deg;
     }
