@@ -10,7 +10,7 @@
 
 #include "common/module.hpp"
 
-#include "libdcnode/dronecan.hpp"
+#include "libdcnode/dronecan.h"
 #include "libdcnode/logger.hpp"
 #include "libdcnode/publisher.hpp"
 #include "libdcnode/subscriber.hpp"

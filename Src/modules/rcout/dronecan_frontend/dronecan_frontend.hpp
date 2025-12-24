@@ -7,7 +7,7 @@
 #ifndef SRC_MODULES_PWM_DRONECAN_FRONTEND_HPP_
 #define SRC_MODULES_PWM_DRONECAN_FRONTEND_HPP_
 
-#include "libdcnode/dronecan.hpp"
+#include "libdcnode/dronecan.h"
 #include "libdcnode/pub.hpp"
 #include "libdcnode/sub.hpp"
 #include "common/logging.hpp"
