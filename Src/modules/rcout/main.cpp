@@ -98,7 +98,7 @@ void RcoutModule::spin_once() {
         last_gimbal_pub_ms = now;
         #if CONFIG_USE_DRONECAN == 1
         if (ModuleManager::get_active_protocol() == Protocol::DRONECAN) {
-            dronecan_frontend.publish_gimbal_status();
+            dronecan_frontend.publish_gimbal_status(servo_coefficient_100us);
         }
         #endif
     }
@@ -111,9 +111,10 @@ void RcoutModule::update_params() {
     }
 
     #if CONFIG_USE_DRONECAN == 1
-    servo_coefficient = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_INPUT_TYPE);
+    servo_coefficient_100us = paramsGetIntegerValue(IntParamsIndexes::PARAM_SERVO_COEFFICIENT);
     #endif
-
+    servo_coefficient_100us = paramsGetIntegerValue(IntParamsIndexes::PARAM_SERVO_COEFFICIENT);
+    temp = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_INPUT_TYPE);
     auto param_frequency = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_FREQUENCY);
     auto frequency = static_cast<uint16_t>(param_frequency);
     Driver::RCPWM::set_frequency(frequency);

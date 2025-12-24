@@ -86,7 +86,7 @@ void DronecanPwmFrontend::angular_command_callback(
 }
 
 		
-void DronecanPwmFrontend::publish_gimbal_status() {
+void DronecanPwmFrontend::publish_gimbal_status(uint8_t servo_coefficient_100us) {
 
     gimbal_status_pub.msg.gimbal_id = 0;
     gimbal_status_pub.msg.mode.command_mode = 1; // example
@@ -104,23 +104,21 @@ void DronecanPwmFrontend::publish_gimbal_status() {
         if (ch.channel < 0 || ch.channel > 2) continue; // Not a gimbal axis
         
         uint8_t percent = Driver::RCPWM::get_pin_percent(i);
-        // percent 0..100 maps to min..max
-        
-        float normalized = (percent / 50.0f) - 1.0f; // 0..100 -> -1.0..+1.0
-        
-        // 1000-2000us = 100 degrees total = +/- 50 degrees
-        float angle_deg = normalized * 50.0f;
-        if (ch.channel == 0) gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[0] = angle_deg;
-        if (ch.channel == 1) pitch_deg = angle_deg;
-        if (ch.channel == 2) yaw_deg = angle_deg;
+        // Count amout of shim changed from min. I.e. max = 2000, min = 1500 and 30% is used now
+        // Then 500 * 0.3 = 150, so then we estimate angle as angle_per_shim_val * 150
+        float current_shim_delta = static_cast<float>(percent)/100 * static_cast<float>(ch.max - ch.min);
+
+        float deg_per_us = servo_coefficient_100us / 100.0f;
+        // Multiply current change in shim on angle per shim coefficient
+        float angle_deg = current_shim_delta * deg_per_us;
+        if (ch.channel == 0) gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[0] = percent;
+        gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[1] = angle_deg;
+        gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[2] = current_shim_delta;
     }
     
-    // Convert RPY to Quaternion (Stub or Real)
+    // Convert RPY to Quaternion
     // STUB for now: Just logging the angles to verify
-    // In real code: euler_to_quat(roll, pitch, yaw, msg.camera_orientation...);
-    
-    // For now, let's just cheat and put simple values to check
-    // (Real quaternion conversion is needed for valid output)
+
     char logMsg[42];
     sprintf(logMsg, "Gimbal Status: R=%.2f P=%.2f Y=%.2f", roll_deg, pitch_deg, yaw_deg);
     logger.log_debug(logMsg);

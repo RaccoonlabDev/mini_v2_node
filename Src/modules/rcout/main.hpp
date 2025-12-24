@@ -38,7 +38,8 @@ private:
     // Current feedback
     std::array<float, 4> gimbal_current_attitude{0, 0, 0, 1};  // xyzw
     std::array<float, 9> gimbal_covariance{};  // 3x3 matrix for orientation uncertainty
-    uint8_t servo_coefficient = 1;
+    uint8_t servo_coefficient_100us = 1;
+    uint8_t temp = 0;
 };
 
 #endif  // SRC_MODULES_PWM_PWMMODULE_HPP_

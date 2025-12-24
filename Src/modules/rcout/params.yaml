@@ -16,6 +16,15 @@ pwm.frequency:
   min: 50
   max: 400
 
+pwm.servos_coefficient:
+  type: Integer
+  note: Angle per 100us shim coefficient.
+  enum: PARAM_SERVO_COEFFICIENT
+  flags: mutable
+  default: 1
+  min: 1
+  max: 255
+
 pwm1.ch:
   type: Integer
   note: Index of setpoint channel. [-1; 255]. -1 means disabled, indexes 0-2 are reserved for 3 servo motors in gimbal # -2 means GPIO SET.

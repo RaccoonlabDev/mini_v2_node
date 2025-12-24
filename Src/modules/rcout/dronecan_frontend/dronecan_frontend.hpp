@@ -27,7 +27,7 @@ public:
     void init();
 
     void update_params();
-    void publish_gimbal_status(); 
+    void publish_gimbal_status(uint8_t servo_coefficient_100us); 
 
     static inline CommandType pwm_cmd_type{CommandType::RAW_COMMAND};
 
