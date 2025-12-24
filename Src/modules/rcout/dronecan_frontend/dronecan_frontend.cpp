@@ -111,7 +111,8 @@ void DronecanPwmFrontend::publish_gimbal_status(uint8_t servo_coefficient_100us)
         float deg_per_us = servo_coefficient_100us / 100.0f;
         // Multiply current change in shim on angle per shim coefficient
         float angle_deg = current_shim_delta * deg_per_us;
-        if (ch.channel == 0) gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[0] = percent;
+        // DEBUG VALS TO SEE WHAT'S GOING ON
+        gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[0] = percent;
         gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[1] = angle_deg;
         gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[2] = current_shim_delta;
     }
