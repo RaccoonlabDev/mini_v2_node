@@ -18,7 +18,7 @@ pwm.frequency:
 
 pwm.servos_coefficient:
   type: Integer
-  note: Angle per 100us shim coefficient.
+  note: Angle per 100us pwm coefficient.
   enum: PARAM_SERVO_COEFFICIENT
   flags: mutable
   default: 1

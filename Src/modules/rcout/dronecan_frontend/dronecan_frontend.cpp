@@ -104,12 +104,12 @@ void DronecanPwmFrontend::publish_gimbal_status(uint8_t servo_coefficient_100us)
         if (ch.channel < 0 || ch.channel > 2) continue; // Not a gimbal axis
         
         uint8_t percent = Driver::RCPWM::get_pin_percent(i);
-        // Count amout of shim changed from min. I.e. max = 2000, min = 1500 and 30% is used now
+        // Count amout of pwm changed from min. I.e. max = 2000, min = 1500 and 30% is used now
         // Then 500 * 0.3 = 150, so then we estimate angle as angle_per_shim_val * 150
         float current_shim_delta = static_cast<float>(percent)/100 * static_cast<float>(ch.max - ch.min);
 
         float deg_per_us = servo_coefficient_100us / 100.0f;
-        // Multiply current change in shim on angle per shim coefficient
+        // Multiply current change in pwm on angle per pwm coefficient
         float angle_deg = current_shim_delta * deg_per_us;
         // DEBUG VALS TO SEE WHAT'S GOING ON
         gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[0] = percent;
