@@ -7,7 +7,7 @@
 #include "algorithms.hpp"
 #include <math.h>
 #include <algorithm>
-
+#include <array>
 
 PwmDurationUs mapInt16CommandToPwm(int16_t command,
                                    PwmDurationUs min_pwm,
@@ -93,4 +93,40 @@ float AdaptiveAlphaFilter::linearly_interpolate_alpha(float delta) const {
     }
 
     return alpha;
+}
+
+void quaternion_to_euler(const std::array<float, 4>& q,
+                                std::array<float, 3>& angles_rpy) {
+    const float qx = q[0];
+    const float qy = q[1];
+    const float qz = q[2];
+    const float qw = q[3];
+
+    // roll (x-axis rotation)
+    double sinr_cosp = 2 * (qw * qx + qy * qz);
+    double cosr_cosp = 1 - 2 * (qx * qx + qy * qy);
+    angles_rpy[0] = std::atan2(sinr_cosp, cosr_cosp);
+
+    // pitch (y-axis rotation)
+    double sinp = std::sqrt(1 + 2 * (qw * qy - qx * qz));
+    double cosp = std::sqrt(1 - 2 * (qw * qy - qx * qz));
+    angles_rpy[1] = 2 * std::atan2(sinp, cosp) - PI_2;
+
+    // yaw (z-axis rotation)
+    double siny_cosp = 2 * (qw * qz + qx * qy);
+    double cosy_cosp = 1 - 2 * (qy * qy + qz * qz);
+    angles_rpy[2] = std::atan2(siny_cosp, cosy_cosp);
+}
+
+
+void normalize_quaternion(std::array<float, 4>& q) {
+    float norm_sq = q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3];
+
+    if (norm_sq > 0.0f && std::fabs(norm_sq - 1.0f) > 1e-6f) {
+        float inv_norm = 1.0f / std::sqrt(norm_sq);
+        q[0] *= inv_norm;
+        q[1] *= inv_norm;
+        q[2] *= inv_norm;
+        q[3] *= inv_norm;
+    }
 }

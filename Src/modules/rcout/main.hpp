@@ -31,13 +31,10 @@ protected:
     void update_params() override;
     void spin_once() override;
 private:
-    std::array<float, 4> gimbal_target_attitude{0, 0, 0, 1};  // xyzw quaternion
-    uint8_t gimbal_command_mode{0};  // COMMAND_MODE_ORIENTATION_BODY_FRAME, etc.
     bool gimbal_is_active{false};
     // Current feedback
     std::array<float, 4> gimbal_current_attitude{0, 0, 0, 1};  // xyzw
-    std::array<float, 9> gimbal_covariance{};  // 3x3 matrix for orientation uncertainty
-    uint16_t max_servo_angle = 160;  // degrees
+    uint16_t max_servos_angle = 90;  // degrees
 };
 
 #endif  // SRC_MODULES_PWM_PWMMODULE_HPP_

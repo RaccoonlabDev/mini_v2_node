@@ -45,6 +45,19 @@ uint8_t Driver::RCPWM::get_pin_percent(uint8_t pin_idx) {
         (channels[pin_idx].pin, channels[pin_idx].min, channels[pin_idx].max);
 }
 
+int16_t Driver::RCPWM::get_current_angle(uint16_t max_servo_angle, uint8_t pin_idx) {
+    if (!is_pin_enabled(pin_idx)) return 0;
+
+    auto current_us = HAL::Pwm::get_duration(channels[pin_idx].pin);
+    float normalized = mapFloat(current_us,
+                                channels[pin_idx].min,
+                                channels[pin_idx].max,
+                                -1.0f, +1.0f);
+
+    float angle_deg = normalized * (max_servo_angle / 2.0f);
+    return static_cast<int16_t>(angle_deg);
+}
+
 int8_t Driver::RCPWM::get_pin_channel(uint8_t pin_idx) {
     return pin_idx < get_pins_amount() ? channels[pin_idx].channel : -1;
 }

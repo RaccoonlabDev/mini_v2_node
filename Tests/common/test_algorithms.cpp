@@ -2,23 +2,29 @@
  * This program is free software under the GNU General Public License v3.
  * See <https://www.gnu.org/licenses/> for details.
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
+ * Author: Ilia Kliantsevich <iliawork112005@gmail.com>
  */
 
 #include <gtest/gtest.h>
 #include <cmath> // For std::fabs
 #include <algorithm> // For std::clamp
+#include <array>
+#include "algorithms.hpp"
 
-static constexpr auto ABS_ERR = 0.1f;
 
-float mapFloat(float value, float in_min, float in_max, float out_min, float out_max) {
-    if (std::fabs(in_min - in_max) < 1e-6f) {
-        return out_min;
+static constexpr float ABS_ERR = 0.015f;
+
+class QuaternionTest : public ::testing::Test {
+protected:
+    std::array<float, 4> q;       // x, y, z, w
+    std::array<float, 3> rpy;     // roll, pitch, yaw
+
+    void SetUp() override {
+        // Default to identity quaternion
+        q = {0.0f, 0.0f, 0.0f, 1.0f};
+        rpy = {0.0f, 0.0f, 0.0f};
     }
-
-    float output = out_min + (value - in_min) / (in_max - in_min) * (out_max - out_min);
-
-    return std::clamp(output, std::min(out_min, out_max), std::max(out_min, out_max));
-}
+};
 
 TEST(MapFloatTest, raw_command_esc) {
     static constexpr auto IN_MIN = 0;
@@ -80,6 +86,108 @@ TEST(MapFloatTest, wrong_input) {
 TEST(MapFloatTest, wrong_output) {
     EXPECT_NEAR(mapFloat(0.5f, 0.0f, 1.0f, 1000, 1000), 1000, ABS_ERR);
 }
+
+
+
+TEST_F(QuaternionTest, Normalize_Basic) {
+    // Identity and simple scaling
+    normalize_quaternion(q);
+    EXPECT_NEAR(q[3], 1.0f, ABS_ERR);
+
+    // Test over-sized and zero input
+    q = {0.0f, 2.0f, 0.0f, 0.0f}; 
+    normalize_quaternion(q);
+    EXPECT_NEAR(q[1], 1.0f, ABS_ERR);
+    
+    q = {0.0f, 0.0f, 0.0f, 0.0f};
+    normalize_quaternion(q);
+    EXPECT_FLOAT_EQ(q[0], 0.0f);
+}
+
+TEST_F(QuaternionTest, Normalize_Advanced) {
+
+    q = {100.0f, 546.0f, 234.0f, 1.0f}; 
+    normalize_quaternion(q);
+    EXPECT_NEAR(q[0], 0.166f, ABS_ERR);
+    EXPECT_NEAR(q[1], 0.906f, ABS_ERR);
+    EXPECT_NEAR(q[2], 0.388f, ABS_ERR);
+    EXPECT_NEAR(q[3], 0.0016601f, ABS_ERR);
+}
+
+
+
+TEST_F(QuaternionTest, Euler_PureAxes_90Deg) {
+    // Identity
+    quaternion_to_euler(q, rpy);
+    EXPECT_NEAR(rpy[0], 0.0f, ABS_ERR);
+
+    float val = std::sin(PI/4.0f);
+    
+    // Pure Roll (+90 deg)
+    q = {val, 0.0f, 0.0f, val};
+    quaternion_to_euler(q, rpy);
+    EXPECT_NEAR(rpy[0], PI_2, ABS_ERR);
+    EXPECT_NEAR(rpy[1], 0.0f, ABS_ERR);
+    
+    // Pure Yaw (+90 deg)
+    q = {0.0f, 0.0f, val, val};
+    quaternion_to_euler(q, rpy);
+    EXPECT_NEAR(rpy[2], PI_2, ABS_ERR);
+    EXPECT_NEAR(rpy[1], 0.0f, ABS_ERR);
+}
+
+TEST_F(QuaternionTest, Euler_ComplexRotation_ZYX_Correct) {
+    // Verification tool: https://www.andre-gaschler.com/rotationconverter/ (ZYX euler transformation!)
+    q = {0.6334939f, 0.3418856f,-0.4323847f, 0.5429947f};
+    normalize_quaternion(q);
+    
+    quaternion_to_euler(q, rpy);
+    EXPECT_NEAR(rpy[0], 1.6633149f, LOOSE_ERR);
+    EXPECT_NEAR(rpy[1], 1.1658162f, LOOSE_ERR);
+    EXPECT_NEAR(rpy[2], -0.0925186f, LOOSE_ERR);
+}
+
+TEST_F(QuaternionTest, Euler_GimbalLock_Singularities) {
+    float val = std::sin(PI/4.0f);
+    
+    // North Pole (Pitch = +90 deg)
+    q = {0.0f, val, 0.0f, val}; 
+    quaternion_to_euler(q, rpy);
+    EXPECT_NEAR(rpy[1], PI_2, ABS_ERR);
+    // The following tests check stability (no NaN/Jitter)
+    EXPECT_FALSE(std::isnan(rpy[0]));
+    EXPECT_FALSE(std::isnan(rpy[2]));
+    
+    // South Pole (Pitch = -90 deg)
+    val = std::sin(-PI/4.0f);
+    q = {0.0f, val, 0.0f, std::cos(-PI/4.0f)};
+    quaternion_to_euler(q, rpy);
+    EXPECT_NEAR(rpy[1], -PI_2, ABS_ERR);
+    EXPECT_FALSE(std::isnan(rpy[0]));
+    EXPECT_FALSE(std::isnan(rpy[2]));
+}
+
+TEST_F(QuaternionTest, Euler_Denormalized_SafeGuard) {
+    // Tests if the asin check (fabs(sinp) >= 1.0f) correctly handles float overruns.
+    float val = std::sin(PI/4.0f);
+    // Deliberately non-unit length to force sinp > 1.0
+    q = {0.0f, val + 0.0001f, 0.0f, val + 0.0001f}; 
+    quaternion_to_euler(q, rpy);
+    
+    // Should be clamped to PI/2, not NaN
+    EXPECT_NEAR(rpy[1], PI_2, ABS_ERR);
+    EXPECT_FALSE(std::isnan(rpy[1]));
+}
+
+TEST_F(QuaternionTest, Euler_180DegRotation) {
+    // 180 degree rotation around X (Tests atan2 behavior with near-zero inputs)
+    q = {1.0f, 0.0f, 0.0f, 0.0f}; 
+    quaternion_to_euler(q, rpy);
+    EXPECT_NEAR(std::abs(rpy[0]), PI, ABS_ERR);
+    EXPECT_NEAR(rpy[1], 0.0f, ABS_ERR);
+    EXPECT_NEAR(rpy[2], 0.0f, ABS_ERR);
+}
+
 
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);

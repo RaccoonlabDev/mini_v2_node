@@ -98,7 +98,7 @@ void RcoutModule::spin_once() {
         last_gimbal_pub_ms = now;
         #if CONFIG_USE_DRONECAN == 1
         if (ModuleManager::get_active_protocol() == Protocol::DRONECAN) {
-            dronecan_frontend.publish_gimbal_status(max_servo_angle);
+            dronecan_frontend.publish_gimbal_status(max_servos_angle);
         }
         #endif
     }
@@ -110,7 +110,7 @@ void RcoutModule::update_params() {
         timing.set_cmd_ttl(cmd_ttl);
     }
 
-    max_servo_angle = paramsGetIntegerValue(IntParamsIndexes::PARAM_MAX_ANGLE);
+    max_servos_angle = paramsGetIntegerValue(IntParamsIndexes::PARAM_MAX_ANGLE);
     auto param_frequency = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_FREQUENCY);
     auto frequency = static_cast<uint16_t>(param_frequency);
     Driver::RCPWM::set_frequency(frequency);

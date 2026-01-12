@@ -19,6 +19,7 @@ void DronecanFeedbackModule::init() {
 }
 
 void DronecanFeedbackModule::update_params() {
+    // FIXME: support different feedback types (degrees/quaternions)
     feedback_esc_enabled = static_cast<bool>(paramsGetIntegerValue(IntParamsIndexes::PARAM_FEEDBACK_ESC_ENABLE));
     feedback_actuator_enabled = static_cast<bool>(paramsGetIntegerValue(IntParamsIndexes::PARAM_FEEDBACK_ACTUATOR_ENABLE));
     feedback_hardpoint_enabled = static_cast<bool>(paramsGetIntegerValue(IntParamsIndexes::PARAM_FEEDBACK_HARDPOINT_ENABLE));
@@ -46,7 +47,7 @@ void DronecanFeedbackModule::spin_once() {
 
 void DronecanFeedbackModule::publish_esc_status(uint8_t pin_idx) {
     esc_status.msg = {
-        .error_count = esc_status.msg.error_count + 1,
+        .error_count = esc_status.msg.error_count + 1, // FIXME: implement proper error counting
         .voltage = CircuitPeriphery::voltage_vin(),
         .current = CircuitPeriphery::current(),
         .temperature = static_cast<float>(CircuitPeriphery::temperature()),

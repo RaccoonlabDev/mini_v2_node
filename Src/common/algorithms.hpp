@@ -8,8 +8,12 @@
 #define SRC_COMMON_ALGORITHMS_H_
 
 #include <stdint.h>
+#include <array>
 
 typedef uint16_t PwmDurationUs;
+static constexpr float PI_2 = 1.5707963267f;
+static constexpr float LOOSE_ERR = 1e-3f;
+static constexpr float PI = 3.1415926535f;
 
 /**
  * @brief Maps a 16-bit integer command to a PWM duration.
@@ -58,6 +62,19 @@ float mapPwmToPct(uint16_t pwm_val, int16_t pwm_min, int16_t pwm_max);
 
 void movingAverage(float* prev_avg, float crnt_val, uint16_t size);
 
+/**
+ * @brief Normalizes a quaternion to unit length
+ * @param q Quaternion to normalize in-place [x, y, z, w]
+ */
+void normalize_quaternion(std::array<float, 4>& q);
+
+/**
+ * @brief Converts quaternion to Euler angles (roll, pitch, yaw)
+ * @param q Quaternion in [x, y, z, w] order (body frame)
+ * @param angles_rpy Output array for [roll, pitch, yaw] in radians
+ */
+void quaternion_to_euler(const std::array<float, 4>& q,
+                                std::array<float, 3>& angles_rpy);
 /**
  * @brief The Adaptive Alpha Filter is a variation of the exponential smoothing filter,
  * where the smoothing factor α is adjusted dynamically based on the magnitude of changes
