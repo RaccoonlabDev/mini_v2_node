@@ -16,14 +16,14 @@ pwm.frequency:
   min: 50
   max: 400
 
-pwm.servos_coefficient:
+pwm.max_servo_angle:
   type: Integer
-  note: Angle per 100us pwm coefficient.
-  enum: PARAM_SERVO_COEFFICIENT
+  note: Maximum deviation angle.
+  enum: PARAM_MAX_ANGLE
   flags: mutable
-  default: 1
-  min: 1
-  max: 255
+  default: 160
+  min: 0
+  max: 360
 
 pwm1.ch:
   type: Integer
