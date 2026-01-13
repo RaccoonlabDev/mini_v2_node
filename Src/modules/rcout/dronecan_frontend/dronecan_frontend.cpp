@@ -103,35 +103,7 @@ void DronecanPwmFrontend::publish_gimbal_status(uint16_t max_servos_angle) {
     gimbal_status_pub.publish();
 }
 
-std::array<float, 3> quaternion_to_euler(const std::array<float, 4>& q) {
-    // q[0] = w, q[1] = x, q[2] = y, q[3] = z
-    float w = q[0], x = q[1], y = q[2], z = q[3];
-    
-    std::array<float, 3> euler_angles{0.0f, 0.0f, 0.0f};
-    
-    // Roll (x-axis rotation)
-    float sinr_cosp = 2.0f * (w * x + y * z);
-    float cosr_cosp = 1.0f - 2.0f * (x * x + y * y);
-    euler_angles[0] = std::atan2(sinr_cosp, cosr_cosp);
-    
-    // Pitch (y-axis rotation)
-    float sinp = 2.0f * (w * y - z * x);
-    if (std::fabs(sinp) >= 1.0f) {
-        // Use 90 degrees if out of range
-        euler_angles[1] = std::copysign(M_PI / 2.0f, sinp);
-    } else {
-        euler_angles[1] = std::asin(sinp);
-    }
-    
-    // Yaw (z-axis rotation)
-    float siny_cosp = 2.0f * (w * z + x * y);
-    float cosy_cosp = 1.0f - 2.0f * (y * y + z * z);
-    euler_angles[2] = std::atan2(siny_cosp, cosy_cosp);
-    
-    return euler_angles;
-}
-
-void DronecanPwmFrontend::set_gimbal_angles(const std::array<float, 4>& q, uint16_t max_servos_angle){
+void DronecanPwmFrontend::set_gimbal_angles_rad(const std::array<float, 3>& angles_rpy, uint16_t max_servos_angle){
     float max_deflection = max_servos_angle / 2.0f;
     for (size_t i = 0; i < Driver::RCPWM::get_pins_amount(); ++i) {
         switch (Driver::RCPWM::get_pin_channel(i)) {
@@ -149,6 +121,13 @@ void DronecanPwmFrontend::set_gimbal_angles(const std::array<float, 4>& q, uint1
         }
     }
 }
+
+void DronecanPwmFrontend::set_gimbal_angles(const std::array<float, 4>& q, uint16_t max_servos_angle){
+    (void)q;
+    (void)max_servos_angle;
+    //set_gimbal_angles_rad();
+}
+
 void DronecanPwmFrontend::arming_status_callback(const uavcan_equipment_safety_ArmingStatus& msg) {
     (void)msg;  // Not supported yet, what to do with SafetyArmingStatus?
 }
