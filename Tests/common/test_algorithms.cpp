@@ -20,7 +20,6 @@ protected:
     std::array<float, 3> rpy;     // roll, pitch, yaw
 
     void SetUp() override {
-        // Default to identity quaternion
         q = {0.0f, 0.0f, 0.0f, 1.0f};
         rpy = {0.0f, 0.0f, 0.0f};
     }
@@ -105,7 +104,7 @@ TEST_F(QuaternionTest, Normalize_Basic) {
 }
 
 TEST_F(QuaternionTest, Normalize_Advanced) {
-
+    // Verification tool: https://www.andre-gaschler.com/rotationconverter/ (normilizes automatically)
     q = {100.0f, 546.0f, 234.0f, 1.0f}; 
     normalize_quaternion(q);
     EXPECT_NEAR(q[0], 0.166f, ABS_ERR);
@@ -145,6 +144,15 @@ TEST_F(QuaternionTest, Euler_ComplexRotation_ZYX_Correct) {
     EXPECT_NEAR(rpy[0], 1.6633149f, LOOSE_ERR);
     EXPECT_NEAR(rpy[1], 1.1658162f, LOOSE_ERR);
     EXPECT_NEAR(rpy[2], -0.0925186f, LOOSE_ERR);
+
+
+    q = {0.34f, -0.95f,-0.3287f, 12};
+    normalize_quaternion(q);
+    
+    quaternion_to_euler(q, rpy);
+    EXPECT_NEAR(rpy[0], 0.0613147f, LOOSE_ERR);
+    EXPECT_NEAR(rpy[1], -0.1561989f, LOOSE_ERR);
+    EXPECT_NEAR(rpy[2], -0.0595695f, LOOSE_ERR);
 }
 
 TEST_F(QuaternionTest, Euler_GimbalLock_Singularities) {
@@ -154,7 +162,6 @@ TEST_F(QuaternionTest, Euler_GimbalLock_Singularities) {
     q = {0.0f, val, 0.0f, val}; 
     quaternion_to_euler(q, rpy);
     EXPECT_NEAR(rpy[1], PI_2, ABS_ERR);
-    // The following tests check stability (no NaN/Jitter)
     EXPECT_FALSE(std::isnan(rpy[0]));
     EXPECT_FALSE(std::isnan(rpy[2]));
     
@@ -168,9 +175,8 @@ TEST_F(QuaternionTest, Euler_GimbalLock_Singularities) {
 }
 
 TEST_F(QuaternionTest, Euler_Denormalized_SafeGuard) {
-    // Tests if the asin check (fabs(sinp) >= 1.0f) correctly handles float overruns.
+    // Tests if the asin check (fabs(sinp) >= 1.0f) correctly handles float overruns
     float val = std::sin(PI/4.0f);
-    // Deliberately non-unit length to force sinp > 1.0
     q = {0.0f, val + 0.0001f, 0.0f, val + 0.0001f}; 
     quaternion_to_euler(q, rpy);
     

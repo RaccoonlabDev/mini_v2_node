@@ -9,6 +9,7 @@
 #include <limits>
 #include "common/algorithms.hpp"
 #include "common/zip.hpp"
+#include "common/logging.hpp"
 
 #ifndef CONFIG_USE_DRONECAN
 #define CONFIG_USE_DRONECAN 0
@@ -27,6 +28,7 @@
     #include "cyphal_frontend/cyphal_frontend.hpp"
     static inline CyphalPwmFrontend cyphal_frontend;
 #endif  // CONFIG_USE_CYPHAL
+
 
 REGISTER_MODULE(RcoutModule)
 
@@ -59,8 +61,15 @@ void RcoutModule::init() {
 void RcoutModule::spin_once() {
     bool at_least_one_channel_is_engaged = false;
     bool at_least_one_ttl_detected = false;
-
+    static bool is_gimbal_set = false;
     for (auto&& [rcout, timing] : zip(Driver::RCPWM::channels, RcoutModule::timings)) {
+        if (!is_gimbal_set) {
+            if (rcout.channel >= 0 && rcout.channel <= 2) {
+                rcout.set_default();
+                timing.mark_command_fresh();
+                is_gimbal_set = true;
+            }
+        }
         if (timing.is_engaged()) {
             at_least_one_channel_is_engaged = true;
             continue;
@@ -114,6 +123,12 @@ void RcoutModule::update_params() {
     auto param_frequency = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_FREQUENCY);
     auto frequency = static_cast<uint16_t>(param_frequency);
     Driver::RCPWM::set_frequency(frequency);
+
+    int quant_x = 0;
+    quant_x = paramsGetIntegerValue(IntParamsIndexes::PARAM_DEBUG_X_QUAT_VALS);
+    auto debug_x_quat_vals = static_cast<float>(quant_x) / 1000.0f;
+    std::array<float, 4> q_debug = {debug_x_quat_vals, 0.0f, 0.0f, 1.0f};
+    dronecan_frontend.set_gimbal_state(q_debug, max_servos_angle);
 
     for_active_frontend([](auto& fe) { fe.update_params(); });
     Driver::RCPWM::update_params();

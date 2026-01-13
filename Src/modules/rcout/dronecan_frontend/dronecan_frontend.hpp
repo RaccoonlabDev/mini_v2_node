@@ -29,10 +29,10 @@ public:
     void update_params();
     void publish_gimbal_status(uint16_t max_servos_angle); 
 
-    void set_gimbal_angles_rad(const std::array<float, 3>& angles_rpy, uint16_t max_servos_angle);
+    void set_gimbal_state_rpy(const std::array<float, 3>& angles_rpy, uint16_t max_servos_angle);
     
-    void set_gimbal_angles(const std::array<float, 4>& q, uint16_t max_servos_angle);
-    
+    void set_gimbal_state(const std::array<float, 4>& q, uint16_t max_servos_angle);
+
     static inline CommandType pwm_cmd_type{CommandType::RAW_COMMAND};
 
     static void raw_command_callback(const uavcan_equipment_esc_RawCommand& msg);
@@ -48,6 +48,8 @@ public:
     static inline libdcnode::DronecanSub<uavcan_equipment_safety_ArmingStatus> arming_status_sub;
 
     static inline libdcnode::DronecanPub<uavcan_equipment_camera_gimbal_Status> gimbal_status_pub;
+
+    // TODO: from PX-4 verify to which type of message to subscribe for gimbal control
 
 private:
     static inline Logging logger{"DPWM"};

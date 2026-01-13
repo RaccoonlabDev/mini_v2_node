@@ -8,8 +8,10 @@
 #include "rcpwm.hpp"
 #include <array>
 #include <algorithm>
+#include <cstdio>
 #include "params.hpp"
 #include "common/algorithms.hpp"
+#include "common/logging.hpp"
 
 int8_t Driver::RCPWM::init() {
     for (const auto& param : channels) {

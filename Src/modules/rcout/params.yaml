@@ -177,3 +177,12 @@ pwm.output_type:
   default: 0
   min: 0
   max: 0
+
+debug_x_qunat_vals:
+  type: Integer
+  note: "Debug: takes quaternion x values divided by 1000 to simulate small angle changes."
+  enum: PARAM_DEBUG_X_QUAT_VALS
+  flags: mutable
+  default: 0
+  min: -100000
+  max: 100000
