@@ -17,6 +17,13 @@ void DronecanPwmFrontend::init() {
     array_command_sub.init(array_command_callback);
     hardpoint_sub.init(hardpoint_callback);
     arming_status_sub.init(arming_status_callback);
+    
+    int8_t status = gimbal_angular_command_sub.init(gimbal_angular_command_callback);
+    if (status < 0) {
+        logger.log_error("Failed to subscribe to Gimbal Angular Command");
+    } else {
+        logger.log_info("Subscribed to Gimbal Angular Command");
+    }
 }
 
 void DronecanPwmFrontend::update_params() {
@@ -24,6 +31,13 @@ void DronecanPwmFrontend::update_params() {
     if (pwm_cmd_type >= CommandType::NUMBER_OF_COMMANDS) {
         pwm_cmd_type = CommandType::RAW_COMMAND;
     }
+}
+
+void DronecanPwmFrontend::gimbal_angular_command_callback(const uavcan_equipment_camera_gimbal_AngularCommand& msg) {
+    Logging logger{"DPWM"};
+    logger.log_warn("Gimbal Angular Command received");
+    uint16_t max_angle = 90; // FIXME: Defaulting to 90
+    set_gimbal_state(msg.quaternion_xyzw, max_angle);
 }
 
 void DronecanPwmFrontend::raw_command_callback(const uavcan_equipment_esc_RawCommand& msg) {
@@ -104,7 +118,7 @@ void DronecanPwmFrontend::publish_gimbal_status(uint16_t max_servos_angle) {
     gimbal_status_pub.publish();
 }
 
-void DronecanPwmFrontend::set_gimbal_state_rpy(const std::array<float, 3>& angles_rpy, uint16_t max_servos_angle){
+void set_gimbal_state_rpy(const float angles_rpy[3], uint16_t max_servos_angle){
     float max_deflection = max_servos_angle / 2.0f;
     for (size_t i = 0; i < Driver::RCPWM::get_pins_amount(); ++i) {
         switch (Driver::RCPWM::get_pin_channel(i)) {
@@ -126,11 +140,10 @@ void DronecanPwmFrontend::set_gimbal_state_rpy(const std::array<float, 3>& angle
     }
 }
 
-void DronecanPwmFrontend::set_gimbal_state(const std::array<float, 4>& q, uint16_t max_servos_angle){
-    std::array<float, 3> angles_rpy;
+void set_gimbal_state(const float q[4], uint16_t max_servos_angle){
+    float angles_rpy[3] = {0.0f, 0.0f, 0.0f};
     // Don't modify the original quaternion
-    std::array<float, 4> q_copy = q;
-
+    float q_copy[4] = {q[0], q[1], q[2], q[3]};
     normalize_quaternion(q_copy);
     quaternion_to_euler(q_copy, angles_rpy);
     rad_to_deg_array(angles_rpy);

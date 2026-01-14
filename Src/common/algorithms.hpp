@@ -76,20 +76,20 @@ void movingAverage(float* prev_avg, float crnt_val, uint16_t size);
  * @brief Normalizes a quaternion to unit length
  * @param q Quaternion to normalize in-place [x, y, z, w]
  */
-void normalize_quaternion(std::array<float, 4>& q);
+void normalize_quaternion(float q[4]);
 
 /**
  * @brief Converts quaternion to Euler angles (roll, pitch, yaw)
  * @param q Quaternion in [x, y, z, w] order (body frame)
  * @param angles_rpy Output array for [roll, pitch, yaw] in radians
  */
-void quaternion_to_euler(const std::array<float, 4>& q,
-                                std::array<float, 3>& angles_rpy);
+void quaternion_to_euler(const float q[4],
+                                float angles_rpy[3]);
 
 /** 
  * @brief Converts radians to degrees for an array of three angles
  */
-void rad_to_deg_array(std::array<float, 3>& angles_rpy);
+void rad_to_deg_array(float angles_rpy[3]);
 /**
  * @brief The Adaptive Alpha Filter is a variation of the exponential smoothing filter,
  * where the smoothing factor α is adjusted dynamically based on the magnitude of changes

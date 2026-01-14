@@ -103,7 +103,7 @@ void RcoutModule::spin_once() {
 
     static uint32_t last_gimbal_pub_ms = 0;
     uint32_t now = HAL_GetTick();
-    if (now - last_gimbal_pub_ms >= 1000) {
+    if (now - last_gimbal_pub_ms >= 100) {
         last_gimbal_pub_ms = now;
         #if CONFIG_USE_DRONECAN == 1
         if (ModuleManager::get_active_protocol() == Protocol::DRONECAN) {
@@ -123,12 +123,6 @@ void RcoutModule::update_params() {
     auto param_frequency = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_FREQUENCY);
     auto frequency = static_cast<uint16_t>(param_frequency);
     Driver::RCPWM::set_frequency(frequency);
-
-    int quant_x = 0;
-    quant_x = paramsGetIntegerValue(IntParamsIndexes::PARAM_DEBUG_X_QUAT_VALS);
-    auto debug_x_quat_vals = static_cast<float>(quant_x) / 1000.0f;
-    std::array<float, 4> q_debug = {debug_x_quat_vals, 0.0f, 0.0f, 1.0f};
-    dronecan_frontend.set_gimbal_state(q_debug, max_servos_angle);
 
     for_active_frontend([](auto& fe) { fe.update_params(); });
     Driver::RCPWM::update_params();

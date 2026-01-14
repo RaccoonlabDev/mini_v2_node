@@ -95,7 +95,7 @@ float AdaptiveAlphaFilter::linearly_interpolate_alpha(float delta) const {
     return alpha;
 }
 
-void rad_to_deg_array(std::array<float, 3>& angles_rpy) {
+void rad_to_deg_array(float angles_rpy[3]) {
     constexpr float RAD_TO_DEG = 57.2957795131f;  // 180.0f / PI
     angles_rpy[0] *= RAD_TO_DEG;
     angles_rpy[1] *= RAD_TO_DEG;
@@ -132,8 +132,8 @@ float fast_atan2(float y, float x) {
 }
 
 // ZYX "decoding" (yaw-pitch-roll) convention
-void quaternion_to_euler(const std::array<float, 4>& q,
-                         std::array<float, 3>& angles_rpy) {
+void quaternion_to_euler(const float q[4],
+                         float angles_rpy[3]) {
     const float qx = q[0];
     const float qy = q[1];
     const float qz = q[2];
@@ -167,7 +167,7 @@ void quaternion_to_euler(const std::array<float, 4>& q,
     }
 }
 
-void normalize_quaternion(std::array<float, 4>& q) {
+void normalize_quaternion(float q[4]) {
     float norm_sq = q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3];
 
     if (norm_sq > 0.0f && std::fabs(norm_sq - 1.0f) > 1e-6f) {

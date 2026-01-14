@@ -16,12 +16,12 @@ static constexpr float ABS_ERR = 0.015f;
 
 class QuaternionTest : public ::testing::Test {
 protected:
-    std::array<float, 4> q;       // x, y, z, w
-    std::array<float, 3> rpy;     // roll, pitch, yaw
+    float q[4];       // x, y, z, w
+    float rpy[3];     // roll, pitch, yaw
 
     void SetUp() override {
-        q = {0.0f, 0.0f, 0.0f, 1.0f};
-        rpy = {0.0f, 0.0f, 0.0f};
+        std::copy_n(std::initializer_list<float>{0.0f, 0.0f, 0.0f, 1.0f}.begin(), 4, q);
+        std::copy_n(std::initializer_list<float>{0.0f, 0.0f, 0.0f}.begin(), 3, q);
     }
 };
 
@@ -94,18 +94,18 @@ TEST_F(QuaternionTest, Normalize_Basic) {
     EXPECT_NEAR(q[3], 1.0f, ABS_ERR);
 
     // Test over-sized and zero input
-    q = {0.0f, 2.0f, 0.0f, 0.0f}; 
+    std::copy_n(std::initializer_list<float>{0.0f, 2.0f, 0.0f, 0.0f}.begin(), 4, q); 
     normalize_quaternion(q);
     EXPECT_NEAR(q[1], 1.0f, ABS_ERR);
     
-    q = {0.0f, 0.0f, 0.0f, 0.0f};
+    std::copy_n(std::initializer_list<float>{0.0f, 0.0f, 0.0f, 0.0f}.begin(), 4, q);
     normalize_quaternion(q);
     EXPECT_FLOAT_EQ(q[0], 0.0f);
 }
 
 TEST_F(QuaternionTest, Normalize_Advanced) {
     // Verification tool: https://www.andre-gaschler.com/rotationconverter/ (normilizes automatically)
-    q = {100.0f, 546.0f, 234.0f, 1.0f}; 
+    std::copy_n(std::initializer_list<float>{100.0f, 546.0f, 234.0f, 1.0f}.begin(), 4, q); 
     normalize_quaternion(q);
     EXPECT_NEAR(q[0], 0.166f, ABS_ERR);
     EXPECT_NEAR(q[1], 0.906f, ABS_ERR);
@@ -123,13 +123,13 @@ TEST_F(QuaternionTest, Euler_PureAxes_90Deg) {
     float val = std::sin(PI/4.0f);
     
     // Pure Roll (+90 deg)
-    q = {val, 0.0f, 0.0f, val};
+    std::copy_n(std::initializer_list<float>{val, 0.0f, 0.0f, val}.begin(), 4, q);
     quaternion_to_euler(q, rpy);
     EXPECT_NEAR(rpy[0], PI_2, ABS_ERR);
     EXPECT_NEAR(rpy[1], 0.0f, ABS_ERR);
     
     // Pure Yaw (+90 deg)
-    q = {0.0f, 0.0f, val, val};
+    std::copy_n(std::initializer_list<float>{0.0f, 0.0f, val, val}.begin(), 4, q);
     quaternion_to_euler(q, rpy);
     EXPECT_NEAR(rpy[2], PI_2, ABS_ERR);
     EXPECT_NEAR(rpy[1], 0.0f, ABS_ERR);
@@ -137,7 +137,7 @@ TEST_F(QuaternionTest, Euler_PureAxes_90Deg) {
 
 TEST_F(QuaternionTest, Euler_ComplexRotation_ZYX_Correct) {
     // Verification tool: https://www.andre-gaschler.com/rotationconverter/ (ZYX euler transformation!)
-    q = {0.6334939f, 0.3418856f,-0.4323847f, 0.5429947f};
+    std::copy_n(std::initializer_list<float>{0.6334939f, 0.3418856f,-0.4323847f, 0.5429947f}.begin(), 4, q);
     normalize_quaternion(q);
     
     quaternion_to_euler(q, rpy);
@@ -146,7 +146,7 @@ TEST_F(QuaternionTest, Euler_ComplexRotation_ZYX_Correct) {
     EXPECT_NEAR(rpy[2], -0.0925186f, LOOSE_ERR);
 
 
-    q = {0.34f, -0.95f,-0.3287f, 12};
+    std::copy_n(std::initializer_list<float>{0.34f, -0.95f,-0.3287f, 12}.begin(), 4, q);
     normalize_quaternion(q);
     
     quaternion_to_euler(q, rpy);
@@ -159,7 +159,7 @@ TEST_F(QuaternionTest, Euler_GimbalLock_Singularities) {
     float val = std::sin(PI/4.0f);
     
     // North Pole (Pitch = +90 deg)
-    q = {0.0f, val, 0.0f, val}; 
+    std::copy_n(std::initializer_list<float>{0.0f, val, 0.0f, val}.begin(), 4, q); 
     quaternion_to_euler(q, rpy);
     EXPECT_NEAR(rpy[1], PI_2, ABS_ERR);
     EXPECT_FALSE(std::isnan(rpy[0]));
@@ -167,7 +167,7 @@ TEST_F(QuaternionTest, Euler_GimbalLock_Singularities) {
     
     // South Pole (Pitch = -90 deg)
     val = std::sin(-PI/4.0f);
-    q = {0.0f, val, 0.0f, std::cos(-PI/4.0f)};
+    std::copy_n(std::initializer_list<float>{0.0f, val, 0.0f, std::cos(-PI/4.0f)}.begin(), 4, q);
     quaternion_to_euler(q, rpy);
     EXPECT_NEAR(rpy[1], -PI_2, ABS_ERR);
     EXPECT_FALSE(std::isnan(rpy[0]));
@@ -177,7 +177,7 @@ TEST_F(QuaternionTest, Euler_GimbalLock_Singularities) {
 TEST_F(QuaternionTest, Euler_Denormalized_SafeGuard) {
     // Tests if the asin check (fabs(sinp) >= 1.0f) correctly handles float overruns
     float val = std::sin(PI/4.0f);
-    q = {0.0f, val + 0.0001f, 0.0f, val + 0.0001f}; 
+    std::copy_n(std::initializer_list<float>{0.0f, val + 0.0001f, 0.0f, val + 0.0001f}.begin(), 4, q); 
     quaternion_to_euler(q, rpy);
     
     // Should be clamped to PI/2, not NaN
@@ -187,7 +187,7 @@ TEST_F(QuaternionTest, Euler_Denormalized_SafeGuard) {
 
 TEST_F(QuaternionTest, Euler_180DegRotation) {
     // 180 degree rotation around X (Tests atan2 behavior with near-zero inputs)
-    q = {1.0f, 0.0f, 0.0f, 0.0f}; 
+    std::copy_n(std::initializer_list<float>{1.0f, 0.0f, 0.0f, 0.0f}.begin(), 4, q); 
     quaternion_to_euler(q, rpy);
     EXPECT_NEAR(std::abs(rpy[0]), PI, ABS_ERR);
     EXPECT_NEAR(rpy[1], 0.0f, ABS_ERR);
