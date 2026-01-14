@@ -13,16 +13,17 @@
 #include "common/logging.hpp"
 
 void DronecanPwmFrontend::init() {
-    raw_command_sub.init(raw_command_callback);
-    array_command_sub.init(array_command_callback);
-    hardpoint_sub.init(hardpoint_callback);
-    arming_status_sub.init(arming_status_callback);
+    int8_t status = 0;
+    status += raw_command_sub.init(raw_command_callback);
+    status += array_command_sub.init(array_command_callback);
+    status += hardpoint_sub.init(hardpoint_callback);
+    status += arming_status_sub.init(arming_status_callback);
+    status +=  gimbal_angular_command_sub.init(gimbal_angular_command_callback);
     
-    int8_t status = gimbal_angular_command_sub.init(gimbal_angular_command_callback);
     if (status < 0) {
-        logger.log_error("Failed to subscribe to Gimbal Angular Command");
+        logger.log_error("Some rcout subscriptions failed");
     } else {
-        logger.log_info("Subscribed to Gimbal Angular Command");
+        logger.log_info("Successfully initialized rcout subscriptions");
     }
 }
 
