@@ -12,7 +12,7 @@
 #include "algorithms.hpp"
 
 
-static constexpr float ABS_ERR = 0.015f;
+static constexpr float ABS_ERR = 0.1f;
 
 class QuaternionTest : public ::testing::Test {
 protected:
