@@ -122,7 +122,7 @@ void RcoutModule::update_params() {
 
     if (new_max_servos_angle != cached_max_servos_angle) {
         cached_max_servos_angle = new_max_servos_angle;
-        for_active_frontend([this](auto& fe) { 
+        for_active_frontend([this](auto& fe) {
             fe.set_max_servos_angle(cached_max_servos_angle);
         });
     }
