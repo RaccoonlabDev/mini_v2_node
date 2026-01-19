@@ -32,7 +32,17 @@ public:
     void init();
 
     void update_params();
-    void publish_gimbal_status(uint16_t max_servos_angle); 
+    void publish_gimbal_status(); 
+    
+    static inline uint16_t max_servos_angle{90};
+
+    // Setter and getter to handle static variable
+    static void set_max_servos_angle(uint16_t angle) {
+        max_servos_angle = angle;
+    }
+    static uint16_t get_max_servos_angle() {
+        return max_servos_angle;
+    }
 
     static inline CommandType pwm_cmd_type{CommandType::RAW_COMMAND};
 
@@ -52,7 +62,6 @@ public:
     static inline libdcnode::DronecanSub<uavcan_equipment_camera_gimbal_AngularCommand> gimbal_angular_command_sub;
 
     static inline libdcnode::DronecanPub<uavcan_equipment_camera_gimbal_Status> gimbal_status_pub;
-
 
 private:
     static inline Logging logger{"DPWM"};

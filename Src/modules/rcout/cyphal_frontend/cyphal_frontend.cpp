@@ -57,3 +57,7 @@ void SetpointSubscriber::callback(const cyphal::CanardRxTransfer& transfer) {
 void CyphalPwmFrontend::update_params() {
     // nothing to do yet
 }
+
+void CyphalPwmFrontend::publish_gimbal_status() {
+
+}

@@ -23,7 +23,7 @@ void DronecanPwmFrontend::init() {
     if (status < 0) {
         logger.log_error("Some rcout subscriptions failed");
     } else {
-        logger.log_info("Successfully initialized rcout subscriptions");
+        logger.log_info("Successfully initialized rcout subscribers");
     }
 }
 
@@ -36,9 +36,7 @@ void DronecanPwmFrontend::update_params() {
 
 void DronecanPwmFrontend::gimbal_angular_command_callback(const uavcan_equipment_camera_gimbal_AngularCommand& msg) {
     Logging logger{"DPWM"};
-    logger.log_warn("Gimbal Angular Command received");
-    uint16_t max_angle = 90; // FIXME: Defaulting to 90
-    set_gimbal_state(msg.quaternion_xyzw, max_angle);
+    set_gimbal_state(msg.quaternion_xyzw, get_max_servos_angle());
 }
 
 void DronecanPwmFrontend::raw_command_callback(const uavcan_equipment_esc_RawCommand& msg) {
@@ -85,10 +83,10 @@ void DronecanPwmFrontend::hardpoint_callback(const uavcan_equipment_hardpoint_Co
 
 
 // Publish gimbal status with current servo angles in degrees
-void DronecanPwmFrontend::publish_gimbal_status(uint16_t max_servos_angle) {
+void DronecanPwmFrontend::publish_gimbal_status() {
 
-    gimbal_status_pub.msg.gimbal_id = 0;
-    gimbal_status_pub.msg.mode.command_mode = 1; // example
+    gimbal_status_pub.msg.gimbal_id = 0; //
+    gimbal_status_pub.msg.mode.command_mode = 1;
     
     gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[0] = 0; // X
     gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[1] = 0; // Y
@@ -99,13 +97,13 @@ void DronecanPwmFrontend::publish_gimbal_status(uint16_t max_servos_angle) {
     for (size_t i = 0; i < Driver::RCPWM::get_pins_amount(); ++i) {
         switch (Driver::RCPWM::get_pin_channel(i)) {
             case 0: // Roll
-                roll_deg = static_cast<float>(Driver::RCPWM::get_current_angle(max_servos_angle, i));
+                roll_deg = static_cast<float>(Driver::RCPWM::get_current_angle(get_max_servos_angle(), i));
                 break;
             case 1: // Pitch
-                pitch_deg = static_cast<float>(Driver::RCPWM::get_current_angle(max_servos_angle, i));
+                pitch_deg = static_cast<float>(Driver::RCPWM::get_current_angle(get_max_servos_angle(), i));
                 break;
             case 2: // Yaw
-                yaw_deg = static_cast<float>(Driver::RCPWM::get_current_angle(max_servos_angle, i));
+                yaw_deg = static_cast<float>(Driver::RCPWM::get_current_angle(get_max_servos_angle(), i));
                 break;
             default:
                 break;
@@ -124,7 +122,7 @@ void set_gimbal_state_rpy(const float angles_rpy[3], uint16_t max_servos_angle){
     for (size_t i = 0; i < Driver::RCPWM::get_pins_amount(); ++i) {
         switch (Driver::RCPWM::get_pin_channel(i)) {
             case 0: // Roll
-                Driver::RCPWM::channels[i].set_normalized_signed(angles_rpy[0] /max_deflection);
+                Driver::RCPWM::channels[i].set_normalized_signed(angles_rpy[0] / max_deflection);
                 RcoutModule::timings[i].mark_command_fresh();
                 break;
             case 1: // Pitch

@@ -105,11 +105,10 @@ void RcoutModule::spin_once() {
     uint32_t now = HAL_GetTick();
     if (now - last_gimbal_pub_ms >= 100) {
         last_gimbal_pub_ms = now;
-        #if CONFIG_USE_DRONECAN == 1
         if (ModuleManager::get_active_protocol() == Protocol::DRONECAN) {
-            dronecan_frontend.publish_gimbal_status(max_servos_angle);
+            // Note: publish_gimbal_status is not implemented in cyphal
+            for_active_frontend([](auto& fe) { fe.publish_gimbal_status(); });
         }
-        #endif
     }
 }
 
@@ -119,7 +118,15 @@ void RcoutModule::update_params() {
         timing.set_cmd_ttl(cmd_ttl);
     }
 
-    max_servos_angle = paramsGetIntegerValue(IntParamsIndexes::PARAM_MAX_ANGLE);
+    new_max_servos_angle = paramsGetIntegerValue(IntParamsIndexes::PARAM_MAX_ANGLE);
+
+    if (new_max_servos_angle != cached_max_servos_angle) {
+        cached_max_servos_angle = new_max_servos_angle;
+        for_active_frontend([this](auto& fe) { 
+            fe.set_max_servos_angle(cached_max_servos_angle);
+        });
+    }
+
     auto param_frequency = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_FREQUENCY);
     auto frequency = static_cast<uint16_t>(param_frequency);
     Driver::RCPWM::set_frequency(frequency);

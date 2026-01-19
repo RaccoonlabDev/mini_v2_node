@@ -12,6 +12,7 @@ public:
     CyphalPwmFrontend() = default;
     void init();
     void update_params();
+    void publish_gimbal_status();
 };
 
 #endif  // SRC_MODULES_PWM_CYPHAL_FRONTEND_HPP_
