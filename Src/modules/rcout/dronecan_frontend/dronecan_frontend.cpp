@@ -6,7 +6,6 @@
  * Author: Ilia Kliantsevich <iliawork112005@gmail.com>
  */
 
-#include <array>
 #include "dronecan_frontend.hpp"
 #include "modules/rcout/router.hpp"
 #include "common/algorithms.hpp"

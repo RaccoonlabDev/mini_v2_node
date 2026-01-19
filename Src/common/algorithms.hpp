@@ -8,7 +8,6 @@
 #define SRC_COMMON_ALGORITHMS_H_
 
 #include <stdint.h>
-#include <array>
 
 using PwmDurationUs = uint16_t;
 static constexpr float PI_2 = 1.5707963267f;

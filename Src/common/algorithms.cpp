@@ -7,7 +7,6 @@
 #include "algorithms.hpp"
 #include <math.h>
 #include <algorithm>
-#include <array>
 
 PwmDurationUs mapInt16CommandToPwm(int16_t command,
                                    PwmDurationUs min_pwm,
