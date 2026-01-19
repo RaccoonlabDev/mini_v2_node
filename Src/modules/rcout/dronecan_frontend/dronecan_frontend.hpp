@@ -2,6 +2,7 @@
  * This program is free software under the GNU General Public License v3.
  * See <https://www.gnu.org/licenses/> for details.
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
+ * Author: Ilia Kliantsevich <iliawork112005@gmail.com>
  */
 
 #ifndef SRC_MODULES_PWM_DRONECAN_FRONTEND_HPP_
@@ -33,7 +34,7 @@ public:
 
     void update_params();
     void publish_gimbal_status(); 
-    
+
     static inline uint16_t max_servos_angle{90};
 
     // Setter and getter to handle static variable

@@ -3,6 +3,7 @@
  * See <https://www.gnu.org/licenses/> for details.
  * Author: Anastasiia Stepanova <asiiapine@gmail.com>
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
+ * Author: Ilia Kliantsevich <iliawork112005@gmail.com>
  */
 
 #ifndef SRC_MODULES_PWM_PWMMODULE_HPP_
