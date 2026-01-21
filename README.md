@@ -7,6 +7,8 @@ This repo introduces a ready-to-use Cyphal/DroneCAN application for [RL Mini v2]
 Please, refer Wiki for details:
 - [Cyphal template application](https://github.com/RaccoonlabDev/mini_v2_node/wiki/Cyphal-application),
 - [DroneCAN template application](https://github.com/RaccoonlabDev/mini_v2_node/wiki/DroneCAN-application).
+Additional app docs:
+- [Gimbal application](docs/gimbal.md).
 
 ### 1. KEY FEATURES
 
