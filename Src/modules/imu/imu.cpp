@@ -168,7 +168,6 @@ void ImuModule::update_gyro_fft() {
 
 
 // Process reading functions
-
 void ImuModule::process_random_gen (std::array<bool, 2>& updated){
     // Set values for to generate
     accel_signal_generator.setAmpl(gen_amplitude);

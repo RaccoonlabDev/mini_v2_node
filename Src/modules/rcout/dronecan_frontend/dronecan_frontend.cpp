@@ -34,8 +34,7 @@ void DronecanPwmFrontend::update_params() {
 }
 
 void DronecanPwmFrontend::gimbal_angular_command_callback(const uavcan_equipment_camera_gimbal_AngularCommand& msg) {
-    Logging logger{"DPWM"};
-    set_gimbal_state(msg.quaternion_xyzw, get_max_servos_angle());
+    gimbal::set_gimbal_state(msg.quaternion_xyzw);
 }
 
 void DronecanPwmFrontend::raw_command_callback(const uavcan_equipment_esc_RawCommand& msg) {
@@ -80,74 +79,62 @@ void DronecanPwmFrontend::hardpoint_callback(const uavcan_equipment_hardpoint_Co
     pwm_router.apply(cmd);
 }
 
-
-// Publish gimbal status with current servo angles in degrees
-void DronecanPwmFrontend::publish_gimbal_status() {
-
-    gimbal_status_pub.msg.gimbal_id = 0; //
-    gimbal_status_pub.msg.mode.command_mode = 1;
-    
-    gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[0] = 0; // X
-    gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[1] = 0; // Y
-    gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[2] = 0; // Z
-    gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[3] = 1; // W
-    
-    float roll_deg = 0, pitch_deg = 0, yaw_deg = 0;
-    for (size_t i = 0; i < Driver::RCPWM::get_pins_amount(); ++i) {
-        switch (Driver::RCPWM::get_pin_channel(i)) {
-            case 0: // Roll
-                roll_deg = static_cast<float>(Driver::RCPWM::get_current_angle(get_max_servos_angle(), i));
-                break;
-            case 1: // Pitch
-                pitch_deg = static_cast<float>(Driver::RCPWM::get_current_angle(get_max_servos_angle(), i));
-                break;
-            case 2: // Yaw
-                yaw_deg = static_cast<float>(Driver::RCPWM::get_current_angle(get_max_servos_angle(), i));
-                break;
-            default:
-                break;
-        }
-    }
-
-    gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[0] = roll_deg; // X
-    gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[1] = pitch_deg; // Y
-    gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[2] = yaw_deg; // Z
-
-    gimbal_status_pub.publish();
-}
-
-void set_gimbal_state_rpy(const float angles_rpy[3], uint16_t max_servos_angle){
-    float max_deflection = max_servos_angle / 2.0f;
-    for (size_t i = 0; i < Driver::RCPWM::get_pins_amount(); ++i) {
-        switch (Driver::RCPWM::get_pin_channel(i)) {
-            case 0: // Roll
-                Driver::RCPWM::channels[i].set_normalized_signed(angles_rpy[0] / max_deflection);
-                RcoutModule::timings[i].mark_command_fresh();
-                break;
-            case 1: // Pitch
-                Driver::RCPWM::channels[i].set_normalized_signed(angles_rpy[1] / max_deflection);
-                RcoutModule::timings[i].mark_command_fresh();
-                break;
-            case 2: // Yaw
-                Driver::RCPWM::channels[i].set_normalized_signed(angles_rpy[2] / max_deflection);
-                RcoutModule::timings[i].mark_command_fresh();
-                break;
-            default:
-                break;
-        }
-    }
-}
-
-void set_gimbal_state(const float q[4], uint16_t max_servos_angle){
-    float angles_rpy[3] = {0.0f, 0.0f, 0.0f};
-    // Don't modify the original quaternion
-    float q_copy[4] = {q[0], q[1], q[2], q[3]};
-    normalize_quaternion(q_copy);
-    quaternion_to_euler(q_copy, angles_rpy);
-    rad_to_deg_array(angles_rpy);
-    set_gimbal_state_rpy(angles_rpy, max_servos_angle);
-}
-
 void DronecanPwmFrontend::arming_status_callback(const uavcan_equipment_safety_ArmingStatus& msg) {
     (void)msg;  // Not supported yet, what to do with SafetyArmingStatus?
+}
+
+namespace gimbal {
+    float q_copy[4];
+    uint16_t max_servos_angle = 90;
+
+    void set_gimbal_state_rpy(const float angles_rpy[3]){
+        float max_deflection = max_servos_angle / 2.0f;
+        for (size_t i = 0; i < Driver::RCPWM::get_pins_amount(); ++i) {
+            switch (Driver::RCPWM::get_pin_channel(i)) {
+                case 0: // Roll
+                    Driver::RCPWM::channels[i].set_normalized_signed(angles_rpy[0] / max_deflection);
+                    RcoutModule::timings[i].mark_command_fresh();
+                    break;
+                case 1: // Pitch
+                    Driver::RCPWM::channels[i].set_normalized_signed(angles_rpy[1] / max_deflection);
+                    RcoutModule::timings[i].mark_command_fresh();
+                    break;
+                case 2: // Yaw
+                    Driver::RCPWM::channels[i].set_normalized_signed(angles_rpy[2] / max_deflection);
+                    RcoutModule::timings[i].mark_command_fresh();
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    void set_gimbal_state(const float q[4]){
+        float angles_rpy[3] = {0.0f, 0.0f, 0.0f};
+        // Don't modify the original quaternion
+        set_quaternion(q);
+
+        normalize_quaternion(q_copy);
+        quaternion_to_euler(q_copy, angles_rpy);
+        rad_to_deg_array(angles_rpy);
+        set_gimbal_state_rpy(angles_rpy);
+    }
+    
+    void set_quaternion(const float new_q[4]) {
+        for (int i = 0; i < 4; i++) {
+            q_copy[i] = new_q[i];
+        }
+    }
+    
+    const float* get_quaternion() {
+        return q_copy;
+    }
+    
+    void set_max_servos_angle(uint16_t angle) {
+        max_servos_angle = angle;
+    }
+    
+    uint16_t get_max_servos_angle() {
+        return max_servos_angle;
+    }
 }

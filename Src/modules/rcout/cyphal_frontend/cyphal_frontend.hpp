@@ -15,7 +15,6 @@ public:
     CyphalPwmFrontend() = default;
     void init();
     void update_params();
-    void publish_gimbal_status();
 
     static inline uint16_t max_servos_angle{90};
 

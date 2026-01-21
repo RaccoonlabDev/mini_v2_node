@@ -101,16 +101,6 @@ void RcoutModule::spin_once() {
     }
 
     set_mode(at_least_one_channel_is_engaged ? Mode::ENGAGED : Module::Mode::STANDBY);
-
-    static uint32_t last_gimbal_pub_ms = 0;
-    uint32_t now = HAL_GetTick();
-    if (now - last_gimbal_pub_ms >= 100) {
-        last_gimbal_pub_ms = now;
-        if (ModuleManager::get_active_protocol() == Protocol::DRONECAN) {
-            // Note: publish_gimbal_status is not implemented in cyphal
-            for_active_frontend([](auto& fe) { fe.publish_gimbal_status(); });
-        }
-    }
 }
 
 void RcoutModule::update_params() {
@@ -123,9 +113,9 @@ void RcoutModule::update_params() {
 
     if (new_max_servos_angle != cached_max_servos_angle) {
         cached_max_servos_angle = new_max_servos_angle;
-        for_active_frontend([this](auto& fe) {
-            fe.set_max_servos_angle(cached_max_servos_angle);
-        });
+        #if CONFIG_USE_DRONECAN == 1
+            gimbal::set_max_servos_angle(new_max_servos_angle);
+        #endif
     }
 
     auto param_frequency = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_FREQUENCY);
