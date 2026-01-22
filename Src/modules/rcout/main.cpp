@@ -109,12 +109,12 @@ void RcoutModule::update_params() {
         timing.set_cmd_ttl(cmd_ttl);
     }
 
-    new_max_servos_angle = paramsGetIntegerValue(IntParamsIndexes::PARAM_MAX_ANGLE);
+    new_max_servos_travel = paramsGetIntegerValue(IntParamsIndexes::PARAM_SERVO_MAX_TRAVEL_DEG);
 
-    if (new_max_servos_angle != cached_max_servos_angle) {
-        cached_max_servos_angle = new_max_servos_angle;
+    if (new_max_servos_travel != cached_max_servos_travel) {
+        cached_max_servos_travel = new_max_servos_travel;
         #if CONFIG_USE_DRONECAN == 1
-            gimbal::set_max_servos_angle(new_max_servos_angle);
+            gimbal::set_max_servos_angle(new_max_servos_travel);
         #endif
     }
 

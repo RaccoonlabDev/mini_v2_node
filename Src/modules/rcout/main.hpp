@@ -35,8 +35,8 @@ private:
     bool gimbal_is_active{false};
     // Current feedback
     std::array<float, 4> gimbal_current_attitude{0, 0, 0, 1};  // xyzw
-    uint16_t new_max_servos_angle = 90;  // degrees
-    uint16_t cached_max_servos_angle = 90;
+    uint16_t new_max_servos_travel = 90;  // degrees
+    uint16_t cached_max_servos_travel = 90;
 };
 
 #endif  // SRC_MODULES_PWM_PWMMODULE_HPP_

@@ -28,7 +28,7 @@ namespace gimbal {
     void set_gimbal_state(const float q[4]);
 
     extern float q_copy[4];
-    extern uint16_t max_servos_angle;
+    extern uint16_t max_servos_travel;
     
     void set_quaternion(const float new_q[4]);
     const float* get_quaternion();

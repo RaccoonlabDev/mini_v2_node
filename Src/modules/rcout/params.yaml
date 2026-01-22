@@ -16,14 +16,14 @@ pwm.frequency:
   min: 50
   max: 400
 
-pwm.max_servos_angle:
+servo.max_travel_degrees:
   type: Integer
-  note: Maximum deviation angle.
-  enum: PARAM_MAX_ANGLE
+  note: Maximum angular travel from PWM minimum to maximum (degrees).
+  enum: PARAM_SERVO_MAX_TRAVEL_DEG
   flags: mutable
   default: 90
   min: 0
-  max: 359
+  max: 360
 
 pwm1.ch:
   type: Integer

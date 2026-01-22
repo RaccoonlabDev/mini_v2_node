@@ -85,10 +85,10 @@ void DronecanPwmFrontend::arming_status_callback(const uavcan_equipment_safety_A
 
 namespace gimbal {
     float q_copy[4];
-    uint16_t max_servos_angle = 90;
+    uint16_t max_servos_travel = 90;
 
-    void set_gimbal_state_rpy(const float angles_rpy[3]){
-        float max_deflection = max_servos_angle / 2.0f;
+    void set_gimbal_state_rpy(const float angles_rpy[3]) {
+        float max_deflection = max_servos_travel / 2.0f;
         for (size_t i = 0; i < Driver::RCPWM::get_pins_amount(); ++i) {
             switch (Driver::RCPWM::get_pin_channel(i)) {
                 case 0: // Roll
@@ -109,10 +109,10 @@ namespace gimbal {
         }
     }
 
-    void set_gimbal_state(const float q[4]){
+    void set_gimbal_state(const float q[4]) {
         float angles_rpy[3] = {0.0f, 0.0f, 0.0f};
         // Don't modify the original quaternion
-        set_quaternion(q);
+        set_quaternion(q); // copy into q_copy
 
         normalize_quaternion(q_copy);
         quaternion_to_euler(q_copy, angles_rpy);
@@ -131,10 +131,10 @@ namespace gimbal {
     }
     
     void set_max_servos_angle(uint16_t angle) {
-        max_servos_angle = angle;
+        max_servos_travel = angle;
     }
     
     uint16_t get_max_servos_angle() {
-        return max_servos_angle;
+        return max_servos_travel;
     }
 }
