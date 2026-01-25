@@ -8,8 +8,8 @@ jobs:
         include:
           - runner: ubuntu-22.04
             image: "" # Let's use a GitHub-hosted virtual machine itself
-          - runner: windows-2022
-            image: ""  # Containers on Windows runners are not supported
+          # - runner: windows-2022
+          #   image: ""  # Containers on Windows runners are not supported
     timeout-minutes: 10
     runs-on: ${{ matrix.runner }}
     container:
