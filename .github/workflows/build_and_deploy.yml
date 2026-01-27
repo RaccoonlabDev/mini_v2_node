@@ -39,10 +39,11 @@ jobs:
           ssh-private-key: |
             ${{ secrets.LIBCPNODE_DEPLOY_KEY }}
 
+      # Temporary skip Cyphal build in forks - the mode is under refactoring since v1.4.0
       - name: Set build target
         shell: bash
         run: |
-          if [[ "${{ matrix.runner }}" == "ubuntu-24.04" && -n "${{ secrets.LIBCPNODE_DEPLOY_KEY }}" ]]; then
+          if [[ "${{ matrix.runner }}" == "ubuntu-24.04" && -n "${{ secrets.LIBCPNODE_DEPLOY_KEY }}" && "${{ github.repository }}" == "RaccoonlabDev/mini_v2_node" ]]; then
             echo "BUILD_TARGET=all" >> "$GITHUB_ENV"
           else
             echo "BUILD_TARGET=dronecan_v2 dronecan_v3" >> "$GITHUB_ENV"

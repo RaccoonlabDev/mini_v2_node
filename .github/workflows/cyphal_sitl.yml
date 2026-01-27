@@ -3,6 +3,8 @@ on: push
 
 jobs:
   sitl:
+    # Temporary skip Cyphal build in forks - the mode is under refactoring since v1.4.0
+    if: ${{ github.repository == 'RaccoonlabDev/mini_v2_node' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     # GitHub Actions does not allow the secrets context inside if expression
