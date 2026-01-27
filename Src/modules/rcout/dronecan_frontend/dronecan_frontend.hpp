@@ -21,17 +21,19 @@ enum class CommandType: uint8_t {
     NUMBER_OF_COMMANDS,
 };
 
-// Maybe even move to separate file?
 namespace gimbal {
+   
+    extern uint8_t gimbal_id;
+    extern float q_copy[4];
+    extern uint16_t max_servos_travel;
+
     void set_gimbal_state_rpy(const float angles_rpy[3]);
         
     void set_gimbal_state(const float q[4]);
-
-    extern float q_copy[4];
-    extern uint16_t max_servos_travel;
     
     void set_quaternion(const float new_q[4]);
     const float* get_quaternion();
+
     void set_max_servos_angle(uint16_t angle);
     uint16_t get_max_servos_angle();
 } // gimbal

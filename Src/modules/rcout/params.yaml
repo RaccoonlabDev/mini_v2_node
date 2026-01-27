@@ -24,6 +24,15 @@ servo.max_travel_degrees:
   default: 90
   min: 0
   max: 360
+  
+gimbal.id:
+  type: Integer
+  note: Current gimbal ID (to account several gimbals connected to one bus).
+  enum: PARAM_GIMBAL_ID
+  flags: mutable
+  default: 0
+  min: 0
+  max: 127
 
 pwm1.ch:
   type: Integer

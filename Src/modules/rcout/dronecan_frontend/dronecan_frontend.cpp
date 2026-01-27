@@ -34,6 +34,10 @@ void DronecanPwmFrontend::update_params() {
 }
 
 void DronecanPwmFrontend::gimbal_angular_command_callback(const uavcan_equipment_camera_gimbal_AngularCommand& msg) {
+    // If node somehow receives a command for a different gimbal, ignore it
+    if (msg.gimbal_id != gimbal::gimbal_id) {
+        return;
+    }
     gimbal::set_gimbal_state(msg.quaternion_xyzw);
 }
 
@@ -86,7 +90,8 @@ void DronecanPwmFrontend::arming_status_callback(const uavcan_equipment_safety_A
 namespace gimbal {
     float q_copy[4];
     uint16_t max_servos_travel = 90;
-
+    uint8_t gimbal_id{0};
+    
     void set_gimbal_state_rpy(const float angles_rpy[3]) {
         float max_deflection = max_servos_travel / 2.0f;
         for (size_t i = 0; i < Driver::RCPWM::get_pins_amount(); ++i) {
