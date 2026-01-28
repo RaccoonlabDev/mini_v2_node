@@ -6,3 +6,21 @@ pwm.input_type:
   default: 0
   min: 0
   max: 2
+  
+servo.max_travel_degrees:
+  type: Integer
+  note: Maximum angular travel from PWM minimum to maximum (degrees).
+  enum: PARAM_SERVO_MAX_TRAVEL_DEG
+  flags: mutable
+  default: 90
+  min: 0
+  max: 360
+  
+gimbal.id:
+  type: Integer
+  note: Current gimbal ID (to account several gimbals connected to one bus).
+  enum: PARAM_GIMBAL_ID
+  flags: mutable
+  default: 0
+  min: 0
+  max: 127

@@ -31,10 +31,6 @@ public:
 protected:
     void update_params() override;
     void spin_once() override;
-private:
-    // Current feedback
-    uint16_t new_max_servos_travel = 90;  // degrees
-    uint16_t cached_max_servos_travel = 90;
 };
 
 #endif  // SRC_MODULES_PWM_PWMMODULE_HPP_

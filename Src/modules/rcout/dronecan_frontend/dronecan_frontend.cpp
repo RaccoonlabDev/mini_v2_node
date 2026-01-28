@@ -31,6 +31,9 @@ void DronecanPwmFrontend::update_params() {
     if (pwm_cmd_type >= CommandType::NUMBER_OF_COMMANDS) {
         pwm_cmd_type = CommandType::RAW_COMMAND;
     }
+    gimbal::gimbal_id = static_cast<uint8_t>
+        (paramsGetIntegerValue(IntParamsIndexes::PARAM_GIMBAL_ID));
+    gimbal::max_servos_travel = paramsGetIntegerValue(IntParamsIndexes::PARAM_SERVO_MAX_TRAVEL_DEG);
 }
 
 void DronecanPwmFrontend::gimbal_angular_command_callback(const uavcan_equipment_camera_gimbal_AngularCommand& msg) {

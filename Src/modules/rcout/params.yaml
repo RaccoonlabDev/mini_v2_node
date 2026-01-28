@@ -16,24 +16,6 @@ pwm.frequency:
   min: 50
   max: 400
 
-servo.max_travel_degrees:
-  type: Integer
-  note: Maximum angular travel from PWM minimum to maximum (degrees).
-  enum: PARAM_SERVO_MAX_TRAVEL_DEG
-  flags: mutable
-  default: 90
-  min: 0
-  max: 360
-  
-gimbal.id:
-  type: Integer
-  note: Current gimbal ID (to account several gimbals connected to one bus).
-  enum: PARAM_GIMBAL_ID
-  flags: mutable
-  default: 0
-  min: 0
-  max: 127
-
 pwm1.ch:
   type: Integer
   note: "Index of setpoint channel. [-1; 255]. -1 means disabled, XYZ/RPY: 0 - roll, 1 - pitch, 2 - yaw, -1 - off."
