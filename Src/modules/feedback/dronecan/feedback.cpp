@@ -114,13 +114,13 @@ void DronecanFeedbackModule::publish_gimbal_status_rpy() {
     for (size_t i = 0; i < Driver::RCPWM::get_pins_amount(); ++i) {
         switch (Driver::RCPWM::get_pin_channel(i)) {
             case 0: // Roll
-                roll_deg = static_cast<float>(Driver::RCPWM::get_current_angle(gimbal::get_max_servos_angle(), i));
+                roll_deg = Driver::RCPWM::get_current_angle(gimbal::get_max_servos_angle(), i);
                 break;
             case 1: // Pitch
-                pitch_deg = static_cast<float>(Driver::RCPWM::get_current_angle(gimbal::get_max_servos_angle(), i));
+                pitch_deg = Driver::RCPWM::get_current_angle(gimbal::get_max_servos_angle(), i);
                 break;
             case 2: // Yaw
-                yaw_deg = static_cast<float>(Driver::RCPWM::get_current_angle(gimbal::get_max_servos_angle(), i));
+                yaw_deg = Driver::RCPWM::get_current_angle(gimbal::get_max_servos_angle(), i);
                 break;
             default:
                 break;
@@ -150,7 +150,7 @@ void DronecanFeedbackModule::publish_gimbal_status_quaternion() {
     gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[0] = q[0]; // X
     gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[1] = q[1]; // Y
     gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[2] = q[2]; // Z
-    gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[3] = q[3]; // Z
+    gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[3] = q[3]; // W
 
     gimbal_status_pub.publish();
 }

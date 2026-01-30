@@ -140,13 +140,13 @@ namespace gimbal {
         for (size_t i = 0; i < Driver::RCPWM::get_pins_amount(); ++i) {
             switch (Driver::RCPWM::get_pin_channel(i)) {
                 case 0: // Roll
-                    angles_rpy[0] = static_cast<float>(Driver::RCPWM::get_current_angle(max_servos_travel, i));
+                    angles_rpy[0] = Driver::RCPWM::get_current_angle(max_servos_travel, i);
                     break;
                 case 1: // Pitch
-                    angles_rpy[1] = static_cast<float>(Driver::RCPWM::get_current_angle(max_servos_travel, i));
+                    angles_rpy[1] = Driver::RCPWM::get_current_angle(max_servos_travel, i);
                     break;
                 case 2: // Yaw
-                    angles_rpy[2] = static_cast<float>(Driver::RCPWM::get_current_angle(max_servos_travel, i));
+                    angles_rpy[2] = Driver::RCPWM::get_current_angle(max_servos_travel, i);
                     break;
                 default:
                     break;

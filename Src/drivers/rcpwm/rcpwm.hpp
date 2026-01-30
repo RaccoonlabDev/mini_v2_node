@@ -112,7 +112,7 @@ public:
 
     static int8_t get_pin_channel(uint8_t pin_idx);
     static bool is_pin_enabled(uint8_t pin_idx);
-    static int16_t get_current_angle(uint16_t max_angle_deg, uint8_t pin_idx);
+    static float get_current_angle(uint16_t max_angle_deg, uint8_t pin_idx);
 // private:
     static std::array<RcpwmChannel, static_cast<uint8_t>(HAL::PwmPin::PWM_AMOUNT)> channels;
 };
