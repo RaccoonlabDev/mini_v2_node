@@ -12,18 +12,25 @@
 #include "common/logging.hpp"
 
 void DronecanPwmFrontend::init() {
-    int8_t status = 0;
-    status += raw_command_sub.init(raw_command_callback);
-    status += array_command_sub.init(array_command_callback);
-    status += hardpoint_sub.init(hardpoint_callback);
-    status += arming_status_sub.init(arming_status_callback);
-    status +=  gimbal_angular_command_sub.init(gimbal_angular_command_callback);
-    
-    if (status < 0) {
-        logger.log_error("Some rcout subscriptions failed");
-    } else {
-        logger.log_info("Successfully initialized rcout subscribers");
-    }
+    uint8_t counterInit = 0;
+    uint8_t counterFail = 0;
+    raw_command_sub.init(raw_command_callback) >= 0 ? 
+            counterInit++ : counterFail++;
+
+    array_command_sub.init(array_command_callback)  >= 0 ? 
+            counterInit++ : counterFail++;
+
+    hardpoint_sub.init(hardpoint_callback) >= 0 ? 
+            counterInit++ : counterFail++;
+
+    arming_status_sub.init(arming_status_callback)  >= 0 ? 
+            counterInit++ : counterFail++;
+
+    gimbal_angular_command_sub.init(gimbal_angular_command_callback)  >= 0 ? 
+            counterInit++ : counterFail++;
+    char buffer[35];
+    sprintf(buffer, "Rcout subs init: %d, subs failed: %d", counterInit, counterFail);
+    logger.log_info(buffer);
 }
 
 void DronecanPwmFrontend::update_params() {
@@ -37,7 +44,7 @@ void DronecanPwmFrontend::update_params() {
 }
 
 void DronecanPwmFrontend::gimbal_angular_command_callback(const uavcan_equipment_camera_gimbal_AngularCommand& msg) {
-    // If node somehow receives a command for a different gimbal, ignore it
+    // If node receives a command for a different gimbal, ignore it
     if (msg.gimbal_id != gimbal::gimbal_id) {
         return;
     }
