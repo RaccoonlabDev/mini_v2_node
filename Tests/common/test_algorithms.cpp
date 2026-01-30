@@ -21,7 +21,7 @@ protected:
 
     void SetUp() override {
         std::copy_n(std::initializer_list<float>{0.0f, 0.0f, 0.0f, 1.0f}.begin(), 4, q);
-        std::copy_n(std::initializer_list<float>{0.0f, 0.0f, 0.0f}.begin(), 3, q);
+        std::copy_n(std::initializer_list<float>{0.0f, 0.0f, 0.0f}.begin(), 3, rpy);
     }
 };
 
@@ -194,6 +194,79 @@ TEST_F(QuaternionTest, Euler_180DegRotation) {
     EXPECT_NEAR(rpy[2], 0.0f, ABS_ERR);
 }
 
+
+TEST(CordicTest, SinCos_FullCircle) {
+    float s, c;
+    
+    // 0 Degrees
+    fast_sin_cos(0.0f, &s, &c);
+    EXPECT_NEAR(s, 0.0f, ABS_ERR);
+    EXPECT_NEAR(c, 1.0f, ABS_ERR);
+
+    // 90 Degrees (PI/2)
+    fast_sin_cos(PI_2, &s, &c);
+    EXPECT_NEAR(s, 1.0f, ABS_ERR);
+    EXPECT_NEAR(c, 0.0f, ABS_ERR);
+
+    // 120 Degrees
+    fast_sin_cos(120.0f * (PI / 180.0f), &s, &c);
+    EXPECT_NEAR(s, 0.8660f, ABS_ERR);  // sin(120) = sqrt(3)/2
+    EXPECT_NEAR(c, -0.5000f, ABS_ERR); // cos(120) = -0.5
+
+    // 180 Degrees (PI)
+    fast_sin_cos(PI, &s, &c);
+    EXPECT_NEAR(s, 0.0f, ABS_ERR);
+    EXPECT_NEAR(c, -1.0f, ABS_ERR);
+
+    // -90 Degrees (-PI/2)
+    fast_sin_cos(-PI_2, &s, &c);
+    EXPECT_NEAR(s, -1.0f, ABS_ERR);
+    EXPECT_NEAR(c, 0.0f, ABS_ERR);
+}
+
+
+TEST_F(QuaternionTest, EulerToQuat_Basic) {
+    // Identity: 0, 0, 0 -> [0, 0, 0, 1]
+    float angles_rpy[3] = {0.0f, 0.0f, 0.0f};
+    euler_to_quaternion(angles_rpy, q);
+    EXPECT_NEAR(q[0], 0.0f, ABS_ERR);
+    EXPECT_NEAR(q[1], 0.0f, ABS_ERR);
+    EXPECT_NEAR(q[2], 0.0f, ABS_ERR);
+    EXPECT_NEAR(q[3], 1.0f, ABS_ERR);
+
+    // Pure Yaw 90 deg: [0, 0, sin(45), cos(45)] -> [0, 0, 0.707, 0.707]
+    angles_rpy[2] = 90.0f;
+    // RPY: roll=0, pitch=0, yaw=90
+    euler_to_quaternion(angles_rpy, q);
+    EXPECT_NEAR(q[2], 0.7071f, ABS_ERR);
+    EXPECT_NEAR(q[3], 0.7071f, ABS_ERR);
+
+    // Pure Pitch 90 deg: [0, sin(45), 0, cos(45)] -> [0, 0.707, 0, 0.707]
+    angles_rpy[2] = 0.0f;
+    angles_rpy[1] = 90.0f;
+    // RPY: roll=0, pitch=90, yaw=0
+    euler_to_quaternion(angles_rpy, q);
+    EXPECT_NEAR(q[1], 0.7071f, ABS_ERR);
+    EXPECT_NEAR(q[3], 0.7071f, ABS_ERR);
+}
+
+/**
+ * Round-trip consistency: Euler -> Quat -> Euler
+ */
+TEST_F(QuaternionTest, Euler_RoundTrip) {
+    float input_rpy[3] = {30.0f, -20.0f, 45.0f}; // Degrees
+    float output_rpy[3]; // Radians
+
+    euler_to_quaternion(input_rpy, q);
+
+    quaternion_to_euler(q, output_rpy);
+
+    rad_to_deg_array(output_rpy);
+
+    EXPECT_NEAR(output_rpy[0], input_rpy[0], 0.5f); // Roll
+    EXPECT_NEAR(output_rpy[1], input_rpy[1], 0.5f); // Pitch
+    EXPECT_NEAR(output_rpy[2], input_rpy[2], 0.5f); // Yaw
+}
 
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);

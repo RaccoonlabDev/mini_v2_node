@@ -13,6 +13,7 @@ using PwmDurationUs = uint16_t;
 static constexpr float PI_2 = 1.5707963267f;
 static constexpr float LOOSE_ERR = 1e-3f;
 static constexpr float PI = 3.1415926535f;
+static constexpr float CORDIC_GAIN = 0.607252935f;
 // Using a small epsilon for float comparisons
 static constexpr float FLT_EPSILON_LOCAL = 1e-7f;
 
@@ -88,6 +89,21 @@ void quaternion_to_euler(const float q[4],
 /** 
  * @brief Converts radians to degrees for an array of three angles
  */
+
+ /**
+ * @brief Converts Euler angles (degrees) to a quaternion.
+ * @param roll_deg, pitch_deg, yaw_deg Input angles in degrees.
+ * @param q Output array for quaternion in [x, y, z, w] order.
+ */
+void euler_to_quaternion(float const angles_rpy[3], float q[4]);
+
+/**
+ * @brief Optimized CORDIC sin/cos calculation.
+ * @param theta_rad Input angle in radians.
+ * @param s, c Pointers to output sine and cosine.
+ */
+void fast_sin_cos(float theta_rad, float* s, float* c);
+
 void rad_to_deg_array(float angles_rpy[3]);
 /**
  * @brief The Adaptive Alpha Filter is a variation of the exponential smoothing filter,

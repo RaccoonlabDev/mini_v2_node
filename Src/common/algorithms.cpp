@@ -177,3 +177,60 @@ void normalize_quaternion(float q[4]) {
         q[3] *= inv_norm;
     }
 }
+
+void fast_sin_cos(float theta_rad, float* s, float* c) {
+    // Range Reduction. Works on [-PI, PI]
+    bool flip = false;
+    if (theta_rad > PI_2) {
+        theta_rad = PI - theta_rad;
+        flip = true;
+    } else if (theta_rad < -PI_2) {
+        theta_rad = -PI - theta_rad;
+        flip = true;
+    }
+
+    float x = CORDIC_GAIN;
+    float y = 0.0f;
+    float current_theta = 0.0f;
+
+    // Iterative CORDIC rotation
+    for (int i = 0; i < 12; i++) {
+        float x_new;
+        float sigma = (theta_rad >= current_theta) ? 1.0f : -1.0f;
+        float factor = std::ldexp(1.0f, -i);  // 2^-i
+
+        x_new = x - (sigma * y * factor);
+        y = y + (sigma * x * factor);
+        x = x_new;
+
+        current_theta += sigma * CORDIC_TABLE[i];
+    }
+
+    // Quadrant Adjustment
+    if (flip) {
+        *c = -x;
+        *s = y;
+    } else {
+        *c = x;
+        *s = y;
+    }
+}
+
+void euler_to_quaternion(float const angles_rpy[3], float q[4]) {
+    // Conversion factor deg to rad and halving for quaternion math
+    constexpr float DEG_TO_RAD_HALF = (PI / 180.0f) * 0.5f;
+
+    float sr, cr, sp, cp, sy, cy;
+
+    // Compute sin/cos for half-angles
+    fast_sin_cos(angles_rpy[0] * DEG_TO_RAD_HALF, &sr, &cr);
+    fast_sin_cos(angles_rpy[1] * DEG_TO_RAD_HALF, &sp, &cp);
+    fast_sin_cos(angles_rpy[2] * DEG_TO_RAD_HALF, &sy, &cy);
+
+    // ZYX Convention
+    // q = [x, y, z, w]
+    q[0] = sr * cp * cy - cr * sp * sy;  // x
+    q[1] = cr * sp * cy + sr * cp * sy;  // y
+    q[2] = cr * cp * sy - sr * sp * cy;  // z
+    q[3] = cr * cp * cy + sr * sp * sy;  // w
+}

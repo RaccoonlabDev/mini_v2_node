@@ -98,7 +98,7 @@ void DronecanPwmFrontend::arming_status_callback(const uavcan_equipment_safety_A
 }
 
 namespace gimbal {
-    float q_copy[4];
+    float gimbal_q[4];
     uint16_t max_servos_travel = 90;
     uint8_t gimbal_id{0};
     
@@ -124,25 +124,36 @@ namespace gimbal {
         }
     }
 
+    // Modifies the internal quaternion state
     void set_gimbal_state(const float q[4]) {
         float angles_rpy[3] = {0.0f, 0.0f, 0.0f};
-        // Don't modify the original quaternion
-        set_quaternion(q); // copy into q_copy
-
+        float q_copy[4] = {q[0], q[1], q[2], q[3]};
         normalize_quaternion(q_copy);
         quaternion_to_euler(q_copy, angles_rpy);
         rad_to_deg_array(angles_rpy);
         set_gimbal_state_rpy(angles_rpy);
     }
     
-    void set_quaternion(const float new_q[4]) {
-        for (int i = 0; i < 4; i++) {
-            q_copy[i] = new_q[i];
-        }
-    }
-    
     const float* get_quaternion() {
-        return q_copy;
+        // Update gimbal_q before returning
+        float angles_rpy[3] = {0.0f, 0.0f, 0.0f};
+        for (size_t i = 0; i < Driver::RCPWM::get_pins_amount(); ++i) {
+            switch (Driver::RCPWM::get_pin_channel(i)) {
+                case 0: // Roll
+                    angles_rpy[0] = static_cast<float>(Driver::RCPWM::get_current_angle(max_servos_travel, i));
+                    break;
+                case 1: // Pitch
+                    angles_rpy[1] = static_cast<float>(Driver::RCPWM::get_current_angle(max_servos_travel, i));
+                    break;
+                case 2: // Yaw
+                    angles_rpy[2] = static_cast<float>(Driver::RCPWM::get_current_angle(max_servos_travel, i));
+                    break;
+                default:
+                    break;
+            }
+        }
+        euler_to_quaternion(angles_rpy, gimbal_q);
+        return gimbal_q;
     }
     
     void set_max_servos_angle(uint16_t angle) {
