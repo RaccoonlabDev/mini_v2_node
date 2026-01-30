@@ -169,7 +169,7 @@ void quaternion_to_euler(const float q[4],
 void normalize_quaternion(float q[4]) {
     float norm_sq = q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3];
 
-    if (norm_sq > 0.0f && std::fabs(norm_sq - 1.0f) > 1e-6f) {
+    if (norm_sq > 0.0f && std::fabs(norm_sq - 1.0f) > 1e-3f) {
         float inv_norm = 1.0f / std::sqrt(norm_sq);
         q[0] *= inv_norm;
         q[1] *= inv_norm;
