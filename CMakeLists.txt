@@ -8,7 +8,7 @@ set(SRC_DIR ${ROOT_DIR}/Src)
 set(CMAKE_DIR ${ROOT_DIR}/cmake)
 set(LIBPARAMS_PATH ${ROOT_DIR}/Libs/libparams)
 set(LIBPARAMS_CMAKE libparams.cmake)
-set(DOC_PATH ${ROOT_DIR}/docs/${CAN_PROTOCOL}.md)
+set(DOCS_ICD_PATH ${ROOT_DIR}/docs/icd_${CAN_PROTOCOL}.md)
 
 # Option 1. Choose the platform
 option(USE_PLATFORM_UBUNTU "Build for SITL (Software In The Loop)" OFF)
@@ -18,6 +18,7 @@ option(USE_PLATFORM_NODE_V3 "Build for stm32g0b1 (512 KBytes)" OFF)
 if(USE_PLATFORM_UBUNTU)
     set(LIBPARAMS_PLATFORM ubuntu)
     set(CAN_PLATFORM socketcan)
+    set(LIBCPNODE_CAN_PLATFORM socketcan)
     set(APP_PLATFORM ubuntu)
     set(PLATFORM_NAME sitl)
     include(${CMAKE_DIR}/toolchain-ubuntu.cmake)
@@ -25,6 +26,7 @@ if(USE_PLATFORM_UBUNTU)
 elseif(USE_PLATFORM_NODE_V2)
     set(LIBPARAMS_PLATFORM stm32f103)
     set(CAN_PLATFORM bxcan)
+    set(LIBCPNODE_CAN_PLATFORM bxcan)
     set(APP_PLATFORM stm32f103)
     set(PLATFORM_NAME v2)
 
@@ -42,6 +44,7 @@ elseif(USE_PLATFORM_NODE_V2)
 elseif(USE_PLATFORM_NODE_V3)
     set(LIBPARAMS_PLATFORM stm32g0b1)
     set(CAN_PLATFORM fdcan)
+    set(LIBCPNODE_CAN_PLATFORM fdcan)
     set(APP_PLATFORM stm32g0b1)
     set(PLATFORM_NAME v3)
 
@@ -67,6 +70,8 @@ if(NOT (EXISTS ${APPLICATION_DIR} AND IS_DIRECTORY ${APPLICATION_DIR}))
     message(FATAL_ERROR "CAN_PROTOCOL '${CAN_PROTOCOL}' is unknown.")
 endif()
 
+include(${CMAKE_DIR}/git.cmake)
+
 # Set build dir based on hardware version and protocol
 set(BUILD_ROOT_DIR ${ROOT_DIR}/build)
 set(BUILD_TARGET_DIR ${BUILD_ROOT_DIR}/${CAN_PROTOCOL}_${PLATFORM_NAME})
@@ -86,7 +91,6 @@ include(${APPLICATION_DIR}/CMakeLists.txt)
 
 # Prebuild
 include(${CMAKE_DIR}/params.cmake)
-include(${CMAKE_DIR}/git.cmake)
 
 # Hardware version is not supported at the momemnt, let's hardcode it for a while
 add_definitions(-DHW_VERSION_MAJOR=2)

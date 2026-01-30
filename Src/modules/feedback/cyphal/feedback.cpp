@@ -6,11 +6,42 @@
 
 #include "feedback.hpp"
 #include <algorithm>
-#include "cyphalNode/cyphal.hpp"
+#include "libcpnode/cyphal.hpp"
 #include "params.hpp"
 #include "peripheral/adc/circuit_periphery.hpp"
 
 REGISTER_MODULE(CyphalFeedbackModule)
+
+void CyphalFeedbackModule::init() {
+    set_mode(Mode::STANDBY);
+    auto cyphal = libcpnode::Cyphal::get_instance();
+
+    udral_feedbacks[0] = cyphal->makePublisher<reg_udral_service_actuator_common_Feedback_0_1>(
+        static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_1_ID))
+    );
+    udral_feedbacks[1] = cyphal->makePublisher<reg_udral_service_actuator_common_Feedback_0_1>(
+        static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_2_ID))
+    );
+    udral_feedbacks[2] = cyphal->makePublisher<reg_udral_service_actuator_common_Feedback_0_1>(
+        static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_3_ID))
+    );
+    udral_feedbacks[3] = cyphal->makePublisher<reg_udral_service_actuator_common_Feedback_0_1>(
+        static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_4_ID))
+    );
+
+    compact_feedbacks[0] = cyphal->makePublisher<zubax_telega_CompactFeedback_1_0>(
+        static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_COMPACT_FEEDBACK_1_ID))
+    );
+    compact_feedbacks[1] = cyphal->makePublisher<zubax_telega_CompactFeedback_1_0>(
+        static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_COMPACT_FEEDBACK_2_ID))
+    );
+    compact_feedbacks[2] = cyphal->makePublisher<zubax_telega_CompactFeedback_1_0>(
+        static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_COMPACT_FEEDBACK_3_ID))
+    );
+    compact_feedbacks[3] = cyphal->makePublisher<zubax_telega_CompactFeedback_1_0>(
+        static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_COMPACT_FEEDBACK_4_ID))
+    );
+}
 
 
 void CyphalFeedbackModule::update_params() {
@@ -44,10 +75,11 @@ void CyphalFeedbackModule::spin_once() {
             continue;
         }
 
+        // Here we also need to map these things correctly...
         compact_feedback.msg = {
-            .dc_voltage = CircuitPeriphery::voltage_vin(),
-            .dc_current = CircuitPeriphery::current(),
-            .phase_current_amplitude = CircuitPeriphery::current(),
+            .dc_voltage = static_cast<uint16_t>(CircuitPeriphery::voltage_vin()),
+            .dc_current = static_cast<int16_t>(CircuitPeriphery::current()),
+            .phase_current_amplitude = static_cast<int16_t>(CircuitPeriphery::current()),
             .velocity = 0,
             .demand_factor_pct = (int8_t)Driver::RCPWM::get_pin_percent(pin_idx),
         };

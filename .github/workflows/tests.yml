@@ -13,7 +13,8 @@ jobs:
 
       - name: Install gtest
         run: |
-          sudo apt install googletest libgtest-dev libgmock-dev
+          sudo apt-get update
+          sudo apt-get install googletest libgtest-dev libgmock-dev
 
       - name: Install arm compiler
         run: |

@@ -37,6 +37,9 @@ target_link_libraries(${EXECUTABLE} PRIVATE ${FFTW_LIBRARIES})
 if(CAN_PROTOCOL STREQUAL "dronecan" OR CAN_PROTOCOL STREQUAL "both")
     target_link_libraries(${EXECUTABLE} PRIVATE libdcnode::libdcnode)
 endif()
+if(CAN_PROTOCOL STREQUAL "cyphal" OR CAN_PROTOCOL STREQUAL "both")
+    target_link_libraries(${EXECUTABLE} PRIVATE libcpnode::libcpnode)
+endif()
 
 # Post-build
 add_custom_command(TARGET ${EXECUTABLE}

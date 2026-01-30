@@ -24,4 +24,5 @@ pwm.4_min: 1000
 pwm.4_max: 2000
 pwm.4_def: 1000
 pwm.4_feedback: 0
-system.name: co.raccoonlab.mini
+pwm.output_type: 0
+system.name: co.rl.mini

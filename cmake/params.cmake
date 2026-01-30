@@ -3,7 +3,7 @@
 
 if(NOT LIBPARAMS_PATH)
     message(SEND_ERROR "LIBPARAMS_PATH is unknown.")
-elseif(NOT DOC_PATH)
+elseif(NOT DOCS_ICD_PATH)
     message(SEND_ERROR "ROOT_DIR is unknown.")
 elseif(NOT BUILD_SRC_DIR)
     message(SEND_ERROR "BUILD_SRC_DIR is unknown.")
@@ -22,7 +22,7 @@ if(NOT result EQUAL 0)
 endif()
 
 # execute_process(
-#     COMMAND python3 ${LIBPARAMS_PATH}/scripts/generate_docs.py --output ${DOC_PATH} ${LIBPARAMS_PARAMS}
+#     COMMAND python3 ${LIBPARAMS_PATH}/scripts/generate_docs.py --output ${DOCS_ICD_PATH} ${LIBPARAMS_PARAMS}
 #     WORKING_DIRECTORY ${APPLICATION_DIR}
 #     RESULT_VARIABLE result
 # )

@@ -6,17 +6,25 @@
 
 #include "circuit_status.hpp"
 #include <algorithm>
-#include "cyphalNode/cyphal.hpp"
+#include "libcpnode/cyphal.hpp"
+#include "peripheral/adc/circuit_periphery.hpp"
 #include "params.hpp"
-
-#include "uavcan/si/sample/electric_current/Scalar_1_0.h"
-#include "uavcan/si/sample/voltage/Scalar_1_0.h"
-#include "uavcan/si/sample/temperature/Scalar_1_0.h"
 
 REGISTER_MODULE(CyphalCircuitStatus)
 
 void CyphalCircuitStatus::init() {
     set_mode(Mode::STANDBY);
+    auto cyphal = libcpnode::Cyphal::get_instance();
+
+    voltage_5v_pub = cyphal->makePublisher<uavcan_si_unit_voltage_Scalar_1_0>(
+        static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_CRCT_5V_ID))
+    );
+    voltage_vin_pub = cyphal->makePublisher<uavcan_si_unit_voltage_Scalar_1_0>(
+        static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_CRCT_VIN_ID))
+    );
+    temperature_pub = cyphal->makePublisher<uavcan_si_unit_temperature_Scalar_1_0>(
+        static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_CRCT_TEMPERATURE_ID))
+    );
 }
 
 void CyphalCircuitStatus::update_params() {
@@ -34,18 +42,18 @@ void CyphalCircuitStatus::update_params() {
 
 void CyphalCircuitStatus::spin_once() {
     if (voltage_5v_pub.isEnabled()) {
-        float volt = CircuitPeriphery::voltage_5v();
-        voltage_5v_pub.publish(uavcan_si_sample_voltage_Scalar_1_0{0, volt});
+        voltage_5v_pub.msg.volt = CircuitPeriphery::voltage_5v();
+        voltage_5v_pub.publish();
     }
 
     if (voltage_vin_pub.isEnabled()) {
-        float volt = CircuitPeriphery::voltage_vin();
-        voltage_vin_pub.publish(uavcan_si_sample_voltage_Scalar_1_0{0, volt});
+        voltage_vin_pub.msg.volt = CircuitPeriphery::voltage_vin();
+        voltage_vin_pub.publish();
     }
 
     if (temperature_pub.isEnabled()) {
-        auto temp = (float)CircuitPeriphery::temperature();
-        temperature_pub.publish(uavcan_si_sample_temperature_Scalar_1_0{0, temp});
+        temperature_pub.msg.kelvin = CircuitPeriphery::temperature();
+        temperature_pub.publish();
     }
 
     set_health(CircuitPeriphery::is_failure() ? Status::MINOR_FAILURE : Status::OK);
