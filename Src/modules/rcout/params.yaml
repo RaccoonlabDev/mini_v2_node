@@ -18,7 +18,7 @@ pwm.frequency:
 
 pwm1.ch:
   type: Integer
-  note: Index of setpoint channel. [-1; 255]. -1 means disabled, # -2 means GPIO SET.
+  note: "Index of setpoint channel. [-1; 255]. -1 means disabled, XYZ/RPY: 0 - roll, 1 - pitch, 2 - yaw, -1 - off."
   enum: PARAM_PWM_1_CH
   flags: mutable
   default: -1
@@ -54,7 +54,7 @@ pwm1.def:
 
 pwm2.ch:
   type: Integer
-  note: Index of setpoint channel. [-1; 255]. -1 means disabled, # -2 means GPIO SET.
+  note: "Index of setpoint channel. [-1; 255]. -1 means disabled, XYZ/RPY: 0 - roll, 1 - pitch, 2 - yaw, -1 - off."
   enum: PARAM_PWM_2_CH
   flags: mutable
   default: -1
@@ -90,7 +90,7 @@ pwm2.def:
 
 pwm3.ch:
   type: Integer
-  note: Index of setpoint channel. [-1; 255]. -1 means disabled, # -2 means GPIO SET.
+  note: "Index of setpoint channel. [-1; 255]. -1 means disabled, XYZ/RPY: 0 - roll, 1 - pitch, 2 - yaw, -1 - off."
   enum: PARAM_PWM_3_CH
   flags: mutable
   default: -1
@@ -126,7 +126,7 @@ pwm3.def:
 
 pwm4.ch:
   type: Integer
-  note: Index of setpoint channel. [-1; 255]. -1 means disabled, # -2 means GPIO SET.
+  note: "Index of setpoint channel. [-1; 255]. -1 means disabled, XYZ/RPY: 0 - roll, 1 - pitch, 2 - yaw, -1 - off."
   enum: PARAM_PWM_4_CH
   flags: mutable
   default: -1

@@ -91,6 +91,10 @@ public:
         return last_recv_time_ms != 0 && HAL_GetTick() < last_recv_time_ms + cmd_ttl;
     }
 
+    void mark_command_fresh() {
+        last_recv_time_ms = HAL_GetTick();
+    }
+
 private:
     uint32_t last_recv_time_ms{0};
     uint32_t engaged_deadline_ms{0};

@@ -24,6 +24,7 @@ include_directories(${FFTW_INCLUDE_DIRS})
 FILE(GLOB commonSources 
     ${ROOT_DIR}/Src/common/FFT.cpp
     ${ROOT_DIR}/Src/common/oscillation_generator.cpp
+    ${ROOT_DIR}/Src/common/algorithms.cpp
 )
 
 function(gen_test app_name test_file)

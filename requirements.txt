@@ -1,3 +1,5 @@
 setuptools<80.9
 pyyaml
 raccoonlab-tools==0.2.0
+empy
+dronecan

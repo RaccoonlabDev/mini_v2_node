@@ -43,7 +43,7 @@ int8_t Mpu9250::read_gyroscope(SensorGyro* gyro) const {
     return 0;
 }
 
-int8_t Mpu9250::read_magnetometer(SensorGyro* mag) const {
+int8_t Mpu9250::read_magnetometer(SensorMag* mag) const {
     (*mag)[0] = 0.0;
     (*mag)[1] = 0.0;
     (*mag)[2] = 0.0;

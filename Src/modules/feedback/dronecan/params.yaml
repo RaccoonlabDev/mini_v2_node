@@ -24,3 +24,12 @@ feedback.hardpoint.enable:
   default: 0
   min: 0
   max: 1
+
+feedback.gimbal.enable:
+  type: Integer
+  note: 0 - disabled, 1 - enabled with degree publishing, 2 - enabled with quaternion publishing
+  enum: PARAM_FEEDBACK_GIMBAL_ENABLE
+  flags: mutable
+  default: 0
+  min: 0
+  max: 2

@@ -9,7 +9,21 @@
 
 #include <stdint.h>
 
-typedef uint16_t PwmDurationUs;
+using PwmDurationUs = uint16_t;
+static constexpr float PI_2 = 1.5707963267f;
+static constexpr float LOOSE_ERR = 1e-3f;
+static constexpr float PI = 3.1415926535f;
+static constexpr float CORDIC_GAIN = 0.607252935f;
+// Using a small epsilon for float comparisons
+static constexpr float FLT_EPSILON_LOCAL = 1e-7f;
+
+// Just precomputed arctan(2^-i) values for i = 0 to 11
+static const float CORDIC_TABLE[] = {
+    0.785398163f, 0.463647609f, 0.244978663f, 0.124354995f,
+    0.062418810f, 0.031239833f, 0.015623729f, 0.007812341f,
+    0.003906230f, 0.001953123f, 0.000976562f, 0.000488281f
+};
+
 
 /**
  * @brief Maps a 16-bit integer command to a PWM duration.
@@ -58,6 +72,39 @@ float mapPwmToPct(uint16_t pwm_val, int16_t pwm_min, int16_t pwm_max);
 
 void movingAverage(float* prev_avg, float crnt_val, uint16_t size);
 
+/**
+ * @brief Normalizes a quaternion to unit length
+ * @param q Quaternion to normalize in-place [x, y, z, w]
+ */
+void normalize_quaternion(float q[4]);
+
+/**
+ * @brief Converts quaternion to Euler angles (roll, pitch, yaw)
+ * @param q Quaternion in [x, y, z, w] order (body frame)
+ * @param angles_rpy Output array for [roll, pitch, yaw] in radians
+ */
+void quaternion_to_euler(const float q[4],
+                                float angles_rpy[3]);
+
+/** 
+ * @brief Converts radians to degrees for an array of three angles
+ */
+
+ /**
+ * @brief Converts Euler angles (degrees) to a quaternion.
+ * @param roll_deg, pitch_deg, yaw_deg Input angles in degrees.
+ * @param q Output array for quaternion in [x, y, z, w] order.
+ */
+void euler_to_quaternion(float const angles_rpy[3], float q[4]);
+
+/**
+ * @brief Optimized CORDIC sin/cos calculation.
+ * @param theta_rad Input angle in radians.
+ * @param s, c Pointers to output sine and cosine.
+ */
+void fast_sin_cos(float theta_rad, float* s, float* c);
+
+void rad_to_deg_array(float angles_rpy[3]);
 /**
  * @brief The Adaptive Alpha Filter is a variation of the exponential smoothing filter,
  * where the smoothing factor α is adjusted dynamically based on the magnitude of changes
