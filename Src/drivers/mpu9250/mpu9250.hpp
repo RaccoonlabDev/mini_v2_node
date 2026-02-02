@@ -38,17 +38,17 @@ public:
     /**
      * @return 0 on success, negative otherwise
      */
-    int8_t read_accelerometer(std::array<int16_t, 3>* accel) const;
+    int8_t read_accelerometer(SensorAccel* accel) const;
 
     /**
      * @return 0 on success, negative otherwise
      */
-    int8_t read_gyroscope(std::array<int16_t, 3>* gyro) const;
+    int8_t read_gyroscope(SensorGyro* gyro) const;
 
     /**
      * @return 0 on success, negative otherwise
      */
-    int8_t read_magnetometer(std::array<int16_t, 3>* mag) const;
+    int8_t read_magnetometer(SensorMag* mag) const;
 
     /**
      * @return 0 on success, negative otherwise
