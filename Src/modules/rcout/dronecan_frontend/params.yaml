@@ -1,6 +1,6 @@
 pwm.input_type:
   type: Integer
-  note: 0 means RawCommand, 1 means ArrayCommand, 2 is reserved for hardpoint.Command.
+  note: 0 means RawCommand, 1 means ArrayCommand, 2 is reserved for HardpointCommand, 3 is reserved for GimbalCommand.
   enum: PARAM_PWM_INPUT_TYPE
   flags: mutable
   default: 0
