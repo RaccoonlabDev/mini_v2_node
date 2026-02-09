@@ -17,7 +17,8 @@ enum class CommandType: uint8_t {
     RAW_COMMAND,
     ARRAY_COMMAND,
     HARDPOINT_COMMAND,
-
+    GIMBAL_COMMAND,
+    
     NUMBER_OF_COMMANDS,
 };
 

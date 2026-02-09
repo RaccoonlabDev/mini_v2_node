@@ -44,6 +44,7 @@ void DronecanPwmFrontend::update_params() {
 }
 
 void DronecanPwmFrontend::gimbal_angular_command_callback(const uavcan_equipment_camera_gimbal_AngularCommand& msg) {
+    if (pwm_cmd_type != CommandType::GIMBAL_COMMAND) return;
     // If node receives a command for a different gimbal, ignore it
     if (msg.gimbal_id != gimbal::gimbal_id) {
         return;
