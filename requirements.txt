@@ -3,3 +3,7 @@ pyyaml
 raccoonlab-tools==0.2.0
 empy
 dronecan
+
+# Dev
+pytest
+pytest-dependency

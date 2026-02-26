@@ -28,3 +28,31 @@ jobs:
         run: |
           cd Tests
           make coverage
+
+  python_integration_tests:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi linux-modules-extra-$(uname -r)
+          sudo apt-get install -y libfftw3-dev
+
+      - name: Build SITL DroneCAN
+        run: make sitl_dronecan
+
+      - name: Run Python integration tests against SITL
+        run: |
+          ./scripts/tools/can/vcan.sh slcan0
+          ./build/dronecan_sitl/obj/node > sitl.log 2>&1 &
+          SITL_PID=$!
+          trap 'kill $SITL_PID || true' EXIT
+          sleep 2
+          pytest -s Tests/test_issue_0001_pwm_same_channel_apply.py
