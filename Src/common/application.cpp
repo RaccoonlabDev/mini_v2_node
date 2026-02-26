@@ -5,8 +5,10 @@
  */
 
 #include "application.hpp"
+#include <algorithm>
 #include <array>
 #include <bitset>
+#include "flash_driver.h"
 #include "peripheral/adc/circuit_periphery.hpp"
 #include "peripheral/gpio/gpio.hpp"
 #include "peripheral/iwdg/iwdg.hpp"
@@ -19,10 +21,20 @@ static int8_t init_board_periphery() {
     Board::Led::reset();
     CircuitPeriphery::init();
 
-    auto libparams_integers_amount = (ParamIndex_t)IntParamsIndexes::INTEGER_PARAMS_AMOUNT;
-    auto libparams_strings_amount = NUM_OF_STR_PARAMS;
-    paramsInit(libparams_integers_amount, libparams_strings_amount, -1, 1);
-    paramsLoad();
+    auto libparams_ints_num = (ParamIndex_t)IntParamsIndexes::INTEGER_PARAMS_AMOUNT;
+    auto libparams_strs_num = NUM_OF_STR_PARAMS;
+    const size_t required_bytes_num = sizeof(IntegerParamValue_t) * libparams_ints_num +
+                                      MAX_STRING_LENGTH * libparams_strs_num;
+    const size_t page_size = flashGetPageSize();
+    const size_t pages_num = std::max<size_t>(1, (required_bytes_num + page_size - 1) / page_size);
+    const int32_t first_page_idx = -static_cast<int32_t>(pages_num);
+
+    if (paramsInit(libparams_ints_num, libparams_strs_num, first_page_idx, pages_num) != 0) {
+        return -1;
+    }
+    if (paramsLoad() != 0) {
+        return -1;
+    }
 
 #if defined(CAN1_TERMINATOR_Pin) && defined(CAN2_TERMINATOR_Pin)
     auto teminator_param = paramsGetIntegerValue(IntParamsIndexes::PARAM_SYSTEM_CAN_TEMINATOR);
