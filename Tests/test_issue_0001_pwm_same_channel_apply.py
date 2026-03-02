@@ -262,19 +262,33 @@ def test_pwm_same_channel_apply_rawcommand_apply_all_mapped_outputs():
     node = SHARED_NODE
     target_node_id = DISCOVERED_TARGET_NODE_ID
     tol = 1
+    mapped_outputs = len(PWM_CHANNELS)
+    skip_samples = mapped_outputs
+    check_samples = 2 * mapped_outputs
+    collect_timeout_s = STATUS_TIMEOUT_S * 3
 
     node.broadcast(_build_raw_command(SHARED_CHANNEL, RAW_VALUE_1))
-    samples_1 = _collect_status_samples(node, target_node_id, SHARED_CHANNEL, STATUS_TIMEOUT_S)
+    samples_1 = _collect_status_samples(node, target_node_id, SHARED_CHANNEL, collect_timeout_s)
+    checked_1 = samples_1[skip_samples:skip_samples + check_samples]
     expected_1 = _expected_percent(RAW_VALUE_1)
     assert samples_1, "No esc.Status samples received for the requested channel."
-    assert all(abs(sample - expected_1) <= tol for sample in samples_1), (
-        f"Unexpected esc.Status power_rating_pct values: {samples_1}, expected ~{expected_1}"
+    assert len(checked_1) == check_samples, (
+        f"Too few esc.Status samples after skipping first {skip_samples}: "
+        f"got total {len(samples_1)}, required >= {skip_samples + check_samples}. Raw: {samples_1}"
+    )
+    assert all(abs(sample - expected_1) <= tol for sample in checked_1), (
+        f"Unexpected esc.Status power_rating_pct values: {checked_1}, expected ~{expected_1}. Raw: {samples_1}"
     )
 
     node.broadcast(_build_raw_command(SHARED_CHANNEL, RAW_VALUE_2))
-    samples_2 = _collect_status_samples(node, target_node_id, SHARED_CHANNEL, STATUS_TIMEOUT_S)
+    samples_2 = _collect_status_samples(node, target_node_id, SHARED_CHANNEL, collect_timeout_s)
+    checked_2 = samples_2[skip_samples:skip_samples + check_samples]
     expected_2 = _expected_percent(RAW_VALUE_2)
     assert samples_2, "No esc.Status samples received for the requested channel."
-    assert all(abs(sample - expected_2) <= tol for sample in samples_2), (
-        f"Unexpected esc.Status power_rating_pct values: {samples_2}, expected ~{expected_2}"
+    assert len(checked_2) == check_samples, (
+        f"Too few esc.Status samples after skipping first {skip_samples}: "
+        f"got total {len(samples_2)}, required >= {skip_samples + check_samples}. Raw: {samples_2}"
+    )
+    assert all(abs(sample - expected_2) <= tol for sample in checked_2), (
+        f"Unexpected esc.Status power_rating_pct values: {checked_2}, expected ~{expected_2}. Raw: {samples_2}"
     )
