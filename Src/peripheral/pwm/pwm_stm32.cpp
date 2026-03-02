@@ -5,6 +5,7 @@
  */
 
 #include "pwm_stm32.hpp"
+#include <cmath>
 #include "common/algorithms.hpp"
 
 extern TIM_HandleTypeDef htim4;
@@ -37,7 +38,8 @@ uint32_t Pwm::get_duration(PwmPin pwm_pin) {
 }
 
 uint8_t Pwm::get_percent(PwmPin pin, uint32_t min_duration_us, uint32_t max_duration_us) {
-    return mapPwmToPct(get_duration(pin), min_duration_us, max_duration_us);
+    const float pct = mapPwmToPct(get_duration(pin), min_duration_us, max_duration_us);
+    return static_cast<uint8_t>(std::lround(pct));
 }
 
 void Pwm::set_frequency(PwmPin pwm_pin, uint32_t frequency_hz) {
