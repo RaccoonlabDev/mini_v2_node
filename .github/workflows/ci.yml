@@ -1,0 +1,167 @@
+name: CI
+on: push
+
+jobs:
+  code_style:
+    timeout-minutes: 1
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - run: pip install cpplint
+      - name: code style
+        run: make code_style
+
+  unit_tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install gtest
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y googletest libgtest-dev libgmock-dev make gcc-arm-none-eabi libfftw3-dev
+
+      - name: Build and run unit tests
+        run: cd Tests && make coverage
+
+  sitl_matrix:
+    needs: [code_style, unit_tests]
+    strategy:
+      matrix:
+        include:
+          - suite: rl_sitl_cyphal
+          - suite: rl_sitl_dronecan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    # GitHub Actions does not allow the secrets context inside if expression
+    # So, let's copy the secret into env
+    env:
+      LIBCPNODE_DEPLOY_KEY: ${{ secrets.LIBCPNODE_DEPLOY_KEY }}
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Check required env variables
+        shell: bash
+        run: |
+          if [[ "${{ matrix.suite }}" == "rl_sitl_cyphal" ]] && [[ -z "${{ env.LIBCPNODE_DEPLOY_KEY }}" ]]; then
+            echo "SKIP_THIS_SUITE=true" >> "$GITHUB_ENV"
+            echo "Skipping rl_sitl_cyphal (missing LIBCPNODE_DEPLOY_KEY)."
+          fi
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi linux-modules-extra-$(uname -r)
+          sudo apt-get install -y libfftw3-dev
+          python -m venv .venv && source .venv/bin/activate
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+          python -m pip install -r requirements.txt
+
+      - name: Setup SSH (Cyphal)
+        if: ${{ env.SKIP_THIS_SUITE != 'true' && matrix.suite == 'rl_sitl_cyphal' }}
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: |
+            ${{ secrets.LIBCPNODE_DEPLOY_KEY }}
+
+      - name: Build SITL
+        if: ${{ env.SKIP_THIS_SUITE != 'true' }}
+        run: make ${{ matrix.suite }}
+
+      - name: Run Cyphal SITL checks
+        if: ${{ env.SKIP_THIS_SUITE != 'true' && matrix.suite == 'rl_sitl_cyphal' }}
+        run: |
+          export REG_DATA_TYPE_PATH="$PWD/build/downloads/libcpnode/Libs/public_regulated_data_types/uavcan $PWD/build/downloads/libcpnode/Libs/public_regulated_data_types/reg"
+          make run &
+          cd scripts/tools/cyphal
+          source init.sh -i slcan0 -n 127 -v
+          ./specification_checker.py
+
+      - name: Run Python integration tests against SITL
+        if: ${{ env.SKIP_THIS_SUITE != 'true' && matrix.suite == 'rl_sitl_dronecan' }}
+        run: |
+          ./scripts/tools/can/vcan.sh slcan0
+          ./build/dronecan_sitl/obj/node > sitl.log 2>&1 &
+          SITL_PID=$!
+          trap 'kill $SITL_PID || true' EXIT
+          sleep 2
+          pytest -s Tests/test_issue_0001_pwm_same_channel_apply.py
+
+  build_and_deploy:
+    needs: [sitl_matrix]
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            image: "" # Let's use a GitHub-hosted virtual machine itself
+          # - runner: windows-2022
+          #   image: ""  # Containers on Windows runners are not supported
+    timeout-minutes: 10
+    runs-on: ${{ matrix.runner }}
+    container:
+      image: ${{ matrix.image }}
+
+    # GitHub Actions does not allow the secrets context inside if expression
+    # So, let's copy the secret into env
+    env:
+      LIBCPNODE_DEPLOY_KEY: ${{ secrets.LIBCPNODE_DEPLOY_KEY }}
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install dependencies (Ubuntu & Manjaro & Windows)
+        run: |
+          python -m venv .venv && source .venv/bin/activate
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python scripts/install.py
+        shell: bash
+
+      - name: Setup SSH
+        if: ${{ matrix.runner == 'ubuntu-24.04' && env.LIBCPNODE_DEPLOY_KEY != '' }}
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: |
+            ${{ secrets.LIBCPNODE_DEPLOY_KEY }}
+
+      # Temporary skip Cyphal build in forks - the mode is under refactoring since v1.4.0
+      - name: Set build target
+        shell: bash
+        run: |
+          if [[ "${{ matrix.runner }}" == "ubuntu-24.04" && -n "${{ secrets.LIBCPNODE_DEPLOY_KEY }}" && "${{ github.repository }}" == "RaccoonlabDev/mini_v2_node" ]]; then
+            echo "BUILD_TARGET=all" >> "$GITHUB_ENV"
+          else
+            echo "BUILD_TARGET=dronecan_v2 dronecan_v3" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build
+        shell: bash
+        run: make $BUILD_TARGET
+
+      - name: Deploy binaries to Telegram
+        if: >
+          matrix.runner == 'ubuntu-24.04' &&
+          github.repository == 'RaccoonlabDev/mini_v2_node' &&
+          (
+            github.ref_name == github.event.repository.default_branch ||
+            startsWith(github.ref, 'refs/tags/')
+          )
+        uses: PonomarevDA/telegram-upload@v1
+        with:
+          bot_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          files: build/release/*.bin
+          message: "Node"
+          add_git_info: "true"
