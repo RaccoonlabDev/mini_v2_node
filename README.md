@@ -54,11 +54,11 @@ The following table outlines the compatibility of the project with different ope
 
 | **Operating System** | **DroneCAN Support** | **Cyphal Support** | **Notes**                              |
 |----------------------|----------------------|--------------------|----------------------------------------|
-| Manjaro (latest)     | ✅ Supported         | ✅ Supported       | Latest Manjaro latest version.            |
 | Ubuntu 24.04         | ✅ Supported         | ✅ Supported       | Latest Ubuntu LTS version.             |
-| Ubuntu 22.04         | ✅ Supported         | ✅ Supported       | Fully supported for both modes.        |
+| Ubuntu 22.04         | ✅ Supported         | ✅ Supported       | Deprecated in mid-2026; unsupported in April 2027. |
+| Windows (2022)       | ⚠️ Not Maintained    | ⚠️ Not Maintained       | Current "latest" Windows version.      |
+| Manjaro (latest)     | ⚠️ Not Maintained    | ⚠️ Not Maintained  | No longer maintained by this project; may still work. |
 | Ubuntu 20.04         | ❌ Not Supported     | ❌ Not Supported   | Deprecated in 2025-04-15.              |
-| Windows (2022)       | ✅ Supported         | ✅ Supported       | Current "latest" Windows version.      |
 
 Requirements:
 - arm-none-eabi-gcc

@@ -9,11 +9,13 @@ set(CMAKE_DIR ${ROOT_DIR}/cmake)
 set(LIBPARAMS_PATH ${ROOT_DIR}/Libs/libparams)
 set(LIBPARAMS_CMAKE libparams.cmake)
 set(DOCS_ICD_PATH ${ROOT_DIR}/docs/icd_${CAN_PROTOCOL}.md)
+set(BUILD_ROOT_DIR ${ROOT_DIR}/build)
 
 # Option 1. Choose the platform
 option(USE_PLATFORM_UBUNTU "Build for SITL (Software In The Loop)" OFF)
 option(USE_PLATFORM_NODE_V2 "Build for stm32f103xB (128 KBytes)" OFF)
 option(USE_PLATFORM_NODE_V3 "Build for stm32g0b1 (512 KBytes)" OFF)
+set(BOARD_VENDOR rl CACHE STRING "Board vendor name under Src/boards")
 
 if(USE_PLATFORM_UBUNTU)
     set(LIBPARAMS_PLATFORM ubuntu)
@@ -21,6 +23,7 @@ if(USE_PLATFORM_UBUNTU)
     set(LIBCPNODE_CAN_PLATFORM socketcan)
     set(APP_PLATFORM ubuntu)
     set(PLATFORM_NAME sitl)
+    set(BOARD_NAME sitl)
     include(${CMAKE_DIR}/toolchain-ubuntu.cmake)
     add_compile_definitions(USE_PLATFORM_UBUNTU=1)
 elseif(USE_PLATFORM_NODE_V2)
@@ -29,6 +32,7 @@ elseif(USE_PLATFORM_NODE_V2)
     set(LIBCPNODE_CAN_PLATFORM bxcan)
     set(APP_PLATFORM stm32f103)
     set(PLATFORM_NAME v2)
+    set(BOARD_NAME mini_v2)
 
     set(stm32cubeMxProjectPath  ${ROOT_DIR}/Libs/stm32-cube-project)
     FILE(GLOB ldFile            ${stm32cubeMxProjectPath}/*_FLASH.ld)
@@ -47,6 +51,7 @@ elseif(USE_PLATFORM_NODE_V3)
     set(LIBCPNODE_CAN_PLATFORM fdcan)
     set(APP_PLATFORM stm32g0b1)
     set(PLATFORM_NAME v3)
+    set(BOARD_NAME mini_v3)
 
     set(stm32cubeMxProjectPath  ${ROOT_DIR}/Libs/mini-v3-ioc)
     FILE(GLOB ldFile            ${stm32cubeMxProjectPath}/*_FLASH.ld)
@@ -64,16 +69,19 @@ else()
     message(SEND_ERROR "Platform Error: Either v2 (stm32f103), v3 (stm32g0) or SITL (Linux) should be specified.")
 endif()
 
-# Option 2. Choose the protocol
-set(APPLICATION_DIR ${ROOT_DIR}/Src/applications/${CAN_PROTOCOL})
-if(NOT (EXISTS ${APPLICATION_DIR} AND IS_DIRECTORY ${APPLICATION_DIR}))
-    message(FATAL_ERROR "CAN_PROTOCOL '${CAN_PROTOCOL}' is unknown.")
+# Option 2. Choose the board target
+if(NOT CAN_PROTOCOL)
+    message(FATAL_ERROR "CAN_PROTOCOL is not specified.")
+endif()
+
+set(BOARD_DIR ${ROOT_DIR}/Src/boards/${BOARD_VENDOR}/${BOARD_NAME})
+if(NOT (EXISTS ${BOARD_DIR} AND IS_DIRECTORY ${BOARD_DIR}))
+    message(FATAL_ERROR "Board directory '${BOARD_DIR}' is not found.")
 endif()
 
 include(${CMAKE_DIR}/git.cmake)
 
 # Set build dir based on hardware version and protocol
-set(BUILD_ROOT_DIR ${ROOT_DIR}/build)
 set(BUILD_TARGET_DIR ${BUILD_ROOT_DIR}/${CAN_PROTOCOL}_${PLATFORM_NAME})
 set(BUILD_SRC_DIR ${BUILD_TARGET_DIR}/src)
 set(BUILD_OBJ_DIR ${BUILD_TARGET_DIR}/obj)
@@ -86,8 +94,19 @@ endif()
 
 include(${LIBPARAMS_PATH}/${LIBPARAMS_CMAKE})
 
-list(APPEND APPLICATION_HEADERS ${ROOT_DIR}/Src ${APPLICATION_DIR})
-include(${APPLICATION_DIR}/CMakeLists.txt)
+list(APPEND APPLICATION_HEADERS ${ROOT_DIR}/Src ${BOARD_DIR})
+set(APPLICATION_DIR ${BOARD_DIR})
+
+if(CAN_PROTOCOL STREQUAL "both")
+    include(${BOARD_DIR}/cyphal.cmake)
+    include(${BOARD_DIR}/dronecan.cmake)
+else()
+    set(BOARD_TARGET_FILE ${BOARD_DIR}/${CAN_PROTOCOL}.cmake)
+    if(NOT EXISTS ${BOARD_TARGET_FILE})
+        message(FATAL_ERROR "Target '${CAN_PROTOCOL}' for board '${BOARD_VENDOR}/${BOARD_NAME}' is unknown.")
+    endif()
+    include(${BOARD_TARGET_FILE})
+endif()
 
 # Prebuild
 include(${CMAKE_DIR}/params.cmake)
