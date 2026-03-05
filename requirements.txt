@@ -2,8 +2,15 @@ setuptools<80.9
 pyyaml
 raccoonlab-tools==0.2.0
 empy
-dronecan
+pexpect
 
 # Dev
+cpplint
 pytest
 pytest-dependency
+
+# DroneCAN
+dronecan
+
+# Cyphal
+yakut==0.13.0
