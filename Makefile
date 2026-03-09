@@ -99,7 +99,7 @@ tests:
 	${ROOT_DIR}/scripts/tests.sh
 
 upload:
-	LATEST_TARGET=$$(ls -td ${BUILD_DIR}/release/*.bin | head -1) && ./scripts/tools/stm32/flash.sh $$LATEST_TARGET
+	LATEST_TARGET=$$(ls -td ${BUILD_DIR}/release/*.bin | head -1) && ./scripts/flash.sh $$LATEST_TARGET
 
 SOCKETCAN_URL:=https://gist.githubusercontent.com/PonomarevDA/6ecc8fc340e4c50619c1e5dfcedc37b2/raw/2db6d1626a9ada543602ff0a52b48fecb94e6e07/socketcan.sh
 SOCKETCAN_EXECUTABLE:=build/tools/socketcan-v1.0.2.sh
