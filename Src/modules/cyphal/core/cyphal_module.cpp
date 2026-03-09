@@ -8,7 +8,7 @@
 #include <algorithm>
 #include "libcpnode/cyphal.hpp"
 #include "params.hpp"
-#include "peripheral/adc/circuit_periphery.hpp"
+#include "drivers/board_monitor/board_monitor.hpp"
 
 REGISTER_MODULE(CyphalModule)
 
@@ -94,7 +94,7 @@ libcpnode::AppInfo buildCyphalAppInfo() {
     auto node_name_param_idx = static_cast<ParamIndex_t>(StrParamsIndexes::PARAM_SYSTEM_NAME);
     const auto current_node_name = (const char*)paramsGetStringValue(node_name_param_idx);
     if (current_node_name == nullptr || strlen(current_node_name) == 0) {
-        const auto& [board_name, name_length] = CircuitPeriphery::get_board_name();
+        const auto& [board_name, name_length] = BoardMonitor::get_board_name();
         paramsSetStringValue(node_name_param_idx, name_length, (const uint8_t*)board_name);
     }
 

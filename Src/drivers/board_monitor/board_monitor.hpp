@@ -1,13 +1,17 @@
-// Copyright (C) 2024 Anastasiia Stepanova <asiiapine@gmail.com>
-// Distributed under the terms of the GPL v3 license, available in the file LICENSE.
+/**
+ * This program is free software under the GNU General Public License v3.
+ * See <https://www.gnu.org/licenses/> for details.
+ * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
+ */
 
-#ifndef SRC_DRIVER_CIRCUIT_PERIPHERY_HPP_
-#define SRC_DRIVER_CIRCUIT_PERIPHERY_HPP_
+#ifndef SRC_DRIVERS_BOARD_MONITOR_BOARD_MONITOR_HPP_
+#define SRC_DRIVERS_BOARD_MONITOR_BOARD_MONITOR_HPP_
 
 #include <stdint.h>
 #include <limits>
 #include <utility>
 #include "peripheral/adc/adc.hpp"
+#include "adc_mapping.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,10 +29,10 @@ enum class BoardType : uint8_t {
     BOARDS_AMOUNT,
 };
 
-class CircuitPeriphery{
+class BoardMonitor{
 public:
     static int8_t init(){
-        return HAL::Adc::init();
+        return HAL::Adc::init(BoardAdc::DMA_CHANNEL_COUNT);
     }
 
     /**
@@ -40,6 +44,10 @@ public:
      * @return The current in Amperes if the hardware supports it, otherwise NaN.
      */
     static float current() {
+        if (BoardAdc::RANK_CURRENT == BoardAdc::INVALID_RANK) {
+            return std::numeric_limits<float>::quiet_NaN();
+        }
+
         if (auto hw_version = hardware_version(); hw_version < 2403 || hw_version > 2450) {
             return std::numeric_limits<float>::quiet_NaN();
         }
@@ -49,24 +57,35 @@ public:
         constexpr float MAX_SENSOR_CURRENT = 10.0f;
         constexpr float CALIBRATION_COEF = 0.6666667f;
         constexpr float ADC_CURRENT_MULTIPLIER = MAX_SENSOR_CURRENT * CALIBRATION_COEF / 4095.0f;
-        uint16_t curr = HAL::Adc::get(HAL::AdcChannel::ADC_CURRENT);
+        uint16_t curr = HAL::Adc::get(BoardAdc::RANK_CURRENT);
         return curr * ADC_CURRENT_MULTIPLIER;
     }
 
     static float voltage_vin() {
+        if (BoardAdc::RANK_VIN == BoardAdc::INVALID_RANK) {
+            return std::numeric_limits<float>::quiet_NaN();
+        }
+
         constexpr float ADC_VIN_MULTIPLIER = 1.0f / 64.0f;
-        uint16_t volt = HAL::Adc::get(HAL::AdcChannel::ADC_VIN);
+        uint16_t volt = HAL::Adc::get(BoardAdc::RANK_VIN);
         return volt * ADC_VIN_MULTIPLIER;
     }
 
     static float voltage_5v() {
+        if (BoardAdc::RANK_5V == BoardAdc::INVALID_RANK) {
+            return std::numeric_limits<float>::quiet_NaN();
+        }
+
         constexpr float ADC_5V_MULTIPLIER = 1.0f / 640.0f;
-        uint16_t volt = HAL::Adc::get(HAL::AdcChannel::ADC_5V);
+        uint16_t volt = HAL::Adc::get(BoardAdc::RANK_5V);
         return volt * ADC_5V_MULTIPLIER;
     }
 
     static uint16_t hardware_version() {
-        return HAL::Adc::get(HAL::AdcChannel::ADC_VERSION);
+        if (BoardAdc::RANK_VERSION == BoardAdc::INVALID_RANK) {
+            return 0;
+        }
+        return HAL::Adc::get(BoardAdc::RANK_VERSION);
     }
 
     static bool overvoltage() {
@@ -97,4 +116,4 @@ public:
 }
 #endif
 
-#endif  // SRC_DRIVER_CIRCUIT_PERIPHERY_HPP_
+#endif  // SRC_DRIVERS_BOARD_MONITOR_BOARD_MONITOR_HPP_

@@ -4,7 +4,7 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#include "circuit_periphery.hpp"
+#include "board_monitor.hpp"
 #include <array>
 #include "application.hpp"
 #include "main.h"
@@ -35,8 +35,12 @@ static const std::array<std::pair<const char*, uint16_t>, (int)BoardType::BOARDS
     {"co.rl.mini.v3", 14},
 }};
 
-uint16_t CircuitPeriphery::temperature() {
-    auto adc_12b = HAL::Adc::get(HAL::AdcChannel::ADC_TEMPERATURE);
+uint16_t BoardMonitor::temperature() {
+    if (BoardAdc::RANK_TEMPERATURE == BoardAdc::INVALID_RANK) {
+        return 0;
+    }
+
+    auto adc_12b = HAL::Adc::get(BoardAdc::RANK_TEMPERATURE);
     uint16_t temperature_kelvin;
 #ifdef STM32G0B1xx
     temperature_kelvin = __HAL_ADC_CALC_TEMPERATURE(3300, adc_12b, ADC_RESOLUTION_12B) + 273;
@@ -49,8 +53,8 @@ uint16_t CircuitPeriphery::temperature() {
     return temperature_kelvin;
 }
 
-BoardType CircuitPeriphery::detect_board_type() {
-    auto hardware_version = CircuitPeriphery::hardware_version();
+BoardType BoardMonitor::detect_board_type() {
+    auto hardware_version = BoardMonitor::hardware_version();
 
     int board_counter = 0;
 
@@ -65,6 +69,6 @@ BoardType CircuitPeriphery::detect_board_type() {
     return (detected_board < BoardType::BOARDS_AMOUNT) ? detected_board : BoardType::MINI_V2_1_1;
 }
 
-std::pair<const char*, uint8_t> CircuitPeriphery::get_board_name() {
+std::pair<const char*, uint8_t> BoardMonitor::get_board_name() {
     return names[(uint8_t)detect_board_type()];
 }

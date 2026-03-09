@@ -9,7 +9,7 @@
 #include "params.hpp"
 #include "libdcnode/dronecan.h"
 #include "libdcnode/can_driver.h"
-#include "peripheral/adc/circuit_periphery.hpp"
+#include "drivers/board_monitor/board_monitor.hpp"
 
 #ifndef GIT_HASH
     #warning "GIT_HASH has been assigned to 0 by default."
@@ -109,7 +109,7 @@ void DronecanModule::init() {
     auto node_name_param_idx = static_cast<ParamIndex_t>(StrParamsIndexes::PARAM_SYSTEM_NAME);
     const auto current_node_name = (const char*)paramsGetStringValue(node_name_param_idx);
     if(strlen(current_node_name) == 0) {
-        const auto& [board_name, name_length] = CircuitPeriphery::get_board_name();
+        const auto& [board_name, name_length] = BoardMonitor::get_board_name();
         paramsSetStringValue(node_name_param_idx, name_length, (const uint8_t*)board_name);
     }
     int param_node_id_value = paramsGetIntegerValue(IntParamsIndexes::PARAM_UAVCAN_NODE_ID);

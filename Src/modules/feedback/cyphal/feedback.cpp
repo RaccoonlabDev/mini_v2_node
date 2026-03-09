@@ -8,7 +8,7 @@
 #include <algorithm>
 #include "libcpnode/cyphal.hpp"
 #include "params.hpp"
-#include "peripheral/adc/circuit_periphery.hpp"
+#include "drivers/board_monitor/board_monitor.hpp"
 
 REGISTER_MODULE(CyphalFeedbackModule)
 
@@ -77,9 +77,9 @@ void CyphalFeedbackModule::spin_once() {
 
         // Here we also need to map these things correctly...
         compact_feedback.msg = {
-            .dc_voltage = static_cast<uint16_t>(CircuitPeriphery::voltage_vin()),
-            .dc_current = static_cast<int16_t>(CircuitPeriphery::current()),
-            .phase_current_amplitude = static_cast<int16_t>(CircuitPeriphery::current()),
+            .dc_voltage = static_cast<uint16_t>(BoardMonitor::voltage_vin()),
+            .dc_current = static_cast<int16_t>(BoardMonitor::current()),
+            .phase_current_amplitude = static_cast<int16_t>(BoardMonitor::current()),
             .velocity = 0,
             .demand_factor_pct = (int8_t)Driver::RCPWM::get_pin_percent(pin_idx),
         };
