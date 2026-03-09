@@ -90,9 +90,22 @@ tests:
 
 upload:
 	LATEST_TARGET=$$(ls -td ${BUILD_DIR}/release/*.bin | head -1) && ./scripts/tools/stm32/flash.sh $$LATEST_TARGET
-run:
-	./scripts/tools/can/vcan.sh slcan0
-	LATEST_TARGET=$$(ls -td ${BUILD_DIR}/* | head -1) && $$LATEST_TARGET/obj/node
+
+SOCKETCAN_URL:=https://gist.githubusercontent.com/PonomarevDA/6ecc8fc340e4c50619c1e5dfcedc37b2/raw/2db6d1626a9ada543602ff0a52b48fecb94e6e07/socketcan.sh
+SOCKETCAN_EXECUTABLE:=build/tools/socketcan-v1.0.2.sh
+download_socketcan:
+	@test -x "${SOCKETCAN_EXECUTABLE}" || { \
+		mkdir -p build/tools; \
+		curl -fsSL "${SOCKETCAN_URL}" -o "${SOCKETCAN_EXECUTABLE}"; \
+		chmod +x "${SOCKETCAN_EXECUTABLE}"; \
+	}
+create_slcan0: download_socketcan
+	${SOCKETCAN_EXECUTABLE} --virtual-can --interface slcan0
+remove_slcan0: download_socketcan
+	${SOCKETCAN_EXECUTABLE} --remove --interface slcan0
+
+run: create_slcan0
+	LATEST_TARGET=$$(ls -td build/*/obj/node | head -1 | head -1) && $$LATEST_TARGET
 clean_releases:
 	-rm -fR ${BUILD_DIR}/release
 clean:
