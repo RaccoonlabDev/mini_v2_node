@@ -7,7 +7,7 @@
 #include "circuit_status.hpp"
 #include <algorithm>
 #include "libcpnode/cyphal.hpp"
-#include "peripheral/adc/circuit_periphery.hpp"
+#include "drivers/board_monitor/board_monitor.hpp"
 #include "params.hpp"
 
 REGISTER_MODULE(CyphalCircuitStatus)
@@ -42,19 +42,19 @@ void CyphalCircuitStatus::update_params() {
 
 void CyphalCircuitStatus::spin_once() {
     if (voltage_5v_pub.isEnabled()) {
-        voltage_5v_pub.msg.volt = CircuitPeriphery::voltage_5v();
+        voltage_5v_pub.msg.volt = BoardMonitor::voltage_5v();
         voltage_5v_pub.publish();
     }
 
     if (voltage_vin_pub.isEnabled()) {
-        voltage_vin_pub.msg.volt = CircuitPeriphery::voltage_vin();
+        voltage_vin_pub.msg.volt = BoardMonitor::voltage_vin();
         voltage_vin_pub.publish();
     }
 
     if (temperature_pub.isEnabled()) {
-        temperature_pub.msg.kelvin = CircuitPeriphery::temperature();
+        temperature_pub.msg.kelvin = BoardMonitor::temperature();
         temperature_pub.publish();
     }
 
-    set_health(CircuitPeriphery::is_failure() ? Status::MINOR_FAILURE : Status::OK);
+    set_health(BoardMonitor::is_failure() ? Status::MINOR_FAILURE : Status::OK);
 }

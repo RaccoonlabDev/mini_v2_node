@@ -8,7 +8,7 @@
 
 #include "feedback.hpp"
 #include "peripheral/pwm/pwm.hpp"
-#include "peripheral/adc/circuit_periphery.hpp"
+#include "drivers/board_monitor/board_monitor.hpp"
 #include "drivers/rcpwm/rcpwm.hpp"
 #include "modules/rcout/dronecan_frontend/dronecan_frontend.hpp"
 #include "params.hpp"
@@ -58,9 +58,9 @@ void DronecanFeedbackModule::spin_once() {
 void DronecanFeedbackModule::publish_esc_status(uint8_t pin_idx) {
     esc_status.msg = {
         .error_count = esc_status.msg.error_count + 1, // FIXME: implement proper error counting
-        .voltage = CircuitPeriphery::voltage_vin(),
-        .current = CircuitPeriphery::current(),
-        .temperature = static_cast<float>(CircuitPeriphery::temperature()),
+        .voltage = BoardMonitor::voltage_vin(),
+        .current = BoardMonitor::current(),
+        .temperature = static_cast<float>(BoardMonitor::temperature()),
         .rpm = 0,
         .power_rating_pct = Driver::RCPWM::get_pin_percent(pin_idx),
         .esc_index = (uint8_t)Driver::RCPWM::get_pin_channel(pin_idx),
@@ -75,9 +75,9 @@ void DronecanFeedbackModule::publish_actuator_status(uint8_t pin_idx) {
 
         // The following fields are not used in PX4 anyway
         // Let's fill them with something useful for logging for a while
-        .position = CircuitPeriphery::voltage_5v(),
-        .force = CircuitPeriphery::current(),
-        .speed = static_cast<float>(CircuitPeriphery::temperature()),
+        .position = BoardMonitor::voltage_5v(),
+        .force = BoardMonitor::current(),
+        .speed = static_cast<float>(BoardMonitor::temperature()),
 
         .power_rating_pct = Driver::RCPWM::get_pin_percent(pin_idx),
     };

@@ -16,7 +16,7 @@ add_executable(${EXECUTABLE}
     ${ROOT_DIR}/Src/common/oscillation_generator.cpp
     ${ROOT_DIR}/Src/common/FFT.cpp
 
-    ${ROOT_DIR}/Src/peripheral/adc/circuit_periphery.cpp
+    ${ROOT_DIR}/Src/drivers/board_monitor/board_monitor.cpp
     ${CMAKE_CURRENT_LIST_DIR}/platform_specific.cpp
     ${CMAKE_CURRENT_LIST_DIR}/rcpwm_channels.cpp
 )

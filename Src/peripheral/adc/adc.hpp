@@ -12,21 +12,17 @@
 
 namespace HAL {
 
-enum class AdcChannel : uint8_t {
-    ADC_VIN,
-    ADC_5V,
-    ADC_CURRENT,
-    ADC_VERSION,
-    ADC_TEMPERATURE,
-    ADC_NUMBER_OF_CNANNELS,
-};
-
 class Adc {
 public:
-    static int8_t init();
-    static uint16_t get(AdcChannel channel);
+    static int8_t init(uint8_t channel_count);
+    static uint16_t get(uint8_t rank);
+    static uint8_t channel_count() { return _channel_count; }
+#ifdef USE_PLATFORM_UBUNTU
+    static int8_t set(uint8_t rank, uint16_t value);
+#endif
 private:
     static inline bool _is_adc_already_inited = false;
+    static inline uint8_t _channel_count = 0;
 };
 
 }  // namespace HAL

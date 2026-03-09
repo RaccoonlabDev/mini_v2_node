@@ -10,37 +10,34 @@
 namespace HAL {
 
 struct adcState {
-    uint16_t current;
-    uint16_t v_in;
-    uint16_t v_5v;
-    uint16_t version;
-    uint16_t temperature;
+    static constexpr uint8_t MAX_CHANNELS = 16;
+    uint16_t channels[MAX_CHANNELS];
 };
 adcState state = {};
 
-int8_t Adc::init() {
-    state.temperature = 3115;
-    state.current = 2048;
-    state.v_in = 640;
-    state.v_5v = 3200;
+int8_t Adc::init(uint8_t channel_count) {
+    if (channel_count == 0 || channel_count > adcState::MAX_CHANNELS) {
+        return -1;
+    }
+
+    _channel_count = channel_count;
     _is_adc_already_inited = true;
     return 0;
 }
 
-uint16_t Adc::get(AdcChannel channel) {
-    switch (channel)
-    {
-    case AdcChannel::ADC_VIN:
-        return state.v_in;
-    case AdcChannel::ADC_CURRENT:
-        return state.current;
-    case AdcChannel::ADC_TEMPERATURE:
-        return state.temperature;
-    case AdcChannel::ADC_5V:
-        return state.v_5v;
-    default:
-        break;
+uint16_t Adc::get(uint8_t rank) {
+    if (!_is_adc_already_inited || rank >= _channel_count) {
+        return 0;
     }
+    return state.channels[rank];
+}
+
+int8_t Adc::set(uint8_t rank, uint16_t value) {
+    if (!_is_adc_already_inited || rank >= _channel_count || value > 4095) {
+        return -1;
+    }
+
+    state.channels[rank] = value;
     return 0;
 }
 

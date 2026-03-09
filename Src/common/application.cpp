@@ -9,7 +9,7 @@
 #include <array>
 #include <bitset>
 #include "flash_driver.h"
-#include "peripheral/adc/circuit_periphery.hpp"
+#include "drivers/board_monitor/board_monitor.hpp"
 #include "peripheral/gpio/gpio.hpp"
 #include "peripheral/iwdg/iwdg.hpp"
 #include "peripheral/led/led.hpp"
@@ -19,7 +19,7 @@
 
 static int8_t init_board_periphery() {
     Board::Led::reset();
-    CircuitPeriphery::init();
+    BoardMonitor::init();
 
     auto libparams_ints_num = (ParamIndex_t)IntParamsIndexes::INTEGER_PARAMS_AMOUNT;
     auto libparams_strs_num = NUM_OF_STR_PARAMS;

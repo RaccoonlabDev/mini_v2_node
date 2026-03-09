@@ -9,6 +9,7 @@ include(${ROOT_DIR}/Src/modules/dronecan/arming/CMakeLists.txt)
 include(${ROOT_DIR}/Src/modules/circuit_status/dronecan/CMakeLists.txt)
 include(${ROOT_DIR}/Src/modules/feedback/dronecan/CMakeLists.txt)
 include(${ROOT_DIR}/Src/modules/rcout/CMakeLists.txt)
+include(${ROOT_DIR}/Src/modules/sitl/CMakeLists.txt)
 
 if(USE_PLATFORM_NODE_V3 OR USE_PLATFORM_UBUNTU)
     include(${ROOT_DIR}/Src/modules/imu/CMakeLists.txt)
