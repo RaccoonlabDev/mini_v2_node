@@ -1,6 +1,6 @@
 # Copyright (C) 2023-2024 Dmitry Ponomarev <ponomarevda96@gmail.com>
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
-.PHONY: require_target all checks code_style tests upload run clean_releases clean distclean \
+.PHONY: require_target all checks code_style tests upload run clean_releases clean distclean build \
 	rl_mini_v2_default rl_mini_v2_dronecan rl_mini_v2_cyphal \
 	rl_mini_v3_default rl_mini_v3_dronecan rl_mini_v3_cyphal rl_mini_v3_both \
 	rl_sitl_default rl_sitl_dronecan rl_sitl_cyphal \
@@ -10,12 +10,19 @@
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 BUILD_DIR:=$(ROOT_DIR)/build
 
+# Generic build inputs:
+# BOARD - board path under Src/boards, for example: rl/mini_v2
+# TARGET - board target file name, for example: default, dronecan, cyphal, both
+BOARD?=
+TARGET?=
+BUILD_VARIANT?=$(subst /,_,$(BOARD))_$(TARGET)
 
 require_target:
 ifeq ($(strip $(MAKECMDGOALS)),)
 	@echo "Error: target is not specified."
-	@echo "Use: make <target>"
-	@echo "Targets: all rl_mini_v2_default rl_mini_v2_dronecan rl_mini_v2_cyphal rl_mini_v3_default rl_mini_v3_dronecan rl_mini_v3_cyphal rl_mini_v3_both rl_sitl_default rl_sitl_dronecan rl_sitl_cyphal code_style tests clean clean_releases distclean"
+	@echo "Use generic mode: make build BOARD=<vendor/board> TARGET=<target>"
+	@echo "Example: make build BOARD=rl/mini_v2 TARGET=default"
+	@echo "Or use aliases: rl_mini_v2_default, rl_mini_v3_cyphal, ..."
 	@exit 2
 else
 	@:
@@ -23,46 +30,49 @@ endif
 
 all: clean_releases rl_mini_v2_default rl_mini_v2_cyphal rl_mini_v3_default rl_mini_v3_cyphal rl_mini_v3_both rl_sitl_default rl_sitl_cyphal
 
+build: checks
+ifeq ($(strip $(BOARD)),)
+	$(error BOARD is not set. Use: make build BOARD=<vendor/board> TARGET=<target>)
+endif
+ifeq ($(strip $(TARGET)),)
+	$(error TARGET is not set. Use: make build BOARD=<vendor/board> TARGET=<target>)
+endif
+	mkdir -p ${BUILD_DIR}/${BUILD_VARIANT}/obj
+	cd ${BUILD_DIR}/${BUILD_VARIANT}/obj && cmake -DBOARD=${BOARD} -DBOARD_TARGET=${TARGET} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -G "Unix Makefiles" ../../.. && make
+
 #
-# rl/mini_v2
+# rl/mini_v2 aliases
 #
-rl_mini_v2_default: rl_mini_v2_dronecan
+rl_mini_v2_default: checks
+	$(MAKE) build BOARD=rl/mini_v2 TARGET=default BUILD_VARIANT=dronecan_v2
 rl_mini_v2_dronecan: checks
-	mkdir -p ${BUILD_DIR}/dronecan_v2/obj
-	cd ${BUILD_DIR}/dronecan_v2/obj && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_NODE_V2=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -G "Unix Makefiles" ../../.. && make
+	$(MAKE) build BOARD=rl/mini_v2 TARGET=dronecan BUILD_VARIANT=dronecan_v2
 rl_mini_v2_cyphal: checks
-	mkdir -p ${BUILD_DIR}/cyphal_v2/obj
-	cd ${BUILD_DIR}/cyphal_v2/obj && cmake -DCAN_PROTOCOL=cyphal -DUSE_PLATFORM_NODE_V2=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -G "Unix Makefiles" ../../.. && make
+	$(MAKE) build BOARD=rl/mini_v2 TARGET=cyphal BUILD_VARIANT=cyphal_v2
 rl_mini_v2_both: checks
-	mkdir -p ${BUILD_DIR}/both_v2/obj
-	cd ${BUILD_DIR}/both_v2/obj && cmake -DCAN_PROTOCOL=both -DUSE_PLATFORM_NODE_V2=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -G "Unix Makefiles" ../../.. && make
+	$(MAKE) build BOARD=rl/mini_v2 TARGET=both BUILD_VARIANT=both_v2
 
 #
-# rl/mini_v3
+# rl/mini_v3 aliases
 #
-rl_mini_v3_default: rl_mini_v3_dronecan
+rl_mini_v3_default: checks
+	$(MAKE) build BOARD=rl/mini_v3 TARGET=default BUILD_VARIANT=dronecan_v3
 rl_mini_v3_dronecan: checks
-	mkdir -p ${BUILD_DIR}/dronecan_v3/obj
-	cd ${BUILD_DIR}/dronecan_v3/obj && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_NODE_V3=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -G "Unix Makefiles" ../../.. && make
+	$(MAKE) build BOARD=rl/mini_v3 TARGET=dronecan BUILD_VARIANT=dronecan_v3
 rl_mini_v3_cyphal: checks
-	mkdir -p ${BUILD_DIR}/cyphal_v3/obj
-	cd ${BUILD_DIR}/cyphal_v3/obj && cmake -DCAN_PROTOCOL=cyphal -DUSE_PLATFORM_NODE_V3=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -G "Unix Makefiles" ../../.. && make
+	$(MAKE) build BOARD=rl/mini_v3 TARGET=cyphal BUILD_VARIANT=cyphal_v3
 rl_mini_v3_both: checks
-	mkdir -p ${BUILD_DIR}/both_v3/obj
-	cd ${BUILD_DIR}/both_v3/obj && cmake -DCAN_PROTOCOL=both -DUSE_PLATFORM_NODE_V3=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -G "Unix Makefiles" ../../.. && make
+	$(MAKE) build BOARD=rl/mini_v3 TARGET=both BUILD_VARIANT=both_v3
 
 #
-# rl/sitl
+# rl/sitl aliases
 #
-rl_sitl_default: rl_sitl_dronecan
+rl_sitl_default: checks
+	$(MAKE) build BOARD=rl/sitl TARGET=default BUILD_VARIANT=dronecan_sitl
 rl_sitl_dronecan: checks
-	mkdir -p ${BUILD_DIR}/dronecan_sitl/obj
-# Prevents bug when last modified dir is not sitl so script looks into build/release in run
-	touch ${BUILD_DIR}/dronecan_sitl
-	cd ${BUILD_DIR}/dronecan_sitl/obj && cmake -DCAN_PROTOCOL=dronecan -DUSE_PLATFORM_UBUNTU=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -G "Unix Makefiles" ../../.. && make
+	$(MAKE) build BOARD=rl/sitl TARGET=dronecan BUILD_VARIANT=dronecan_sitl
 rl_sitl_cyphal: checks
-	mkdir -p ${BUILD_DIR}/cyphal_sitl/obj
-	cd ${BUILD_DIR}/cyphal_sitl/obj && cmake -DCAN_PROTOCOL=cyphal -DUSE_PLATFORM_UBUNTU=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -G "Unix Makefiles" ../../.. && make
+	$(MAKE) build BOARD=rl/sitl TARGET=cyphal BUILD_VARIANT=cyphal_sitl
 
 #
 # Legacy (for compatibility)
