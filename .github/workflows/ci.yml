@@ -89,7 +89,8 @@ jobs:
         if: ${{ env.SKIP_THIS_SUITE != 'true' && matrix.suite == 'rl_sitl_dronecan' }}
         run: |
           make create_slcan0
-          ./build/dronecan_sitl/obj/node > sitl.log 2>&1 &
+          test -x ./build/rl_sitl_dronecan_standalone/obj/node
+          ./build/rl_sitl_dronecan_standalone/obj/node > sitl.log 2>&1 &
           SITL_PID=$!
           trap 'kill $SITL_PID || true' EXIT
           sleep 2
