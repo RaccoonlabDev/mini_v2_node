@@ -96,7 +96,7 @@ Each module is expected to have a yaml file with his parameters.
 
 ### 3.6. Application entry point
 
-After the peripheral initialization the application goes to the `application_entry_point()` in [Src/common/application.cpp](Src/common/application.cpp). It is assumed that a user will provide a custom application here.
+After the peripheral initialization the application goes to the `application_entry_point()` in [Src/modules/application/application.cpp](Src/modules/application/application.cpp). It is assumed that a user will provide a custom application here.
 
 ## 4. Running SITL mode
 
@@ -193,7 +193,7 @@ Since [Libs/stm32-cube-project](Libs/stm32-cube-project) is submodule, you can e
 
 ### 6.4. Modify the application
 
-The main application is started in [Src/common/application.cpp](Src/common/application.cpp).
+The main application is started in [Src/modules/application/application.cpp](Src/modules/application/application.cpp).
 By default it just blinks the RGB LED, subscribes to the setpoint topic to control PWM1 and publishes a feedback with the latest applied setpoint.
 
 > Note, that the application is as simple as possible: it controls only a single PWM and doesn't have safety features like TTL, but you are free to extend it as you want.

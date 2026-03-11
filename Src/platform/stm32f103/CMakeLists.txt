@@ -8,7 +8,6 @@ add_executable(${EXECUTABLE}
     ${BUILD_SRC_DIR}/params.cpp
     ${ROOT_DIR}/Src/common/algorithms.cpp
     ${ROOT_DIR}/Src/common/logging.cpp
-    ${ROOT_DIR}/Src/common/application.cpp
     ${ROOT_DIR}/Src/common/module.cpp
 
     ${ROOT_DIR}/Src/drivers/board_monitor/board_monitor.cpp
@@ -53,5 +52,8 @@ add_custom_command(TARGET ${EXECUTABLE}
     COMMAND ${CMAKE_OBJCOPY} -O binary ${EXECUTABLE} ${BUILD_OBJ_DIR}/${PROJECT_NAME}.bin
     COMMAND ${CMAKE_OBJCOPY} -I binary -O elf32-little ${EXECUTABLE} ${BUILD_OBJ_DIR}/${PROJECT_NAME}.elf
 )
+
+include(${CMAKE_DIR}/bootloader_application_postprocess.cmake)
+configure_bootloader_application_postprocess(${EXECUTABLE})
 
 include(${CMAKE_DIR}/create_binary_with_meaningful_name.cmake)

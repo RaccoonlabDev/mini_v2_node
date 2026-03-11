@@ -3,18 +3,29 @@
 
 
 set(EXECUTABLE ${PROJECT_NAME})
+
+#
+# @todo Later rcpwm_channels.cpp and pwm.cpp should be refactored and moven to Src/boards
+#
+if(BOARD_TARGET_BOOTLOADER)
+    set(PLATFORM_RCPWM_PWM_SOURCES)
+else()
+    set(PLATFORM_RCPWM_PWM_SOURCES
+        ${CMAKE_CURRENT_LIST_DIR}/pwm.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/rcpwm_channels.cpp
+    )
+endif()
+
 add_executable(${EXECUTABLE}
     ${APPLICATION_SOURCES}
     ${PERIPHERAL_SOURCES}
     ${BUILD_SRC_DIR}/params.cpp
     ${ROOT_DIR}/Src/common/algorithms.cpp
     ${ROOT_DIR}/Src/common/logging.cpp
-    ${ROOT_DIR}/Src/common/application.cpp
     ${ROOT_DIR}/Src/common/module.cpp
 
     ${ROOT_DIR}/Src/drivers/board_monitor/board_monitor.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/pwm.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/rcpwm_channels.cpp
+    ${PLATFORM_RCPWM_PWM_SOURCES}
     ${ROOT_DIR}/Src/platform/stm32/platform_specific.cpp
 
     ${coreSources}
@@ -55,5 +66,8 @@ add_custom_command(TARGET ${EXECUTABLE}
     COMMAND ${CMAKE_OBJCOPY} -O binary ${EXECUTABLE} ${BUILD_OBJ_DIR}/${PROJECT_NAME}.bin
     COMMAND ${CMAKE_OBJCOPY} -I binary -O elf32-little ${EXECUTABLE} ${BUILD_OBJ_DIR}/${PROJECT_NAME}.elf
 )
+
+include(${CMAKE_DIR}/bootloader_application_postprocess.cmake)
+configure_bootloader_application_postprocess(${EXECUTABLE})
 
 include(${CMAKE_DIR}/create_binary_with_meaningful_name.cmake)

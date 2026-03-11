@@ -13,6 +13,7 @@ add_definitions(-DCONFIG_USE_CYPHAL=1)
 add_definitions(-DLIBCPNODE_CUSTOM_HEAP_SIZE=4096)
 
 include(${ROOT_DIR}/Src/modules/cyphal/core/CMakeLists.txt)
+include(${ROOT_DIR}/Src/modules/application/CMakeLists.txt)
 include(${ROOT_DIR}/Src/modules/system/CMakeLists.txt)
 include(${ROOT_DIR}/Src/modules/circuit_status/cyphal/CMakeLists.txt)
 include(${ROOT_DIR}/Src/modules/feedback/cyphal/CMakeLists.txt)

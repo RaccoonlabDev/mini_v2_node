@@ -11,6 +11,7 @@ endif()
 add_definitions(-DCONFIG_USE_DRONECAN=1)
 
 include(${ROOT_DIR}/Src/modules/dronecan/core/CMakeLists.txt)
+include(${ROOT_DIR}/Src/modules/application/CMakeLists.txt)
 include(${ROOT_DIR}/Src/modules/system/CMakeLists.txt)
 include(${ROOT_DIR}/Src/modules/dronecan/arming/CMakeLists.txt)
 include(${ROOT_DIR}/Src/modules/circuit_status/dronecan/CMakeLists.txt)
