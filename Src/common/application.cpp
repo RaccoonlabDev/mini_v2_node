@@ -12,6 +12,7 @@
 #include "drivers/board_monitor/board_monitor.hpp"
 #include "peripheral/gpio/gpio.hpp"
 #include "peripheral/iwdg/iwdg.hpp"
+#include "peripheral/irq/irq.hpp"
 #include "peripheral/led/led.hpp"
 #include "params.hpp"
 #include "module.hpp"
@@ -86,6 +87,7 @@ static void blink_board_led() {
 }
 
 __attribute__((noreturn)) void application_entry_point() {
+    HAL::platform_enable_irq();
     init_board_periphery();
     ModuleManager::init();
 

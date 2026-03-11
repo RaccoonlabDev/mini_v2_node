@@ -169,5 +169,6 @@ include(${CMAKE_DIR}/full_firmware_info.cmake)
 include(${ROOT_DIR}/Src/peripheral/adc/CMakeLists.txt)
 include(${ROOT_DIR}/Src/peripheral/gpio/CMakeLists.txt)
 include(${ROOT_DIR}/Src/peripheral/iwdg/CMakeLists.txt)
+include(${ROOT_DIR}/Src/peripheral/irq/CMakeLists.txt)
 
 add_subdirectory(${ROOT_DIR}/Src/platform/${APP_PLATFORM})
