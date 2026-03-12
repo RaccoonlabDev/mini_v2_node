@@ -1,7 +1,7 @@
 # Copyright (C) 2023-2024 Dmitry Ponomarev <ponomarevda96@gmail.com>
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 .PHONY: require_target all checks code_style tests upload run clean_releases clean distclean build \
-	rl_mini_v2_default rl_mini_v2_dronecan rl_mini_v2_cyphal \
+	rl_mini_v2_default rl_mini_v2_dronecan rl_mini_v2_dronecan_application rl_mini_v2_cyphal \
 	rl_mini_v3_default rl_mini_v3_dronecan rl_mini_v3_dronecan_application rl_mini_v3_cyphal rl_mini_v3_both \
 	rl_sitl_default rl_sitl_dronecan rl_sitl_cyphal \
 	cyphal cyphal_v2 cyphal_v3 dronecan dronecan_v2 dronecan_v3 v2 v3 sitl_dronecan sitl_cyphal
@@ -68,6 +68,8 @@ rl_mini_v2_default: checks
 	$(MAKE) build BOARD=rl/mini_v2 TARGET=default IMAGE_KIND=standalone FIRMWARE_TYPE=standalone BUILD_VARIANT=rl_mini_v2_default_standalone
 rl_mini_v2_dronecan: checks
 	$(MAKE) build BOARD=rl/mini_v2 TARGET=dronecan IMAGE_KIND=standalone FIRMWARE_TYPE=standalone BUILD_VARIANT=rl_mini_v2_dronecan_standalone
+rl_mini_v2_dronecan_application: checks
+	$(MAKE) build BOARD=rl/mini_v2 TARGET=dronecan IMAGE_KIND=application FIRMWARE_TYPE=application BUILD_VARIANT=rl_mini_v2_dronecan_application
 rl_mini_v2_cyphal: checks
 	$(MAKE) build BOARD=rl/mini_v2 TARGET=cyphal IMAGE_KIND=standalone FIRMWARE_TYPE=standalone BUILD_VARIANT=rl_mini_v2_cyphal_standalone
 rl_mini_v2_both: checks
@@ -86,9 +88,6 @@ rl_mini_v3_cyphal: checks
 	$(MAKE) build BOARD=rl/mini_v3 TARGET=cyphal IMAGE_KIND=standalone FIRMWARE_TYPE=standalone BUILD_VARIANT=rl_mini_v3_cyphal_standalone
 rl_mini_v3_both: checks
 	$(MAKE) build BOARD=rl/mini_v3 TARGET=both IMAGE_KIND=standalone FIRMWARE_TYPE=standalone BUILD_VARIANT=rl_mini_v3_both_standalone
-rl_mini_v3_bootloader: checks
-	./scripts/generate_cubemx_hal.sh -i Src/boards/rl/mini_v3/bootloader.ioc -o build/stm32cubemx/rl/mini_v3/bootloader
-	$(MAKE) build BOARD=rl/mini_v3 TARGET=bootloader FIRMWARE_TYPE=bootloader BUILD_VARIANT=rl_mini_v3_dronecan_bootloader
 
 #
 # rl/sitl aliases

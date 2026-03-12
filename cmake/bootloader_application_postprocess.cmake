@@ -38,9 +38,14 @@ function(configure_bootloader_application_postprocess executable)
         return()
     endif()
 
-    if((NOT BOARD_VENDOR STREQUAL "rl") OR
-       (NOT BOARD_NAME STREQUAL "mini_v3") OR
-       (NOT BOARD_TARGET STREQUAL "dronecan"))
+    if(NOT BOARD_VENDOR STREQUAL "rl")
+        return()
+    endif()
+    if(NOT BOARD_TARGET STREQUAL "dronecan")
+        return()
+    endif()
+    if((NOT BOARD_NAME STREQUAL "mini_v3") AND
+       (NOT BOARD_NAME STREQUAL "mini_v2"))
         return()
     endif()
 
