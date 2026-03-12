@@ -43,6 +43,7 @@ public:
         uint32_t tx_frames;
         uint32_t rx_frames;
         uint32_t errors;
+        uint32_t rx_overflow;
     };
 
     /**
@@ -64,7 +65,8 @@ public:
 
     /**
      * @brief Receives one frame from RX FIFO when available.
-     * @return ClassicFrame on success, or ErrorCode (e.g. TIMEOUT_OR_FIFO_EMPTY) for caller-side branching.
+     * @return ClassicFrame on success, or ErrorCode
+     *         (e.g. TIMEOUT_OR_FIFO_EMPTY) for caller-side branching.
      */
     [[nodiscard]] std::variant<ClassicFrame, ErrorCode> receive();
 
@@ -78,7 +80,7 @@ public:
 private:
     Instance _instance;
     bool _is_initialized = false;
-    CanBusStats _stats{0, 0, 0};
+    CanBusStats _stats{0, 0, 0, 0};
 };
 
 }  // namespace HAL
