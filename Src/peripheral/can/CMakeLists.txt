@@ -13,7 +13,15 @@ endif()
 
 if(APP_PLATFORM STREQUAL "stm32g0b1")
     list(APPEND PERIPHERAL_SOURCES ${CMAKE_CURRENT_LIST_DIR}/can_stm32g0.cpp)
+elseif(APP_PLATFORM STREQUAL "stm32f103")
+    list(APPEND PERIPHERAL_SOURCES
+        ${CMAKE_CURRENT_LIST_DIR}/can_stm32f103.cpp
+        ${ROOT_DIR}/Libs/Dronecan/platform_specific/bxcan/canard_stm32.c
+    )
+    list(APPEND APPLICATION_HEADERS
+        ${ROOT_DIR}/Libs/Dronecan/platform_specific/bxcan
+        ${ROOT_DIR}/Libs/Dronecan/Libs
+    )
 else()
-    message(SEND_ERROR "CAN peripheral is implemented for stm32g0b1 only.")
+    message(SEND_ERROR "CAN peripheral is implemented for stm32g0b1 and stm32f103 only.")
 endif()
-
