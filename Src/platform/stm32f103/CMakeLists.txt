@@ -2,17 +2,37 @@
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 
 set(EXECUTABLE ${PROJECT_NAME})
+
+#
+# @todo Later rcpwm_channels.cpp and pwm.cpp should be refactored and moven to Src/boards
+#
+if(BOARD_TARGET_BOOTLOADER)
+    set(PLATFORM_RCPWM_PWM_SOURCES)
+    set(PLATFORM_BOARD_MONITOR_SOURCES)
+    set(PLATFORM_COMMON_ALGORITHMS_SOURCES)
+else()
+    set(PLATFORM_RCPWM_PWM_SOURCES
+        ${CMAKE_CURRENT_LIST_DIR}/pwm.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/rcpwm_channels.cpp
+    )
+    set(PLATFORM_BOARD_MONITOR_SOURCES
+        ${ROOT_DIR}/Src/drivers/board_monitor/board_monitor.cpp
+    )
+    set(PLATFORM_COMMON_ALGORITHMS_SOURCES
+        ${ROOT_DIR}/Src/common/algorithms.cpp
+    )
+endif()
+
 add_executable(${EXECUTABLE}
     ${APPLICATION_SOURCES}
     ${PERIPHERAL_SOURCES}
     ${BUILD_SRC_DIR}/params.cpp
-    ${ROOT_DIR}/Src/common/algorithms.cpp
+    ${PLATFORM_COMMON_ALGORITHMS_SOURCES}
     ${ROOT_DIR}/Src/common/logging.cpp
     ${ROOT_DIR}/Src/common/module.cpp
 
-    ${ROOT_DIR}/Src/drivers/board_monitor/board_monitor.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/pwm.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/rcpwm_channels.cpp
+    ${PLATFORM_BOARD_MONITOR_SOURCES}
+    ${PLATFORM_RCPWM_PWM_SOURCES}
     ${ROOT_DIR}/Src/platform/stm32/platform_specific.cpp
 
     ${coreSources}
@@ -37,7 +57,8 @@ target_include_directories(${EXECUTABLE} PRIVATE
     ${stm32cubeMxProjectPath}/Drivers/STM32G0xx_HAL_Driver/Inc/Legacy
 )
 
-if(CAN_PROTOCOL STREQUAL "dronecan" OR CAN_PROTOCOL STREQUAL "both")
+if(CAN_PROTOCOL STREQUAL "dronecan" OR
+   CAN_PROTOCOL STREQUAL "both")
     target_link_libraries(${EXECUTABLE} PRIVATE libdcnode::libdcnode)
 endif()
 if(CAN_PROTOCOL STREQUAL "cyphal" OR CAN_PROTOCOL STREQUAL "both")
