@@ -8,12 +8,16 @@
 #include <array>
 #include <cstring>
 #include "main.h"
+#include "spi.h"
 
 static constexpr uint32_t TRANSMIT_DELAY = 100;  // 100 is experimental value. Need to prove it
 static constexpr std::byte SPI_READ{0x80};
 
-extern SPI_HandleTypeDef hspi2;
-SPI_HandleTypeDef* hspi = &hspi2;
+#if defined(STM32F103xB) || defined(STM32F103xE)
+static SPI_HandleTypeDef* hspi = &hspi1;
+#else
+static SPI_HandleTypeDef* hspi = &hspi2;
+#endif
 
 namespace HAL {
 

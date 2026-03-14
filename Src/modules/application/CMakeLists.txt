@@ -10,8 +10,7 @@ list(APPEND APPLICATION_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/application.cpp
 )
 
-if((USE_PLATFORM_NODE_V2 OR USE_PLATFORM_NODE_V3) AND
-   IMAGE_KIND STREQUAL "application")
+if(IMAGE_KIND STREQUAL "application")
     list(APPEND APPLICATION_SOURCES
         ${CMAKE_CURRENT_LIST_DIR}/app_descriptor.cpp
     )

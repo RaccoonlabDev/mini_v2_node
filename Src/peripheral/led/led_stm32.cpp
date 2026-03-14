@@ -13,8 +13,12 @@ namespace Board {
 #ifndef INTERNAL_LED_RED_GPIO_Port
     #define INTERNAL_LED_RED_GPIO_Port      INT_RGB_LED_RED_GPIO_Port
     #define INTERNAL_LED_RED_Pin            INT_RGB_LED_RED_Pin
+#endif
+#ifndef INTERNAL_LED_GREEN_GPIO_Port
     #define INTERNAL_LED_GREEN_GPIO_Port    INT_RGB_LED_GREEN_GPIO_Port
     #define INTERNAL_LED_GREEN_Pin          INT_RGB_LED_GREEN_Pin
+#endif
+#ifndef INTERNAL_LED_BLUE_GPIO_Port
     #define INTERNAL_LED_BLUE_GPIO_Port     INT_RGB_LED_BLUE_GPIO_Port
     #define INTERNAL_LED_BLUE_Pin           INT_RGB_LED_BLUE_Pin
 #endif
@@ -29,7 +33,12 @@ static void write_red(bool enabled) {
 }
 static void write_green(bool enabled) {
     GPIO_PinState state = enabled ? GPIO_PIN_RESET : GPIO_PIN_SET;
+#ifdef INTERNAL_LED_GREEN_GPIO_Port
     HAL_GPIO_WritePin(INTERNAL_LED_GREEN_GPIO_Port, INTERNAL_LED_GREEN_Pin, state);
+#else
+    (void)state;
+#endif
+
 
 #ifdef EXT_RGB_LED_GREEN_GPIO_Port
     HAL_GPIO_WritePin(EXT_RGB_LED_GREEN_GPIO_Port, EXT_RGB_LED_GREEN_Pin, state);
@@ -37,7 +46,11 @@ static void write_green(bool enabled) {
 }
 static void write_blue(bool enabled) {
     GPIO_PinState state = enabled ? GPIO_PIN_RESET : GPIO_PIN_SET;
+#ifdef INTERNAL_LED_BLUE_GPIO_Port
     HAL_GPIO_WritePin(INTERNAL_LED_BLUE_GPIO_Port, INTERNAL_LED_BLUE_Pin, state);
+#else
+    (void)state;
+#endif
 
 #ifdef EXT_RGB_LED_BLUE_GPIO_Port
     HAL_GPIO_WritePin(EXT_RGB_LED_BLUE_GPIO_Port, EXT_RGB_LED_BLUE_Pin, state);

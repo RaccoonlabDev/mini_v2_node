@@ -5,6 +5,7 @@
 include(${CMAKE_DIR}/libparams_generate_default_params.cmake)
 
 set(EXECUTABLE ${PROJECT_NAME})
+
 add_executable(${EXECUTABLE}
     ${APPLICATION_SOURCES}
     ${PERIPHERAL_SOURCES}
@@ -17,7 +18,6 @@ add_executable(${EXECUTABLE}
 
     ${ROOT_DIR}/Src/drivers/board_monitor/board_monitor.cpp
     ${CMAKE_CURRENT_LIST_DIR}/platform_specific.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/rcpwm_channels.cpp
 )
 
 find_package(PkgConfig REQUIRED)

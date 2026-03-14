@@ -30,22 +30,7 @@ if(DEFINED SELECT_LATEST_APP_DESCRIPTOR_BIN AND SELECT_LATEST_APP_DESCRIPTOR_BIN
 endif()
 
 function(configure_bootloader_application_postprocess executable)
-    if(BOARD_TARGET_BOOTLOADER)
-        return()
-    endif()
-
     if(NOT DEFINED IMAGE_KIND OR NOT IMAGE_KIND STREQUAL "application")
-        return()
-    endif()
-
-    if(NOT BOARD_VENDOR STREQUAL "rl")
-        return()
-    endif()
-    if(NOT BOARD_TARGET STREQUAL "dronecan")
-        return()
-    endif()
-    if((NOT BOARD_NAME STREQUAL "mini_v3") AND
-       (NOT BOARD_NAME STREQUAL "mini_v2"))
         return()
     endif()
 
