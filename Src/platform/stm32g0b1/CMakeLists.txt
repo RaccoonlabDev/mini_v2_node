@@ -8,12 +8,6 @@ set(EXECUTABLE ${PROJECT_NAME})
 # @todo Later rcpwm_channels.cpp and pwm.cpp should be refactored and moven to Src/boards
 #
 if(BOARD_TARGET_BOOTLOADER)
-    set(PLATFORM_RCPWM_PWM_SOURCES)
-else()
-    set(PLATFORM_RCPWM_PWM_SOURCES
-        ${CMAKE_CURRENT_LIST_DIR}/pwm.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/rcpwm_channels.cpp
-    )
 endif()
 
 add_executable(${EXECUTABLE}
@@ -25,7 +19,6 @@ add_executable(${EXECUTABLE}
     ${ROOT_DIR}/Src/common/module.cpp
 
     ${ROOT_DIR}/Src/drivers/board_monitor/board_monitor.cpp
-    ${PLATFORM_RCPWM_PWM_SOURCES}
     ${ROOT_DIR}/Src/platform/stm32/platform_specific.cpp
 
     ${coreSources}

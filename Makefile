@@ -13,13 +13,12 @@ BUILD_DIR:=$(ROOT_DIR)/build
 # Generic build inputs:
 # BOARD - board path under Src/boards, for example: rl/mini_v2
 # TARGET - board target file name, for example: default, dronecan, cyphal, both
-# IMAGE_KIND - firmware image kind, for example: standalone, application
-# FIRMWARE_TYPE - standalone/application/bootloader (for build dir naming)
+# IMAGE_KIND - firmware image kind used by CMake and build dir naming,
+#              for example: standalone, application, bootloader, sitl
 BOARD?=
 TARGET?=
-IMAGE_KIND?=
-FIRMWARE_TYPE?=$(if $(IMAGE_KIND),$(IMAGE_KIND),standalone)
-BUILD_VARIANT?=$(subst /,_,$(BOARD))_$(TARGET)_$(FIRMWARE_TYPE)
+IMAGE_KIND?=standalone
+BUILD_VARIANT?=$(subst /,_,$(BOARD))_$(TARGET)_$(IMAGE_KIND)
 
 require_target:
 ifeq ($(strip $(MAKECMDGOALS)),)
@@ -46,6 +45,8 @@ endif
 	NEED_CONFIG=0; \
 		if [ ! -f $$OBJ_DIR/CMakeCache.txt ]; then \
 			NEED_CONFIG=1; \
+		elif [ ! -f $$OBJ_DIR/Makefile ]; then \
+			NEED_CONFIG=1; \
 		elif ! grep -q "^BOARD:STRING=${BOARD}$$" $$OBJ_DIR/CMakeCache.txt; then \
 			NEED_CONFIG=1; \
 		elif ! grep -q "^BOARD_TARGET:STRING=${TARGET}$$" $$OBJ_DIR/CMakeCache.txt; then \
@@ -65,39 +66,45 @@ endif
 # rl/mini_v2 aliases
 #
 rl_mini_v2_default: checks
-	$(MAKE) build BOARD=rl/mini_v2 TARGET=default IMAGE_KIND=standalone FIRMWARE_TYPE=standalone BUILD_VARIANT=rl_mini_v2_default_standalone
+	$(MAKE) build BOARD=rl/mini_v2 TARGET=default IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v2_default_standalone
 rl_mini_v2_dronecan: checks
-	$(MAKE) build BOARD=rl/mini_v2 TARGET=dronecan IMAGE_KIND=standalone FIRMWARE_TYPE=standalone BUILD_VARIANT=rl_mini_v2_dronecan_standalone
+	$(MAKE) build BOARD=rl/mini_v2 TARGET=dronecan IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v2_dronecan_standalone
 rl_mini_v2_dronecan_application: checks
-	$(MAKE) build BOARD=rl/mini_v2 TARGET=dronecan IMAGE_KIND=application FIRMWARE_TYPE=application BUILD_VARIANT=rl_mini_v2_dronecan_application
+	$(MAKE) build BOARD=rl/mini_v2 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_mini_v2_dronecan_application
 rl_mini_v2_cyphal: checks
-	$(MAKE) build BOARD=rl/mini_v2 TARGET=cyphal IMAGE_KIND=standalone FIRMWARE_TYPE=standalone BUILD_VARIANT=rl_mini_v2_cyphal_standalone
+	$(MAKE) build BOARD=rl/mini_v2 TARGET=cyphal IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v2_cyphal_standalone
 rl_mini_v2_both: checks
-	$(MAKE) build BOARD=rl/mini_v2 TARGET=both IMAGE_KIND=standalone FIRMWARE_TYPE=standalone BUILD_VARIANT=rl_mini_v2_both_standalone
+	$(MAKE) build BOARD=rl/mini_v2 TARGET=both IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v2_both_standalone
 
 #
 # rl/mini_v3 aliases
 #
 rl_mini_v3_default: checks
-	$(MAKE) build BOARD=rl/mini_v3 TARGET=default IMAGE_KIND=standalone FIRMWARE_TYPE=standalone BUILD_VARIANT=rl_mini_v3_default_standalone
+	$(MAKE) build BOARD=rl/mini_v3 TARGET=default IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v3_default_standalone
 rl_mini_v3_dronecan: checks
-	$(MAKE) build BOARD=rl/mini_v3 TARGET=dronecan IMAGE_KIND=standalone FIRMWARE_TYPE=standalone BUILD_VARIANT=rl_mini_v3_dronecan_standalone
+	$(MAKE) build BOARD=rl/mini_v3 TARGET=dronecan IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v3_dronecan_standalone
 rl_mini_v3_dronecan_application: checks
-	$(MAKE) build BOARD=rl/mini_v3 TARGET=dronecan IMAGE_KIND=application FIRMWARE_TYPE=application BUILD_VARIANT=rl_mini_v3_dronecan_application
+	$(MAKE) build BOARD=rl/mini_v3 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_mini_v3_dronecan_application
 rl_mini_v3_cyphal: checks
-	$(MAKE) build BOARD=rl/mini_v3 TARGET=cyphal IMAGE_KIND=standalone FIRMWARE_TYPE=standalone BUILD_VARIANT=rl_mini_v3_cyphal_standalone
+	$(MAKE) build BOARD=rl/mini_v3 TARGET=cyphal IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v3_cyphal_standalone
 rl_mini_v3_both: checks
-	$(MAKE) build BOARD=rl/mini_v3 TARGET=both IMAGE_KIND=standalone FIRMWARE_TYPE=standalone BUILD_VARIANT=rl_mini_v3_both_standalone
+	$(MAKE) build BOARD=rl/mini_v3 TARGET=both IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v3_both_standalone
 
 #
 # rl/sitl aliases
 #
 rl_sitl_default: checks
-	$(MAKE) build BOARD=rl/sitl TARGET=default FIRMWARE_TYPE=standalone BUILD_VARIANT=rl_sitl_default_standalone
+	$(MAKE) build BOARD=rl/sitl TARGET=default IMAGE_KIND=sitl BUILD_VARIANT=rl_sitl_default_sitl
 rl_sitl_dronecan: checks
-	$(MAKE) build BOARD=rl/sitl TARGET=dronecan FIRMWARE_TYPE=standalone BUILD_VARIANT=rl_sitl_dronecan_standalone
+	$(MAKE) build BOARD=rl/sitl TARGET=dronecan IMAGE_KIND=sitl BUILD_VARIANT=rl_sitl_dronecan_sitl
 rl_sitl_cyphal: checks
-	$(MAKE) build BOARD=rl/sitl TARGET=cyphal FIRMWARE_TYPE=standalone BUILD_VARIANT=rl_sitl_cyphal_standalone
+	$(MAKE) build BOARD=rl/sitl TARGET=cyphal IMAGE_KIND=sitl BUILD_VARIANT=rl_sitl_cyphal_sitl
+
+#
+# Optional vendor/local extensions
+#
+-include ${ROOT_DIR}/Makefile.vendor
+-include ${ROOT_DIR}/Makefile.local
 
 #
 # Legacy (for compatibility)
