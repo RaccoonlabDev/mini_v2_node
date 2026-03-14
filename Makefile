@@ -1,9 +1,13 @@
 # Copyright (C) 2023-2024 Dmitry Ponomarev <ponomarevda96@gmail.com>
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 .PHONY: require_target all checks code_style tests upload run clean_releases clean distclean build \
-	rl_mini_v2_default rl_mini_v2_dronecan rl_mini_v2_dronecan_application rl_mini_v2_cyphal \
-	rl_mini_v3_default rl_mini_v3_dronecan rl_mini_v3_dronecan_application rl_mini_v3_cyphal rl_mini_v3_both \
-	rl_sitl_default rl_sitl_dronecan rl_sitl_cyphal \
+	rl_mini_v2_dronecan rl_mini_v2_dronecan_application rl_mini_v2_dronecan_standalone \
+	rl_mini_v2_cyphal rl_mini_v2_cyphal_application rl_mini_v2_cyphal_standalone \
+	rl_mini_v2_both rl_mini_v2_both_application rl_mini_v2_both_standalone \
+	rl_mini_v3_dronecan rl_mini_v3_dronecan_application rl_mini_v3_dronecan_standalone \
+	rl_mini_v3_cyphal rl_mini_v3_cyphal_application rl_mini_v3_cyphal_standalone \
+	rl_mini_v3_both rl_mini_v3_both_application rl_mini_v3_both_standalone \
+	rl_sitl_dronecan rl_sitl_cyphal \
 	cyphal cyphal_v2 cyphal_v3 dronecan dronecan_v2 dronecan_v3 v2 v3 sitl_dronecan sitl_cyphal
 .DEFAULT_GOAL := require_target
 
@@ -12,9 +16,12 @@ BUILD_DIR:=$(ROOT_DIR)/build
 
 # Generic build inputs:
 # BOARD - board path under Src/boards, for example: rl/mini_v2
-# TARGET - board target file name, for example: default, dronecan, cyphal, both
-# IMAGE_KIND - firmware image kind used by CMake and build dir naming,
-#              for example: standalone, application, bootloader, sitl
+# TARGET - board target file name, for example: dronecan, cyphal, both, bootloader
+# IMAGE_KIND - firmware image kind used by CMake and build dir naming
+#              standalone - full firmware image
+#              application - bootloader-linked application image
+#              bootloader - bootloader image itself
+#              sitl - host-native simulation build
 BOARD?=
 TARGET?=
 IMAGE_KIND?=standalone
@@ -24,8 +31,8 @@ require_target:
 ifeq ($(strip $(MAKECMDGOALS)),)
 	@echo "Error: target is not specified."
 	@echo "Use generic mode: make build BOARD=<vendor/board> TARGET=<target>"
-	@echo "Example: make build BOARD=rl/mini_v2 TARGET=default"
-	@echo "Or use aliases: rl_mini_v2_default, rl_mini_v3_cyphal, ..."
+	@echo "Example: make build BOARD=rl/mini_v2 TARGET=dronecan IMAGE_KIND=application"
+	@echo "Or use aliases: rl_mini_v2_dronecan, rl_mini_v3_cyphal, ..."
 	@exit 2
 else
 	@:
@@ -63,38 +70,57 @@ endif
 		$(MAKE) -C $$OBJ_DIR
 
 #
+# Alias naming rules:
+# <vendor>_<board>_<target> builds the bootloader application image
+#                           (IMAGE_KIND=application) for that target.
+# <vendor>_<board>_<target>_standalone builds the standalone app image explicitly.
+#
 # rl/mini_v2 aliases
 #
-rl_mini_v2_default: checks
-	$(MAKE) build BOARD=rl/mini_v2 TARGET=default IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v2_default_standalone
 rl_mini_v2_dronecan: checks
-	$(MAKE) build BOARD=rl/mini_v2 TARGET=dronecan IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v2_dronecan_standalone
+	$(MAKE) build BOARD=rl/mini_v2 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_mini_v2_dronecan_application
 rl_mini_v2_dronecan_application: checks
 	$(MAKE) build BOARD=rl/mini_v2 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_mini_v2_dronecan_application
+rl_mini_v2_dronecan_standalone: checks
+	$(MAKE) build BOARD=rl/mini_v2 TARGET=dronecan IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v2_dronecan_standalone
 rl_mini_v2_cyphal: checks
+	$(MAKE) build BOARD=rl/mini_v2 TARGET=cyphal IMAGE_KIND=application BUILD_VARIANT=rl_mini_v2_cyphal_application
+rl_mini_v2_cyphal_application: checks
+	$(MAKE) build BOARD=rl/mini_v2 TARGET=cyphal IMAGE_KIND=application BUILD_VARIANT=rl_mini_v2_cyphal_application
+rl_mini_v2_cyphal_standalone: checks
 	$(MAKE) build BOARD=rl/mini_v2 TARGET=cyphal IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v2_cyphal_standalone
 rl_mini_v2_both: checks
+	$(MAKE) build BOARD=rl/mini_v2 TARGET=both IMAGE_KIND=application BUILD_VARIANT=rl_mini_v2_both_application
+rl_mini_v2_both_application: checks
+	$(MAKE) build BOARD=rl/mini_v2 TARGET=both IMAGE_KIND=application BUILD_VARIANT=rl_mini_v2_both_application
+rl_mini_v2_both_standalone: checks
 	$(MAKE) build BOARD=rl/mini_v2 TARGET=both IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v2_both_standalone
 
 #
 # rl/mini_v3 aliases
 #
-rl_mini_v3_default: checks
-	$(MAKE) build BOARD=rl/mini_v3 TARGET=default IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v3_default_standalone
 rl_mini_v3_dronecan: checks
-	$(MAKE) build BOARD=rl/mini_v3 TARGET=dronecan IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v3_dronecan_standalone
+	$(MAKE) build BOARD=rl/mini_v3 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_mini_v3_dronecan_application
 rl_mini_v3_dronecan_application: checks
 	$(MAKE) build BOARD=rl/mini_v3 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_mini_v3_dronecan_application
+rl_mini_v3_dronecan_standalone: checks
+	$(MAKE) build BOARD=rl/mini_v3 TARGET=dronecan IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v3_dronecan_standalone
 rl_mini_v3_cyphal: checks
+	$(MAKE) build BOARD=rl/mini_v3 TARGET=cyphal IMAGE_KIND=application BUILD_VARIANT=rl_mini_v3_cyphal_application
+rl_mini_v3_cyphal_application: checks
+	$(MAKE) build BOARD=rl/mini_v3 TARGET=cyphal IMAGE_KIND=application BUILD_VARIANT=rl_mini_v3_cyphal_application
+rl_mini_v3_cyphal_standalone: checks
 	$(MAKE) build BOARD=rl/mini_v3 TARGET=cyphal IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v3_cyphal_standalone
 rl_mini_v3_both: checks
+	$(MAKE) build BOARD=rl/mini_v3 TARGET=both IMAGE_KIND=application BUILD_VARIANT=rl_mini_v3_both_application
+rl_mini_v3_both_application: checks
+	$(MAKE) build BOARD=rl/mini_v3 TARGET=both IMAGE_KIND=application BUILD_VARIANT=rl_mini_v3_both_application
+rl_mini_v3_both_standalone: checks
 	$(MAKE) build BOARD=rl/mini_v3 TARGET=both IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v3_both_standalone
 
 #
 # rl/sitl aliases
 #
-rl_sitl_default: checks
-	$(MAKE) build BOARD=rl/sitl TARGET=default IMAGE_KIND=sitl BUILD_VARIANT=rl_sitl_default_sitl
 rl_sitl_dronecan: checks
 	$(MAKE) build BOARD=rl/sitl TARGET=dronecan IMAGE_KIND=sitl BUILD_VARIANT=rl_sitl_dronecan_sitl
 rl_sitl_cyphal: checks
@@ -108,16 +134,17 @@ rl_sitl_cyphal: checks
 
 #
 # Legacy (for compatibility)
+# These aliases intentionally build standalone images for backward compatibility, not bootloader-linked application images.
 # Don't extend this section for new targets
 #
-dronecan: rl_mini_v2_default
-dronecan_v2: rl_mini_v2_dronecan
-cyphal_v2: rl_mini_v2_cyphal
-v2: rl_mini_v2_default
-dronecan_v3: rl_mini_v3_dronecan
-cyphal_v3: rl_mini_v3_cyphal
-cyphal: rl_mini_v3_cyphal
-v3: rl_mini_v3_both
+dronecan: rl_mini_v2_dronecan_standalone
+dronecan_v2: rl_mini_v2_dronecan_standalone
+cyphal_v2: rl_mini_v2_cyphal_standalone
+v2: rl_mini_v2_dronecan_standalone
+dronecan_v3: rl_mini_v3_dronecan_standalone
+cyphal_v3: rl_mini_v3_cyphal_standalone
+cyphal: rl_mini_v3_cyphal_standalone
+v3: rl_mini_v3_both_standalone
 sitl_cyphal: rl_sitl_cyphal
 sitl_dronecan: rl_sitl_dronecan
 
