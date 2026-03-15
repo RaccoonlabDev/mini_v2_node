@@ -62,12 +62,26 @@ set(USE_PLATFORM_UBUNTU OFF)
 set(USE_PLATFORM_NODE_V2 OFF)
 set(USE_PLATFORM_NODE_V3 OFF)
 
+# Keep these values aligned with `Src/common/mcu_family_id.hpp`.
+# Reserved IDs:
+#   0 = Unknown
+#   1 = STM32F103
+#   2 = STM32G0B1
+#   3 = Ubuntu/SITL
+#   4 = STM32H7
+set(MCU_FAMILY_ID_UNKNOWN 0)
+set(MCU_FAMILY_ID_STM32F103 1)
+set(MCU_FAMILY_ID_STM32G0B1 2)
+set(MCU_FAMILY_ID_UBUNTU 3)
+set(MCU_FAMILY_ID_STM32H7 4)
+
 if(BOARD_PLATFORM STREQUAL "ubuntu")
     set(LIBPARAMS_PLATFORM ubuntu)
     set(CAN_PLATFORM socketcan)
     set(LIBCPNODE_CAN_PLATFORM socketcan)
     set(APP_PLATFORM ubuntu)
     set(PLATFORM_NAME sitl)
+    set(MCU_FAMILY_ID ${MCU_FAMILY_ID_UBUNTU})
     set(USE_PLATFORM_UBUNTU ON)
     include(${CMAKE_DIR}/toolchain-ubuntu.cmake)
     add_compile_definitions(USE_PLATFORM_UBUNTU=1)
@@ -77,6 +91,7 @@ elseif(BOARD_PLATFORM STREQUAL "stm32f103")
     set(LIBCPNODE_CAN_PLATFORM bxcan)
     set(APP_PLATFORM stm32f103)
     set(PLATFORM_NAME v2)
+    set(MCU_FAMILY_ID ${MCU_FAMILY_ID_STM32F103})
     set(USE_PLATFORM_NODE_V2 ON)
 
     if(DEFINED STM32_CUBEMX_PROJECT_PATH)
@@ -111,6 +126,7 @@ elseif(BOARD_PLATFORM STREQUAL "stm32g0b1")
     set(LIBCPNODE_CAN_PLATFORM fdcan)
     set(APP_PLATFORM stm32g0b1)
     set(PLATFORM_NAME v3)
+    set(MCU_FAMILY_ID ${MCU_FAMILY_ID_STM32G0B1})
     set(USE_PLATFORM_NODE_V3 ON)
 
     if(DEFINED STM32_CUBEMX_PROJECT_PATH)
@@ -143,6 +159,8 @@ elseif(BOARD_PLATFORM STREQUAL "stm32g0b1")
 else()
     message(FATAL_ERROR "Unknown BOARD_PLATFORM '${BOARD_PLATFORM}'. Expected: ubuntu, stm32f103, stm32g0b1.")
 endif()
+
+add_definitions(-DMCU_FAMILY_ID=${MCU_FAMILY_ID})
 
 include(${CMAKE_DIR}/git.cmake)
 
