@@ -46,7 +46,7 @@ If the image contains more than one descriptor, only that which is located at th
     void32                          # Used to contain 32-bit vcs_revision_id, now deprecated; see replacement below.
     uint8[2] version_major_minor
     uint8    flags                  # See below.
-    void8
+    uint8    mcu_family_id          # Project-defined compatibility identifier.
     uint32   timestamp_utc          # UTC UNIX timestamp when the application was built.
     uint64   vcs_revision_id        # The version control system revision identifier, e.g., a git hash.
     void64
@@ -138,6 +138,7 @@ class AppDescriptor:
     image_size: int
     version: typing.Tuple[int, int]
     flags: Flags
+    mcu_family_id: int
     timestamp_utc: int
     vcs_revision_id: int
 
@@ -149,6 +150,7 @@ class AppDescriptor:
             self.image_size,
             *self.version,
             self.flags.pack(),
+            self.mcu_family_id,
             self.timestamp_utc,
             self.vcs_revision_id,
         )
@@ -166,6 +168,7 @@ class AppDescriptor:
                 v_major,
                 v_minor,
                 flags,
+                mcu_family_id,
                 ts_utc,
                 vcs_revision_id,
             ) = AppDescriptor._get_marshaller(byte_order).unpack_from(image, offset)
@@ -177,6 +180,7 @@ class AppDescriptor:
                 image_size=image_size,
                 version=(v_major, v_minor),
                 flags=Flags.unpack(flags),
+                mcu_family_id=mcu_family_id,
                 timestamp_utc=ts_utc,
                 vcs_revision_id=vcs_revision_id,
             )
@@ -197,7 +201,7 @@ class AppDescriptor:
     @staticmethod
     def _get_marshaller(byte_order: str) -> struct.Struct:
         byte_order = {"big": ">", "little": "<"}[byte_order]
-        out = struct.Struct(byte_order + "Q 8s Q L 4x BB B x L Q 16x")
+        out = struct.Struct(byte_order + "Q 8s Q L 4x BB B B L Q 16x")
         assert out.size == AppDescriptor.SIZE
         return out
 
@@ -415,6 +419,12 @@ def _main() -> int:
         "--assign-flag-dirty", type=int, metavar="FLAG", help="Overwrite the dirty build flag in the app descriptor."
     )
     parser.add_argument(
+        "--assign-mcu-family-id",
+        type=lambda x: int(x, 0),
+        metavar="MCU_FAMILY_ID",
+        help="Overwrite the MCU family ID in the app descriptor.",
+    )
+    parser.add_argument(
         "--assign-timestamp",
         type=lambda x: int(x, 0),
         metavar="TIMESTAMP",
@@ -490,6 +500,8 @@ def _main() -> int:
         desc.flags.release = bool(args.assign_flag_release)
     if args.assign_flag_dirty is not None:
         desc.flags.dirty = bool(args.assign_flag_dirty)
+    if args.assign_mcu_family_id is not None:
+        desc.mcu_family_id = int(args.assign_mcu_family_id)
     if args.assign_timestamp is not None:
         desc.timestamp_utc = int(args.assign_timestamp)
     if args.assign_vcs_revision_id is not None:
@@ -564,6 +576,7 @@ def _test() -> None:
         image_size=0,
         version=(0, 0),
         flags=Flags.unpack(0),
+        mcu_family_id=0,
         timestamp_utc=0,
         vcs_revision_id=0,
     )
@@ -586,6 +599,7 @@ def _test() -> None:
     desc.flags.dirty = True
     desc.timestamp_utc = 1234567890
     desc.vcs_revision_id = 0x1122334455667788
+    desc.mcu_family_id = 7
     assert (
         AppDescriptor.MAGIC.to_bytes(8, "little")
         + b"APDesc00"
@@ -594,7 +608,7 @@ def _test() -> None:
         + bytes(4)
         + bytes([42, 95])
         + bytes([2])
-        + bytes(1)
+        + bytes([7])
         + (1234567890).to_bytes(4, "little")
         + 0x1122334455667788.to_bytes(8, "little")
         + bytes(16)
@@ -607,7 +621,7 @@ def _test() -> None:
         + bytes(4)
         + bytes([42, 95])
         + bytes([2])
-        + bytes(1)
+        + bytes([7])
         + (1234567890).to_bytes(4, "big")
         + 0x1122334455667788.to_bytes(8, "big")
         + bytes(16)
@@ -621,7 +635,7 @@ def _test() -> None:
         + bytes(4)
         + bytes([42, 95])
         + bytes([2])
-        + bytes(1)
+        + bytes([7])
         + (1234567890).to_bytes(4, "little")
         + 0x1122334455667788.to_bytes(8, "little")
         + bytes(16),
@@ -632,6 +646,7 @@ def _test() -> None:
     assert desc.version == (42, 95)
     assert not desc.flags.release
     assert desc.flags.dirty
+    assert desc.mcu_family_id == 7
     assert desc.timestamp_utc == 1234567890
     assert desc.vcs_revision_id == 0x1122334455667788
 
@@ -643,7 +658,7 @@ def _test() -> None:
         + bytes(4)
         + bytes([42, 95])
         + bytes([2])
-        + bytes(1)
+        + bytes([7])
         + (1234567890).to_bytes(4, "big")
         + 0x1122334455667788.to_bytes(8, "big")
         + bytes(16),
@@ -654,6 +669,7 @@ def _test() -> None:
     assert desc.version == (42, 95)
     assert not desc.flags.release
     assert desc.flags.dirty
+    assert desc.mcu_family_id == 7
     assert desc.timestamp_utc == 1234567890
     assert desc.vcs_revision_id == 0x1122334455667788
 
@@ -676,7 +692,7 @@ def _test() -> None:
         + bytes(4)
         + bytes([42, 95])
         + bytes([2])
-        + bytes(1)
+        + bytes([7])
         + (1234567890).to_bytes(4, "big")
         + 0x1122334455667788.to_bytes(8, "big")
         + bytes(16)
@@ -695,7 +711,7 @@ def _test() -> None:
             + bytes(4)
             + bytes([42, 95])
             + bytes([2])
-            + bytes(1)
+            + bytes([7])
             + (1234567890).to_bytes(4, "big")
             + 0x1122334455667788.to_bytes(8, "big")
             + bytes(16)
@@ -711,6 +727,7 @@ def _test() -> None:
         image_size=0,
         version=(42, 95),
         flags=Flags.unpack(2),
+        mcu_family_id=7,
         timestamp_utc=1234567890,
         vcs_revision_id=0x1122334455667788,
     )
@@ -722,6 +739,7 @@ def _test() -> None:
         image_size=96,
         version=(42, 95),
         flags=Flags.unpack(2),
+        mcu_family_id=7,
         timestamp_utc=1234567890,
         vcs_revision_id=0x1122334455667788,
     )
@@ -734,7 +752,7 @@ def _test() -> None:
         + bytes(4)
         + bytes([42, 95])
         + bytes([2])
-        + bytes(1)
+        + bytes([7])
         + (1234567890).to_bytes(4, "big")
         + 0x1122334455667788.to_bytes(8, "big")
         + bytes(16)
@@ -759,7 +777,7 @@ def _test() -> None:
             + bytes(4)
             + bytes([1, 5])
             + bytes([3])
-            + bytes(1)
+            + bytes([7])
             + (1234567890).to_bytes(4, "big")
             + 0x1122334455667788.to_bytes(8, "big")
             + bytes(16)
@@ -777,7 +795,7 @@ def _test() -> None:
         + bytes(4)
         + bytes([1, 5])
         + bytes([3])
-        + bytes(1)
+        + bytes([7])
         + (1234567890).to_bytes(4, "big")
         + 0x1122334455667788.to_bytes(8, "big")
         + bytes(16)

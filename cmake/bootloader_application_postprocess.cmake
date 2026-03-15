@@ -40,6 +40,7 @@ function(configure_bootloader_application_postprocess executable)
         COMMAND ${Python3_EXECUTABLE}
             ${ROOT_DIR}/scripts/kocherga_image.py
             --assign-version ${APP_VERSION_MAJOR}.${APP_VERSION_MINOR}
+            --assign-mcu-family-id ${MCU_FAMILY_ID}
             --assign-flag-release ${RELEASE_BUILD_FLAG}
             --assign-flag-dirty ${DIRTY_BUILD_FLAG}
             --assign-timestamp ${BUILD_TIMESTAMP_UTC}
