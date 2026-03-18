@@ -25,8 +25,8 @@ protected:
     void spin_once() override;
 
 private:
-    std::array<libcpnode::Cyphal::Publisher<libcpnode::SubjectTraits<reg_udral_service_actuator_common_Feedback_0_1>>, Driver::RCPWM::get_pins_amount()> udral_feedbacks;
-    std::array<libcpnode::Cyphal::Publisher<libcpnode::SubjectTraits<zubax_telega_CompactFeedback_1_0>>, Driver::RCPWM::get_pins_amount()> compact_feedbacks;
+    std::array<libcpnode::Cyphal::Publisher<libcpnode::SubjectTraits<reg_udral_service_actuator_common_Feedback_0_1>>, 4> udral_feedbacks;
+    std::array<libcpnode::Cyphal::Publisher<libcpnode::SubjectTraits<zubax_telega_CompactFeedback_1_0>>, 4> compact_feedbacks;
 };
 
 #endif  // SRC_CYPHAL_APPLICATION_FEEDBACK_HPP_

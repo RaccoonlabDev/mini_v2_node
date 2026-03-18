@@ -9,7 +9,7 @@
 #define SRC_DRIVERS_RCPWM_RCPWM_HPP_
 
 #include <cstdint>
-#include <array>
+#include <span>
 #include "peripheral/pwm/pwm.hpp"
 
 namespace Driver {
@@ -106,15 +106,15 @@ public:
      */
     static uint8_t get_pin_percent(uint8_t pin_idx);
 
-    static constexpr uint8_t get_pins_amount() {
-        return static_cast<uint8_t>(HAL::PwmPin::PWM_AMOUNT);
+    static uint8_t get_pins_count() {
+        return static_cast<uint8_t>(channels.size());
     }
 
     static int8_t get_pin_channel(uint8_t pin_idx);
     static bool is_pin_enabled(uint8_t pin_idx);
     static float get_current_angle(uint16_t max_angle_deg, uint8_t pin_idx);
-// private:
-    static std::array<RcpwmChannel, static_cast<uint8_t>(HAL::PwmPin::PWM_AMOUNT)> channels;
+
+    static std::span<RcpwmChannel> channels;
 };
 
 }  // namespace Driver

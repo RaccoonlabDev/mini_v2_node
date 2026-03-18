@@ -33,6 +33,21 @@
 
 REGISTER_MODULE(RcoutModule)
 
+namespace {
+
+void sync_timings_with_channels() {
+    const auto count =
+        std::min(Driver::RCPWM::channels.size(), RcoutModule::timings_storage.size());
+    if (RcoutModule::timings.size() != count) {
+        RcoutModule::timings = std::span<ActuatorTtl>(RcoutModule::timings_storage.data(), count);
+        for (auto& timing : RcoutModule::timings) {
+            timing = ActuatorTtl{};
+        }
+    }
+}
+
+}  // namespace
+
 template <typename Fn>
 static inline void for_active_frontend(Fn&& fn) {
     auto proto = ModuleManager::get_active_protocol();
@@ -45,6 +60,7 @@ static inline void for_active_frontend(Fn&& fn) {
 }
 
 void RcoutModule::init() {
+    sync_timings_with_channels();
     Driver::RCPWM::init();
     logger.log_debug("init");
     for_active_frontend([this](auto& fe) { fe.init(); });
@@ -60,6 +76,7 @@ void RcoutModule::init() {
  * 3. INFO message once Node is STANDBY (disarmed)
  */
 void RcoutModule::spin_once() {
+    sync_timings_with_channels();
     bool at_least_one_channel_is_engaged = false;
     bool at_least_one_ttl_detected = false;
     static bool is_gimbal_set = false;
@@ -104,6 +121,7 @@ void RcoutModule::spin_once() {
 }
 
 void RcoutModule::update_params() {
+    sync_timings_with_channels();
     cmd_ttl = paramsGetIntegerValue(IntParamsIndexes::PARAM_PWM_CMD_TTL_MS);
     for (auto& timing : timings) {
         timing.set_cmd_ttl(cmd_ttl);
@@ -116,4 +134,3 @@ void RcoutModule::update_params() {
     for_active_frontend([](auto& fe) { fe.update_params(); });
     Driver::RCPWM::update_params();
 }
-

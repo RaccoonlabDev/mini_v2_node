@@ -11,17 +11,8 @@
 
 namespace HAL {
 
-/**
- * @note PWM pinout related to RaccoonLab Mini v2 node
- */
-enum class PwmPin : uint8_t {
-    PWM_1,      // PB7
-    PWM_2,      // PB6
-    PWM_3,      // PB4
-    PWM_4,      // PB5
-    PWM_AMOUNT,
-};
-
+using PwmPin = uint8_t;
+extern const uint8_t pwm_pins_amount;
 
 class Pwm {
 public:
@@ -29,6 +20,7 @@ public:
      * @return 0 on success, otherwise < 0
      */
     static int8_t init(PwmPin pin);
+    static uint8_t pin_count();
 
     /**
      * @brief Set the duration of the PWM signal for a specific PWM pin in microseconds
@@ -54,6 +46,9 @@ public:
      * @brief Set the frequency of the PWM signal for a specific PWM pin in Hz
      */
     static void set_frequency(PwmPin pwm_pin, uint32_t frequency_hz);
+
+private:
+    static bool is_valid_pin(PwmPin pin);
 };
 
 }  // namespace HAL

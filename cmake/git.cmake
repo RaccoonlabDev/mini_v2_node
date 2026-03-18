@@ -12,36 +12,39 @@ function(check_version_component component_name component_value)
     endif()
 endfunction()
 
+function(resolve_version_component flag output_var)
+    execute_process(
+        COMMAND rl-git-info ${flag}
+        WORKING_DIRECTORY ${ROOT_DIR}
+        RESULT_VARIABLE _rl_git_info_result
+        OUTPUT_VARIABLE _rl_git_info_output
+        ERROR_VARIABLE _rl_git_info_error
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+
+    if(_rl_git_info_result EQUAL 0)
+        set(${output_var} "${_rl_git_info_output}" PARENT_SCOPE)
+    else()
+        set(${output_var} "0" PARENT_SCOPE)
+    endif()
+endfunction()
+
 execute_process(
     COMMAND git rev-parse --short=16 HEAD
+    WORKING_DIRECTORY ${ROOT_DIR}
     COMMAND_ERROR_IS_FATAL ANY
     OUTPUT_VARIABLE GIT_HASH_SHORT_16_DIGITS
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 string(SUBSTRING "${GIT_HASH_SHORT_16_DIGITS}" 0 8 GIT_HASH_SHORT_8_DIGITS)
 
-execute_process(
-    COMMAND rl-git-info --major
-    COMMAND_ERROR_IS_FATAL ANY
-    OUTPUT_VARIABLE APP_VERSION_MAJOR
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-execute_process(
-    COMMAND rl-git-info --minor
-    COMMAND_ERROR_IS_FATAL ANY
-    OUTPUT_VARIABLE APP_VERSION_MINOR
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-execute_process(
-    COMMAND rl-git-info --patch
-    COMMAND_ERROR_IS_FATAL ANY
-    OUTPUT_VARIABLE APP_VERSION_PATCH
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
+resolve_version_component(--major APP_VERSION_MAJOR)
+resolve_version_component(--minor APP_VERSION_MINOR)
+resolve_version_component(--patch APP_VERSION_PATCH)
 
 execute_process(
     COMMAND git log -1 --format=%cd --date=format:"%Y.%m.%d"
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}  # Adjust the working directory as needed
+    WORKING_DIRECTORY ${ROOT_DIR}
     OUTPUT_VARIABLE LATEST_COMMIT_DATE
     ERROR_QUIET
 )

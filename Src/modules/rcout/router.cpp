@@ -10,7 +10,7 @@
 PwmRouter pwm_router;
 
 void PwmRouter::apply(const ActuatorCommand& cmd) {
-    for (uint8_t channel_idx = 0; channel_idx < Driver::RCPWM::get_pins_amount(); channel_idx++) {
+    for (uint8_t channel_idx = 0; channel_idx < Driver::RCPWM::get_pins_count(); channel_idx++) {
         if (Driver::RCPWM::channels[channel_idx].channel != cmd.actuator_id) {
             continue;
         }

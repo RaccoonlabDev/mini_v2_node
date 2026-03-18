@@ -12,26 +12,33 @@
 .DEFAULT_GOAL := require_target
 
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-BUILD_DIR:=$(ROOT_DIR)/build
+NC_BUILD_DIR?=$(ROOT_DIR)/build
 
 # Generic build inputs:
-# BOARD - board path under Src/boards, for example: rl/mini_v2
-# TARGET - board target file name, for example: dronecan, cyphal, both, bootloader
-# IMAGE_KIND - firmware image kind used by CMake and build dir naming
+# NC_BOARD - board path under Src/boards, for example: rl/mini_v2
+# NC_TARGET - board target file name, for example: dronecan, cyphal, both, bootloader
+# NC_IMAGE_KIND - firmware image kind used by CMake and build dir naming
+# NC_APP_SRC_DIR - optional application source directory containing boards/, modules/, drivers/
+# NC_BUILD_DIR - build output root directory
 #              standalone - full firmware image
 #              application - bootloader-linked application image
 #              bootloader - bootloader image itself
 #              sitl - host-native simulation build
+NC_BOARD?=$(BOARD)
+NC_TARGET?=$(TARGET)
+NC_IMAGE_KIND?=$(if $(IMAGE_KIND),$(IMAGE_KIND),standalone)
+NC_APP_SRC_DIR?=
 BOARD?=
 TARGET?=
-IMAGE_KIND?=standalone
-BUILD_VARIANT?=$(subst /,_,$(BOARD))_$(TARGET)_$(IMAGE_KIND)
+IMAGE_KIND?=
+BUILD_VARIANT?=$(subst /,_,$(NC_BOARD))_$(NC_TARGET)_$(NC_IMAGE_KIND)
+EXTRA_CMAKE_ARGS?=
 
 require_target:
 ifeq ($(strip $(MAKECMDGOALS)),)
 	@echo "Error: target is not specified."
-	@echo "Use generic mode: make build BOARD=<vendor/board> TARGET=<target>"
-	@echo "Example: make build BOARD=rl/mini_v2 TARGET=dronecan IMAGE_KIND=application"
+	@echo "Use generic mode: make build NC_BOARD=<vendor/board> NC_TARGET=<target>"
+	@echo "Example: make build NC_BOARD=rl/mini_v2 NC_TARGET=dronecan NC_IMAGE_KIND=application"
 	@echo "Or use aliases: rl_mini_v2_dronecan, rl_mini_v3_cyphal, ..."
 	@exit 2
 else
@@ -41,33 +48,21 @@ endif
 all: clean_releases rl_mini_v2_dronecan rl_mini_v2_cyphal rl_mini_v3_dronecan rl_mini_v3_cyphal rl_mini_v3_both rl_sitl_dronecan rl_sitl_cyphal
 
 build: checks
-ifeq ($(strip $(BOARD)),)
-	$(error BOARD is not set. Use: make build BOARD=<vendor/board> TARGET=<target>)
+ifeq ($(strip $(NC_BOARD)),)
+	$(error NC_BOARD is not set. Use: make build NC_BOARD=<vendor/board> NC_TARGET=<target>)
 endif
-ifeq ($(strip $(TARGET)),)
-	$(error TARGET is not set. Use: make build BOARD=<vendor/board> TARGET=<target>)
+ifeq ($(strip $(NC_TARGET)),)
+	$(error NC_TARGET is not set. Use: make build NC_BOARD=<vendor/board> NC_TARGET=<target>)
 endif
-	@OBJ_DIR=${BUILD_DIR}/${BUILD_VARIANT}/obj; \
-	mkdir -p $$OBJ_DIR; \
-	NEED_CONFIG=0; \
-		if [ ! -f $$OBJ_DIR/CMakeCache.txt ]; then \
-			NEED_CONFIG=1; \
-		elif [ ! -f $$OBJ_DIR/Makefile ]; then \
-			NEED_CONFIG=1; \
-		elif ! grep -q "^BOARD:STRING=${BOARD}$$" $$OBJ_DIR/CMakeCache.txt; then \
-			NEED_CONFIG=1; \
-		elif ! grep -q "^BOARD_TARGET:STRING=${TARGET}$$" $$OBJ_DIR/CMakeCache.txt; then \
-			NEED_CONFIG=1; \
-		elif ! grep -q "^IMAGE_KIND:STRING=${IMAGE_KIND}$$" $$OBJ_DIR/CMakeCache.txt; then \
-			NEED_CONFIG=1; \
-		fi; \
-		if [ $$NEED_CONFIG -eq 1 ]; then \
-			echo "Configuring $$OBJ_DIR"; \
-			cd $$OBJ_DIR && cmake -DBOARD=${BOARD} -DBOARD_TARGET=${TARGET} -DIMAGE_KIND=${IMAGE_KIND} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -G "Unix Makefiles" ../../..; \
-		else \
-			echo "Configuration is up to date: $$OBJ_DIR"; \
-		fi; \
-		$(MAKE) -C $$OBJ_DIR
+	@bash "${ROOT_DIR}/scripts/build.sh" \
+		--board "${NC_BOARD}" \
+		--target "${NC_TARGET}" \
+		--image-kind "${NC_IMAGE_KIND}" \
+		--app-src-dir "${NC_APP_SRC_DIR}" \
+		--build-dir "${NC_BUILD_DIR}" \
+		--build-variant "${BUILD_VARIANT}" \
+		--cmake-build-type "${CMAKE_BUILD_TYPE}" \
+		-- ${EXTRA_CMAKE_ARGS}
 
 #
 # Alias naming rules:

@@ -13,7 +13,7 @@
 
 namespace {
 void setpointCallback(reg_udral_service_actuator_common_sp_Vector31_0_1* msg) {
-    const size_t max_setpoints = std::min<size_t>(Driver::RCPWM::get_pins_amount(), 31U);
+    const size_t max_setpoints = std::min<size_t>(Driver::RCPWM::get_pins_count(), 31U);
     for (size_t setpoint_idx = 0; setpoint_idx < max_setpoints; setpoint_idx++) {
         ActuatorCommand cmd{};
         cmd.actuator_id = static_cast<int16_t>(setpoint_idx);

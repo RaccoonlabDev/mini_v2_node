@@ -6,58 +6,70 @@
 
 #include "feedback.hpp"
 #include <algorithm>
+#include <array>
 #include "libcpnode/cyphal.hpp"
 #include "params.hpp"
 #include "drivers/board_monitor/board_monitor.hpp"
 
 REGISTER_MODULE(CyphalFeedbackModule)
 
+namespace {
+
+constexpr std::array<int, 4> UDRAL_FEEDBACK_PORT_PARAMS = {
+    PARAM_PUB_FEEDBACK_1_ID,
+    PARAM_PUB_FEEDBACK_2_ID,
+    PARAM_PUB_FEEDBACK_3_ID,
+    PARAM_PUB_FEEDBACK_4_ID,
+};
+
+constexpr std::array<int, 4> COMPACT_FEEDBACK_PORT_PARAMS = {
+    PARAM_PUB_COMPACT_FEEDBACK_1_ID,
+    PARAM_PUB_COMPACT_FEEDBACK_2_ID,
+    PARAM_PUB_COMPACT_FEEDBACK_3_ID,
+    PARAM_PUB_COMPACT_FEEDBACK_4_ID,
+};
+
+template <typename MessageType, size_t N>
+void init_publishers(
+    libcpnode::Cyphal* cyphal,
+    const std::array<int, N>& port_params,
+    std::array<libcpnode::Cyphal::Publisher<libcpnode::SubjectTraits<MessageType>>, N>& publishers
+) {
+    const auto count = std::min<size_t>(Driver::RCPWM::get_pins_count(), port_params.size());
+    for (size_t i = 0; i < count; ++i) {
+        publishers[i] = libcpnode::Cyphal::Publisher<libcpnode::SubjectTraits<MessageType>>(
+            cyphal,
+            static_cast<uint16_t>(paramsGetIntegerValue(port_params[i]))
+        );
+    }
+}
+
+template <typename PublisherType, size_t N>
+void update_publisher_ports(std::array<PublisherType, N>& publishers, const std::array<int, N>& port_params) {
+    const auto count = std::min<size_t>(Driver::RCPWM::get_pins_count(), port_params.size());
+    for (size_t i = 0; i < count; ++i) {
+        publishers[i].setPortId(static_cast<uint16_t>(paramsGetIntegerValue(port_params[i])));
+    }
+}
+
+}  // namespace
+
 void CyphalFeedbackModule::init() {
     set_mode(Mode::STANDBY);
     auto cyphal = libcpnode::Cyphal::get_instance();
-
-    udral_feedbacks[0] = cyphal->makePublisher<reg_udral_service_actuator_common_Feedback_0_1>(
-        static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_1_ID))
-    );
-    udral_feedbacks[1] = cyphal->makePublisher<reg_udral_service_actuator_common_Feedback_0_1>(
-        static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_2_ID))
-    );
-    udral_feedbacks[2] = cyphal->makePublisher<reg_udral_service_actuator_common_Feedback_0_1>(
-        static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_3_ID))
-    );
-    udral_feedbacks[3] = cyphal->makePublisher<reg_udral_service_actuator_common_Feedback_0_1>(
-        static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_4_ID))
-    );
-
-    compact_feedbacks[0] = cyphal->makePublisher<zubax_telega_CompactFeedback_1_0>(
-        static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_COMPACT_FEEDBACK_1_ID))
-    );
-    compact_feedbacks[1] = cyphal->makePublisher<zubax_telega_CompactFeedback_1_0>(
-        static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_COMPACT_FEEDBACK_2_ID))
-    );
-    compact_feedbacks[2] = cyphal->makePublisher<zubax_telega_CompactFeedback_1_0>(
-        static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_COMPACT_FEEDBACK_3_ID))
-    );
-    compact_feedbacks[3] = cyphal->makePublisher<zubax_telega_CompactFeedback_1_0>(
-        static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_COMPACT_FEEDBACK_4_ID))
-    );
+    init_publishers(cyphal, UDRAL_FEEDBACK_PORT_PARAMS, udral_feedbacks);
+    init_publishers(cyphal, COMPACT_FEEDBACK_PORT_PARAMS, compact_feedbacks);
 }
 
 
 void CyphalFeedbackModule::update_params() {
-    udral_feedbacks[0].setPortId(static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_1_ID)));
-    udral_feedbacks[1].setPortId(static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_2_ID)));
-    udral_feedbacks[2].setPortId(static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_3_ID)));
-    udral_feedbacks[3].setPortId(static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_FEEDBACK_4_ID)));
-
-    compact_feedbacks[0].setPortId(static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_COMPACT_FEEDBACK_1_ID)));
-    compact_feedbacks[1].setPortId(static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_COMPACT_FEEDBACK_2_ID)));
-    compact_feedbacks[2].setPortId(static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_COMPACT_FEEDBACK_3_ID)));
-    compact_feedbacks[3].setPortId(static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_COMPACT_FEEDBACK_4_ID)));
+    update_publisher_ports(udral_feedbacks, UDRAL_FEEDBACK_PORT_PARAMS);
+    update_publisher_ports(compact_feedbacks, COMPACT_FEEDBACK_PORT_PARAMS);
 }
 
 void CyphalFeedbackModule::spin_once() {
-    for (size_t pin_idx = 0; pin_idx < Driver::RCPWM::get_pins_amount(); pin_idx++) {
+    const auto udral_count = std::min<size_t>(Driver::RCPWM::get_pins_count(), udral_feedbacks.size());
+    for (size_t pin_idx = 0; pin_idx < udral_count; pin_idx++) {
         auto& udral_feedback = udral_feedbacks[pin_idx];
         if (!udral_feedback.isEnabled()) {
             continue;
@@ -69,7 +81,8 @@ void CyphalFeedbackModule::spin_once() {
         udral_feedback.publish();
     }
 
-    for (size_t pin_idx = 0; pin_idx < Driver::RCPWM::get_pins_amount(); pin_idx++) {
+    const auto compact_count = std::min<size_t>(Driver::RCPWM::get_pins_count(), compact_feedbacks.size());
+    for (size_t pin_idx = 0; pin_idx < compact_count; pin_idx++) {
         auto& compact_feedback = compact_feedbacks[pin_idx];
         if (!compact_feedback.isEnabled()) {
             continue;

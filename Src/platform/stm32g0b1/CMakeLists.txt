@@ -51,13 +51,28 @@ if(CAN_PROTOCOL STREQUAL "cyphal" OR CAN_PROTOCOL STREQUAL "both")
     target_link_libraries(${EXECUTABLE} PRIVATE libcpnode::libcpnode)
 endif()
 
-# Post-build
-add_custom_command(TARGET ${EXECUTABLE}
-    POST_BUILD
-    COMMAND ${CMAKE_SIZE} ${EXECUTABLE}
-    COMMAND ${CMAKE_OBJCOPY} -O ihex ${EXECUTABLE} ${BUILD_OBJ_DIR}/${PROJECT_NAME}.hex
-    COMMAND ${CMAKE_OBJCOPY} -O binary ${EXECUTABLE} ${BUILD_OBJ_DIR}/${PROJECT_NAME}.bin
-    COMMAND ${CMAKE_OBJCOPY} -I binary -O elf32-little ${EXECUTABLE} ${BUILD_OBJ_DIR}/${PROJECT_NAME}.elf
+set(FIRMWARE_ARTIFACTS_TARGET "${EXECUTABLE}_artifacts")
+set(FIRMWARE_FINAL_TARGET "${FIRMWARE_ARTIFACTS_TARGET}")
+
+add_custom_command(
+    OUTPUT
+        ${BUILD_OBJ_DIR}/${PROJECT_NAME}.hex
+        ${BUILD_OBJ_DIR}/${PROJECT_NAME}.bin
+        ${BUILD_OBJ_DIR}/${PROJECT_NAME}.elf
+    COMMAND ${CMAKE_SIZE} $<TARGET_FILE:${EXECUTABLE}>
+    COMMAND ${CMAKE_OBJCOPY} -O ihex $<TARGET_FILE:${EXECUTABLE}> ${BUILD_OBJ_DIR}/${PROJECT_NAME}.hex
+    COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${EXECUTABLE}> ${BUILD_OBJ_DIR}/${PROJECT_NAME}.bin
+    COMMAND ${CMAKE_OBJCOPY} -I binary -O elf32-little $<TARGET_FILE:${EXECUTABLE}> ${BUILD_OBJ_DIR}/${PROJECT_NAME}.elf
+    DEPENDS ${EXECUTABLE}
+    COMMENT "Generating firmware artifacts"
+    VERBATIM
+)
+
+add_custom_target(${FIRMWARE_ARTIFACTS_TARGET} ALL
+    DEPENDS
+        ${BUILD_OBJ_DIR}/${PROJECT_NAME}.hex
+        ${BUILD_OBJ_DIR}/${PROJECT_NAME}.bin
+        ${BUILD_OBJ_DIR}/${PROJECT_NAME}.elf
 )
 
 include(${CMAKE_DIR}/bootloader_application_postprocess.cmake)

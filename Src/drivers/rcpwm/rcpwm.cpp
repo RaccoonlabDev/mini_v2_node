@@ -31,6 +31,10 @@ void Driver::RCPWM::update_params() {
 }
 
 void Driver::RCPWM::set_frequency(uint16_t frequency) {
+    if (channels.empty()) {
+        return;
+    }
+
     if (HAL::Pwm::get_frequency(channels[0].pin) != frequency) {
         for (const auto& pwm : channels) {
             HAL::Pwm::set_frequency(pwm.pin, frequency);
@@ -60,7 +64,7 @@ float Driver::RCPWM::get_current_angle(uint16_t max_servo_angle, uint8_t pin_idx
 }
 
 int8_t Driver::RCPWM::get_pin_channel(uint8_t pin_idx) {
-    return pin_idx < get_pins_amount() ? channels[pin_idx].channel : -1;
+    return pin_idx < get_pins_count() ? channels[pin_idx].channel : -1;
 }
 
 bool Driver::RCPWM::is_pin_enabled(uint8_t pin_idx) {

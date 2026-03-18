@@ -29,7 +29,7 @@ void DronecanFeedbackModule::update_params() {
 }
 
 void DronecanFeedbackModule::spin_once() {
-    for (uint_fast8_t pin_idx = 0; pin_idx < Driver::RCPWM::get_pins_amount(); pin_idx++) {
+    for (uint_fast8_t pin_idx = 0; pin_idx < Driver::RCPWM::get_pins_count(); pin_idx++) {
         if (!Driver::RCPWM::is_pin_enabled(pin_idx)) {
             continue;
         }
@@ -111,7 +111,7 @@ void DronecanFeedbackModule::publish_gimbal_status_rpy() {
     gimbal_status_pub.msg.camera_orientation_in_body_frame_xyzw[3] = 1; // W
     
     float roll_deg = 0, pitch_deg = 0, yaw_deg = 0;
-    for (size_t i = 0; i < Driver::RCPWM::get_pins_amount(); ++i) {
+    for (size_t i = 0; i < Driver::RCPWM::get_pins_count(); ++i) {
         switch (Driver::RCPWM::get_pin_channel(i)) {
             case 0: // Roll
                 roll_deg = Driver::RCPWM::get_current_angle(gimbal::get_max_servos_angle(), i);

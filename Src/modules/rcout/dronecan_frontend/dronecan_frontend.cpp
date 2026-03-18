@@ -105,7 +105,7 @@ namespace gimbal {
     
     void set_gimbal_state_rpy(const float angles_rpy[3]) {
         float max_deflection = max_servos_travel / 2.0f;
-        for (size_t i = 0; i < Driver::RCPWM::get_pins_amount(); ++i) {
+        for (size_t i = 0; i < Driver::RCPWM::get_pins_count(); ++i) {
             switch (Driver::RCPWM::get_pin_channel(i)) {
                 case 0: // Roll
                     Driver::RCPWM::channels[i].set_normalized_signed(angles_rpy[0] / max_deflection);
@@ -138,7 +138,7 @@ namespace gimbal {
     const float* get_quaternion() {
         // Update gimbal_q before returning
         float angles_rpy[3] = {0.0f, 0.0f, 0.0f};
-        for (size_t i = 0; i < Driver::RCPWM::get_pins_amount(); ++i) {
+        for (size_t i = 0; i < Driver::RCPWM::get_pins_count(); ++i) {
             switch (Driver::RCPWM::get_pin_channel(i)) {
                 case 0: // Roll
                     angles_rpy[0] = Driver::RCPWM::get_current_angle(max_servos_travel, i);

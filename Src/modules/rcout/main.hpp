@@ -10,6 +10,8 @@
 #define SRC_MODULES_PWM_PWMMODULE_HPP_
 
 #include <algorithm>
+#include <array>
+#include <span>
 #include "params.hpp"
 #include "peripheral/pwm/pwm.hpp"
 #include "common/algorithms.hpp"
@@ -26,7 +28,8 @@ public:
     static inline uint16_t cmd_ttl{500};
     static inline Logging logger{"RCOUT"};
 
-    static inline std::array<ActuatorTtl, Driver::RCPWM::get_pins_amount()> timings{};
+    static inline std::array<ActuatorTtl, 4> timings_storage{};
+    static inline std::span<ActuatorTtl> timings{};
 
 protected:
     void update_params() override;

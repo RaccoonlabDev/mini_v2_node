@@ -8,7 +8,7 @@
 #define SRC_PERIPHERAL_PWM_STM32_PWM_HPP_
 
 #include <stdint.h>
-#include <array>
+#include <span>
 #include "peripheral/pwm/pwm.hpp"
 #include "main.h"
 
@@ -20,7 +20,7 @@ struct PwmPinInfo {
     volatile uint32_t& ccr;
 };
 
-extern const std::array<PwmPinInfo, static_cast<uint8_t>(PwmPin::PWM_AMOUNT)> pwms;
+extern const std::span<const PwmPinInfo> pwms;
 
 }  // namespace HAL
 

@@ -35,8 +35,11 @@ function(configure_bootloader_application_postprocess executable)
     endif()
 
     find_package(Python3 REQUIRED COMPONENTS Interpreter)
-    add_custom_command(TARGET ${executable}
-        POST_BUILD
+    set(POSTPROCESS_STAMP "${BUILD_OBJ_DIR}/${PROJECT_NAME}.postprocess.stamp")
+    set(FIRMWARE_POSTPROCESS_TARGET "${executable}_postprocess")
+
+    add_custom_command(
+        OUTPUT ${POSTPROCESS_STAMP}
         COMMAND ${Python3_EXECUTABLE}
             ${ROOT_DIR}/scripts/kocherga_image.py
             --assign-version ${APP_VERSION_MAJOR}.${APP_VERSION_MINOR}
@@ -53,6 +56,16 @@ function(configure_bootloader_application_postprocess executable)
             -DOUT_FILE=${BUILD_OBJ_DIR}/${PROJECT_NAME}.bin
             -DSELECT_LATEST_APP_DESCRIPTOR_BIN=1
             -P ${ROOT_DIR}/cmake/bootloader_application_postprocess.cmake
+        COMMAND ${CMAKE_COMMAND} -E touch ${POSTPROCESS_STAMP}
+        DEPENDS
+            ${FIRMWARE_ARTIFACTS_TARGET}
+            ${BUILD_OBJ_DIR}/${PROJECT_NAME}.bin
+            ${BUILD_OBJ_DIR}/${PROJECT_NAME}.elf
         COMMENT "Applying Kocherga app descriptor CRC/size patch"
+        VERBATIM
     )
+
+    add_custom_target(${FIRMWARE_POSTPROCESS_TARGET} ALL DEPENDS ${POSTPROCESS_STAMP})
+    add_dependencies(${FIRMWARE_POSTPROCESS_TARGET} ${FIRMWARE_ARTIFACTS_TARGET})
+    set(FIRMWARE_FINAL_TARGET "${FIRMWARE_POSTPROCESS_TARGET}" PARENT_SCOPE)
 endfunction()
