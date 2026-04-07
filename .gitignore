@@ -3,3 +3,4 @@ build_dsdl/
 .vscode/
 .venv/
 __pycache__/
+.codex

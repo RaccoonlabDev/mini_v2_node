@@ -1,8 +1,8 @@
-[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=RaccoonlabDev_mini_v2_node&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=RaccoonlabDev_mini_v2_node) [![LOC](https://sonarcloud.io/api/project_badges/measure?project=RaccoonlabDev_mini_v2_node&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=RaccoonlabDev_mini_v2_node) [![Cyphal SITL](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/cyphal_sitl.yml/badge.svg)](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/cyphal_sitl.yml) [![DroneCAN SITL](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/dronecan_sitl.yml/badge.svg)](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/dronecan_sitl.yml) [![Code Style](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/code_style.yml/badge.svg)](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/code_style.yml) [![Build & Deploy](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/build_and_deploy.yml/badge.svg)](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/build_and_deploy.yml)
+[![CI](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/ci.yml/badge.svg)](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/ci.yml) [![SonarCloud](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/sonarcloud.yml/badge.svg)](https://github.com/RaccoonlabDev/mini_v2_node/actions/workflows/sonarcloud.yml) [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=RaccoonlabDev_mini_v2_node&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=RaccoonlabDev_mini_v2_node) [![LOC](https://sonarcloud.io/api/project_badges/measure?project=RaccoonlabDev_mini_v2_node&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=RaccoonlabDev_mini_v2_node)
 
-# Cyphal/DroneCAN application
+# General-purpose CAN node application
 
-A ready-to-use Cyphal/DroneCAN application for [RL Mini v2](https://docs.raccoonlab.co/guide/can_pwm/can_pwm_mini_v2.html), [RL Mini v3](https://docs.raccoonlab.co/guide/can_pwm/mini_v3.html) and other compatible nodes.
+A ready-to-use firmware base for [RL Mini v2](https://docs.raccoonlab.co/guide/can_pwm/can_pwm_mini_v2.html), [RL Mini v3](https://docs.raccoonlab.co/guide/can_pwm/mini_v3.html), and other compatible CAN nodes, with Cyphal/CAN and DroneCAN support.
 
 Please, refer to the docs in this repo for details:
 - [docs/mode_cyphal](docs/mode_cyphal.md),
@@ -11,7 +11,8 @@ Please, refer to the docs in this repo for details:
 ### 1. KEY FEATURES
 
 Supported features:
-- [x] Both Cyphal/CAN and DroneCAN protocols or one of them in a single firmware,
+- [x] Cyphal/CAN and DroneCAN protocol support, together or separately depending on the firmware target,
+- [x] Cyphal/DroneCAN bootloader (testing stage),
 - [x] You can try the software in Software-In-The-Loop (SITL) mode,
 - [x] Small firmware image and software is friendly for customization,
 - [x] Redundant CAN interface (node v3),
@@ -19,9 +20,8 @@ Supported features:
 - [x] CAN terminator resistors control (node v3).
 
 Roadmap / Not supported or tested yet:
-- [ ] Cyphal/DroneCAN Bootloader,
 - [ ] Dynamic Node Allocation (DNA),
-- [ ] Vibration Analysis: estimate dominant frequency and magnitude of vibrations for diagnosing mechanical issues or ensuring smooth operation in drones or robotic platforms in real time.
+- [ ] Vibration analysis: estimate dominant frequency and magnitude of vibrations for diagnosing mechanical issues or ensuring smooth operation in robotic and embedded systems in real time.
 - [ ] AS5600 I2C sensor encoder for servo position estimation
 
 ### 2. TARGET HARDWARE
@@ -35,18 +35,18 @@ The software supports RL v2 nodes (stm32f103, 128 KBytes flash) and v3 nodes (st
 
 ### 3. USE CASES
 
-This node is a versatile device integrating PWM control, IMU sensing, and dual CAN bus communication, suitable for various applications in robotics, drones, and other embedded systems. Below are the detailed use cases for different scenarios.
+This node is a versatile CAN-connected controller integrating PWM control, IMU sensing, and dual CAN bus communication, suitable for robotics, automation, test rigs, and other embedded systems. Below are example use cases.
 
 | Use case | Description |
 |-|-|
-| <img src="https://docs.raccoonlab.co/assets/img/mini_v2_with_servo.4761fdf2.png" alt="drawing" width="400"> | **1. Basic ESC and Servo Control** </br> PWM1-4 to control PWM ESCs via Cyphal/DroneCAN. </br> PWM1-2 to control 5V servos. </br> DroneCAN interface: [RawCommand](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#rawcommand) / [ArrayCommand](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#arraycommand). </br> Cyphal/CAN interface: [UDRAL setpoint](https://github.com/OpenCyphal/public_regulated_data_types/blob/master/reg/udral/service/actuator/esc/_.0.1.dsdl) |
+| <img src="https://docs.raccoonlab.co/assets/img/mini_v2_with_servo.4761fdf2.png" alt="drawing" width="400"> | **1. Basic ESC and Servo Control** </br> PWM1-4 to control PWM ESCs via Cyphal/CAN or DroneCAN. </br> PWM1-2 to control 5V servos. </br> DroneCAN interface: [RawCommand](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#rawcommand) / [ArrayCommand](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#arraycommand). </br> Cyphal/CAN interface: [UDRAL setpoint](https://github.com/OpenCyphal/public_regulated_data_types/blob/master/reg/udral/service/actuator/esc/_.0.1.dsdl) |
 | <img src="https://docs.raccoonlab.co/assets/img/mini_v2_with_esc_flame.0ffb552f.png" alt="drawing" width="400"> | **2. Advanced ESC Control with Feedback** </br> PWM3-4 for controlling PWM ESCs </br> UART or ADC feedback on the FB pin. </br> DroneCAN interface: [esc.Status](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#status-2) / [actuator.Status](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#status). </br> Cyphal/CAN interface: [UDRAL Feedback](https://github.com/OpenCyphal/public_regulated_data_types/blob/master/reg/udral/service/actuator/common/Feedback.0.1.dsdl) |
-| <img src="https://docs.raccoonlab.co/assets/img/lw20_i2c.82bad2a4.png" alt="drawing" width="400"> | **3. CAN-I2C Converter** </br> PWM1 and PWM2 as I2C pins. </br> Cyphal/DroneCAN adapter for I2C peripherals. </br> DroneCAN examples: [range_sensor.Measurement](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#measurement).|
-| | **4. Camera Gimbal** </br> PWM1-2 to control servo-based gimbal. </br> UAV payload management systems. </br> DroneCAN interface: [camera_gimbal.AngularCommand](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#angularcommand). |
-| | **5. Cargo Gripper** </br> PWM1-2 to control servo-based cargo grippers. </br> UAV payload management systems. </br> DroneCAN interface: [hardpoint.Command](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#command-1). |
-| | **6. CAN-CAN converter** </br> CAN1 for Cyphal/DroneCAN. </br> CAN2 for another CAN protocol. </br> Cyphal/DroneCAN adapter for another CAN device. </br> Examples: KST/CAN servo, CANopen motor, CAN BMS. </br> Keep a consistent CAN network. </br> Supported only on Mini v3 node. |
+| <img src="https://docs.raccoonlab.co/assets/img/lw20_i2c.82bad2a4.png" alt="drawing" width="400"> | **3. CAN-I2C Converter** </br> PWM1 and PWM2 as I2C pins. </br> Cyphal/CAN or DroneCAN adapter for I2C peripherals. </br> DroneCAN examples: [range_sensor.Measurement](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#measurement).|
+| | **4. Camera Gimbal or Sensor Mount** </br> PWM1-2 to control a servo-based gimbal. </br> Suitable for stabilized cameras, sensors, or inspection tooling. </br> DroneCAN interface: [camera_gimbal.AngularCommand](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#angularcommand). |
+| | **5. End Effector / Servo Latch** </br> PWM1-2 to control a servo-based latch, clamp, or lightweight end effector. </br> Suitable for ground robots, mobile platforms, and general-purpose tooling. </br> DroneCAN interface: [hardpoint.Command](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#command-1). |
+| | **6. CAN-CAN converter** </br> CAN1 for Cyphal/CAN or DroneCAN. </br> CAN2 for another CAN protocol. </br> CAN adapter for another CAN device. </br> Examples: KST/CAN servo, CANopen motor, CAN BMS. </br> Keep a consistent CAN network. </br> Supported only on Mini v3 node. |
 | | **7. Servo Position Estimation with I2C Encoder** </br> PWM3-4 for a servo </br> PWM1-2 for a [AS5600 I2C encoder](https://docs.raccoonlab.co/guide/as5600/). </br> Estimate the angular position of the servo. </br> DroneCAN interface: [actuator.Status](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#status). |
-| | **8. Vibration Analysis with IMU** </br> Utilize the onboard IMU (MPU-9250) </br> Monitor vibrations in your system. </br> Estimate dominant frequency and magnitude of vibrations. </br> Crucial for diagnosing mechanical issues </br> or ensuring smooth operation in drones or robotic platforms. </br> DroneCAN interface: [ahrs.RawIMU](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#rawimu). |
+| | **8. Vibration Analysis with IMU** </br> Utilize the onboard IMU (MPU-9250) </br> Monitor vibrations in your system. </br> Estimate dominant frequency and magnitude of vibrations. </br> Useful for diagnosing mechanical issues </br> or ensuring smooth operation in robotic and embedded platforms. </br> DroneCAN interface: [ahrs.RawIMU](https://dronecan.github.io/Specification/7._List_of_standard_data_types/#rawimu). |
 
 ### 4. SOFTWARE PREREQUISITES
 
@@ -164,12 +164,13 @@ All nodes run a minimal application after flashing so you can verify the board i
 
 ### 8. CREATING YOUR OWN APPLICATION
 
-This repository can be used in two ways:
+This repository can be used in three ways:
 
 | Approach | When to Use | Summary |
 | -------- | ----------- | ------- |
 | **Fork (recommended)**  | Use it by default | One fork per user/org |
 | **Template (advanced)** | When multiple apps are needed. | Unlimited repos per user/org, but extra steps to restore history and no automatic pull requests. |
+| **Framework (testing stage)** | When you want to keep your application in a separate repository and reuse this repo as a submodule/vendor dependency. | Put your custom boards, modules, and drivers in your app repo and build against `node-core` via custom CMake/Make wrappers. |
 
 <details open> <summary><b>▶ Workflow 1 — Fork (Recommended)</b></summary>
 
@@ -216,6 +217,45 @@ This repository can be used in two ways:
     ```
 
     ✅ This workflow is ideal if you need multiple independent applications, separate permissions per repo, and still want to keep upstream history.
+
+</details>
+
+<details> <summary><b>▶ Workflow 3 — Framework (Testing Stage, for Vendor/Submodule Integration)</b></summary>
+
+Use this workflow when your application lives in its own repository and this repo is included as a git submodule or vendor dependency.
+
+1. Add this repository to your application repo as a submodule, for example under `third_party/node-core`.
+2. Keep your application-specific code outside this repo, typically in a layout like:
+    ```text
+    your_app/
+    ├── CMakeLists.txt
+    ├── Makefile
+    ├── third_party/node-core/
+    └── src/
+        ├── boards/<vendor>/<board>/
+        ├── modules/
+        └── drivers/
+    ```
+3. Point the build to your external sources using `NC_APP_SRC_DIR`. The build system already knows how to look there for:
+    - `boards/<vendor>/<board>`
+    - `modules/...`
+    - `drivers/...`
+4. Provide your own top-level `CMakeLists.txt` or `Makefile` wrapper and forward the build to `node-core`. A minimal example:
+    ```make
+    NODE_CORE := third_party/node-core
+    APP_SRC := $(CURDIR)/src
+
+    my_board_dronecan:
+    	$(MAKE) -C $(NODE_CORE) build \
+    		NC_BOARD=my_vendor/my_board \
+    		NC_TARGET=dronecan \
+    		NC_APP_SRC_DIR=$(APP_SRC) \
+    		NC_BUILD_DIR=$(CURDIR)/build
+    ```
+5. If you need custom aliases or board-generation helpers, define them in your application repo similarly to this repo's `Makefile.vendor`.
+6. Define board targets in `src/boards/<vendor>/<board>/<target>.cmake`. The default convention is documented in `Src/boards/<vendor>/<board>/`.
+
+This workflow is useful when `node-core` is treated as a reusable firmware framework and your product-specific code, board definitions, and release process are maintained separately.
 
 </details>
 
