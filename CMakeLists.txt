@@ -8,6 +8,7 @@ set(SRC_DIR ${ROOT_DIR}/Src)
 set(CMAKE_DIR ${ROOT_DIR}/cmake)
 set(LIBPARAMS_PATH ${ROOT_DIR}/Libs/libparams)
 set(LIBPARAMS_CMAKE libparams.cmake)
+set(NC_LIBDCNODE_PATH "${ROOT_DIR}/Libs/Dronecan" CACHE PATH "Path to libdcnode/DroneCAN source tree")
 set(BUILD_ROOT_DIR ${ROOT_DIR}/build)
 
 include(${CMAKE_DIR}/module.cmake)
