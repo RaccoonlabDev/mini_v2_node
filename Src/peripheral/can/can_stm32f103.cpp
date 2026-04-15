@@ -26,6 +26,11 @@ static RingBuffer<Can::ClassicFrame, RX_RING_CAPACITY> rx_ring_buffer;
 static volatile uint32_t software_rx_overflow_count = 0U;
 static volatile uint32_t local_error_count = 0U;
 
+// Avoid deprecated ++ on volatile objects.
+void incrementVolatileCounter(volatile uint32_t& counter) {
+    counter = counter + 1U;
+}
+
 uint32_t saturateToU32(const uint64_t value) {
     const uint64_t max_u32 = static_cast<uint64_t>(std::numeric_limits<uint32_t>::max());
     return static_cast<uint32_t>(value > max_u32 ? max_u32 : value);
@@ -64,7 +69,7 @@ void pushFrameToRxRing(const CanardCANFrame& rx_frame) {
     frame.timestamp_ns = static_cast<uint64_t>(HAL_GetTick()) * 1000000ULL;
 
     if (rx_ring_buffer.getSize() >= RX_RING_CAPACITY) {
-        software_rx_overflow_count++;
+        incrementVolatileCounter(software_rx_overflow_count);
     }
     rx_ring_buffer.push(frame);
 }
@@ -75,7 +80,7 @@ void drainHardwareRxFifos() {
         const int16_t result = canardSTM32Receive(&rx_frame);
         if (result <= 0) {
             if (result < 0) {
-                local_error_count++;
+                incrementVolatileCounter(local_error_count);
             }
             return;
         }
@@ -89,7 +94,7 @@ Can::Can(Instance instance) : _instance(instance) {}
 
 Can::ErrorCode Can::init(const InitConfig& config) {
     if (_instance != Instance::INSTANCE_1) {
-        local_error_count++;
+        incrementVolatileCounter(local_error_count);
         refreshDriverStats(_stats);
         return ErrorCode::INITIALIZATION_FAILED;
     }
@@ -104,20 +109,20 @@ Can::ErrorCode Can::init(const InitConfig& config) {
     const int16_t timings_result =
         canardSTM32ComputeCANTimings(HAL_RCC_GetPCLK1Freq(), config.baud_rate, &timings);
     if (timings_result < 0) {
-        local_error_count++;
+        incrementVolatileCounter(local_error_count);
         refreshDriverStats(_stats);
         return ErrorCode::INITIALIZATION_FAILED;
     }
 
     if (canardSTM32Init(&timings, CanardSTM32IfaceModeNormal) < 0) {
-        local_error_count++;
+        incrementVolatileCounter(local_error_count);
         refreshDriverStats(_stats);
         return ErrorCode::INITIALIZATION_FAILED;
     }
 
     const CanardSTM32AcceptanceFilterConfiguration filter{.id = 0U, .mask = 0U};
     if (canardSTM32ConfigureAcceptanceFilters(&filter, 1U) < 0) {
-        local_error_count++;
+        incrementVolatileCounter(local_error_count);
         refreshDriverStats(_stats);
         return ErrorCode::INITIALIZATION_FAILED;
     }
@@ -139,7 +144,7 @@ Can::ErrorCode Can::init(const InitConfig& config) {
 
 std::variant<Can::ClassicFrame, Can::ErrorCode> Can::receive() {
     if (!_is_initialized) {
-        local_error_count++;
+        incrementVolatileCounter(local_error_count);
         refreshDriverStats(_stats);
         return ErrorCode::INITIALIZATION_FAILED;
     }
@@ -161,7 +166,7 @@ std::variant<Can::ClassicFrame, Can::ErrorCode> Can::receive() {
 
 Can::ErrorCode Can::send(const ClassicFrame& frame) {
     if (!_is_initialized) {
-        local_error_count++;
+        incrementVolatileCounter(local_error_count);
         refreshDriverStats(_stats);
         return ErrorCode::INITIALIZATION_FAILED;
     }
@@ -170,7 +175,7 @@ Can::ErrorCode Can::send(const ClassicFrame& frame) {
     tx_frame.id = (frame.id & CANARD_CAN_EXT_ID_MASK) | CANARD_CAN_FRAME_EFF;
     tx_frame.data_len = frame.data_len;
     if (tx_frame.data_len > sizeof(tx_frame.data)) {
-        local_error_count++;
+        incrementVolatileCounter(local_error_count);
         refreshDriverStats(_stats);
         return ErrorCode::TRANSMISSION_ERROR;
     }
@@ -179,7 +184,7 @@ Can::ErrorCode Can::send(const ClassicFrame& frame) {
     const int16_t result = canardSTM32Transmit(&tx_frame);
     if (result <= 0) {
         if (result < 0) {
-            local_error_count++;
+            incrementVolatileCounter(local_error_count);
             refreshDriverStats(_stats);
             return ErrorCode::TRANSMISSION_ERROR;
         }
@@ -188,7 +193,7 @@ Can::ErrorCode Can::send(const ClassicFrame& frame) {
     }
 
     if (!waitForAllTxMailboxesFree(10U)) {
-        local_error_count++;
+        incrementVolatileCounter(local_error_count);
         refreshDriverStats(_stats);
         return ErrorCode::TRANSMISSION_ERROR;
     }
