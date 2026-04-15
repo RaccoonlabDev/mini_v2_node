@@ -109,6 +109,8 @@ elif ! grep -q "^NC_IMAGE_KIND:STRING=${NC_IMAGE_KIND}$" "${OBJ_DIR}/CMakeCache.
     need_config=1
 elif ! grep -q "^NC_APP_SRC_DIR:PATH=${NC_APP_SRC_DIR}$" "${OBJ_DIR}/CMakeCache.txt"; then
     need_config=1
+elif [[ "${#CMAKE_EXTRA_ARGS[@]}" -gt 0 ]]; then
+    need_config=1
 fi
 
 if [[ "${need_config}" -eq 1 ]]; then
