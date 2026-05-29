@@ -14,6 +14,7 @@ Options:
   --target <value>           Board target name, e.g. dronecan
   --image-kind <value>       Firmware image kind. Default: standalone
   --app-src-dir <path>       Optional app source directory with boards/modules/drivers
+  --icd-doc <path>           Optional ICD markdown output path
   --build-dir <path>         Build root directory. Default: <node-core>/build
   --build-variant <value>    Override build subdirectory name
   --cmake-build-type <value> Forward CMAKE_BUILD_TYPE to CMake
@@ -25,6 +26,7 @@ NC_BOARD=""
 NC_TARGET=""
 NC_IMAGE_KIND="standalone"
 NC_APP_SRC_DIR=""
+NC_DOCS_ICD_PATH=""
 NC_BUILD_DIR="${ROOT_DIR}/build"
 BUILD_VARIANT=""
 CMAKE_BUILD_TYPE=""
@@ -46,6 +48,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --app-src-dir)
             NC_APP_SRC_DIR="$2"
+            shift 2
+            ;;
+        --icd-doc)
+            NC_DOCS_ICD_PATH="$2"
             shift 2
             ;;
         --build-dir)
@@ -109,6 +115,8 @@ elif ! grep -q "^NC_IMAGE_KIND:STRING=${NC_IMAGE_KIND}$" "${OBJ_DIR}/CMakeCache.
     need_config=1
 elif ! grep -q "^NC_APP_SRC_DIR:PATH=${NC_APP_SRC_DIR}$" "${OBJ_DIR}/CMakeCache.txt"; then
     need_config=1
+elif ! grep -q "^NC_DOCS_ICD_PATH:FILEPATH=${NC_DOCS_ICD_PATH}$" "${OBJ_DIR}/CMakeCache.txt"; then
+    need_config=1
 elif [[ "${#CMAKE_EXTRA_ARGS[@]}" -gt 0 ]]; then
     need_config=1
 fi
@@ -122,6 +130,7 @@ if [[ "${need_config}" -eq 1 ]]; then
         -DNC_TARGET="${NC_TARGET}" \
         -DNC_IMAGE_KIND="${NC_IMAGE_KIND}" \
         -DNC_APP_SRC_DIR="${NC_APP_SRC_DIR}" \
+        -DNC_DOCS_ICD_PATH="${NC_DOCS_ICD_PATH}" \
         -DCMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE}" \
         "${CMAKE_EXTRA_ARGS[@]}" \
         -G "Unix Makefiles"

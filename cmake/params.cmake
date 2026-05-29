@@ -3,8 +3,6 @@
 
 if(NOT LIBPARAMS_PATH)
     message(SEND_ERROR "LIBPARAMS_PATH is unknown.")
-elseif(NOT DOCS_ICD_PATH)
-    message(SEND_ERROR "ROOT_DIR is unknown.")
 elseif(NOT BUILD_SRC_DIR)
     message(SEND_ERROR "BUILD_SRC_DIR is unknown.")
 elseif(NOT LIBPARAMS_PARAMS)
@@ -21,11 +19,13 @@ if(NOT result EQUAL 0)
     message(FATAL_ERROR "Failed to execute generate_params.py script. Return code: ${result}")
 endif()
 
-# execute_process(
-#     COMMAND python3 ${LIBPARAMS_PATH}/scripts/generate_docs.py --output ${DOCS_ICD_PATH} ${LIBPARAMS_PARAMS}
-#     WORKING_DIRECTORY ${APPLICATION_DIR}
-#     RESULT_VARIABLE result
-# )
-# if(NOT result EQUAL 0)
-#     message(FATAL_ERROR "Failed to execute generate_docs.py script. Return code: ${result}")
-# endif()
+if(NOT "${DOCS_ICD_PATH}" STREQUAL "")
+    execute_process(
+        COMMAND python3 ${LIBPARAMS_PATH}/scripts/generate_docs.py --output ${DOCS_ICD_PATH} ${LIBPARAMS_PARAMS}
+        WORKING_DIRECTORY ${APPLICATION_DIR}
+        RESULT_VARIABLE result
+    )
+    if(NOT result EQUAL 0)
+        message(FATAL_ERROR "Failed to execute generate_docs.py script. Return code: ${result}")
+    endif()
+endif()
