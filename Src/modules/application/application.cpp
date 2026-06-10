@@ -33,8 +33,17 @@ static int8_t init_board_periphery() {
     if (paramsInit(libparams_ints_num, libparams_strs_num, first_page_idx, pages_num) != 0) {
         return -1;
     }
+    if (paramsEnableCrc(IntParamsIndexes::PARAM_SYSTEM_CRC) != 0) {
+        return -1;
+    }
+    if (paramsInitRedundantPage() != 0) {
+        return -1;
+    }
     if (paramsLoad() != 0) {
         return -1;
+    }
+    if (!paramsIsCrcValid()) {
+        (void)paramsSave();
     }
 
 #if defined(CAN1_TERMINATOR_Pin) && defined(CAN2_TERMINATOR_Pin)

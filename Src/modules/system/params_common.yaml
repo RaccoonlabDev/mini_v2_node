@@ -44,4 +44,4 @@ system.reserved1:
   flags: mutable
   default: 0
   min: 0
-  max: 0
+  max: 2147483647
