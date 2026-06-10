@@ -7,6 +7,9 @@
 	rl_mini_v3_dronecan rl_mini_v3_dronecan_application rl_mini_v3_dronecan_standalone \
 	rl_mini_v3_cyphal rl_mini_v3_cyphal_application rl_mini_v3_cyphal_standalone \
 	rl_mini_v3_both rl_mini_v3_both_application rl_mini_v3_both_standalone \
+	rl_node_v3_dronecan rl_node_v3_dronecan_application rl_node_v3_dronecan_standalone \
+	rl_node_v3_cyphal rl_node_v3_cyphal_application rl_node_v3_cyphal_standalone \
+	rl_node_v3_both rl_node_v3_both_application rl_node_v3_both_standalone \
 	rl_sitl_dronecan rl_sitl_cyphal \
 	cyphal cyphal_v2 cyphal_v3 dronecan dronecan_v2 dronecan_v3 v2 v3 sitl_dronecan sitl_cyphal
 .DEFAULT_GOAL := require_target
@@ -112,6 +115,28 @@ rl_mini_v3_both_application: checks
 	$(MAKE) build BOARD=rl/mini_v3 TARGET=both IMAGE_KIND=application BUILD_VARIANT=rl_mini_v3_both_application
 rl_mini_v3_both_standalone: checks
 	$(MAKE) build BOARD=rl/mini_v3 TARGET=both IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v3_both_standalone
+
+#
+# rl/node_v3 aliases
+#
+rl_node_v3_dronecan: checks
+	$(MAKE) build BOARD=rl/node_v3 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_node_v3_dronecan_application
+rl_node_v3_dronecan_application: checks
+	$(MAKE) build BOARD=rl/node_v3 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_node_v3_dronecan_application
+rl_node_v3_dronecan_standalone: checks
+	$(MAKE) build BOARD=rl/node_v3 TARGET=dronecan IMAGE_KIND=standalone BUILD_VARIANT=rl_node_v3_dronecan_standalone
+rl_node_v3_cyphal: checks
+	$(MAKE) build BOARD=rl/node_v3 TARGET=cyphal IMAGE_KIND=application BUILD_VARIANT=rl_node_v3_cyphal_application
+rl_node_v3_cyphal_application: checks
+	$(MAKE) build BOARD=rl/node_v3 TARGET=cyphal IMAGE_KIND=application BUILD_VARIANT=rl_node_v3_cyphal_application
+rl_node_v3_cyphal_standalone: checks
+	$(MAKE) build BOARD=rl/node_v3 TARGET=cyphal IMAGE_KIND=standalone BUILD_VARIANT=rl_node_v3_cyphal_standalone
+rl_node_v3_both: checks
+	$(MAKE) build BOARD=rl/node_v3 TARGET=both IMAGE_KIND=application BUILD_VARIANT=rl_node_v3_both_application
+rl_node_v3_both_application: checks
+	$(MAKE) build BOARD=rl/node_v3 TARGET=both IMAGE_KIND=application BUILD_VARIANT=rl_node_v3_both_application
+rl_node_v3_both_standalone: checks
+	$(MAKE) build BOARD=rl/node_v3 TARGET=both IMAGE_KIND=standalone BUILD_VARIANT=rl_node_v3_both_standalone
 
 #
 # rl/sitl aliases
