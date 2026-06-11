@@ -9,6 +9,7 @@
 #include "params.hpp"
 #include "libdcnode/dronecan.h"
 #include "libdcnode/can_driver.h"
+#include "libdcnode/logger.hpp"
 #include "drivers/board_monitor/board_monitor.hpp"
 
 #ifndef GIT_HASH
@@ -49,6 +50,10 @@ uint32_t canDriverGetDiagnosticStatus();
 #endif
 
 REGISTER_MODULE(DronecanModule)
+
+namespace {
+DronecanLogger bringup_logger{"H7"};
+}
 
 DronecanModule::DronecanModule() : Module(0, Protocol::DRONECAN) {
 }
@@ -135,6 +140,10 @@ void DronecanModule::init() {
 
     set_health(res >= 0 ? Status::OK : Status::FATAL_MALFANCTION);
     set_mode(res >= 0 ? Mode::ENGAGED : Mode::STANDBY);
+
+    if (res >= 0) {
+        bringup_logger.log_error("CHECK");
+    }
 }
 
 void DronecanModule::spin_once() {
