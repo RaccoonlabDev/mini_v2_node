@@ -23,7 +23,11 @@ void platformSpecificReadUniqueID(uint8_t out_uid[4]) {
 }
 
 bool platformSpecificRequestRestart() {
+#ifdef HAL_IWDG_MODULE_ENABLED
     HAL::Watchdog::request_reboot();
+#else
+    HAL_NVIC_SystemReset();
+#endif
     return true;
 }
 
