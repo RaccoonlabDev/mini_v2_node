@@ -24,7 +24,8 @@ set(COMMON_FLAGS "-mcpu=cortex-m7 -mthumb -mfpu=fpv5-d16 -mfloat-abi=hard -fdata
 set(WARNING_FLAGS "-Wall -Wextra -Wfloat-equal -Werror -Wundef -Wshadow -Wpointer-arith -Wunreachable-code -Wstrict-overflow=5 -Wwrite-strings -Wswitch-default")
 
 set(CMAKE_C_FLAGS       "${CMAKE_C_FLAGS} ${COMMON_FLAGS} ${WARNING_FLAGS}")
-set(CMAKE_CXX_FLAGS     "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS} ${WARNING_FLAGS} -Wno-volatile -fno-exceptions -fno-rtti")
+set(CMAKE_C_FLAGS       "${CMAKE_C_FLAGS} -Wno-unused-parameter -Wno-missing-field-initializers")
+set(CMAKE_CXX_FLAGS     "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS} ${WARNING_FLAGS} -Wno-unused-parameter -Wno-missing-field-initializers -Wno-volatile -fno-exceptions -fno-rtti")
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${COMMON_FLAGS} -lc -lm -lnosys -specs=nano.specs -Wl,--gc-sections")
 
@@ -39,4 +40,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_definitions(
     USE_HAL_DRIVER
     STM32H753xx
+    USE_FLASH_ECC=0U
+    USE_SDIO_TRANSCEIVER=0U
+    USBD_USER_REGISTER_CALLBACK=0U
+    USE_MULTI_CORE_SHARED_CODE=0U
 )

@@ -20,7 +20,11 @@ int8_t Adc::init(uint8_t channel_count) {
         return -1;
     }
 
+#ifdef STM32H753xx
+    if (HAL_ADCEx_Calibration_Start(&hadc1, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK) {
+#else
     if (HAL_ADCEx_Calibration_Start(&hadc1) != HAL_OK) {
+#endif
         return -1;
     }
 

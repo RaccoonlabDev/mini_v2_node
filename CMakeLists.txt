@@ -26,7 +26,7 @@ set(IMAGE_KIND "" CACHE STRING "Deprecated. Use NC_IMAGE_KIND.")
 option(USE_PLATFORM_UBUNTU "Build for SITL (Software In The Loop)" OFF)
 option(USE_PLATFORM_NODE_V2 "Build for stm32f103xB (128 KBytes)" OFF)
 option(USE_PLATFORM_NODE_V3 "Build for stm32g0b1 (512 KBytes)" OFF)
-option(USE_PLATFORM_NODE_V3_H7 "Build for stm32h753xx (2048 KBytes)" OFF)
+option(USE_PLATFORM_NODE_V4 "Build for stm32h753xx (2048 KBytes)" OFF)
 set(BOARD_VENDOR rl CACHE STRING "Board vendor name under Src/boards")
 
 if(NC_BOARD STREQUAL "" AND NOT BOARD STREQUAL "")
@@ -134,7 +134,7 @@ endif()
 set(USE_PLATFORM_UBUNTU OFF)
 set(USE_PLATFORM_NODE_V2 OFF)
 set(USE_PLATFORM_NODE_V3 OFF)
-set(USE_PLATFORM_NODE_V3_H7 OFF)
+set(USE_PLATFORM_NODE_V4 OFF)
 
 # Keep these values aligned with `Src/common/mcu_family_id.hpp`.
 # Reserved IDs:
@@ -188,6 +188,9 @@ elseif(BOARD_PLATFORM STREQUAL "stm32f103")
     FILE(GLOB coreSources       ${stm32cubeMxProjectPath}/Core/Src/*)
     FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c
                                 ${stm32cubeMxProjectPath}/Drivers/*/*/*/*.c)
+    FILE(GLOB_RECURSE middlewareSources
+                                ${stm32cubeMxProjectPath}/Middlewares/ST/STM32_USB_Device_Library/*.c)
+    FILE(GLOB usbDeviceSources  ${stm32cubeMxProjectPath}/USB_DEVICE/*/*.c)
     FILE(GLOB startupFile       ${stm32cubeMxProjectPath}/*.s
                                 ${stm32cubeMxProjectPath}/Core/Startup/*.s
     )
@@ -223,6 +226,10 @@ elseif(BOARD_PLATFORM STREQUAL "stm32g0b1")
     FILE(GLOB coreSources       ${stm32cubeMxProjectPath}/Core/Src/*)
     FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c
                                 ${stm32cubeMxProjectPath}/Drivers/*/*/*/*.c)
+    FILE(GLOB_RECURSE middlewareSources
+                                ${stm32cubeMxProjectPath}/Middlewares/ST/STM32_USB_Device_Library/*.c)
+    FILE(GLOB_RECURSE usbDeviceSources
+                                ${stm32cubeMxProjectPath}/USB_DEVICE/*.c)
     FILE(GLOB startupFile       ${stm32cubeMxProjectPath}/*.s
                                 ${stm32cubeMxProjectPath}/Core/Startup/*.s
     )
@@ -236,10 +243,9 @@ elseif(BOARD_PLATFORM STREQUAL "stm32h753xx")
     set(CAN_PLATFORM fdcan)
     set(LIBCPNODE_CAN_PLATFORM fdcan)
     set(APP_PLATFORM stm32h753xx)
-    set(PLATFORM_NAME v3)
+    set(PLATFORM_NAME v4)
     set(MCU_FAMILY_ID ${MCU_FAMILY_ID_STM32H7})
-    set(USE_PLATFORM_NODE_V3 ON)
-    set(USE_PLATFORM_NODE_V3_H7 ON)
+    set(USE_PLATFORM_NODE_V4 ON)
 
     if(DEFINED STM32_CUBEMX_PROJECT_PATH)
         set(stm32cubeMxProjectPath  ${STM32_CUBEMX_PROJECT_PATH})
@@ -266,6 +272,10 @@ elseif(BOARD_PLATFORM STREQUAL "stm32h753xx")
     FILE(GLOB coreSources       ${stm32cubeMxProjectPath}/Core/Src/*)
     FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c
                                 ${stm32cubeMxProjectPath}/Drivers/*/*/*/*.c)
+    FILE(GLOB_RECURSE middlewareSources
+                                ${stm32cubeMxProjectPath}/Middlewares/ST/STM32_USB_Device_Library/*.c)
+    FILE(GLOB_RECURSE usbDeviceSources
+                                ${stm32cubeMxProjectPath}/USB_DEVICE/*.c)
     FILE(GLOB startupFile       ${stm32cubeMxProjectPath}/*.s
                                 ${stm32cubeMxProjectPath}/Core/Startup/*.s
     )
@@ -274,6 +284,7 @@ elseif(BOARD_PLATFORM STREQUAL "stm32h753xx")
     include(${CMAKE_DIR}/toolchain-stm32h753xx.cmake)
     add_compile_definitions(NUM_OF_CAN_BUSES=2)
     add_compile_definitions(CYPHAL_NUM_OF_CAN_BUSES=2)
+    add_compile_definitions(USE_PWR_LDO_SUPPLY)
 else()
     message(FATAL_ERROR "Unknown BOARD_PLATFORM '${BOARD_PLATFORM}'. Expected: ubuntu, stm32f103, stm32g0b1, stm32h753xx.")
 endif()

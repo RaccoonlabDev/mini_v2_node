@@ -16,6 +16,8 @@ add_executable(${EXECUTABLE}
 
     ${coreSources}
     ${driversSources}
+    ${middlewareSources}
+    ${usbDeviceSources}
     ${startupFile}
 )
 
@@ -25,12 +27,15 @@ target_include_directories(${EXECUTABLE} PRIVATE
     ${ROOT_DIR}/Src/common
     ${CMAKE_CURRENT_LIST_DIR}
     ${stm32cubeMxProjectPath}/Core/Inc
+    ${stm32cubeMxProjectPath}/USB_DEVICE/App
+    ${stm32cubeMxProjectPath}/USB_DEVICE/Target
     ${stm32cubeMxProjectPath}/Drivers/CMSIS/Include
-    ${stm32cubeMxProjectPath}/Drivers/CMSIS/DSP/Include
 
     ${stm32cubeMxProjectPath}/Drivers/CMSIS/Device/ST/STM32H7xx/Include
     ${stm32cubeMxProjectPath}/Drivers/STM32H7xx_HAL_Driver/Inc
     ${stm32cubeMxProjectPath}/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy
+    ${stm32cubeMxProjectPath}/Middlewares/ST/STM32_USB_Device_Library/Core/Inc
+    ${stm32cubeMxProjectPath}/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc
 )
 
 if(CAN_PROTOCOL STREQUAL "dronecan" OR CAN_PROTOCOL STREQUAL "both")

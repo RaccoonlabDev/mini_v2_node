@@ -8,6 +8,7 @@ SCRIPT_NAME="flash.sh"
 VERSION="v1.1.0"
 
 BINARY_FILE=$1
+FLASH_ADDRESS=${2:-0x08000000}
 
 RED='\033[0;31m'
 NC='\033[0m'
@@ -20,7 +21,13 @@ elif [ ! -f "$BINARY_FILE" ]; then
 elif [[ ! $BINARY_FILE == *.bin ]]; then
     echo -e "${RED}${SCRIPT_NAME} ${VERSION} error on line $LINENO: speficied file must have .bin extension!${NC}"
     exit
+elif [[ ! $FLASH_ADDRESS =~ ^0x[0-9a-fA-F]+$ ]]; then
+    echo -e "${RED}${SCRIPT_NAME} ${VERSION} error on line $LINENO: flash address must be a hex value, got $FLASH_ADDRESS!${NC}"
+    exit
 fi
+
+echo "${SCRIPT_NAME} ${VERSION}: binary $BINARY_FILE"
+echo "${SCRIPT_NAME} ${VERSION}: address $FLASH_ADDRESS"
 
 for attempt in {1..25}; do
     echo ""
@@ -50,9 +57,10 @@ for attempt in {1..25}; do
         EXPLICIT_FLASH_SIZE="--flash=0x00020000"
     fi
 
-    output=$(st-flash $EXPLICIT_FLASH_SIZE --connect-under-reset --reset write $BINARY_FILE 0x8000000 | tee /dev/tty)
-    compare_res=$(echo "$output" | grep "pages written")
-    if [ -z "$compare_res" ]; then
+    output=$(st-flash $EXPLICIT_FLASH_SIZE --connect-under-reset --reset write $BINARY_FILE $FLASH_ADDRESS 2>&1 | tee /dev/tty)
+    write_status=${PIPESTATUS[0]}
+    is_write_verified=$(echo "$output" | grep -E "Flash written and verified|pages written")
+    if [ "$write_status" -ne 0 ] || [ -z "$is_write_verified" ]; then
         sleep 2
     else
         echo "${SCRIPT_NAME} ${VERSION}: done"
