@@ -88,33 +88,15 @@ int main(void)
 
   /* USER CODE BEGIN Init */
   MX_GPIO_Init();
-#if defined(NLED_RED_GPIO_Port) && defined(NLED_GREEN_GPIO_Port) && defined(NLED_BLUE_GPIO_Port)
-  HAL_GPIO_WritePin(NLED_RED_GPIO_Port, NLED_RED_Pin, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(NLED_GREEN_GPIO_Port, NLED_GREEN_Pin, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(NLED_BLUE_GPIO_Port, NLED_BLUE_Pin, GPIO_PIN_RESET);
-#endif
 
-HAL_Delay(1000);
   /* USER CODE END Init */
 
   /* Configure the system clock */
   SystemClock_Config();
-  #if defined(NLED_RED_GPIO_Port) && defined(NLED_GREEN_GPIO_Port) && defined(NLED_BLUE_GPIO_Port)
-  HAL_GPIO_WritePin(NLED_RED_GPIO_Port, NLED_RED_Pin, GPIO_PIN_SET);
-  HAL_GPIO_WritePin(NLED_GREEN_GPIO_Port, NLED_GREEN_Pin, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(NLED_BLUE_GPIO_Port, NLED_BLUE_Pin, GPIO_PIN_SET);
-#endif
-HAL_Delay(1000);
+
   /* Configure the peripherals common clocks */
   PeriphCommonClock_Config();
-
   /* USER CODE BEGIN SysInit */
-  #if defined(NLED_RED_GPIO_Port) && defined(NLED_GREEN_GPIO_Port) && defined(NLED_BLUE_GPIO_Port)
-  HAL_GPIO_WritePin(NLED_RED_GPIO_Port, NLED_RED_Pin, GPIO_PIN_SET);
-  HAL_GPIO_WritePin(NLED_GREEN_GPIO_Port, NLED_GREEN_Pin, GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(NLED_BLUE_GPIO_Port, NLED_BLUE_Pin, GPIO_PIN_SET);
-#endif
-HAL_Delay(1000);
 
   /* USER CODE END SysInit */
 
@@ -122,20 +104,19 @@ HAL_Delay(1000);
   MX_GPIO_Init();
   MX_FDCAN1_Init();
   MX_FDCAN2_Init();
-  MX_USB_DEVICE_Init();
   MX_ADC1_Init();
   MX_ADC2_Init();
   MX_ADC3_Init();
-  MX_ETH_Init();
+  // MX_ETH_Init();
   MX_SPI5_Init();
   MX_I2C2_Init();
   MX_I2C3_Init();
-  MX_SDMMC2_MMC_Init();
+  // MX_SDMMC2_MMC_Init();
   MX_SPI3_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  //application_entry_point();
+  application_entry_point();
 
   /* USER CODE END 2 */
 
@@ -172,12 +153,13 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_DIV1;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLM = 1;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLM = 4;
   RCC_OscInitStruct.PLL.PLLN = 9;
   RCC_OscInitStruct.PLL.PLLP = 2;
   RCC_OscInitStruct.PLL.PLLQ = 3;
@@ -185,7 +167,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_3;
   RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOMEDIUM;
   RCC_OscInitStruct.PLL.PLLFRACN = 3072;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) == HAL_ERROR)
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
   }
@@ -205,7 +187,7 @@ void SystemClock_Config(void)
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
   {
-    //Error_Handler();
+    Error_Handler();
   }
 }
 
@@ -220,7 +202,7 @@ void PeriphCommonClock_Config(void)
   /** Initializes the peripherals clock
   */
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC;
-  PeriphClkInitStruct.PLL2.PLL2M = 1;
+  PeriphClkInitStruct.PLL2.PLL2M = 4;
   PeriphClkInitStruct.PLL2.PLL2N = 10;
   PeriphClkInitStruct.PLL2.PLL2P = 2;
   PeriphClkInitStruct.PLL2.PLL2Q = 2;
