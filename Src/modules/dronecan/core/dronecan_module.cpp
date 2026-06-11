@@ -42,6 +42,8 @@ extern "C" {
 uint32_t platformSpecificGetTimeMs();
 bool platformSpecificRequestRestart();
 void platformSpecificReadUniqueID(uint8_t out_uid[4]);
+uint64_t canDriverGetTxCount();
+uint32_t canDriverGetDiagnosticStatus();
 #ifdef __cplusplus
 }
 #endif
@@ -132,7 +134,7 @@ void DronecanModule::init() {
     int8_t res = uavcanInitApplication(params_api, platform_api, &app_info);
 
     set_health(res >= 0 ? Status::OK : Status::FATAL_MALFANCTION);
-    set_mode(Mode::STANDBY);
+    set_mode(res >= 0 ? Mode::ENGAGED : Mode::STANDBY);
 }
 
 void DronecanModule::spin_once() {
@@ -144,4 +146,22 @@ void DronecanModule::spin_once() {
     uavcanSetNodeStatusMode(static_cast<NodeStatusMode_t>(global_mode));
     uavcanSetVendorSpecificStatusCode(ModuleManager::get_vssc());
     uavcanSpinOnce();
+
+    const auto can_diag = canDriverGetDiagnosticStatus();
+    if (can_diag == 0) {
+        set_health(Status::OK);
+        set_mode(Mode::STANDBY);
+    } else if (can_diag == 1) {
+        set_health(Status::OK);
+        set_mode(Mode::ENGAGED);
+    } else if (can_diag == 2) {
+        set_health(Status::MINOR_FAILURE);
+        set_mode(Mode::STANDBY);
+    } else if (can_diag <= 4) {
+        set_health(Status::MAJOR_FAILURE);
+        set_mode(Mode::STANDBY);
+    } else {
+        set_health(Status::FATAL_MALFANCTION);
+        set_mode(Mode::STANDBY);
+    }
 }

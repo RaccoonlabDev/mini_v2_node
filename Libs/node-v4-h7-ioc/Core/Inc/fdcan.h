@@ -27,7 +27,6 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "string.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -35,14 +34,11 @@ extern "C" {
 
 extern FDCAN_HandleTypeDef hfdcan1;
 
-extern FDCAN_HandleTypeDef hfdcan2;
-
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
 
 void MX_FDCAN1_Init(void);
-void MX_FDCAN2_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 
