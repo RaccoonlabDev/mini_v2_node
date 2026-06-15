@@ -273,20 +273,6 @@ patch_generated_main_c() {
   fi
 }
 
-patch_generated_fdcan_c() {
-  local output_dir="$1"
-  local fdcan_c_path="${output_dir}/Core/Src/fdcan.c"
-  if [[ ! -f "${fdcan_c_path}" ]]; then
-    return 0
-  fi
-
-  if grep -q "hfdcan2.Init.MessageRAMOffset = 0;" "${fdcan_c_path}"; then
-    sed -i 's/hfdcan2\.Init\.MessageRAMOffset = 0;/hfdcan2.Init.MessageRAMOffset = 256;/' "${fdcan_c_path}"
-    if [[ ${VERBOSE} -eq 1 ]]; then
-      echo "Patched FDCAN2 message RAM offset: ${fdcan_c_path}"
-    fi
-  fi
-}
 
 patch_generated_system_c() {
   local output_dir="$1"
@@ -324,7 +310,6 @@ patch_generated_sources() {
   local output_dir="$1"
   normalize_generated_layout "${output_dir}"
   patch_generated_main_c "${output_dir}"
-  patch_generated_fdcan_c "${output_dir}"
   patch_generated_system_c "${output_dir}"
 }
 
