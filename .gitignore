@@ -4,3 +4,12 @@ build_dsdl/
 .venv/
 __pycache__/
 .codex
+.cubemx_ioc.sha256
+
+Libs/node-v4-h7-ioc/cmake/*
+Libs/node-v4-h7-ioc/Core/*
+Libs/node-v4-h7-ioc/Drivers/*
+Libs/node-v4-h7-ioc/CMakeLists.txt
+Libs/node-v4-h7-ioc/CMakePresets.json
+Libs/node-v4-h7-ioc/startup_stm32h753xx.s
+Libs/node-v4-h7-ioc/STM32H753XX_FLASH.ld

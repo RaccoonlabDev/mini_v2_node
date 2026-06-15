@@ -19,6 +19,14 @@ Options:
   --build-variant <value>    Override build subdirectory name
   --cmake-build-type <value> Forward CMAKE_BUILD_TYPE to CMake
   --help                     Show this help
+
+Environment:
+  NC_GENERATE_CUBEMX_HAL=1   Check/regenerate STM32CubeMX HAL before configuring CMake.
+                             Missing generated HAL files are regenerated automatically.
+  STM32CUBEMX=<path>         Optional STM32CubeMX executable for generation.
+  CUBEMX_TOOLCHAIN=<name>    Optional CubeMX toolchain name.
+  CUBEMX_FORCE=1             Force CubeMX generation even if .ioc hash matches.
+  CUBEMX_VERBOSE=1           Print CubeMX generation details.
 EOF
 }
 
@@ -100,6 +108,90 @@ if [[ -z "${BUILD_VARIANT}" ]]; then
 fi
 
 OBJ_DIR="${NC_BUILD_DIR}/${BUILD_VARIANT}/obj"
+
+generate_cubemx_hal_if_requested() {
+    local ioc_file=""
+    local output_dir=""
+    local required_files=()
+    case "${NC_BOARD}" in
+        rl/mini_v2)
+            ioc_file="${ROOT_DIR}/Libs/stm32-cube-project/project_v2.ioc"
+            output_dir="${ROOT_DIR}/Libs/stm32-cube-project"
+            required_files=(
+                "${output_dir}/Core/Inc/main.h"
+                "${output_dir}/Core/Src/main.c"
+                "${output_dir}/Drivers"
+            )
+            ;;
+        rl/mini_v3)
+            ioc_file="${ROOT_DIR}/Libs/mini-v3-ioc/project_v3.ioc"
+            output_dir="${ROOT_DIR}/Libs/mini-v3-ioc"
+            required_files=(
+                "${output_dir}/Core/Inc/main.h"
+                "${output_dir}/Core/Src/main.c"
+                "${output_dir}/Drivers"
+            )
+            ;;
+        rl/node_v4)
+            ioc_file="${ROOT_DIR}/Libs/node-v4-h7-ioc/STM32H753IIK6-V4.ioc"
+            output_dir="${ROOT_DIR}/Libs/node-v4-h7-ioc"
+            required_files=(
+                "${output_dir}/Core/Inc/main.h"
+                "${output_dir}/Core/Src/main.c"
+                "${output_dir}/Core/Src/fdcan.c"
+                "${output_dir}/Drivers"
+            )
+            ;;
+        *)
+            if [[ "${NC_GENERATE_CUBEMX_HAL:-0}" == "1" ]]; then
+                echo "CubeMX HAL generation is not configured for board '${NC_BOARD}'." >&2
+                exit 2
+            fi
+            return 0
+            ;;
+    esac
+
+    local generation_needed=0
+    if [[ "${NC_GENERATE_CUBEMX_HAL:-0}" == "1" ]]; then
+        generation_needed=1
+    else
+        local required_file
+        for required_file in "${required_files[@]}"; do
+            if [[ ! -e "${required_file}" ]]; then
+                generation_needed=1
+                break
+            fi
+        done
+    fi
+
+    if [[ "${generation_needed}" -eq 0 ]]; then
+        return 0
+    fi
+
+    local args=(
+        "${ROOT_DIR}/scripts/generate_cubemx_hal.sh"
+        --ioc "${ioc_file}"
+        --out "${output_dir}"
+    )
+    if [[ -n "${STM32CUBEMX:-}" ]]; then
+        args+=(--cubemx "${STM32CUBEMX}")
+    fi
+    if [[ -n "${CUBEMX_TOOLCHAIN:-}" ]]; then
+        args+=(--toolchain "${CUBEMX_TOOLCHAIN}")
+    fi
+    if [[ "${CUBEMX_FORCE:-0}" == "1" ]]; then
+        args+=(--force)
+    fi
+    if [[ "${CUBEMX_VERBOSE:-0}" == "1" ]]; then
+        args+=(--verbose)
+    fi
+
+    echo "Generating STM32CubeMX HAL for ${NC_BOARD}"
+    "${args[@]}"
+}
+
+generate_cubemx_hal_if_requested
+
 mkdir -p "${OBJ_DIR}"
 
 need_config=0
