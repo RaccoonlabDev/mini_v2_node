@@ -6,11 +6,9 @@
 
 #include "dronecan_module.hpp"
 #include <algorithm>
-#include <cstdio>
 #include "params.hpp"
 #include "libdcnode/dronecan.h"
 #include "libdcnode/can_driver.h"
-#include "libdcnode/logger.hpp"
 #include "drivers/board_monitor/board_monitor.hpp"
 
 #ifndef GIT_HASH
@@ -146,40 +144,4 @@ void DronecanModule::spin_once() {
     uavcanSetNodeStatusMode(static_cast<NodeStatusMode_t>(global_mode));
     uavcanSetVendorSpecificStatusCode(ModuleManager::get_vssc());
     uavcanSpinOnce();
-
-#ifdef USE_PLATFORM_NODE_V4
-    static DronecanLogger can_diag_logger{"CAN"};
-    static uint32_t next_diag_ms = 3000;
-    const uint32_t now_ms = platformSpecificGetTimeMs();
-    if (now_ms >= next_diag_ms) {
-        next_diag_ms = now_ms + 5000;
-
-        char msg[90] = {};
-        std::snprintf(msg,
-                      sizeof(msg),
-                      "1 tx=%lu rx=%lu last=%d free=%lu lec=%lu act=%lu tec=%lu bo=%lu",
-                      static_cast<unsigned long>(canDriverGetTxCount(0)),
-                      static_cast<unsigned long>(canDriverGetRxCount(0)),
-                      static_cast<int>(canDriverGetLastTxStatus(0)),
-                      static_cast<unsigned long>(canDriverGetTxFifoFreeLevel(0)),
-                      static_cast<unsigned long>(canDriverGetLastErrorCode(0)),
-                      static_cast<unsigned long>(canDriverGetActivity(0)),
-                      static_cast<unsigned long>(canDriverGetTxErrorCount(0)),
-                      static_cast<unsigned long>(canDriverGetBusOff(0)));
-        can_diag_logger.log_warn(msg);
-
-        std::snprintf(msg,
-                      sizeof(msg),
-                      "2 tx=%lu rx=%lu last=%d free=%lu lec=%lu act=%lu tec=%lu bo=%lu",
-                      static_cast<unsigned long>(canDriverGetTxCount(1)),
-                      static_cast<unsigned long>(canDriverGetRxCount(1)),
-                      static_cast<int>(canDriverGetLastTxStatus(1)),
-                      static_cast<unsigned long>(canDriverGetTxFifoFreeLevel(1)),
-                      static_cast<unsigned long>(canDriverGetLastErrorCode(1)),
-                      static_cast<unsigned long>(canDriverGetActivity(1)),
-                      static_cast<unsigned long>(canDriverGetTxErrorCount(1)),
-                      static_cast<unsigned long>(canDriverGetBusOff(1)));
-        can_diag_logger.log_warn(msg);
-    }
-#endif
 }
