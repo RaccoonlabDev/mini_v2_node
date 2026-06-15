@@ -109,6 +109,7 @@ int main(void)
   MX_I2C3_Init();
   MX_SPI3_Init();
   MX_USART1_UART_Init();
+  MX_FDCAN2_Init();
   /* USER CODE BEGIN 2 */
 
   application_entry_point();

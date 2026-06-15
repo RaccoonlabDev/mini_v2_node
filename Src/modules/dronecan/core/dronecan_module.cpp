@@ -6,6 +6,7 @@
 
 #include "dronecan_module.hpp"
 #include <algorithm>
+#include <cstdio>
 #include "params.hpp"
 #include "libdcnode/dronecan.h"
 #include "libdcnode/can_driver.h"
@@ -43,17 +44,11 @@ extern "C" {
 uint32_t platformSpecificGetTimeMs();
 bool platformSpecificRequestRestart();
 void platformSpecificReadUniqueID(uint8_t out_uid[4]);
-uint64_t canDriverGetTxCount();
-uint32_t canDriverGetDiagnosticStatus();
 #ifdef __cplusplus
 }
 #endif
 
 REGISTER_MODULE(DronecanModule)
-
-namespace {
-DronecanLogger bringup_logger{"H7"};
-}
 
 DronecanModule::DronecanModule() : Module(0, Protocol::DRONECAN) {
 }
@@ -139,11 +134,7 @@ void DronecanModule::init() {
     int8_t res = uavcanInitApplication(params_api, platform_api, &app_info);
 
     set_health(res >= 0 ? Status::OK : Status::FATAL_MALFANCTION);
-    set_mode(res >= 0 ? Mode::ENGAGED : Mode::STANDBY);
-
-    if (res >= 0) {
-        bringup_logger.log_error("CHECK");
-    }
+    set_mode(Mode::STANDBY);
 }
 
 void DronecanModule::spin_once() {
@@ -156,21 +147,39 @@ void DronecanModule::spin_once() {
     uavcanSetVendorSpecificStatusCode(ModuleManager::get_vssc());
     uavcanSpinOnce();
 
-    const auto can_diag = canDriverGetDiagnosticStatus();
-    if (can_diag == 0) {
-        set_health(Status::OK);
-        set_mode(Mode::STANDBY);
-    } else if (can_diag == 1) {
-        set_health(Status::OK);
-        set_mode(Mode::ENGAGED);
-    } else if (can_diag == 2) {
-        set_health(Status::MINOR_FAILURE);
-        set_mode(Mode::STANDBY);
-    } else if (can_diag <= 4) {
-        set_health(Status::MAJOR_FAILURE);
-        set_mode(Mode::STANDBY);
-    } else {
-        set_health(Status::FATAL_MALFANCTION);
-        set_mode(Mode::STANDBY);
+#ifdef USE_PLATFORM_NODE_V4
+    static DronecanLogger can_diag_logger{"CAN"};
+    static uint32_t next_diag_ms = 3000;
+    const uint32_t now_ms = platformSpecificGetTimeMs();
+    if (now_ms >= next_diag_ms) {
+        next_diag_ms = now_ms + 5000;
+
+        char msg[90] = {};
+        std::snprintf(msg,
+                      sizeof(msg),
+                      "1 tx=%lu rx=%lu last=%d free=%lu lec=%lu act=%lu tec=%lu bo=%lu",
+                      static_cast<unsigned long>(canDriverGetTxCount(0)),
+                      static_cast<unsigned long>(canDriverGetRxCount(0)),
+                      static_cast<int>(canDriverGetLastTxStatus(0)),
+                      static_cast<unsigned long>(canDriverGetTxFifoFreeLevel(0)),
+                      static_cast<unsigned long>(canDriverGetLastErrorCode(0)),
+                      static_cast<unsigned long>(canDriverGetActivity(0)),
+                      static_cast<unsigned long>(canDriverGetTxErrorCount(0)),
+                      static_cast<unsigned long>(canDriverGetBusOff(0)));
+        can_diag_logger.log_warn(msg);
+
+        std::snprintf(msg,
+                      sizeof(msg),
+                      "2 tx=%lu rx=%lu last=%d free=%lu lec=%lu act=%lu tec=%lu bo=%lu",
+                      static_cast<unsigned long>(canDriverGetTxCount(1)),
+                      static_cast<unsigned long>(canDriverGetRxCount(1)),
+                      static_cast<int>(canDriverGetLastTxStatus(1)),
+                      static_cast<unsigned long>(canDriverGetTxFifoFreeLevel(1)),
+                      static_cast<unsigned long>(canDriverGetLastErrorCode(1)),
+                      static_cast<unsigned long>(canDriverGetActivity(1)),
+                      static_cast<unsigned long>(canDriverGetTxErrorCount(1)),
+                      static_cast<unsigned long>(canDriverGetBusOff(1)));
+        can_diag_logger.log_warn(msg);
     }
+#endif
 }
