@@ -8,7 +8,7 @@ endif()
 set(PERIPHERAL_PWM_CMAKE ${CMAKE_CURRENT_LIST_DIR})
 
 if(NOT APP_PLATFORM)
-  message(SEND_ERROR "APP_PLATFORM is not specified or unsupported! Options: stm32f103, stm32g0b1, ubuntu.")
+  message(SEND_ERROR "APP_PLATFORM is not specified or unsupported! Options: stm32f103, stm32g0b1, stm32h753xx, ubuntu.")
 endif()
 
 if(APP_PLATFORM STREQUAL "stm32f103" OR APP_PLATFORM STREQUAL "stm32g0b1" OR APP_PLATFORM STREQUAL "stm32h753xx")
@@ -16,5 +16,5 @@ if(APP_PLATFORM STREQUAL "stm32f103" OR APP_PLATFORM STREQUAL "stm32g0b1" OR APP
 elseif(APP_PLATFORM STREQUAL "ubuntu")
     list(APPEND PERIPHERAL_SOURCES ${CMAKE_CURRENT_LIST_DIR}/pwm_ubuntu.cpp)
 else()
-    message(SEND_ERROR "APP_PLATFORM is unknown.")
+    message(SEND_ERROR "PWM peripheral is implemented for stm32f103, stm32g0b1, stm32h753xx, and ubuntu only.")
 endif()
