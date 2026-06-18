@@ -276,7 +276,7 @@ elseif(BOARD_PLATFORM STREQUAL "stm32h753xx")
     FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c
                                 ${stm32cubeMxProjectPath}/Drivers/*/*/*/*.c)
     FILE(GLOB_RECURSE middlewareSources
-                                ${stm32cubeMxProjectPath}/Middlewares/ST/STM32_USB_Device_Library/*.c)
+                                ${stm32cubeMxProjectPath}/Middlewares/ST/STM32_USB_Device_Library/*/*.c)
     FILE(GLOB_RECURSE usbDeviceSources
                                 ${stm32cubeMxProjectPath}/USB_DEVICE/*.c)
     FILE(GLOB startupFile       ${stm32cubeMxProjectPath}/*.s

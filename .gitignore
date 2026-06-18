@@ -9,6 +9,8 @@ __pycache__/
 Libs/node-v4-h7-ioc/cmake/*
 Libs/node-v4-h7-ioc/Core/*
 Libs/node-v4-h7-ioc/Drivers/*
+Libs/node-v4-h7-ioc/Middlewares/*
+Libs/node-v4-h7-ioc/USB_DEVICE/*
 Libs/node-v4-h7-ioc/CMakeLists.txt
 Libs/node-v4-h7-ioc/CMakePresets.json
 Libs/node-v4-h7-ioc/startup_stm32h753xx.s
