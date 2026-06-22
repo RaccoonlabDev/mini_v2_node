@@ -10,6 +10,7 @@
 #include "libdcnode/dronecan.h"
 #include "libdcnode/can_driver.h"
 #include "drivers/board_monitor/board_monitor.hpp"
+#include "peripheral/iwdg/iwdg.hpp"
 
 #ifndef GIT_HASH
     #warning "GIT_HASH has been assigned to 0 by default."
@@ -70,6 +71,13 @@ static IntegerParamValue_t paramsGetIntegerDef(ParamIndex_t param_idx) {
     return desc != nullptr ? desc->def : 0;
 }
 
+static int8_t paramsSaveWithWatchdogMargin() {
+    HAL::Watchdog::refresh();
+    int8_t res = paramsSave();
+    HAL::Watchdog::refresh();
+    return res;
+}
+
 void DronecanModule::init() {
 #if defined(NODE_V4_DIAG_SKIP_DRONECAN_INIT) && NODE_V4_DIAG_SKIP_DRONECAN_INIT
     set_health(Status::OK);
@@ -82,7 +90,7 @@ void DronecanModule::init() {
         .isInteger = paramsIsInteger,
         .isString = paramsIsString,
         .find = paramsFind,
-        .save = paramsSave,
+        .save = paramsSaveWithWatchdogMargin,
         .resetToDefault = paramsResetToDefault,
 
         .integer = {
