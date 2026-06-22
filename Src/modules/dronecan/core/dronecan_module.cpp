@@ -79,11 +79,6 @@ static int8_t paramsSaveWithWatchdogMargin() {
 }
 
 void DronecanModule::init() {
-#if defined(NODE_V4_DIAG_SKIP_DRONECAN_INIT) && NODE_V4_DIAG_SKIP_DRONECAN_INIT
-    set_health(Status::OK);
-    set_mode(Mode::STANDBY);
-    return;
-#endif
 
     ParamsApi params_api = {
         .getName = paramsGetName,

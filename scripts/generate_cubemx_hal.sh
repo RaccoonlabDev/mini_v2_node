@@ -313,6 +313,14 @@ patch_generated_sources() {
   patch_generated_system_c "${output_dir}"
 }
 
+record_ioc_hash() {
+  local stamp_file="$1"
+  local ioc_hash="$2"
+  if [[ -n "${ioc_hash}" ]]; then
+    echo "${ioc_hash}" > "${stamp_file}"
+  fi
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     -i|--ioc)
@@ -389,16 +397,20 @@ if IOC_HASH=$(calc_file_hash "${IOC_FILE}"); then
   :
 fi
 
-if [[ ${FORCE} -eq 0 ]] && has_dir_content "${OUTPUT_DIR}"; then
+if [[ ${FORCE} -eq 0 ]] && has_dir_content "${OUTPUT_DIR}" && has_generated_sources "${OUTPUT_DIR}"; then
+  patch_generated_sources "${OUTPUT_DIR}"
+
   if [[ -n "${IOC_HASH}" && -f "${STAMP_FILE}" ]]; then
     PREV_HASH=$(cat "${STAMP_FILE}" 2>/dev/null || true)
-    if [[ "${PREV_HASH}" == "${IOC_HASH}" ]] && has_generated_sources "${OUTPUT_DIR}"; then
-      patch_generated_sources "${OUTPUT_DIR}"
+    if [[ "${PREV_HASH}" == "${IOC_HASH}" ]]; then
       echo "No IOC changes detected. Skipping generation: ${OUTPUT_DIR}"
       exit 0
     fi
-  elif [[ -z "${IOC_HASH}" ]]; then
-    patch_generated_sources "${OUTPUT_DIR}"
+  elif [[ -n "${IOC_HASH}" ]]; then
+    record_ioc_hash "${STAMP_FILE}" "${IOC_HASH}"
+    echo "Generated sources present. Recorded IOC hash and skipping generation: ${OUTPUT_DIR}"
+    exit 0
+  else
     echo "Output directory is not empty. Skipping generation: ${OUTPUT_DIR}"
     echo "Use --force to regenerate."
     exit 0
@@ -462,7 +474,5 @@ fi
 
 patch_generated_sources "${OUTPUT_DIR}"
 
-if [[ -n "${IOC_HASH}" ]]; then
-  echo "${IOC_HASH}" > "${STAMP_FILE}"
-fi
+record_ioc_hash "${STAMP_FILE}" "${IOC_HASH}"
 echo "CubeMX generation finished: ${OUTPUT_DIR}"
