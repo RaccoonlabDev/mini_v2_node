@@ -253,6 +253,9 @@ def normalize_to_flat(out_dir: Path) -> None:
 
 def generate(generator: Path, ioc: Path, out_dir: Path, ioc_hash: str) -> None:
     """Generate the CubeMX project into out_dir and flatten it to the stock layout."""
+    if out_dir.exists():
+        shutil.rmtree(out_dir)  # start clean so a stale project can't bloat the result
+    out_dir.mkdir(parents=True)
     run_generator(generator, ioc, out_dir)
     normalize_to_flat(out_dir)
     if not stamp_matches(out_dir, ioc_hash):
