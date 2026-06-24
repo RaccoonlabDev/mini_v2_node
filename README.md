@@ -86,30 +86,32 @@ pip install -r requirements.txt
 
 ```bash
 # DroneCAN firmware:
-make dronecan_v2
-make dronecan_v3
+make rl_mini_v2_dronecan
+make rl_mini_v3_dronecan
 
 # Cyphal firmware:
-make cyphal_v2
-make cyphal_v3
+make rl_mini_v2_cyphal
+make rl_mini_v3_cyphal
 
 ```
 Note: Cyphal builds require access to the private `libcpnode` repository. Fork CI skips Cyphal (and combined v3) builds.
 
+See [docs/build_system.md](docs/build_system.md) for how the Make targets and the underlying CMake build relate.
+
 **Upload/Flash**:
 
 ```bash
-make dronecan_v2 upload
+make rl_mini_v2_dronecan upload
 # or:
-make dronecan_v3 upload
+make rl_mini_v3_dronecan upload
 ```
 
 **SITL (Software-In-The-Loop)**:
 
 ```bash
-make sitl_dronecan run
+make rl_sitl_dronecan run
 # or:
-make sitl_cyphal run
+make rl_sitl_cyphal run
 ```
 
 **GUI Tools**
@@ -134,7 +136,7 @@ The project is organized into three main layers to make it portable across board
     - Uses DroneCAN or Cyphal/CAN for communication.
 
 **Build Targets**
-- Build and flash using Make, for example: `make dronecan_v3`
+- Build and flash using Make, for example: `make rl_mini_v3_dronecan`
 - STM32CubeMX is used only to generate peripheral code. Application logic starts in `application_entry_point()` called from `main.c`.
 
 **Standards & Hardware Info**
@@ -256,6 +258,8 @@ Use this workflow when your application lives in its own repository and this rep
 6. Define board targets in `src/boards/<vendor>/<board>/<target>.cmake`. The default convention is documented in `Src/boards/<vendor>/<board>/`.
 
 This workflow is useful when `node-core` is treated as a reusable firmware framework and your product-specific code, board definitions, and release process are maintained separately.
+
+See [docs/framework.md](docs/framework.md) for the concrete step-by-step recipe and the gotchas.
 
 </details>
 
