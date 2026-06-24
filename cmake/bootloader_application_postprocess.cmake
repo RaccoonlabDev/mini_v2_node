@@ -48,6 +48,7 @@ function(configure_bootloader_application_postprocess executable)
             --assign-flag-dirty ${DIRTY_BUILD_FLAG}
             --assign-timestamp ${BUILD_TIMESTAMP_UTC}
             --assign-vcs-revision-id ${GIT_HASH}
+            --lazy
             --side-patch ${BUILD_OBJ_DIR}/${PROJECT_NAME}.elf
             ${BUILD_OBJ_DIR}/${PROJECT_NAME}.bin
         COMMAND ${CMAKE_COMMAND}
@@ -57,8 +58,12 @@ function(configure_bootloader_application_postprocess executable)
             -DSELECT_LATEST_APP_DESCRIPTOR_BIN=1
             -P ${ROOT_DIR}/cmake/bootloader_application_postprocess.cmake
         COMMAND ${CMAKE_COMMAND} -E touch ${POSTPROCESS_STAMP}
+        # Depend on the FILES, not FIRMWARE_ARTIFACTS_TARGET (a phony target):
+        # depending on a phony target marks this command always-out-of-date, so it
+        # re-runs every build and re-patches the already-patched .elf/.bin in place,
+        # failing with "uninitialized app descriptor could not be found". With file
+        # deps it only re-runs after a real relink/re-objcopy.
         DEPENDS
-            ${FIRMWARE_ARTIFACTS_TARGET}
             ${BUILD_OBJ_DIR}/${PROJECT_NAME}.bin
             ${BUILD_OBJ_DIR}/${PROJECT_NAME}.elf
         COMMENT "Applying Kocherga app descriptor CRC/size patch"

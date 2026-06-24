@@ -394,6 +394,24 @@ def _get_output_file_name(input_file_name: str, descriptor: AppDescriptor) -> st
     return f"{base_stem}-{descriptor}.bin"
 
 
+def _validate_side_patch_path(raw_path: str, base_dir: str) -> str:
+    """Resolve a side-patch target and ensure it stays within base_dir.
+
+    File paths come from CLI arguments; constraining side-patch targets to the
+    firmware image's own directory prevents a malformed or hostile argument from
+    escaping to unrelated files on the file system (path traversal).
+    """
+    base = os.path.realpath(base_dir)
+    resolved = os.path.realpath(raw_path)
+    if resolved != base and not resolved.startswith(base + os.sep):
+        raise ValueError(
+            f"Refusing to side-patch {raw_path!r}: outside the firmware image directory {base!r}"
+        )
+    if not os.path.isfile(resolved):
+        raise FileNotFoundError(f"Side-patch target is not a regular file: {raw_path!r}")
+    return resolved
+
+
 def _main() -> int:
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter, description=globals()["__doc__"])
     parser.add_argument(
@@ -524,8 +542,11 @@ def _main() -> int:
         out_file.write(model.image)
     _logger.info(f"Output image written into {out_name!r}")
 
-    # Perform the side-patching.
-    for path in args.side_patch:
+    # Perform the side-patching. Constrain targets to the firmware image's own
+    # directory to guard against path traversal from malformed CLI arguments.
+    base_dir = os.path.dirname(os.path.realpath(args.firmware_image))
+    for raw_path in args.side_patch:
+        path = _validate_side_patch_path(raw_path, base_dir)
         with open(path, "rb") as f:
             data = bytearray(f.read())
         offset = data.find(AppDescriptor.get_search_prefix(model.byte_order, uninitialized_only=True))

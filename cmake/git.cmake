@@ -1,6 +1,16 @@
 # Copyright (C) 2023-2024 Dmitry Ponomarev <ponomarevda96@gmail.com>
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 
+# GIT_HASH (vcs_commit) identifies the exact build, so it comes from the
+# consuming application repo when built as a framework (NC_APP_SRC_DIR), else
+# node-core itself. The reported software_version (major.minor.patch) instead
+# tracks the node-core framework version (see below), as that is the meaningful
+# cross-fleet signal.
+set(GIT_INFO_DIR ${ROOT_DIR})
+if(DEFINED APP_ROOT_DIR AND NOT APP_ROOT_DIR STREQUAL "")
+    set(GIT_INFO_DIR ${APP_ROOT_DIR})
+endif()
+
 # Function to ensure a variable is within the range of 0 to 99
 function(check_version_component component_name component_value)
     if(NOT ("${component_value}" MATCHES "^[0-9]+$"))
@@ -31,7 +41,7 @@ endfunction()
 
 execute_process(
     COMMAND git rev-parse --short=16 HEAD
-    WORKING_DIRECTORY ${ROOT_DIR}
+    WORKING_DIRECTORY ${GIT_INFO_DIR}
     COMMAND_ERROR_IS_FATAL ANY
     OUTPUT_VARIABLE GIT_HASH_SHORT_16_DIGITS
     OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -44,7 +54,7 @@ resolve_version_component(--patch APP_VERSION_PATCH)
 
 execute_process(
     COMMAND git log -1 --format=%cd --date=format:"%Y.%m.%d"
-    WORKING_DIRECTORY ${ROOT_DIR}
+    WORKING_DIRECTORY ${GIT_INFO_DIR}
     OUTPUT_VARIABLE LATEST_COMMIT_DATE
     ERROR_QUIET
 )

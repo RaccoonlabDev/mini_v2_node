@@ -264,8 +264,14 @@ See [docs/framework.md](docs/framework.md) for the concrete step-by-step recipe 
 </details>
 
 **Custom application versioning**
-- Recommended format: `v<upstream-version>-<app-version>`
-- Example: `v1.3.0-0.1.0` (based on upstream `v1.3.0`, app version `0.1.0`).
+- Resulting version format: `v<upstream-version>-<app-version>`, e.g. `v1.3.0-0.1.0`
+  (based on upstream `v1.3.0`, app version `0.1.0`).
+- **Fork / Template** (single repo): tag with the full combined version, e.g. `v1.3.0-0.1.0`.
+- **Framework** (submodule): tag your app repo with the **app version only**, e.g. `v0.1.0`.
+  The build derives the upstream prefix from the pinned `node-core` submodule and
+  produces the combined `v<upstream>-<app>` automatically — so the artifact version
+  always reflects the node-core you actually built against. Do **not** put the
+  upstream version in the app tag (it would be duplicated).
 
 ### 9. Q&A
 
