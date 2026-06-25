@@ -35,7 +35,7 @@ struct CanDriver {
     uint32_t rx_counter;
 };
 
-static CanDriver can_drivers[NUM_OF_CAN_BUSES] = {
+CanDriver can_drivers[NUM_OF_CAN_BUSES] = {
 #if DRONECAN_FDCAN_PRIMARY == 2
     {.handler = &hfdcan2, .tx_header = {}, .rx_buf = {}, .initialized = false,
         .err_counter = 0, .tx_counter = 0, .rx_counter = 0},
@@ -244,7 +244,7 @@ Can::ErrorCode Can::send(const ClassicFrame& frame) {
 
         const HAL_StatusTypeDef status = HAL_FDCAN_AddMessageToTxFifoQ(driver.handler,
                                                                 &driver.tx_header,
-                                                                const_cast<uint8_t*>(frame.data));
+                                                                (uint8_t*)(frame.data));
         if (status == HAL_OK) {
             driver.tx_counter++;
             sent = true;

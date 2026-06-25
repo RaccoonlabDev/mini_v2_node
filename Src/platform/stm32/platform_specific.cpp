@@ -11,11 +11,14 @@
 namespace {
 
 constexpr uint32_t RESTART_DELAY_MS = 500;
-bool restart_requested = false;
-uint32_t restart_deadline_ms = 0;
+struct RestartContext {
+    static inline bool restart_requested = false;
+    static inline uint32_t restart_deadline_ms = 0;
+};
 
 void process_deferred_restart(uint32_t now_ms) {
-    if (restart_requested && static_cast<int32_t>(now_ms - restart_deadline_ms) >= 0) {
+    if (RestartContext::restart_requested
+        && static_cast<int32_t>(now_ms - RestartContext::restart_deadline_ms) >= 0) {
         HAL_NVIC_SystemReset();
     }
 }
@@ -38,8 +41,8 @@ void platformSpecificReadUniqueID(uint8_t out_uid[4]) {
 
 bool platformSpecificRequestRestart() {
     auto now_ms = HAL_GetTick();
-    restart_deadline_ms = now_ms + RESTART_DELAY_MS;
-    restart_requested = true;
+    RestartContext::restart_deadline_ms = now_ms + RESTART_DELAY_MS;
+    RestartContext::restart_requested = true;
 
 #ifdef HAL_IWDG_MODULE_ENABLED
     HAL::Watchdog::request_reboot();
