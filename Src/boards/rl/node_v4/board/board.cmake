@@ -2,6 +2,7 @@
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 
 set(BOARD_PLATFORM stm32h753xx)
+set(STM32_CUBEMX_PROJECT_PATH ${ROOT_DIR}/build/stm32cubemx/rl/node_v4/STM32H753IIK6-V4)
 
 if(NOT DEFINED IMAGE_KIND OR IMAGE_KIND STREQUAL "")
     set(IMAGE_KIND standalone)

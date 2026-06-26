@@ -22,9 +22,7 @@ NODE_V4_CUBEMX_NAME:=rl-node-v4
 NODE_V4_CUBEMX_PROJECT_NAME:=STM32H753IIK6-V4
 NODE_V4_IOC:=$(ROOT_DIR)/Src/boards/rl/node_v4/board/STM32H753IIK6-V4.ioc
 NODE_V4_HAL:=$(NC_BUILD_DIR)/stm32cubemx/rl/node_v4
-NODE_V4_HAL_PROJECT:=$(NODE_V4_HAL)/$(NODE_V4_CUBEMX_PROJECT_NAME)
 NODE_V4_CUBEMX_GENERATOR:=$(ROOT_DIR)/scripts/generate_cubemx_hal.sh
-NODE_V4_CMAKE_ARGS:=-DSTM32_CUBEMX_PROJECT_PATH=$(NODE_V4_HAL_PROJECT)
 
 # Generic build inputs:
 # NC_BOARD - board path under Src/boards, for example: rl/mini_v2
@@ -145,13 +143,13 @@ rl_mini_v3_both_standalone: checks
 #
 rl_node_v4_dronecan: checks
 	$(MAKE) ensure_node_v4_cubemx
-	$(MAKE) build BOARD=rl/node_v4 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_node_v4_dronecan_application EXTRA_CMAKE_ARGS="$(NODE_V4_CMAKE_ARGS) $(EXTRA_CMAKE_ARGS)"
+	$(MAKE) build BOARD=rl/node_v4 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_node_v4_dronecan_application
 rl_node_v4_dronecan_application: checks
 	$(MAKE) ensure_node_v4_cubemx
-	$(MAKE) build BOARD=rl/node_v4 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_node_v4_dronecan_application EXTRA_CMAKE_ARGS="$(NODE_V4_CMAKE_ARGS) $(EXTRA_CMAKE_ARGS)"
+	$(MAKE) build BOARD=rl/node_v4 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_node_v4_dronecan_application
 rl_node_v4_dronecan_standalone: checks
 	$(MAKE) ensure_node_v4_cubemx
-	$(MAKE) build BOARD=rl/node_v4 TARGET=dronecan IMAGE_KIND=standalone BUILD_VARIANT=rl_node_v4_dronecan_standalone EXTRA_CMAKE_ARGS="$(NODE_V4_CMAKE_ARGS) $(EXTRA_CMAKE_ARGS)"
+	$(MAKE) build BOARD=rl/node_v4 TARGET=dronecan IMAGE_KIND=standalone BUILD_VARIANT=rl_node_v4_dronecan_standalone
 rl_node_v4_cyphal: checks
 	$(error rl/node_v4 Cyphal is not enabled yet. Use rl_node_v4_dronecan_application or rl_node_v4_dronecan_standalone)
 rl_node_v4_cyphal_application: checks
