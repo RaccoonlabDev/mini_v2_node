@@ -206,34 +206,7 @@ tests:
 	${ROOT_DIR}/scripts/tests.sh
 
 upload:
-	UPLOAD_GOAL=""; \
-	for goal in $(MAKECMDGOALS); do \
-		if [ "$$goal" != "upload" ]; then UPLOAD_GOAL="$$goal"; break; fi; \
-	done; \
-	RELEASE_PATTERN="*.bin"; \
-	case "$$UPLOAD_GOAL" in \
-		rl_mini_v2_*_application|rl_mini_v2_dronecan|rl_mini_v2_cyphal|rl_mini_v2_both) RELEASE_PATTERN="rl_mini_v2_v2_application_*.bin" ;; \
-		rl_mini_v2_*_standalone) RELEASE_PATTERN="rl_mini_v2_v2_standalone_*.bin" ;; \
-		rl_mini_v3_*_application|rl_mini_v3_dronecan|rl_mini_v3_cyphal|rl_mini_v3_both) RELEASE_PATTERN="rl_mini_v3_v3_application_*.bin" ;; \
-		rl_mini_v3_*_standalone) RELEASE_PATTERN="rl_mini_v3_v3_standalone_*.bin" ;; \
-		rl_node_v4_*_application|rl_node_v4_dronecan) RELEASE_PATTERN="rl_node_v4_v4_application_*.bin" ;; \
-		rl_node_v4_*_standalone) RELEASE_PATTERN="rl_node_v4_v4_standalone_*.bin" ;; \
-	esac; \
-	LATEST_TARGET=$$(ls -td ${NC_BUILD_DIR}/release/$$RELEASE_PATTERN 2>/dev/null | head -1); \
-	if [ -z "$$LATEST_TARGET" ]; then \
-		echo "No release binary matches pattern: ${NC_BUILD_DIR}/release/$$RELEASE_PATTERN"; \
-		exit 2; \
-	fi; \
-	FLASH_ADDRESS=0x08000000; \
-	case "$$(basename "$$LATEST_TARGET")" in \
-		rl_mini_v2_*_application_*) FLASH_ADDRESS=0x08008000 ;; \
-		rl_mini_v3_*_application_*) FLASH_ADDRESS=0x08010000 ;; \
-		rl_node_v4_*_application_*) FLASH_ADDRESS=0x08020000 ;; \
-	esac; \
-	echo "Upload goal: $${UPLOAD_GOAL:-latest release}"; \
-	echo "Uploading $$LATEST_TARGET"; \
-	echo "Flash address: $$FLASH_ADDRESS"; \
-	./scripts/flash.sh "$$LATEST_TARGET" "$$FLASH_ADDRESS"
+	LATEST_TARGET=$$(ls -td ${NC_BUILD_DIR}/release/*.bin | head -1) && ./scripts/flash.sh $$LATEST_TARGET
 
 SOCKETCAN_URL:=https://gist.githubusercontent.com/PonomarevDA/6ecc8fc340e4c50619c1e5dfcedc37b2/raw/2db6d1626a9ada543602ff0a52b48fecb94e6e07/socketcan.sh
 SOCKETCAN_EXECUTABLE:=build/tools/socketcan-v1.0.2.sh
