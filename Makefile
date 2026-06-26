@@ -17,8 +17,6 @@
 
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 NC_BUILD_DIR?=$(ROOT_DIR)/build
-PYTHON?=$(if $(wildcard $(ROOT_DIR)/.venv/bin/python),$(ROOT_DIR)/.venv/bin/python,python3)
-CUBEMX_ARCHIVE_DIR?=$(ROOT_DIR)/release/cubemx
 
 NODE_V4_CUBEMX_NAME:=rl-node-v4
 NODE_V4_CUBEMX_PROJECT_NAME:=STM32H753IIK6-V4
@@ -91,7 +89,7 @@ cubemx_archives:
 		--ioc "$(NODE_V4_IOC)" \
 		--out "$(NODE_V4_HAL)" \
 		--generator "$(NODE_V4_CUBEMX_GENERATOR)" \
-		--archive-dir "$(CUBEMX_ARCHIVE_DIR)"
+		--archive-dir "$(ROOT_DIR)/release/cubemx"
 
 #
 # Alias naming rules:
@@ -199,7 +197,7 @@ sitl_dronecan: rl_sitl_dronecan
 
 # Common:
 checks:
-	@$(PYTHON) scripts/prebuild_check.py || (echo "Requirements verification failed. Stopping build." && exit 1)
+	@python scripts/prebuild_check.py || (echo "Requirements verification failed. Stopping build." && exit 1)
 
 code_style:
 	${ROOT_DIR}/scripts/code_style.sh
