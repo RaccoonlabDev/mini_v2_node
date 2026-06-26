@@ -19,14 +19,6 @@ Options:
   --build-variant <value>    Override build subdirectory name
   --cmake-build-type <value> Forward CMAKE_BUILD_TYPE to CMake
   --help                     Show this help
-
-Environment:
-  NC_SKIP_CUBEMX_HAL=1       Skip the STM32CubeMX HAL ensure step before configuring CMake.
-  NC_GENERATE_CUBEMX_HAL=1   Deprecated; CubeMX HAL is checked by default for configured boards.
-  STM32CUBEMX=<path>         Optional STM32CubeMX executable for generation.
-  CUBEMX_TOOLCHAIN=<name>    Optional CubeMX toolchain name.
-  CUBEMX_FORCE=1             Force CubeMX generation even if .ioc hash matches.
-  CUBEMX_VERBOSE=1           Print CubeMX generation details.
 EOF
 }
 
@@ -108,60 +100,6 @@ if [[ -z "${BUILD_VARIANT}" ]]; then
 fi
 
 OBJ_DIR="${NC_BUILD_DIR}/${BUILD_VARIANT}/obj"
-
-ensure_cubemx_hal() {
-    if [[ "${NC_SKIP_CUBEMX_HAL:-0}" == "1" ]]; then
-        return 0
-    fi
-
-    local ioc_file=""
-    local output_dir=""
-    case "${NC_BOARD}" in
-        rl/mini_v2)
-            ioc_file="${ROOT_DIR}/Libs/stm32-cube-project/project_v2.ioc"
-            output_dir="${ROOT_DIR}/Libs/stm32-cube-project"
-            ;;
-        rl/mini_v3)
-            ioc_file="${ROOT_DIR}/Libs/mini-v3-ioc/project_v3.ioc"
-            output_dir="${ROOT_DIR}/Libs/mini-v3-ioc"
-            ;;
-        rl/node_v4)
-            ioc_file="${ROOT_DIR}/Libs/node-v4-h7-ioc/STM32H753IIK6-V4.ioc"
-            output_dir="${ROOT_DIR}/Libs/node-v4-h7-ioc"
-            ;;
-        *)
-            if [[ "${NC_GENERATE_CUBEMX_HAL:-0}" == "1" || "${CUBEMX_FORCE:-0}" == "1" ]]; then
-                echo "CubeMX HAL generation is not configured for board '${NC_BOARD}'." >&2
-                exit 2
-            fi
-            return 0
-            ;;
-    esac
-
-    local args=(
-        "${ROOT_DIR}/scripts/generate_cubemx_hal.sh"
-        --ioc "${ioc_file}"
-        --out "${output_dir}"
-    )
-    if [[ -n "${STM32CUBEMX:-}" ]]; then
-        args+=(--cubemx "${STM32CUBEMX}")
-    fi
-    if [[ -n "${CUBEMX_TOOLCHAIN:-}" ]]; then
-        args+=(--toolchain "${CUBEMX_TOOLCHAIN}")
-    fi
-    if [[ "${CUBEMX_FORCE:-0}" == "1" ]]; then
-        args+=(--force)
-    fi
-    if [[ "${CUBEMX_VERBOSE:-0}" == "1" ]]; then
-        args+=(--verbose)
-    fi
-
-    echo "Ensuring STM32CubeMX HAL for ${NC_BOARD}"
-    "${args[@]}"
-}
-
-ensure_cubemx_hal
-
 mkdir -p "${OBJ_DIR}"
 
 need_config=0

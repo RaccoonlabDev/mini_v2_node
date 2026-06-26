@@ -1,6 +1,7 @@
 # Copyright (C) 2023-2024 Dmitry Ponomarev <ponomarevda96@gmail.com>
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 .PHONY: require_target all checks code_style tests upload run clean_releases clean distclean build \
+	ensure_node_v4_cubemx cubemx_archives \
 	rl_mini_v2_dronecan rl_mini_v2_dronecan_application rl_mini_v2_dronecan_standalone \
 	rl_mini_v2_cyphal rl_mini_v2_cyphal_application rl_mini_v2_cyphal_standalone \
 	rl_mini_v2_both rl_mini_v2_both_application rl_mini_v2_both_standalone \
@@ -16,6 +17,16 @@
 
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 NC_BUILD_DIR?=$(ROOT_DIR)/build
+PYTHON?=$(if $(wildcard $(ROOT_DIR)/.venv/bin/python),$(ROOT_DIR)/.venv/bin/python,python3)
+CUBEMX_ARCHIVE_DIR?=$(ROOT_DIR)/release/cubemx
+
+NODE_V4_CUBEMX_NAME:=rl-node-v4
+NODE_V4_CUBEMX_PROJECT_NAME:=STM32H753IIK6-V4
+NODE_V4_IOC:=$(ROOT_DIR)/Src/boards/rl/node_v4/board/STM32H753IIK6-V4.ioc
+NODE_V4_HAL:=$(NC_BUILD_DIR)/stm32cubemx/rl/node_v4
+NODE_V4_HAL_PROJECT:=$(NODE_V4_HAL)/$(NODE_V4_CUBEMX_PROJECT_NAME)
+NODE_V4_CUBEMX_GENERATOR:=$(ROOT_DIR)/scripts/generate_cubemx_hal.sh
+NODE_V4_CMAKE_ARGS:=-DSTM32_CUBEMX_PROJECT_PATH=$(NODE_V4_HAL_PROJECT)
 
 # Generic build inputs:
 # NC_BOARD - board path under Src/boards, for example: rl/mini_v2
@@ -66,6 +77,21 @@ endif
 		--build-variant "${BUILD_VARIANT}" \
 		--cmake-build-type "${CMAKE_BUILD_TYPE}" \
 		-- ${EXTRA_CMAKE_ARGS}
+
+ensure_node_v4_cubemx:
+	@bash "$(ROOT_DIR)/scripts/ensure_cubemx_project.sh" \
+		--name "$(NODE_V4_CUBEMX_NAME)" \
+		--ioc "$(NODE_V4_IOC)" \
+		--out "$(NODE_V4_HAL)" \
+		--generator "$(NODE_V4_CUBEMX_GENERATOR)"
+
+cubemx_archives:
+	@bash "$(ROOT_DIR)/scripts/package_cubemx_archive.sh" \
+		--name "$(NODE_V4_CUBEMX_NAME)" \
+		--ioc "$(NODE_V4_IOC)" \
+		--out "$(NODE_V4_HAL)" \
+		--generator "$(NODE_V4_CUBEMX_GENERATOR)" \
+		--archive-dir "$(CUBEMX_ARCHIVE_DIR)"
 
 #
 # Alias naming rules:
@@ -120,11 +146,14 @@ rl_mini_v3_both_standalone: checks
 # rl/node_v4 aliases
 #
 rl_node_v4_dronecan: checks
-	$(MAKE) build BOARD=rl/node_v4 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_node_v4_dronecan_application
+	$(MAKE) ensure_node_v4_cubemx
+	$(MAKE) build BOARD=rl/node_v4 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_node_v4_dronecan_application EXTRA_CMAKE_ARGS="$(NODE_V4_CMAKE_ARGS) $(EXTRA_CMAKE_ARGS)"
 rl_node_v4_dronecan_application: checks
-	$(MAKE) build BOARD=rl/node_v4 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_node_v4_dronecan_application
+	$(MAKE) ensure_node_v4_cubemx
+	$(MAKE) build BOARD=rl/node_v4 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_node_v4_dronecan_application EXTRA_CMAKE_ARGS="$(NODE_V4_CMAKE_ARGS) $(EXTRA_CMAKE_ARGS)"
 rl_node_v4_dronecan_standalone: checks
-	$(MAKE) build BOARD=rl/node_v4 TARGET=dronecan IMAGE_KIND=standalone BUILD_VARIANT=rl_node_v4_dronecan_standalone
+	$(MAKE) ensure_node_v4_cubemx
+	$(MAKE) build BOARD=rl/node_v4 TARGET=dronecan IMAGE_KIND=standalone BUILD_VARIANT=rl_node_v4_dronecan_standalone EXTRA_CMAKE_ARGS="$(NODE_V4_CMAKE_ARGS) $(EXTRA_CMAKE_ARGS)"
 rl_node_v4_cyphal: checks
 	$(error rl/node_v4 Cyphal is not enabled yet. Use rl_node_v4_dronecan_application or rl_node_v4_dronecan_standalone)
 rl_node_v4_cyphal_application: checks
@@ -170,7 +199,7 @@ sitl_dronecan: rl_sitl_dronecan
 
 # Common:
 checks:
-	@python scripts/prebuild_check.py || (echo "Requirements verification failed. Stopping build." && exit 1)
+	@$(PYTHON) scripts/prebuild_check.py || (echo "Requirements verification failed. Stopping build." && exit 1)
 
 code_style:
 	${ROOT_DIR}/scripts/code_style.sh

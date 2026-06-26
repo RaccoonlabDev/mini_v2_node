@@ -112,11 +112,6 @@ has_dir_content() {
   return 1
 }
 
-has_generated_sources() {
-  local dir_path="$1"
-  [[ -f "${dir_path}/Core/Src/main.c" && -f "${dir_path}/Core/Inc/main.h" && -d "${dir_path}/Drivers" ]]
-}
-
 calc_file_hash() {
   local file_path="$1"
   if command -v sha256sum >/dev/null 2>&1; then
@@ -145,43 +140,6 @@ find_main_c_file() {
     return 0
   fi
   return 1
-}
-
-normalize_generated_layout() {
-  local output_dir="$1"
-  local direct="${output_dir}/Core/Src/main.c"
-  if [[ -f "${direct}" ]]; then
-    return 0
-  fi
-
-  local main_c_path=""
-  if ! main_c_path=$(find_main_c_file "${output_dir}"); then
-    return 0
-  fi
-
-  local generated_root="${main_c_path%/Core/Src/main.c}"
-  if [[ "${generated_root}" == "${output_dir}" ]]; then
-    return 0
-  fi
-
-  if [[ "$(dirname "${generated_root}")" != "${output_dir}" ]]; then
-    echo "${SCRIPT_NAME}: unexpected CubeMX output layout: ${generated_root}" >&2
-    return 1
-  fi
-
-  local item dest
-  shopt -s dotglob nullglob
-  for item in "${generated_root}"/*; do
-    dest="${output_dir}/$(basename "${item}")"
-    rm -rf "${dest}"
-    mv "${item}" "${output_dir}/"
-  done
-  shopt -u dotglob nullglob
-  rmdir "${generated_root}" 2>/dev/null || true
-
-  if [[ ${VERBOSE} -eq 1 ]]; then
-    echo "Normalized CubeMX output layout: ${generated_root} -> ${output_dir}"
-  fi
 }
 
 insert_line_between_markers() {
@@ -273,54 +231,6 @@ patch_generated_main_c() {
   fi
 }
 
-
-patch_generated_system_c() {
-  local output_dir="$1"
-  local system_c_path="${output_dir}/Core/Src/system_stm32h7xx.c"
-  if [[ ! -f "${system_c_path}" ]]; then
-    return 0
-  fi
-
-  if ! grep -q "#ifndef VECT_TAB_OFFSET" "${system_c_path}"; then
-    local tmp_file
-    tmp_file=$(mktemp)
-    if ! awk '
-      /^#define VECT_TAB_OFFSET/ {
-        print "#ifndef VECT_TAB_OFFSET";
-        print;
-        if (getline next_line > 0) {
-          print next_line;
-        }
-        print "#endif";
-        next;
-      }
-      { print; }
-    ' "${system_c_path}" > "${tmp_file}"; then
-      rm -f "${tmp_file}"
-      return 1
-    fi
-    mv "${tmp_file}" "${system_c_path}"
-    if [[ ${VERBOSE} -eq 1 ]]; then
-      echo "Patched vector table offset guard: ${system_c_path}"
-    fi
-  fi
-}
-
-patch_generated_sources() {
-  local output_dir="$1"
-  normalize_generated_layout "${output_dir}"
-  patch_generated_main_c "${output_dir}"
-  patch_generated_system_c "${output_dir}"
-}
-
-record_ioc_hash() {
-  local stamp_file="$1"
-  local ioc_hash="$2"
-  if [[ -n "${ioc_hash}" ]]; then
-    echo "${ioc_hash}" > "${stamp_file}"
-  fi
-}
-
 while [[ $# -gt 0 ]]; do
   case "$1" in
     -i|--ioc)
@@ -397,20 +307,16 @@ if IOC_HASH=$(calc_file_hash "${IOC_FILE}"); then
   :
 fi
 
-if [[ ${FORCE} -eq 0 ]] && has_dir_content "${OUTPUT_DIR}" && has_generated_sources "${OUTPUT_DIR}"; then
-  patch_generated_sources "${OUTPUT_DIR}"
-
+if [[ ${FORCE} -eq 0 ]] && has_dir_content "${OUTPUT_DIR}"; then
   if [[ -n "${IOC_HASH}" && -f "${STAMP_FILE}" ]]; then
     PREV_HASH=$(cat "${STAMP_FILE}" 2>/dev/null || true)
     if [[ "${PREV_HASH}" == "${IOC_HASH}" ]]; then
+      patch_generated_main_c "${OUTPUT_DIR}"
       echo "No IOC changes detected. Skipping generation: ${OUTPUT_DIR}"
       exit 0
     fi
-  elif [[ -n "${IOC_HASH}" ]]; then
-    record_ioc_hash "${STAMP_FILE}" "${IOC_HASH}"
-    echo "Generated sources present. Recorded IOC hash and skipping generation: ${OUTPUT_DIR}"
-    exit 0
   else
+    patch_generated_main_c "${OUTPUT_DIR}"
     echo "Output directory is not empty. Skipping generation: ${OUTPUT_DIR}"
     echo "Use --force to regenerate."
     exit 0
@@ -472,7 +378,9 @@ else
   exit 1
 fi
 
-patch_generated_sources "${OUTPUT_DIR}"
+patch_generated_main_c "${OUTPUT_DIR}"
 
-record_ioc_hash "${STAMP_FILE}" "${IOC_HASH}"
+if [[ -n "${IOC_HASH}" ]]; then
+  echo "${IOC_HASH}" > "${STAMP_FILE}"
+fi
 echo "CubeMX generation finished: ${OUTPUT_DIR}"
