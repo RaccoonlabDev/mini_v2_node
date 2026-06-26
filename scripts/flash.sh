@@ -8,7 +8,6 @@ SCRIPT_NAME="flash.sh"
 VERSION="v1.1.0"
 
 BINARY_FILE=$1
-FLASH_ADDRESS=${2:-0x08000000}
 
 RED='\033[0;31m'
 NC='\033[0m'
@@ -21,16 +20,12 @@ elif [ ! -f "$BINARY_FILE" ]; then
 elif [[ ! $BINARY_FILE == *.bin ]]; then
     echo -e "${RED}${SCRIPT_NAME} ${VERSION} error on line $LINENO: speficied file must have .bin extension!${NC}"
     exit
-elif [[ ! "$FLASH_ADDRESS" =~ ^0x[0-9A-Fa-f]+$ ]]; then
-    echo -e "${RED}${SCRIPT_NAME} ${VERSION} error on line $LINENO: specified flash address $FLASH_ADDRESS is not a hex address!${NC}"
-    exit
 fi
 
 for attempt in {1..25}; do
     echo ""
     echo "${SCRIPT_NAME} ${VERSION}: attempt $attempt. Trying to load the firmware..."
     echo -en "\007"
-    EXPLICIT_FLASH_SIZE=""
 
     output=$(st-info --probe)
 
@@ -55,14 +50,9 @@ for attempt in {1..25}; do
         EXPLICIT_FLASH_SIZE="--flash=0x00020000"
     fi
 
-    output_file=$(mktemp)
-    st-flash $EXPLICIT_FLASH_SIZE --connect-under-reset --reset write "$BINARY_FILE" "$FLASH_ADDRESS" 2>&1 | tee "$output_file"
-    write_status=${PIPESTATUS[0]}
-    output=$(cat "$output_file")
-    rm -f "$output_file"
-
+    output=$(st-flash $EXPLICIT_FLASH_SIZE --connect-under-reset --reset write $BINARY_FILE 0x8000000 2>&1 | tee /dev/tty)
     compare_res=$(echo "$output" | grep -E "pages written|Flash written and verified")
-    if [ "$write_status" -ne 0 ] || [ -z "$compare_res" ]; then
+    if [ -z "$compare_res" ]; then
         sleep 2
     else
         echo "${SCRIPT_NAME} ${VERSION}: done"
