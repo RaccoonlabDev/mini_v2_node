@@ -18,11 +18,8 @@
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 NC_BUILD_DIR?=$(ROOT_DIR)/build
 
-NODE_V4_CUBEMX_NAME:=rl-node-v4
-NODE_V4_CUBEMX_PROJECT_NAME:=STM32H753IIK6-V4
-NODE_V4_IOC:=$(ROOT_DIR)/Src/boards/rl/node_v4/board/STM32H753IIK6-V4.ioc
+NODE_V4_CUBEMX_MANIFEST:=$(ROOT_DIR)/Src/boards/rl/node_v4/cubemx.json
 NODE_V4_HAL:=$(NC_BUILD_DIR)/stm32cubemx/rl/node_v4
-NODE_V4_CUBEMX_GENERATOR:=$(ROOT_DIR)/scripts/generate_cubemx_hal.sh
 
 # Generic build inputs:
 # NC_BOARD - board path under Src/boards, for example: rl/mini_v2
@@ -75,18 +72,14 @@ endif
 		-- ${EXTRA_CMAKE_ARGS}
 
 ensure_node_v4_cubemx:
-	@bash "$(ROOT_DIR)/scripts/ensure_cubemx_project.sh" \
-		--name "$(NODE_V4_CUBEMX_NAME)" \
-		--ioc "$(NODE_V4_IOC)" \
-		--out "$(NODE_V4_HAL)" \
-		--generator "$(NODE_V4_CUBEMX_GENERATOR)"
+	@python3 "$(ROOT_DIR)/scripts/cubemx.py" ensure \
+		--manifest "$(NODE_V4_CUBEMX_MANIFEST)" \
+		--out "$(NODE_V4_HAL)"
 
 cubemx_archives:
-	@bash "$(ROOT_DIR)/scripts/package_cubemx_archive.sh" \
-		--name "$(NODE_V4_CUBEMX_NAME)" \
-		--ioc "$(NODE_V4_IOC)" \
+	@python3 "$(ROOT_DIR)/scripts/cubemx.py" package \
+		--manifest "$(NODE_V4_CUBEMX_MANIFEST)" \
 		--out "$(NODE_V4_HAL)" \
-		--generator "$(NODE_V4_CUBEMX_GENERATOR)" \
 		--archive-dir "$(ROOT_DIR)/release/cubemx"
 
 #
