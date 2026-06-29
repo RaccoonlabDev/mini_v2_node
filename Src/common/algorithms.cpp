@@ -22,7 +22,6 @@ PwmDurationUs mapInt16CommandToPwm(int16_t command,
 }
 
 
-
 PwmDurationUs mapFloatCommandToPwm(float command,
                                    PwmDurationUs min_pwm,
                                    PwmDurationUs max_pwm,

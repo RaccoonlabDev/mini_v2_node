@@ -97,11 +97,7 @@ static void blink_board_led() {
 
 __attribute__((noreturn)) void application_entry_point() {
     HAL::platform_enable_irq();
-    if (init_board_periphery() != 0) {
-        while (true) {
-            Board::Led::blink(Board::Led::Color::RED, Board::Led::Color::BLACK);
-        }
-    }
+    init_board_periphery();
     ModuleManager::init();
 
     while (true) {
