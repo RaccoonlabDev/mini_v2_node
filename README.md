@@ -2,17 +2,13 @@
 
 # General-purpose CAN node application
 
-A ready-to-use firmware base for [RL Mini v2](https://docs.raccoonlab.co/guide/can_pwm/can_pwm_mini_v2.html), [RL Mini v3](https://docs.raccoonlab.co/guide/can_pwm/mini_v3.html), and other compatible CAN nodes, with Cyphal/CAN and DroneCAN support.
-
-Please, refer to the docs in this repo for details:
-- [docs/mode_cyphal](docs/mode_cyphal.md),
-- [docs/mode_dronecan](docs/mode_dronecan.md).
+A ready-to-use firmware base for [RL Mini v2](https://docs.raccoonlab.co/guide/can_pwm/can_pwm_mini_v2.html), [RL Mini v3](https://docs.raccoonlab.co/guide/can_pwm/mini_v3.html), and other compatible CAN nodes. It can run different CAN protocols — see [docs/supported_can_backends.md](docs/supported_can_backends.md).
 
 ### 1. KEY FEATURES
 
 Supported features:
-- [x] Cyphal/CAN and DroneCAN protocol support, together or separately depending on the firmware target,
-- [x] Cyphal/DroneCAN bootloader (testing stage),
+- [x] Multiple CAN protocol backends, selectable per firmware target — see [docs/supported_can_backends.md](docs/supported_can_backends.md),
+- [x] CAN bootloader,
 - [x] You can try the software in Software-In-The-Loop (SITL) mode,
 - [x] Small firmware image and software is friendly for customization,
 - [x] Redundant CAN interface (node v3),
@@ -147,22 +143,7 @@ See [docs/hardware.md](docs/hardware.md) for hardware details.
 
 All nodes run a minimal application after flashing so you can verify the board is working without extra setup:
 - **CAN communication** starts according to the selected build target (DroneCAN or Cyphal/CAN).
-- **LED indicator** follows a standard pattern common to all Raccoonlab boards (similar to [PX4 LED Meanings](https://docs.px4.io/main/en/getting_started/led_meanings.html) and [Ardupilot LED meanings](https://ardupilot.org/copter/docs/common-leds-pixhawk.html)):
-
-| LED Pattern & Color | Meaning |
-|-|-|
-| **Blinking Blue/Red** | Initialization / Calibration       |
-| **Blinking Yellow**   | Minor Failure / Warning            |
-| **Blinking Magenta**  | Major Failure / Error              |
-| **Blinking Red**      | Fatal Malfunction / Critical       |
-| **Blinking Blue**     | Ready — No GPS Lock                |
-| **Solid Blue**¹       | Armed — No GPS Lock                |
-| **Blinking Green**²   | Ready — 3D Fix (8+ satellites)     |
-| **Solid Green**¹²     | Armed — 3D Fix (8+ satellites)     |
-
-¹ Applicable to nodes that support an **armed** state (e.g. actuator nodes).
-
-² Applicable to nodes that use **GPS** (e.g. GNSS or combined nodes).
+- **LED indicator** follows a standard pattern common to all RaccoonLab boards — see [docs/led_meaning.md](docs/led_meaning.md).
 
 ### 8. CREATING YOUR OWN APPLICATION
 

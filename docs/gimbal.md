@@ -53,6 +53,3 @@ Typical parameters to set for gimbal control:
 2. Map `pwm*.ch` to roll/pitch/yaw (AngularCommand) or to raw/array indices.
 3. Set `pwm*.min`, `pwm*.max`, and `pwm*.def` to match the gimbal PWM range.
 4. Enable `feedback.gimbal.enable` when available to publish status.
-
-## Notes
-- Hardpoint and arming inputs are available but typically not used for gimbals.
