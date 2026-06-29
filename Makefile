@@ -1,18 +1,25 @@
 # Copyright (C) 2023-2024 Dmitry Ponomarev <ponomarevda96@gmail.com>
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 .PHONY: require_target all checks code_style tests upload run clean_releases clean distclean build \
+	ensure_node_v4_cubemx cubemx_archives \
 	rl_mini_v2_dronecan rl_mini_v2_dronecan_application rl_mini_v2_dronecan_standalone \
 	rl_mini_v2_cyphal rl_mini_v2_cyphal_application rl_mini_v2_cyphal_standalone \
 	rl_mini_v2_both rl_mini_v2_both_application rl_mini_v2_both_standalone \
 	rl_mini_v3_dronecan rl_mini_v3_dronecan_application rl_mini_v3_dronecan_standalone \
 	rl_mini_v3_cyphal rl_mini_v3_cyphal_application rl_mini_v3_cyphal_standalone \
 	rl_mini_v3_both rl_mini_v3_both_application rl_mini_v3_both_standalone \
+	rl_node_v4_dronecan rl_node_v4_dronecan_application rl_node_v4_dronecan_standalone \
+	rl_node_v4_cyphal rl_node_v4_cyphal_application rl_node_v4_cyphal_standalone \
+	rl_node_v4_both rl_node_v4_both_application rl_node_v4_both_standalone \
 	rl_sitl_dronecan rl_sitl_cyphal \
 	cyphal cyphal_v2 cyphal_v3 dronecan dronecan_v2 dronecan_v3 v2 v3 sitl_dronecan sitl_cyphal
 .DEFAULT_GOAL := require_target
 
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 NC_BUILD_DIR?=$(ROOT_DIR)/build
+
+NODE_V4_CUBEMX_MANIFEST:=$(ROOT_DIR)/Src/boards/rl/node_v4/cubemx.json
+NODE_V4_HAL:=$(NC_BUILD_DIR)/stm32cubemx/rl/node_v4
 
 # Generic build inputs:
 # NC_BOARD - board path under Src/boards, for example: rl/mini_v2
@@ -64,6 +71,17 @@ endif
 		--cmake-build-type "${CMAKE_BUILD_TYPE}" \
 		-- ${EXTRA_CMAKE_ARGS}
 
+ensure_node_v4_cubemx:
+	@python3 "$(ROOT_DIR)/scripts/cubemx.py" ensure \
+		--manifest "$(NODE_V4_CUBEMX_MANIFEST)" \
+		--out "$(NODE_V4_HAL)"
+
+cubemx_archives:
+	@python3 "$(ROOT_DIR)/scripts/cubemx.py" package \
+		--manifest "$(NODE_V4_CUBEMX_MANIFEST)" \
+		--out "$(NODE_V4_HAL)" \
+		--archive-dir "$(ROOT_DIR)/release/cubemx"
+
 #
 # Alias naming rules:
 # <vendor>_<board>_<target> builds the bootloader application image
@@ -112,6 +130,31 @@ rl_mini_v3_both_application: checks
 	$(MAKE) build BOARD=rl/mini_v3 TARGET=both IMAGE_KIND=application BUILD_VARIANT=rl_mini_v3_both_application
 rl_mini_v3_both_standalone: checks
 	$(MAKE) build BOARD=rl/mini_v3 TARGET=both IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v3_both_standalone
+
+#
+# rl/node_v4 aliases
+#
+rl_node_v4_dronecan: checks
+	$(MAKE) ensure_node_v4_cubemx
+	$(MAKE) build BOARD=rl/node_v4 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_node_v4_dronecan_application
+rl_node_v4_dronecan_application: checks
+	$(MAKE) ensure_node_v4_cubemx
+	$(MAKE) build BOARD=rl/node_v4 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_node_v4_dronecan_application
+rl_node_v4_dronecan_standalone: checks
+	$(MAKE) ensure_node_v4_cubemx
+	$(MAKE) build BOARD=rl/node_v4 TARGET=dronecan IMAGE_KIND=standalone BUILD_VARIANT=rl_node_v4_dronecan_standalone
+rl_node_v4_cyphal: checks
+	$(error rl/node_v4 Cyphal is not enabled yet. Use rl_node_v4_dronecan_application or rl_node_v4_dronecan_standalone)
+rl_node_v4_cyphal_application: checks
+	$(error rl/node_v4 Cyphal is not enabled yet. Use rl_node_v4_dronecan_application)
+rl_node_v4_cyphal_standalone: checks
+	$(error rl/node_v4 Cyphal is not enabled yet. Use rl_node_v4_dronecan_standalone)
+rl_node_v4_both: checks
+	$(error rl/node_v4 combined Cyphal+DroneCAN is not enabled yet. Use rl_node_v4_dronecan_application)
+rl_node_v4_both_application: checks
+	$(error rl/node_v4 combined Cyphal+DroneCAN is not enabled yet. Use rl_node_v4_dronecan_application)
+rl_node_v4_both_standalone: checks
+	$(error rl/node_v4 combined Cyphal+DroneCAN is not enabled yet. Use rl_node_v4_dronecan_standalone)
 
 #
 # rl/sitl aliases

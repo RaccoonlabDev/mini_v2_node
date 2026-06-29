@@ -23,6 +23,10 @@ public:
         reboot_required = true;
     }
 
+    static bool is_reboot_requested() {
+        return reboot_required;
+    }
+
 private:
     static inline bool reboot_required{false};
 };

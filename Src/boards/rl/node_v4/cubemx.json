@@ -1,0 +1,8 @@
+{
+  "name": "rl-node-v4",
+  "ioc": "board/STM32H753IIK6-V4.ioc",
+  "store": {
+    "repo": "mini-v2-node",
+    "tag": "cubemx-v0.1.0"
+  }
+}

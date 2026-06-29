@@ -50,8 +50,8 @@ for attempt in {1..25}; do
         EXPLICIT_FLASH_SIZE="--flash=0x00020000"
     fi
 
-    output=$(st-flash $EXPLICIT_FLASH_SIZE --connect-under-reset --reset write $BINARY_FILE 0x8000000 | tee /dev/tty)
-    compare_res=$(echo "$output" | grep "pages written")
+    output=$(st-flash $EXPLICIT_FLASH_SIZE --connect-under-reset --reset write $BINARY_FILE 0x8000000 2>&1 | tee /dev/tty)
+    compare_res=$(echo "$output" | grep -E "pages written|Flash written and verified")
     if [ -z "$compare_res" ]; then
         sleep 2
     else

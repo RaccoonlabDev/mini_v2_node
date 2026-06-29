@@ -27,6 +27,7 @@ set(IMAGE_KIND "" CACHE STRING "Deprecated. Use NC_IMAGE_KIND.")
 option(USE_PLATFORM_UBUNTU "Build for SITL (Software In The Loop)" OFF)
 option(USE_PLATFORM_NODE_V2 "Build for stm32f103xB (128 KBytes)" OFF)
 option(USE_PLATFORM_NODE_V3 "Build for stm32g0b1 (512 KBytes)" OFF)
+option(USE_PLATFORM_NODE_V4 "Build for stm32h753xx (2048 KBytes)" OFF)
 set(BOARD_VENDOR rl CACHE STRING "Board vendor name under Src/boards")
 
 if(NC_BOARD STREQUAL "" AND NOT BOARD STREQUAL "")
@@ -134,6 +135,7 @@ endif()
 set(USE_PLATFORM_UBUNTU OFF)
 set(USE_PLATFORM_NODE_V2 OFF)
 set(USE_PLATFORM_NODE_V3 OFF)
+set(USE_PLATFORM_NODE_V4 OFF)
 
 # Keep these values aligned with `Src/common/mcu_family_id.hpp`.
 # Reserved IDs:
@@ -166,6 +168,7 @@ elseif(BOARD_PLATFORM STREQUAL "stm32f103")
     set(PLATFORM_NAME v2)
     set(MCU_FAMILY_ID ${MCU_FAMILY_ID_STM32F103})
     set(USE_PLATFORM_NODE_V2 ON)
+    add_compile_definitions(USE_PLATFORM_NODE_V2=1)
 
     if(DEFINED STM32_CUBEMX_PROJECT_PATH)
         set(stm32cubeMxProjectPath  ${STM32_CUBEMX_PROJECT_PATH})
@@ -187,6 +190,9 @@ elseif(BOARD_PLATFORM STREQUAL "stm32f103")
     FILE(GLOB coreSources       ${stm32cubeMxProjectPath}/Core/Src/*)
     FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c
                                 ${stm32cubeMxProjectPath}/Drivers/*/*/*/*.c)
+    FILE(GLOB_RECURSE middlewareSources
+                                ${stm32cubeMxProjectPath}/Middlewares/ST/STM32_USB_Device_Library/*.c)
+    FILE(GLOB usbDeviceSources  ${stm32cubeMxProjectPath}/USB_DEVICE/*/*.c)
     FILE(GLOB startupFile       ${stm32cubeMxProjectPath}/*.s
                                 ${stm32cubeMxProjectPath}/Core/Startup/*.s
     )
@@ -201,6 +207,7 @@ elseif(BOARD_PLATFORM STREQUAL "stm32g0b1")
     set(PLATFORM_NAME v3)
     set(MCU_FAMILY_ID ${MCU_FAMILY_ID_STM32G0B1})
     set(USE_PLATFORM_NODE_V3 ON)
+    add_compile_definitions(USE_PLATFORM_NODE_V3=1)
 
     if(DEFINED STM32_CUBEMX_PROJECT_PATH)
         set(stm32cubeMxProjectPath  ${STM32_CUBEMX_PROJECT_PATH})
@@ -222,15 +229,69 @@ elseif(BOARD_PLATFORM STREQUAL "stm32g0b1")
     FILE(GLOB coreSources       ${stm32cubeMxProjectPath}/Core/Src/*)
     FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c
                                 ${stm32cubeMxProjectPath}/Drivers/*/*/*/*.c)
+    FILE(GLOB_RECURSE middlewareSources
+                                ${stm32cubeMxProjectPath}/Middlewares/ST/STM32_USB_Device_Library/*.c)
+    FILE(GLOB_RECURSE usbDeviceSources
+                                ${stm32cubeMxProjectPath}/USB_DEVICE/*.c)
     FILE(GLOB startupFile       ${stm32cubeMxProjectPath}/*.s
                                 ${stm32cubeMxProjectPath}/Core/Startup/*.s
     )
 
     set(CMAKE_EXE_LINKER_FLAGS "-T${ldFile} -Wl,-Map=${PROJECT_NAME}.map,--cref")
     include(${CMAKE_DIR}/toolchain-stm32g0b1.cmake)
+    add_compile_definitions(NUM_OF_CAN_BUSES=2)
     add_compile_definitions(CYPHAL_NUM_OF_CAN_BUSES=2)
+elseif(BOARD_PLATFORM STREQUAL "stm32h753xx")
+    set(LIBPARAMS_PLATFORM stm32h753xx)
+    set(CAN_PLATFORM fdcan)
+    set(LIBCPNODE_CAN_PLATFORM fdcan)
+    set(APP_PLATFORM stm32h753xx)
+    set(PLATFORM_NAME v4)
+    set(MCU_FAMILY_ID ${MCU_FAMILY_ID_STM32H7})
+    set(USE_PLATFORM_NODE_V4 ON)
+    add_compile_definitions(USE_PLATFORM_NODE_V4=1)
+
+    if(DEFINED STM32_CUBEMX_PROJECT_PATH)
+        set(stm32cubeMxProjectPath  ${STM32_CUBEMX_PROJECT_PATH})
+    else()
+        message(FATAL_ERROR "STM32_CUBEMX_PROJECT_PATH is required for '${NC_BOARD}' (${BOARD_PLATFORM}).")
+    endif()
+    if(NOT EXISTS "${stm32cubeMxProjectPath}")
+        message(FATAL_ERROR
+            "STM32_CUBEMX_PROJECT_PATH '${stm32cubeMxProjectPath}' does not exist. "
+            "Provide an STM32H753xx CubeMX project with -DSTM32_CUBEMX_PROJECT_PATH=<path>.")
+    endif()
+    if(DEFINED STM32_LINKER_SCRIPT_PATH)
+        set(ldFile ${STM32_LINKER_SCRIPT_PATH})
+    elseif(DEFINED STM32_LINKER_SCRIPT_TEMPLATE_PATH)
+        if(NOT DEFINED LINK_FLASH_ORIGIN_HEX OR NOT DEFINED LINK_FLASH_LENGTH_KB)
+            message(FATAL_ERROR "Linker template requires LINK_FLASH_ORIGIN_HEX and LINK_FLASH_LENGTH_KB.")
+        endif()
+        set(GENERATED_LINKER_SCRIPT ${CMAKE_BINARY_DIR}/generated_linker.ld)
+        configure_file(${STM32_LINKER_SCRIPT_TEMPLATE_PATH} ${GENERATED_LINKER_SCRIPT} @ONLY)
+        set(ldFile ${GENERATED_LINKER_SCRIPT})
+    else()
+        FILE(GLOB ldFile        ${stm32cubeMxProjectPath}/*_FLASH.ld)
+    endif()
+    FILE(GLOB coreSources       ${stm32cubeMxProjectPath}/Core/Src/*)
+    FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c
+                                ${stm32cubeMxProjectPath}/Drivers/*/*/*/*.c)
+    FILE(GLOB_RECURSE middlewareSources
+                                ${stm32cubeMxProjectPath}/Middlewares/ST/STM32_USB_Device_Library/*/*.c)
+    FILE(GLOB_RECURSE usbDeviceSources
+                                ${stm32cubeMxProjectPath}/USB_DEVICE/*.c)
+    FILE(GLOB startupFile       ${stm32cubeMxProjectPath}/*.s
+                                ${stm32cubeMxProjectPath}/Core/Startup/*.s
+    )
+
+    set(CMAKE_EXE_LINKER_FLAGS "-T${ldFile} -Wl,-Map=${PROJECT_NAME}.map,--cref")
+    include(${CMAKE_DIR}/toolchain-stm32h753xx.cmake)
+    add_compile_definitions(NUM_OF_CAN_BUSES=1)
+    add_compile_definitions(CYPHAL_NUM_OF_CAN_BUSES=1)
+    add_compile_definitions(DRONECAN_FDCAN_PRIMARY=1)
+    add_compile_definitions(USE_PWR_LDO_SUPPLY)
 else()
-    message(FATAL_ERROR "Unknown BOARD_PLATFORM '${BOARD_PLATFORM}'. Expected: ubuntu, stm32f103, stm32g0b1.")
+    message(FATAL_ERROR "Unknown BOARD_PLATFORM '${BOARD_PLATFORM}'. Expected: ubuntu, stm32f103, stm32g0b1, stm32h753xx.")
 endif()
 
 add_definitions(-DMCU_FAMILY_ID=${MCU_FAMILY_ID})

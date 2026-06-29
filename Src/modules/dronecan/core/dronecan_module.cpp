@@ -11,6 +11,7 @@
 #include "libdcnode/dronecan.h"
 #include "libdcnode/can_driver.h"
 #include "drivers/board_monitor/board_monitor.hpp"
+#include "peripheral/iwdg/iwdg.hpp"
 
 #ifndef GIT_HASH
     #warning "GIT_HASH has been assigned to 0 by default."
@@ -71,6 +72,13 @@ static IntegerParamValue_t paramsGetIntegerDef(ParamIndex_t param_idx) {
     return desc != nullptr ? desc->def : 0;
 }
 
+static int8_t paramsSaveWithWatchdogMargin() {
+    HAL::Watchdog::refresh();
+    int8_t res = paramsSave();
+    HAL::Watchdog::refresh();
+    return res;
+}
+
 static bool shouldUseDefaultNodeName(const char *node_name) {
     return node_name == nullptr || strlen(node_name) == 0;
 }
@@ -99,12 +107,13 @@ static void setDefaultNodeName(ParamIndex_t node_name_param_idx) {
 }
 
 void DronecanModule::init() {
+
     ParamsApi params_api = {
         .getName = paramsGetName,
         .isInteger = paramsIsInteger,
         .isString = paramsIsString,
         .find = paramsFind,
-        .save = paramsSave,
+        .save = paramsSaveWithWatchdogMargin,
         .resetToDefault = paramsResetToDefault,
 
         .integer = {
