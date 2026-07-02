@@ -18,6 +18,10 @@
 #include "module.hpp"
 #include "main.h"
 
+#ifndef LIBPARAMS_HAS_REDUNDANT_STORAGE
+#define LIBPARAMS_HAS_REDUNDANT_STORAGE 1
+#endif
+
 static int8_t init_board_periphery() {
     Board::Led::reset();
     BoardMonitor::init();
@@ -36,9 +40,11 @@ static int8_t init_board_periphery() {
     if (paramsEnableCrc(IntParamsIndexes::PARAM_SYSTEM_CRC) != 0) {
         return -1;
     }
+#if LIBPARAMS_HAS_REDUNDANT_STORAGE
     if (paramsInitRedundantPage() != 0) {
         return -1;
     }
+#endif
     if (paramsLoad() != 0) {
         return -1;
     }
