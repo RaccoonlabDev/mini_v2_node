@@ -248,17 +248,18 @@ elseif(BOARD_PLATFORM STREQUAL "stm32h753xx")
     endif()
 
     if(LIBPARAMS_STORAGE_BACKEND STREQUAL "internal_flash")
-        set(LIBPARAMS_PLATFORM stm32h753xx)
         add_compile_definitions(LIBPARAMS_HAS_REDUNDANT_STORAGE=1)
+        add_compile_definitions(LIBPARAMS_STORAGE_BACKEND_INTERNAL_FLASH=1)
     elseif(LIBPARAMS_STORAGE_BACKEND STREQUAL "spifram")
-        set(LIBPARAMS_PLATFORM stm32h753xx/stm32h753xx_spifram)
         add_compile_definitions(LIBPARAMS_HAS_REDUNDANT_STORAGE=0)
+        add_compile_definitions(LIBPARAMS_STORAGE_BACKEND_SPIFRAM=1)
     else()
         message(FATAL_ERROR
             "Unsupported LIBPARAMS_STORAGE_BACKEND='${LIBPARAMS_STORAGE_BACKEND}' "
             "for '${BOARD_PLATFORM}'. Expected: internal_flash or spifram.")
     endif()
 
+    set(LIBPARAMS_PLATFORM stm32h753xx)
     set(CAN_PLATFORM fdcan)
     set(LIBCPNODE_CAN_PLATFORM fdcan)
     set(APP_PLATFORM stm32h753xx)
