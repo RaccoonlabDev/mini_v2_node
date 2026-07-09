@@ -72,6 +72,16 @@ int8_t SPI::transaction(std::byte* tx, std::byte* rx, uint8_t size) {
         return -1;
     }
 
+    // SPI slaves frame a transfer between nCS falling and rising edges, but MX_GPIO_Init
+    // may leave nCS asserted (low) since power-on. Deassert it before the first transfer
+    // so the slave always sees a clean falling edge at the start of the frame.
+    static bool nss_deasserted = false;
+    if (!nss_deasserted) {
+        spi_set_nss(true);
+        HAL_Delay(1);
+        nss_deasserted = true;
+    }
+
     spi_set_nss(false);
     memset(rx, 0x00, size);
     auto status = HAL_SPI_TransmitReceive(hspi,
