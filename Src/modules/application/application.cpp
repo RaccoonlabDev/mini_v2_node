@@ -9,6 +9,7 @@
 #include <array>
 #include <bitset>
 #include "flash_driver.h"
+#include "platform_flash_driver.h"
 #include "drivers/board_monitor/board_monitor.hpp"
 #include "peripheral/gpio/gpio.hpp"
 #include "peripheral/iwdg/iwdg.hpp"
@@ -18,6 +19,29 @@
 #include "module.hpp"
 #include "main.h"
 
+#ifndef LIBPARAMS_HAS_REDUNDANT_STORAGE
+#define LIBPARAMS_HAS_REDUNDANT_STORAGE 1
+#endif
+
+// It's quite ugly
+// but it let's automatically take needed flash driver for params
+// preserving us from accidental wrong flash driver usage
+static const FlashDriverOps* get_params_flash_ops() {
+#if defined(USE_PLATFORM_NODE_V4) && defined(LIBPARAMS_STORAGE_BACKEND_SPIFRAM)
+    return stm32h753xxSpiFramGetOps();
+#elif defined(USE_PLATFORM_NODE_V4)
+    return stm32h753xxInternalFlashGetOps();
+#elif defined(USE_PLATFORM_NODE_V3)
+    return stm32g0b1InternalFlashGetOps();
+#elif defined(USE_PLATFORM_NODE_V2)
+    return stm32f103InternalFlashGetOps();
+#elif defined(USE_PLATFORM_UBUNTU)
+    return ubuntuFlashGetOps();
+#else
+    return nullptr;
+#endif
+}
+
 static int8_t init_board_periphery() {
     Board::Led::reset();
     BoardMonitor::init();
@@ -26,19 +50,26 @@ static int8_t init_board_periphery() {
     auto libparams_strs_num = NUM_OF_STR_PARAMS;
     const size_t required_bytes_num = sizeof(IntegerParamValue_t) * libparams_ints_num +
                                       MAX_STRING_LENGTH * libparams_strs_num;
-    const size_t page_size = flashGetPageSize();
+    const FlashDriverOps* params_flash = get_params_flash_ops();
+    if (params_flash == nullptr) {
+        return -1;
+    }
+    const size_t page_size = params_flash->get_page_size();
     const size_t pages_num = std::max<size_t>(1, (required_bytes_num + page_size - 1) / page_size);
     const int32_t first_page_idx = -static_cast<int32_t>(pages_num);
 
-    if (paramsInit(libparams_ints_num, libparams_strs_num, first_page_idx, pages_num) != 0) {
+    if (paramsInit(params_flash, libparams_ints_num,
+                    libparams_strs_num, first_page_idx, pages_num) != 0) {
         return -1;
     }
     if (paramsEnableCrc(IntParamsIndexes::PARAM_SYSTEM_CRC) != 0) {
         return -1;
     }
+#if LIBPARAMS_HAS_REDUNDANT_STORAGE
     if (paramsInitRedundantPage() != 0) {
         return -1;
     }
+#endif
     if (paramsLoad() != 0) {
         return -1;
     }

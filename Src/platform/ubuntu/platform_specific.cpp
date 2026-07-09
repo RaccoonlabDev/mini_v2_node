@@ -12,12 +12,14 @@
 #include <iostream>
 #include "main.h"
 #include "application.hpp"
+#include "flash_driver.h"
+#include "platform_flash_driver.h"
 #include "rom.h"
 #include "peripheral/iwdg/iwdg.hpp"
 
 int main() {
     std::cout << "The app has been started." << std::endl;
-    romInit(0, 1);
+    romInit(ubuntuFlashGetOps(), 0, 1);
     application_entry_point();
     return 0;
 }
