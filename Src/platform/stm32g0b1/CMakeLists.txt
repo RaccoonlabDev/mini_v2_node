@@ -23,6 +23,7 @@ add_executable(${EXECUTABLE}
 
     ${coreSources}
     ${driversSources}
+    ${cmsisDspSources}
     ${startupFile}
 )
 
@@ -33,7 +34,7 @@ target_include_directories(${EXECUTABLE} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}
     ${stm32cubeMxProjectPath}/Core/Inc
     ${stm32cubeMxProjectPath}/Drivers/CMSIS/Include
-    ${stm32cubeMxProjectPath}/Drivers/CMSIS/DSP/Include
+    ${ROOT_DIR}/Libs/CMSIS-DSP/Include
 
     ${stm32cubeMxProjectPath}/Drivers/CMSIS/Device/ST/STM32F1xx/Include
     ${stm32cubeMxProjectPath}/Drivers/STM32F1xx_HAL_Driver/Inc

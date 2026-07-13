@@ -243,6 +243,7 @@ elseif(BOARD_PLATFORM STREQUAL "stm32g0b1")
     FILE(GLOB coreSources       ${stm32cubeMxProjectPath}/Core/Src/*)
     FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c
                                 ${stm32cubeMxProjectPath}/Drivers/*/*/*/*.c)
+    FILE(GLOB cmsisDspSources   ${ROOT_DIR}/Libs/CMSIS-DSP/Source/*.c)
     FILE(GLOB_RECURSE middlewareSources
                                 ${stm32cubeMxProjectPath}/Middlewares/ST/STM32_USB_Device_Library/*.c)
     FILE(GLOB_RECURSE usbDeviceSources
