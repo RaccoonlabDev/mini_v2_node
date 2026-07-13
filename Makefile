@@ -90,7 +90,8 @@ ensure_mini_v2_cubemx:
 ensure_mini_v3_cubemx:
 	@python3 "$(ROOT_DIR)/scripts/cubemx.py" ensure \
 		--manifest "$(MINI_V3_CUBEMX_MANIFEST)" \
-		--out "$(MINI_V3_HAL)"
+		--out "$(MINI_V3_HAL)" \
+		--release-only
 
 ensure_node_v4_cubemx:
 	@python3 "$(ROOT_DIR)/scripts/cubemx.py" ensure \

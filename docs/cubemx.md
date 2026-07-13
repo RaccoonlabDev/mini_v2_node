@@ -52,6 +52,11 @@ third_party/node-core/scripts/cubemx.py ensure --manifest src/boards/<v>/<b>/cub
 `ensure` resolves in order: existing project → local cache → local CubeMX →
 download from the release.
 
+Pass `--release-only` when a target must always consume the published project.
+This ignores an installed local CubeMX, an existing generated project, and the
+local archive cache. Mini v3 currently uses this as a deliberate temporary
+policy so its optional IMU/DSP generation path cannot slow ordinary builds.
+
 ## Wiring into a build
 
 Point the board at the restored project and run `ensure` before building. In the

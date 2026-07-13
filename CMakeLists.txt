@@ -243,7 +243,19 @@ elseif(BOARD_PLATFORM STREQUAL "stm32g0b1")
     FILE(GLOB coreSources       ${stm32cubeMxProjectPath}/Core/Src/*)
     FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c
                                 ${stm32cubeMxProjectPath}/Drivers/*/*/*/*.c)
-    FILE(GLOB cmsisDspSources   ${ROOT_DIR}/Libs/CMSIS-DSP/Source/*.c)
+    set(cmsisDspPath            ${stm32cubeMxProjectPath}/Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP)
+    set(cmsisDspSources
+                                ${cmsisDspPath}/Source/BasicMathFunctions/arm_mult_q15.c
+                                ${cmsisDspPath}/Source/BasicMathFunctions/arm_shift_q15.c
+                                ${cmsisDspPath}/Source/CommonTables/arm_common_tables.c
+                                ${cmsisDspPath}/Source/CommonTables/arm_const_structs.c
+                                ${cmsisDspPath}/Source/SupportFunctions/arm_float_to_q15.c
+                                ${cmsisDspPath}/Source/SupportFunctions/arm_q15_to_float.c
+                                ${cmsisDspPath}/Source/TransformFunctions/arm_bitreversal2.c
+                                ${cmsisDspPath}/Source/TransformFunctions/arm_cfft_q15.c
+                                ${cmsisDspPath}/Source/TransformFunctions/arm_cfft_radix4_q15.c
+                                ${cmsisDspPath}/Source/TransformFunctions/arm_rfft_init_q15.c
+                                ${cmsisDspPath}/Source/TransformFunctions/arm_rfft_q15.c)
     FILE(GLOB_RECURSE middlewareSources
                                 ${stm32cubeMxProjectPath}/Middlewares/ST/STM32_USB_Device_Library/*.c)
     FILE(GLOB_RECURSE usbDeviceSources
