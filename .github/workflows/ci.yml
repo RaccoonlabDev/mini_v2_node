@@ -163,6 +163,6 @@ jobs:
         with:
           bot_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          files: build/release/*.bin
+          files: release/*.bin
           message: "Node"
           add_git_info: "true"

@@ -244,7 +244,7 @@ tests:
 	${ROOT_DIR}/scripts/tests.sh
 
 upload:
-	LATEST_TARGET=$$(ls -td ${NC_BUILD_DIR}/release/*.bin | head -1) && ./scripts/flash.sh $$LATEST_TARGET
+	LATEST_TARGET=$$(ls -td ${ROOT_DIR}/release/*.bin | head -1) && ./scripts/flash.sh $$LATEST_TARGET
 
 SOCKETCAN_URL:=https://gist.githubusercontent.com/PonomarevDA/6ecc8fc340e4c50619c1e5dfcedc37b2/raw/2db6d1626a9ada543602ff0a52b48fecb94e6e07/socketcan.sh
 SOCKETCAN_EXECUTABLE:=build/tools/socketcan-v1.0.2.sh
@@ -262,7 +262,7 @@ remove_slcan0: download_socketcan
 run: create_slcan0
 	LATEST_TARGET=$$(ls -td build/*/obj/node | head -1 | head -1) && $$LATEST_TARGET
 clean_releases:
-	-rm -fR ${NC_BUILD_DIR}/release
+	-rm -f ${ROOT_DIR}/release/*.bin
 clean:
 	-rm -fR ${NC_BUILD_DIR}/*/obj
 distclean:
