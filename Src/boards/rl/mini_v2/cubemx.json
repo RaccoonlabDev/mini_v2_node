@@ -1,5 +1,5 @@
 {
-  "name": "rl-node-v4",
+  "name": "rl-mini-v2",
   "ioc": "board/project.ioc",
   "store": {
     "repo": "mini-v2-node",

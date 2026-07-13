@@ -174,8 +174,14 @@ elseif(BOARD_PLATFORM STREQUAL "stm32f103")
     if(DEFINED STM32_CUBEMX_PROJECT_PATH)
         set(stm32cubeMxProjectPath  ${STM32_CUBEMX_PROJECT_PATH})
     else()
-        set(stm32cubeMxProjectPath  ${ROOT_DIR}/Libs/stm32-cube-project)
+        message(FATAL_ERROR "STM32_CUBEMX_PROJECT_PATH is required for '${NC_BOARD}' (${BOARD_PLATFORM}).")
     endif()
+    if(NOT EXISTS "${stm32cubeMxProjectPath}")
+        message(FATAL_ERROR
+            "STM32_CUBEMX_PROJECT_PATH '${stm32cubeMxProjectPath}' does not exist. "
+            "Provide an STM32H753xx CubeMX project with -DSTM32_CUBEMX_PROJECT_PATH=<path>.")
+    endif()
+    
     if(DEFINED STM32_LINKER_SCRIPT_PATH)
         set(ldFile ${STM32_LINKER_SCRIPT_PATH})
     elseif(DEFINED STM32_LINKER_SCRIPT_TEMPLATE_PATH)
@@ -213,8 +219,15 @@ elseif(BOARD_PLATFORM STREQUAL "stm32g0b1")
     if(DEFINED STM32_CUBEMX_PROJECT_PATH)
         set(stm32cubeMxProjectPath  ${STM32_CUBEMX_PROJECT_PATH})
     else()
-        set(stm32cubeMxProjectPath  ${ROOT_DIR}/Libs/mini-v3-ioc)
+        message(FATAL_ERROR "STM32_CUBEMX_PROJECT_PATH is required for '${NC_BOARD}' (${BOARD_PLATFORM}).")
     endif()
+
+    if(NOT EXISTS "${stm32cubeMxProjectPath}")
+        message(FATAL_ERROR
+            "STM32_CUBEMX_PROJECT_PATH '${stm32cubeMxProjectPath}' does not exist. "
+            "Provide an STM32H753xx CubeMX project with -DSTM32_CUBEMX_PROJECT_PATH=<path>.")
+    endif()
+
     if(DEFINED STM32_LINKER_SCRIPT_PATH)
         set(ldFile ${STM32_LINKER_SCRIPT_PATH})
     elseif(DEFINED STM32_LINKER_SCRIPT_TEMPLATE_PATH)
