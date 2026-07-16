@@ -9,31 +9,12 @@
 
 #include <stdio.h>
 
-#include "libcanopen/fdcan.hpp"
-#include "peripheral/can/can_ownership.hpp"
-
-extern "C" FDCAN_HandleTypeDef hfdcan2;
+#include "peripheral/can/canopen_stm32h7.hpp"
 
 REGISTER_MODULE(CanopenModule)
 
 void CanopenModule::init() {
-    if (!HAL::claimCanPeripheral(&hfdcan2, HAL::CanOwner::CANOPEN)) {
-        set_health(Status::FATAL_MALFANCTION);
-        set_mode(Mode::STANDBY);
-        return;
-    }
-
-    const CanopenFdcanInterfaceConfig interface{
-        .handle = &hfdcan2,
-        .interface_id = 0U,
-    };
-    if (canopenFdcanConfigure(&interface, 1U) < 0) {
-        set_health(Status::FATAL_MALFANCTION);
-        set_mode(Mode::STANDBY);
-        return;
-    }
-
-    static libcanopen::Node node(canopenFdcanGetTransportApi());
+    static libcanopen::Node node(canopenGetTransportApi());
     _node = &node;
     if (_node->init(CANOPEN_BITRATE, PIHER_NODE_ID) < 0) {
         set_health(Status::FATAL_MALFANCTION);

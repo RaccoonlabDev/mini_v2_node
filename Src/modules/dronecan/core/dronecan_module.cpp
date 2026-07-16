@@ -12,16 +12,6 @@
 #include "libdcnode/can_driver.h"
 #include "drivers/board_monitor/board_monitor.hpp"
 #include "peripheral/iwdg/iwdg.hpp"
-#include "peripheral/can/can_ownership.hpp"
-
-#if defined(USE_PLATFORM_NODE_V3) || defined(USE_PLATFORM_NODE_V4)
-#include "fdcan_config.h"
-
-extern FDCAN_HandleTypeDef hfdcan1;
-#if defined(USE_PLATFORM_NODE_V3)
-extern FDCAN_HandleTypeDef hfdcan2;
-#endif
-#endif
 
 #ifndef GIT_HASH
     #warning "GIT_HASH has been assigned to 0 by default."
@@ -117,31 +107,6 @@ static void setDefaultNodeName(ParamIndex_t node_name_param_idx) {
 }
 
 void DronecanModule::init() {
-
-#if defined(USE_PLATFORM_NODE_V3) || defined(USE_PLATFORM_NODE_V4)
-    DronecanFdcanInterfaceConfig can_interfaces[2]{};
-    size_t can_interface_count = 0U;
-    if (!HAL::claimCanPeripheral(&hfdcan1, HAL::CanOwner::DRONECAN)) {
-        set_health(Status::FATAL_MALFANCTION);
-        set_mode(Mode::STANDBY);
-        return;
-    }
-    can_interfaces[can_interface_count++] = {.handle = &hfdcan1, .interface_id = 0U};
-#if defined(USE_PLATFORM_NODE_V3)
-    if (!HAL::claimCanPeripheral(&hfdcan2, HAL::CanOwner::DRONECAN)) {
-        set_health(Status::FATAL_MALFANCTION);
-        set_mode(Mode::STANDBY);
-        return;
-    }
-    can_interfaces[can_interface_count++] = {.handle = &hfdcan2, .interface_id = 1U};
-#endif
-    if (dronecanFdcanConfigure(can_interfaces, can_interface_count) < 0) {
-        set_health(Status::FATAL_MALFANCTION);
-        set_mode(Mode::STANDBY);
-        return;
-    }
-#endif
-
     ParamsApi params_api = {
         .getName = paramsGetName,
         .isInteger = paramsIsInteger,

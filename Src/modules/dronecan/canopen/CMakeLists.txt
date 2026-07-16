@@ -9,15 +9,9 @@ if(NOT TARGET libcanopen)
     add_subdirectory(${NC_LIBCANOPEN_PATH} ${CMAKE_BINARY_DIR}/libcanopen)
 endif()
 
-include(${NC_LIBCANOPEN_PATH}/platform_specific/fdcan/config.cmake)
-
 list(APPEND APPLICATION_SOURCES
-    ${CANOPEN_PLATFORM_SOURCES}
+    ${ROOT_DIR}/Src/peripheral/can/canopen_stm32h7.cpp
     ${CMAKE_CURRENT_LIST_DIR}/canopen.cpp
-)
-
-list(APPEND APPLICATION_HEADERS
-    ${CANOPEN_PLATFORM_HEADERS}
 )
 
 set(CONFIG_USE_CANOPEN ON)
