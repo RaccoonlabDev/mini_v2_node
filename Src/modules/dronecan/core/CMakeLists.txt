@@ -14,7 +14,6 @@ include(${NC_LIBDCNODE_PATH}/platform_specific/${CAN_PLATFORM}/config.cmake)
 list(APPEND APPLICATION_SOURCES
     ${libparamsSrc}
     ${DRONECAN_PLATFORM_SOURCES}
-    ${ROOT_DIR}/Src/peripheral/can/can_ownership.cpp
     ${CMAKE_CURRENT_LIST_DIR}/dronecan_module.cpp
 )
 

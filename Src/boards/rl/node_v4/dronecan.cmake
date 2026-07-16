@@ -11,6 +11,7 @@ rl_include_module(system)
 
 rl_include_module(dronecan/core)
 rl_include_module(dronecan/canopen)
+rl_include_module(angle_sensor)
 
 if(NOT NODE_V4_DIAG_MINIMAL_MODULES)
     rl_include_module(dronecan/arming)
