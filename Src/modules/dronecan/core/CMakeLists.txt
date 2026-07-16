@@ -8,8 +8,11 @@ use_external_github_library(libdcnode
     submodule ${NC_LIBDCNODE_PATH} -
 )
 
-# 2. libcanver
-include(${NC_LIBDCNODE_PATH}/platform_specific/${CAN_PLATFORM}/config.cmake)
+if(CAN_PLATFORM STREQUAL "fdcan")
+    include(${ROOT_DIR}/Src/peripheral/can/CMakeLists.txt)
+else()
+    include(${NC_LIBDCNODE_PATH}/platform_specific/${CAN_PLATFORM}/config.cmake)
+endif()
 
 list(APPEND APPLICATION_SOURCES
     ${libparamsSrc}

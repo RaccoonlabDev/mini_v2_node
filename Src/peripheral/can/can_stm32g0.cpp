@@ -4,139 +4,110 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#include "peripheral/can/can.hpp"
+#include "libdcnode/can_driver.h"
 
 #include <string.h>
 
 #include "main.h"
-#include "peripheral/can/ring_buffer.hpp"
 
 extern FDCAN_HandleTypeDef hfdcan1;
 
-namespace HAL {
+namespace {
 
-typedef struct {
-    FDCAN_HandleTypeDef* handler;
+struct CanDriver {
     FDCAN_TxHeaderTypeDef tx_header;
-} CanDriver;
+    uint8_t rx_buf[8];
+    size_t err_counter;
+    size_t tx_counter;
+    size_t rx_counter;
+};
 
-static CanDriver can_driver{};
-static RingBuffer<Can::ClassicFrame, 128U> rx_ring_buffer;
+CanDriver driver{};
+bool started = false;
 
-void canOnRxFifo0Callback(FDCAN_HandleTypeDef* const hfdcan) {
-    if (hfdcan == nullptr || can_driver.handler == nullptr || hfdcan != can_driver.handler) {
-        return;
-    }
+}  // namespace
 
-    FDCAN_RxHeaderTypeDef rx_header{};
-    uint8_t rx_buf[8]{};
-    const uint8_t fifo_size = HAL_FDCAN_GetRxFifoFillLevel(hfdcan, FDCAN_RX_FIFO0);
-    for (uint8_t idx = 0U; idx < fifo_size; idx++) {
-        if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &rx_header, rx_buf) != HAL_OK) {
-            continue;
-        }
-
-        Can::ClassicFrame frame{};
-        frame.id = rx_header.Identifier;
-        frame.data_len = static_cast<uint8_t>(rx_header.DataLength >> 16U);
-        if (frame.data_len > 8U) {
-            frame.data_len = 8U;
-        }
-        frame.timestamp_ns = static_cast<uint64_t>(HAL_GetTick()) * 1000000ULL;
-        memcpy(frame.data, rx_buf, frame.data_len);
-        rx_ring_buffer.push(frame);
-    }
+extern "C" void canDriverSetInterfaceName(const char* interface_name) {
+    (void)interface_name;
 }
 
-Can::Can(Instance instance) : _instance(instance) {}
-
-Can::ErrorCode Can::init(const InitConfig& config) {
-    (void)config.baud_rate;
-
-    if (_instance != Instance::INSTANCE_1) {
-        _stats.errors++;
-        return ErrorCode::INITIALIZATION_FAILED;
+extern "C" int16_t canDriverInit(uint32_t can_speed, uint8_t can_driver_idx) {
+    (void)can_speed;
+    if (can_driver_idx != CAN_DRIVER_FIRST || started) {
+        return -1;
     }
 
-    can_driver.handler = &hfdcan1;
-    can_driver.tx_header.IdType = FDCAN_EXTENDED_ID;
-    can_driver.tx_header.TxFrameType = FDCAN_DATA_FRAME;
-    can_driver.tx_header.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
-    can_driver.tx_header.BitRateSwitch = FDCAN_BRS_OFF;
-    can_driver.tx_header.FDFormat = FDCAN_CLASSIC_CAN;
-    can_driver.tx_header.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
-    can_driver.tx_header.MessageMarker = 0;
+    driver.tx_header.IdType = FDCAN_EXTENDED_ID;
+    driver.tx_header.TxFrameType = FDCAN_DATA_FRAME;
+    driver.tx_header.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
+    driver.tx_header.BitRateSwitch = FDCAN_BRS_OFF;
+    driver.tx_header.FDFormat = FDCAN_CLASSIC_CAN;
+    driver.tx_header.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
+    driver.tx_header.MessageMarker = 0U;
 
-    FDCAN_FilterTypeDef filter_config;
+    FDCAN_FilterTypeDef filter_config{};
     filter_config.IdType = FDCAN_EXTENDED_ID;
-    filter_config.FilterIndex = 0;
+    filter_config.FilterIndex = 0U;
     filter_config.FilterType = FDCAN_FILTER_MASK;
     filter_config.FilterConfig = FDCAN_FILTER_DISABLE;
 
-    if (HAL_FDCAN_ConfigFilter(can_driver.handler, &filter_config) != HAL_OK) {
-        _stats.errors++;
-        return ErrorCode::INITIALIZATION_FAILED;
+    if (HAL_FDCAN_ConfigFilter(&hfdcan1, &filter_config) != HAL_OK ||
+        HAL_FDCAN_Start(&hfdcan1) != HAL_OK) {
+        driver.err_counter++;
+        return -1;
     }
 
-    if (HAL_FDCAN_Start(can_driver.handler) != HAL_OK) {
-        _stats.errors++;
-        return ErrorCode::INITIALIZATION_FAILED;
-    }
-
-    if (HAL_FDCAN_ActivateNotification(can_driver.handler,
-                                       FDCAN_IT_RX_FIFO0_NEW_MESSAGE,
-                                       0U) != HAL_OK) {
-        _stats.errors++;
-        return ErrorCode::INITIALIZATION_FAILED;
-    }
-
-    _is_initialized = true;
-    return ErrorCode::SUCCESS;
+    started = true;
+    return 0;
 }
 
-std::variant<Can::ClassicFrame, Can::ErrorCode> Can::receive() {
-    if (!_is_initialized) {
-        _stats.errors++;
-        return ErrorCode::INITIALIZATION_FAILED;
+extern "C" int16_t canDriverReceive(CanardCANFrame* const rx_frame,
+                                      uint8_t can_driver_idx) {
+    if (rx_frame == nullptr || can_driver_idx != CAN_DRIVER_FIRST || !started) {
+        return 0;
     }
 
-    if (rx_ring_buffer.getSize() == 0U) {
-        return ErrorCode::TIMEOUT_OR_FIFO_EMPTY;
+    FDCAN_RxHeaderTypeDef rx_header{};
+    if (HAL_FDCAN_GetRxMessage(&hfdcan1, FDCAN_RX_FIFO0, &rx_header, driver.rx_buf) != HAL_OK) {
+        return 0;
     }
 
-    __disable_irq();
-    ClassicFrame frame = rx_ring_buffer.pop();
-    __enable_irq();
-
-    _stats.rx_frames++;
-    return frame;
+    driver.rx_counter++;
+    rx_frame->id = (CANARD_CAN_EXT_ID_MASK & rx_header.Identifier) | CANARD_CAN_FRAME_EFF;
+    rx_frame->data_len = static_cast<uint8_t>(rx_header.DataLength >> 16U);
+    rx_frame->iface_id = 0U;
+    if (rx_frame->data_len > sizeof(rx_frame->data)) {
+        driver.err_counter++;
+        return 0;
+    }
+    memcpy(rx_frame->data, driver.rx_buf, rx_frame->data_len);
+    return 1;
 }
 
-Can::ErrorCode Can::send(const ClassicFrame& frame) {
-    if (!_is_initialized) {
-        _stats.errors++;
-        return ErrorCode::INITIALIZATION_FAILED;
+extern "C" int16_t canDriverTransmit(const CanardCANFrame* const tx_frame,
+                                       uint8_t can_driver_idx) {
+    if (tx_frame == nullptr || can_driver_idx != CAN_DRIVER_FIRST || !started ||
+        tx_frame->data_len > sizeof(tx_frame->data)) {
+        return 0;
     }
 
-    can_driver.tx_header.Identifier = frame.id;
-    can_driver.tx_header.DataLength = frame.data_len << 16;
-
-    HAL_StatusTypeDef status = HAL_FDCAN_AddMessageToTxFifoQ(can_driver.handler,
-                                                              &can_driver.tx_header,
-                                                              (uint8_t*)frame.data);
-    if (status != HAL_OK) {
-        _stats.errors++;
-        return ErrorCode::TRANSMISSION_ERROR;
+    driver.tx_header.Identifier = tx_frame->id & CANARD_CAN_EXT_ID_MASK;
+    driver.tx_header.DataLength = static_cast<uint32_t>(tx_frame->data_len) << 16U;
+    if (HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1,
+                                      &driver.tx_header,
+                                      const_cast<uint8_t*>(tx_frame->data)) != HAL_OK) {
+        driver.err_counter++;
+        return 0;
     }
 
-    _stats.tx_frames++;
-    return ErrorCode::SUCCESS;
+    driver.tx_counter++;
+    return 1;
 }
 
-}  // namespace HAL
+extern "C" uint64_t canDriverGetErrorCount() {
+    return driver.err_counter;
+}
 
-extern "C" void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan,
-                                          uint32_t RxFifo0ITs) {
-    (void)RxFifo0ITs;
-    HAL::canOnRxFifo0Callback(hfdcan);
+extern "C" uint64_t canDriverGetRxOverflowCount() {
+    return 0U;
 }

@@ -18,6 +18,12 @@
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 NC_BUILD_DIR?=$(ROOT_DIR)/build
 
+MINI_V2_CUBEMX_MANIFEST:=$(ROOT_DIR)/Src/boards/rl/mini_v2/cubemx.json
+MINI_V2_HAL:=$(NC_BUILD_DIR)/stm32cubemx/rl/mini_v2
+
+MINI_V3_CUBEMX_MANIFEST:=$(ROOT_DIR)/Src/boards/rl/mini_v3/cubemx.json
+MINI_V3_HAL:=$(NC_BUILD_DIR)/stm32cubemx/rl/mini_v3
+
 NODE_V4_CUBEMX_MANIFEST:=$(ROOT_DIR)/Src/boards/rl/node_v4/cubemx.json
 NODE_V4_HAL:=$(NC_BUILD_DIR)/stm32cubemx/rl/node_v4
 
@@ -76,6 +82,17 @@ endif
 		--cmake-build-type "${CMAKE_BUILD_TYPE}" \
 		-- ${EXTRA_CMAKE_ARGS}
 
+ensure_mini_v2_cubemx:
+	@python3 "$(ROOT_DIR)/scripts/cubemx.py" ensure \
+		--manifest "$(MINI_V2_CUBEMX_MANIFEST)" \
+		--out "$(MINI_V2_HAL)"
+
+ensure_mini_v3_cubemx:
+	@python3 "$(ROOT_DIR)/scripts/cubemx.py" ensure \
+		--manifest "$(MINI_V3_CUBEMX_MANIFEST)" \
+		--out "$(MINI_V3_HAL)" \
+		--release-only
+
 ensure_node_v4_cubemx:
 	@python3 "$(ROOT_DIR)/scripts/cubemx.py" ensure \
 		--manifest "$(NODE_V4_CUBEMX_MANIFEST)" \
@@ -85,6 +102,14 @@ cubemx_archives:
 	@python3 "$(ROOT_DIR)/scripts/cubemx.py" package \
 		--manifest "$(NODE_V4_CUBEMX_MANIFEST)" \
 		--out "$(NODE_V4_HAL)" \
+		--archive-dir "$(ROOT_DIR)/release/cubemx"
+	@python3 "$(ROOT_DIR)/scripts/cubemx.py" package \
+		--manifest "$(MINI_V3_CUBEMX_MANIFEST)" \
+		--out "$(MINI_V3_HAL)" \
+		--archive-dir "$(ROOT_DIR)/release/cubemx"
+	@python3 "$(ROOT_DIR)/scripts/cubemx.py" package \
+		--manifest "$(MINI_V2_CUBEMX_MANIFEST)" \
+		--out "$(MINI_V2_HAL)" \
 		--archive-dir "$(ROOT_DIR)/release/cubemx"
 
 #
@@ -96,44 +121,62 @@ cubemx_archives:
 # rl/mini_v2 aliases
 #
 rl_mini_v2_dronecan: checks
+	$(MAKE) ensure_mini_v2_cubemx
 	$(MAKE) build BOARD=rl/mini_v2 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_mini_v2_dronecan_application
 rl_mini_v2_dronecan_application: checks
+	$(MAKE) ensure_mini_v2_cubemx
 	$(MAKE) build BOARD=rl/mini_v2 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_mini_v2_dronecan_application
 rl_mini_v2_dronecan_standalone: checks
+	$(MAKE) ensure_mini_v2_cubemx
 	$(MAKE) build BOARD=rl/mini_v2 TARGET=dronecan IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v2_dronecan_standalone
 rl_mini_v2_cyphal: checks
+	$(MAKE) ensure_mini_v2_cubemx
 	$(MAKE) build BOARD=rl/mini_v2 TARGET=cyphal IMAGE_KIND=application BUILD_VARIANT=rl_mini_v2_cyphal_application
 rl_mini_v2_cyphal_application: checks
+	$(MAKE) ensure_mini_v2_cubemx
 	$(MAKE) build BOARD=rl/mini_v2 TARGET=cyphal IMAGE_KIND=application BUILD_VARIANT=rl_mini_v2_cyphal_application
 rl_mini_v2_cyphal_standalone: checks
+	$(MAKE) ensure_mini_v2_cubemx
 	$(MAKE) build BOARD=rl/mini_v2 TARGET=cyphal IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v2_cyphal_standalone
 rl_mini_v2_both: checks
+	$(MAKE) ensure_mini_v2_cubemx
 	$(MAKE) build BOARD=rl/mini_v2 TARGET=both IMAGE_KIND=application BUILD_VARIANT=rl_mini_v2_both_application
 rl_mini_v2_both_application: checks
+	$(MAKE) ensure_mini_v2_cubemx
 	$(MAKE) build BOARD=rl/mini_v2 TARGET=both IMAGE_KIND=application BUILD_VARIANT=rl_mini_v2_both_application
 rl_mini_v2_both_standalone: checks
+	$(MAKE) ensure_mini_v2_cubemx
 	$(MAKE) build BOARD=rl/mini_v2 TARGET=both IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v2_both_standalone
 
 #
 # rl/mini_v3 aliases
 #
 rl_mini_v3_dronecan: checks
+	$(MAKE) ensure_mini_v3_cubemx
 	$(MAKE) build BOARD=rl/mini_v3 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_mini_v3_dronecan_application
 rl_mini_v3_dronecan_application: checks
+	$(MAKE) ensure_mini_v3_cubemx
 	$(MAKE) build BOARD=rl/mini_v3 TARGET=dronecan IMAGE_KIND=application BUILD_VARIANT=rl_mini_v3_dronecan_application
 rl_mini_v3_dronecan_standalone: checks
+	$(MAKE) ensure_mini_v3_cubemx
 	$(MAKE) build BOARD=rl/mini_v3 TARGET=dronecan IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v3_dronecan_standalone
 rl_mini_v3_cyphal: checks
+	$(MAKE) ensure_mini_v3_cubemx
 	$(MAKE) build BOARD=rl/mini_v3 TARGET=cyphal IMAGE_KIND=application BUILD_VARIANT=rl_mini_v3_cyphal_application
 rl_mini_v3_cyphal_application: checks
+	$(MAKE) ensure_mini_v3_cubemx
 	$(MAKE) build BOARD=rl/mini_v3 TARGET=cyphal IMAGE_KIND=application BUILD_VARIANT=rl_mini_v3_cyphal_application
 rl_mini_v3_cyphal_standalone: checks
+	$(MAKE) ensure_mini_v3_cubemx
 	$(MAKE) build BOARD=rl/mini_v3 TARGET=cyphal IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v3_cyphal_standalone
 rl_mini_v3_both: checks
+	$(MAKE) ensure_mini_v3_cubemx
 	$(MAKE) build BOARD=rl/mini_v3 TARGET=both IMAGE_KIND=application BUILD_VARIANT=rl_mini_v3_both_application
 rl_mini_v3_both_application: checks
+	$(MAKE) ensure_mini_v3_cubemx
 	$(MAKE) build BOARD=rl/mini_v3 TARGET=both IMAGE_KIND=application BUILD_VARIANT=rl_mini_v3_both_application
 rl_mini_v3_both_standalone: checks
+	$(MAKE) ensure_mini_v3_cubemx
 	$(MAKE) build BOARD=rl/mini_v3 TARGET=both IMAGE_KIND=standalone BUILD_VARIANT=rl_mini_v3_both_standalone
 
 #
@@ -202,7 +245,7 @@ tests:
 	${ROOT_DIR}/scripts/tests.sh
 
 upload:
-	LATEST_TARGET=$$(ls -td ${NC_BUILD_DIR}/release/*.bin | head -1) && ./scripts/flash.sh $$LATEST_TARGET
+	LATEST_TARGET=$$(ls -td ${ROOT_DIR}/release/*.bin | head -1) && ./scripts/flash.sh $$LATEST_TARGET
 
 SOCKETCAN_URL:=https://gist.githubusercontent.com/PonomarevDA/6ecc8fc340e4c50619c1e5dfcedc37b2/raw/2db6d1626a9ada543602ff0a52b48fecb94e6e07/socketcan.sh
 SOCKETCAN_EXECUTABLE:=build/tools/socketcan-v1.0.2.sh
@@ -220,7 +263,7 @@ remove_slcan0: download_socketcan
 run: create_slcan0
 	LATEST_TARGET=$$(ls -td build/*/obj/node | head -1 | head -1) && $$LATEST_TARGET
 clean_releases:
-	-rm -fR ${NC_BUILD_DIR}/release
+	-rm -f ${ROOT_DIR}/release/*.bin
 clean:
 	-rm -fR ${NC_BUILD_DIR}/*/obj
 distclean:

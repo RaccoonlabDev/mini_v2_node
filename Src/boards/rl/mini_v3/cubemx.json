@@ -1,8 +1,8 @@
 {
-  "name": "rl-node-v4",
+  "name": "rl-mini-v3",
   "ioc": "board/project.ioc",
   "store": {
-    "repo": "RaccoonlabDev/mini_v2_node",
+    "repo": "Ilyhadev/mini_v2_node",
     "tag": "cubemx-v0.1.0"
   }
 }

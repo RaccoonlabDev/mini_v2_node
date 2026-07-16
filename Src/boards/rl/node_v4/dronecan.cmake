@@ -10,6 +10,7 @@ rl_include_module(application)
 rl_include_module(system)
 
 rl_include_module(dronecan/core)
+rl_include_module(dronecan/canopen)
 
 if(NOT NODE_V4_DIAG_MINIMAL_MODULES)
     rl_include_module(dronecan/arming)

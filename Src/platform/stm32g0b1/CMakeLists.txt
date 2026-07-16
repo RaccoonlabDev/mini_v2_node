@@ -23,8 +23,11 @@ add_executable(${EXECUTABLE}
 
     ${coreSources}
     ${driversSources}
+    ${cmsisDspSources}
     ${startupFile}
 )
+
+set_source_files_properties(${cmsisDspSources} PROPERTIES COMPILE_OPTIONS "-Wno-error")
 
 target_include_directories(${EXECUTABLE} PRIVATE
     ${BUILD_SRC_DIR}
@@ -33,7 +36,8 @@ target_include_directories(${EXECUTABLE} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}
     ${stm32cubeMxProjectPath}/Core/Inc
     ${stm32cubeMxProjectPath}/Drivers/CMSIS/Include
-    ${stm32cubeMxProjectPath}/Drivers/CMSIS/DSP/Include
+    ${cmsisDspPath}/Include
+    ${cmsisDspPath}/PrivateInclude
 
     ${stm32cubeMxProjectPath}/Drivers/CMSIS/Device/ST/STM32F1xx/Include
     ${stm32cubeMxProjectPath}/Drivers/STM32F1xx_HAL_Driver/Inc

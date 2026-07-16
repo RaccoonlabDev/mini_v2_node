@@ -107,7 +107,6 @@ static void setDefaultNodeName(ParamIndex_t node_name_param_idx) {
 }
 
 void DronecanModule::init() {
-
     ParamsApi params_api = {
         .getName = paramsGetName,
         .isInteger = paramsIsInteger,

@@ -9,6 +9,7 @@ set(CMAKE_DIR ${ROOT_DIR}/cmake)
 set(LIBPARAMS_PATH ${ROOT_DIR}/Libs/libparams)
 set(LIBPARAMS_CMAKE libparams.cmake)
 set(NC_LIBDCNODE_PATH "${ROOT_DIR}/Libs/Dronecan" CACHE PATH "Path to libdcnode/DroneCAN source tree")
+set(NC_LIBCANOPEN_PATH "${ROOT_DIR}/Libs/Canopen" CACHE PATH "Path to libcanopen source tree")
 set(BUILD_ROOT_DIR ${ROOT_DIR}/build)
 
 include(${CMAKE_DIR}/module.cmake)
@@ -174,8 +175,14 @@ elseif(BOARD_PLATFORM STREQUAL "stm32f103")
     if(DEFINED STM32_CUBEMX_PROJECT_PATH)
         set(stm32cubeMxProjectPath  ${STM32_CUBEMX_PROJECT_PATH})
     else()
-        set(stm32cubeMxProjectPath  ${ROOT_DIR}/Libs/stm32-cube-project)
+        message(FATAL_ERROR "STM32_CUBEMX_PROJECT_PATH is required for '${NC_BOARD}' (${BOARD_PLATFORM}).")
     endif()
+    if(NOT EXISTS "${stm32cubeMxProjectPath}")
+        message(FATAL_ERROR
+            "STM32_CUBEMX_PROJECT_PATH '${stm32cubeMxProjectPath}' does not exist. "
+            "Provide an STM32H753xx CubeMX project with -DSTM32_CUBEMX_PROJECT_PATH=<path>.")
+    endif()
+    
     if(DEFINED STM32_LINKER_SCRIPT_PATH)
         set(ldFile ${STM32_LINKER_SCRIPT_PATH})
     elseif(DEFINED STM32_LINKER_SCRIPT_TEMPLATE_PATH)
@@ -213,8 +220,15 @@ elseif(BOARD_PLATFORM STREQUAL "stm32g0b1")
     if(DEFINED STM32_CUBEMX_PROJECT_PATH)
         set(stm32cubeMxProjectPath  ${STM32_CUBEMX_PROJECT_PATH})
     else()
-        set(stm32cubeMxProjectPath  ${ROOT_DIR}/Libs/mini-v3-ioc)
+        message(FATAL_ERROR "STM32_CUBEMX_PROJECT_PATH is required for '${NC_BOARD}' (${BOARD_PLATFORM}).")
     endif()
+
+    if(NOT EXISTS "${stm32cubeMxProjectPath}")
+        message(FATAL_ERROR
+            "STM32_CUBEMX_PROJECT_PATH '${stm32cubeMxProjectPath}' does not exist. "
+            "Provide an STM32H753xx CubeMX project with -DSTM32_CUBEMX_PROJECT_PATH=<path>.")
+    endif()
+
     if(DEFINED STM32_LINKER_SCRIPT_PATH)
         set(ldFile ${STM32_LINKER_SCRIPT_PATH})
     elseif(DEFINED STM32_LINKER_SCRIPT_TEMPLATE_PATH)
@@ -230,6 +244,19 @@ elseif(BOARD_PLATFORM STREQUAL "stm32g0b1")
     FILE(GLOB coreSources       ${stm32cubeMxProjectPath}/Core/Src/*)
     FILE(GLOB driversSources    ${stm32cubeMxProjectPath}/Drivers/*/*/*.c
                                 ${stm32cubeMxProjectPath}/Drivers/*/*/*/*.c)
+    set(cmsisDspPath            ${stm32cubeMxProjectPath}/Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP)
+    set(cmsisDspSources
+                                ${cmsisDspPath}/Source/BasicMathFunctions/arm_mult_q15.c
+                                ${cmsisDspPath}/Source/BasicMathFunctions/arm_shift_q15.c
+                                ${cmsisDspPath}/Source/CommonTables/arm_common_tables.c
+                                ${cmsisDspPath}/Source/CommonTables/arm_const_structs.c
+                                ${cmsisDspPath}/Source/SupportFunctions/arm_float_to_q15.c
+                                ${cmsisDspPath}/Source/SupportFunctions/arm_q15_to_float.c
+                                ${cmsisDspPath}/Source/TransformFunctions/arm_bitreversal2.c
+                                ${cmsisDspPath}/Source/TransformFunctions/arm_cfft_q15.c
+                                ${cmsisDspPath}/Source/TransformFunctions/arm_cfft_radix4_q15.c
+                                ${cmsisDspPath}/Source/TransformFunctions/arm_rfft_init_q15.c
+                                ${cmsisDspPath}/Source/TransformFunctions/arm_rfft_q15.c)
     FILE(GLOB_RECURSE middlewareSources
                                 ${stm32cubeMxProjectPath}/Middlewares/ST/STM32_USB_Device_Library/*.c)
     FILE(GLOB_RECURSE usbDeviceSources
@@ -240,7 +267,6 @@ elseif(BOARD_PLATFORM STREQUAL "stm32g0b1")
 
     set(CMAKE_EXE_LINKER_FLAGS "-T${ldFile} -Wl,-Map=${PROJECT_NAME}.map,--cref")
     include(${CMAKE_DIR}/toolchain-stm32g0b1.cmake)
-    add_compile_definitions(NUM_OF_CAN_BUSES=2)
     add_compile_definitions(CYPHAL_NUM_OF_CAN_BUSES=2)
 elseif(BOARD_PLATFORM STREQUAL "stm32h753xx")
     if(LIBPARAMS_STORAGE_BACKEND STREQUAL "")
@@ -303,9 +329,7 @@ elseif(BOARD_PLATFORM STREQUAL "stm32h753xx")
 
     set(CMAKE_EXE_LINKER_FLAGS "-T${ldFile} -Wl,-Map=${PROJECT_NAME}.map,--cref")
     include(${CMAKE_DIR}/toolchain-stm32h753xx.cmake)
-    add_compile_definitions(NUM_OF_CAN_BUSES=1)
     add_compile_definitions(CYPHAL_NUM_OF_CAN_BUSES=1)
-    add_compile_definitions(DRONECAN_FDCAN_PRIMARY=1)
     add_compile_definitions(USE_PWR_LDO_SUPPLY)
 else()
     message(FATAL_ERROR "Unknown BOARD_PLATFORM '${BOARD_PLATFORM}'. Expected: ubuntu, stm32f103, stm32g0b1, stm32h753xx.")

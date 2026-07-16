@@ -13,3 +13,6 @@
 [submodule "Libs/mini-v3-ioc"]
 	path = Libs/mini-v3-ioc
 	url = https://github.com/RaccoonLabHardware/mini-v3-ioc.git
+[submodule "Libs/Canopen"]
+	path = Libs/Canopen
+	url = git@github.com:Ilyhadev/Canopen.git
