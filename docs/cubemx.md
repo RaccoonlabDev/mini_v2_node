@@ -57,6 +57,11 @@ This ignores an installed local CubeMX, an existing generated project, and the
 local archive cache. Mini v3 currently uses this as a deliberate temporary
 policy so its optional IMU/DSP generation path cannot slow ordinary builds.
 
+For Mini v3, make the archive self-contained before publishing it: copy the DSP
+implementation files used by `cmsisDspSources` from the ARM CMSIS pack selected
+by the `.ioc` into the matching directories under the generated
+`Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP/Source/` tree.
+
 ## Wiring into a build
 
 Point the board at the restored project and run `ensure` before building. In the
