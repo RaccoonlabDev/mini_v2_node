@@ -13,7 +13,13 @@
 static constexpr uint32_t TRANSMIT_DELAY = 100;  // 100 is experimental value. Need to prove it
 static constexpr std::byte SPI_READ{0x80};
 
-#if defined(STM32F103xB) || defined(STM32F103xE)
+// The SPI instance and chip-select GPIO can be overridden per board via
+// -DNC_SPI_INSTANCE=<hspiX> and -DNC_SPI_NSS_GPIO_Port / -DNC_SPI_NSS_Pin
+// (e.g. am/node_h7 puts the MAX14906 on SPI6 with nCS on PI10). Defaults keep
+// the historical behaviour for boards that don't override.
+#if defined(NC_SPI_INSTANCE)
+static SPI_HandleTypeDef* hspi = &NC_SPI_INSTANCE;
+#elif defined(STM32F103xB) || defined(STM32F103xE)
 static SPI_HandleTypeDef* hspi = &hspi1;
 #else
 static SPI_HandleTypeDef* hspi = &hspi2;
@@ -22,12 +28,15 @@ static SPI_HandleTypeDef* hspi = &hspi2;
 namespace HAL {
 
 static void spi_set_nss(bool nss_state) {
-#ifdef SPI2_NSS_GPIO_Port
     auto state = nss_state ? GPIO_PIN_SET : GPIO_PIN_RESET;
+#if defined(NC_SPI_NSS_GPIO_Port)
+    HAL_GPIO_WritePin(NC_SPI_NSS_GPIO_Port, NC_SPI_NSS_Pin, state);
+#elif defined(SPI2_NSS_GPIO_Port)
     HAL_GPIO_WritePin(SPI2_NSS_GPIO_Port, SPI2_NSS_Pin, state);
 #elif defined(SPI_SS_GPIO_Port)
-    auto state = nss_state ? GPIO_PIN_SET : GPIO_PIN_RESET;
     HAL_GPIO_WritePin(SPI_SS_GPIO_Port, SPI_SS_Pin, state);
+#else
+    (void)state;
 #endif
 }
 
