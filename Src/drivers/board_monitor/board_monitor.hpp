@@ -48,8 +48,13 @@ public:
             return std::numeric_limits<float>::quiet_NaN();
         }
 
-        if (auto hw_version = hardware_version(); hw_version < 2403 || hw_version > 2450) {
-            return std::numeric_limits<float>::quiet_NaN();
+        // The INA169 calibration below only holds for the kirpi revisions that carry a
+        // hardware-version divider. Boards without one (RANK_VERSION unmapped) have their
+        // own current sense, so the version gate would reject them forever.
+        if constexpr (BoardAdc::RANK_VERSION != BoardAdc::INVALID_RANK) {
+            if (auto hw_version = hardware_version(); hw_version < 2403 || hw_version > 2450) {
+                return std::numeric_limits<float>::quiet_NaN();
+            }
         }
 
         // Current sensor: INA169NA/3K, R = 33K ohm
