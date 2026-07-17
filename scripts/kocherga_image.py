@@ -394,6 +394,19 @@ def _get_output_file_name(input_file_name: str, descriptor: AppDescriptor) -> st
     return f"{base_stem}-{descriptor}.bin"
 
 
+def _validate_firmware_image_path(raw_path: str) -> str:
+    """Resolve the firmware image path and ensure it refers to a regular file.
+
+    The path comes from a CLI argument; resolving and checking it before any
+    file system access keeps a malformed argument from reaching an unintended
+    target.
+    """
+    resolved = os.path.realpath(raw_path)
+    if not os.path.isfile(resolved):
+        raise FileNotFoundError(f"Firmware image is not a regular file: {raw_path!r}")
+    return resolved
+
+
 def _validate_side_patch_path(raw_path: str, base_dir: str) -> str:
     """Resolve a side-patch target and ensure it stays within base_dir.
 
@@ -488,20 +501,22 @@ def _main() -> int:
         return 0
     _logger.debug(f"CLI arguments: {args}")
 
+    firmware_image = _validate_firmware_image_path(args.firmware_image)
+
     # Read the input file. All operations done in-memory.
-    with open(args.firmware_image, "rb") as in_file:
+    with open(firmware_image, "rb") as in_file:
         img = in_file.read()
         model = ImageModel.construct_from_image(img, uninitialized_only=True)
         if not model:
             existing_model = ImageModel.construct_from_image(img)
             if existing_model and args.lazy:
                 _logger.info(
-                    f"Image {args.firmware_image!r} does not require processing because it already contains a "
+                    f"Image {firmware_image!r} does not require processing because it already contains a "
                     f"valid app descriptor: {existing_model.app_descriptor!r}"
                 )
                 return 0
             _logger.fatal(
-                f"An uninitialized app descriptor could not be found in {args.firmware_image!r}. "
+                f"An uninitialized app descriptor could not be found in {firmware_image!r}. "
                 f"If this is intentional, use --lazy to squelch this error. "
                 f"Existing app descriptor: {existing_model.app_descriptor if existing_model else None!r}"
             )
@@ -536,7 +551,7 @@ def _main() -> int:
     _logger.info(f"Final app descriptor:  {model.app_descriptor!r}")
 
     # Write the resulting image into the output file.
-    out_name = _get_output_file_name(args.firmware_image, model.app_descriptor)
+    out_name = _get_output_file_name(firmware_image, model.app_descriptor)
     with open(out_name, "wb") as out_file:
         assert model.validate_app_descriptor(), "Internal logic error: output image validation failed"
         out_file.write(model.image)
@@ -544,7 +559,7 @@ def _main() -> int:
 
     # Perform the side-patching. Constrain targets to the firmware image's own
     # directory to guard against path traversal from malformed CLI arguments.
-    base_dir = os.path.dirname(os.path.realpath(args.firmware_image))
+    base_dir = os.path.dirname(firmware_image)
     for raw_path in args.side_patch:
         path = _validate_side_patch_path(raw_path, base_dir)
         with open(path, "rb") as f:
