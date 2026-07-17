@@ -2,7 +2,7 @@
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 
 set(BOARD_PLATFORM stm32g0b1)
-set(STM32_CUBEMX_PROJECT_PATH ${ROOT_DIR}/Libs/mini-v3-ioc)
+set(STM32_CUBEMX_PROJECT_PATH ${ROOT_DIR}/build/stm32cubemx/rl/mini_v3)
 
 if(NOT DEFINED IMAGE_KIND OR IMAGE_KIND STREQUAL "")
     set(IMAGE_KIND standalone)

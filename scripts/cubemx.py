@@ -164,11 +164,14 @@ def _download_via_gh(manifest: Manifest, archive_name: str, dest: Path) -> bool:
     print(f"Downloading {archive_name} via gh from {manifest.repo}@{manifest.tag}")
     # `gh release download` is unreliable for a single private asset, so resolve
     # the asset id via the API and stream it as octet-stream (works with GH_TOKEN).
-    asset_id = subprocess.run(
+    release = subprocess.run(
         ["gh", "api", f"repos/{manifest.repo}/releases/tags/{manifest.tag}",
          "--jq", f'.assets[] | select(.name=="{archive_name}") | .id'],
         check=False, capture_output=True, text=True,
-    ).stdout.strip()
+    )
+    if release.returncode != 0:
+        return False
+    asset_id = release.stdout.strip()
     if not asset_id:
         return False
     with dest.open("wb") as handle:
@@ -198,6 +201,15 @@ def cmd_ensure(args: argparse.Namespace) -> None:
     out_dir = Path(args.out).resolve()
     ioc_hash = manifest.ioc_hash
     cache_dir = Path(args.cache_dir).resolve()
+
+    if args.release_only:
+        if download_from_store(manifest, ioc_hash, out_dir):
+            print(f"Restored from release: {out_dir}")
+            return
+        fail(
+            f"no release archive for '{manifest.name}' ({ioc_hash}) at "
+            f"{manifest.repo}@{manifest.tag}."
+        )
 
     if stamp_matches(out_dir, ioc_hash):
         print(f"CubeMX project is up to date: {out_dir}")
@@ -317,6 +329,8 @@ def main() -> None:
 
     p_ensure = sub.add_parser("ensure", help="restore or generate the project")
     add_common(p_ensure)
+    p_ensure.add_argument("--release-only", action="store_true",
+                          help="always restore from the configured GitHub release")
     p_ensure.set_defaults(func=cmd_ensure)
 
     p_package = sub.add_parser("package", help="generate and archive the project")

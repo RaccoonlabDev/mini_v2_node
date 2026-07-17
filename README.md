@@ -90,6 +90,9 @@ make rl_mini_v2_cyphal
 make rl_mini_v3_cyphal
 
 ```
+
+> **Mini v3 IMU/DSP:** The IMU vibration analysis uses CMSIS-DSP, which is declared in the Mini v3 `.ioc`. CubeMX copies the DSP aggregate wrappers but omits the implementation `.c` files included by those wrappers. The published Mini v3 HAL is therefore made self-contained by copying the implementation files listed in `cmsisDspSources` from the IOC-selected ARM CMSIS pack into the generated HAL before archiving it. Mini v3 builds always download this completed archive. After changing the IOC, regenerate the HAL, copy the required DSP files, test it, and publish the new matching archive. See [docs/cubemx.md](docs/cubemx.md).
+
 Note: Cyphal builds require access to the private `libcpnode` repository. Fork CI skips Cyphal (and combined v3) builds.
 
 See [docs/build_system.md](docs/build_system.md) for how the Make targets and the underlying CMake build relate.

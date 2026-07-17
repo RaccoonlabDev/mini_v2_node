@@ -113,6 +113,7 @@ jobs:
     # GitHub Actions does not allow the secrets context inside if expression
     # So, let's copy the secret into env
     env:
+      CUBEMX_ARCHIVE_REPO: ${{ github.repository }}
       LIBCPNODE_DEPLOY_KEY: ${{ secrets.LIBCPNODE_DEPLOY_KEY }}
 
     steps:
@@ -163,6 +164,6 @@ jobs:
         with:
           bot_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          files: build/release/*.bin
+          files: release/*.bin
           message: "Node"
           add_git_info: "true"

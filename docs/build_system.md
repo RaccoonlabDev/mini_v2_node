@@ -41,6 +41,9 @@ Naming rule:
 Under the hood each target runs `scripts/build.sh`, which (re)configures CMake
 only when an input changed and then compiles.
 
+Final firmware binaries are copied to `release/`. Intermediate objects and
+board-specific build trees remain under `build/`.
+
 ## 3. Options
 
 Pass these as `VAR=value` before the target when you need them:

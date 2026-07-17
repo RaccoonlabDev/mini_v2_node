@@ -53,6 +53,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #  Preprocessor Definitions
 # ==================================
 add_compile_definitions(
+    ARM_MATH_CM0PLUS
     USE_HAL_DRIVER
     STM32G0B1xx
 )
