@@ -9,6 +9,7 @@
 #define SRC_MODULES_DRONECAN_CANOPEN_CANOPEN_HPP_
 
 #include "libcanopen/canopen.hpp"
+#include "libcanopen/lss.hpp"
 #include "module.hpp"
 
 class CanopenModule : public Module {
@@ -20,12 +21,17 @@ public:
         return _node;
     }
 
+    static libcanopen::LssMaster* getLssMaster() {
+        return _lss_master;
+    }
+
 protected:
     void spin_once() override;
 
 private:
     static constexpr uint32_t CANOPEN_BITRATE = 250000U;
     static inline libcanopen::Node* _node{nullptr};
+    static inline libcanopen::LssMaster* _lss_master{nullptr};
 };
 
 #endif  // SRC_MODULES_DRONECAN_CANOPEN_CANOPEN_HPP_

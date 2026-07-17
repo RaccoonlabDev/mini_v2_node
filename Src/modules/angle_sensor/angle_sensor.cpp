@@ -12,27 +12,108 @@
 
 REGISTER_MODULE(AngleSensorModule)
 
+namespace {
+
+const char* lssStatusName(const libcanopen::LssStatus status) {
+    switch (status) {
+        case libcanopen::LssStatus::SUCCESS:
+            return "OK";
+        case libcanopen::LssStatus::INVALID_ARGUMENT:
+            return "INVALID_ARGUMENT";
+        case libcanopen::LssStatus::TIMEOUT:
+            return "TIMEOUT";
+        case libcanopen::LssStatus::TRANSPORT_ERROR:
+            return "TRANSPORT_ERROR";
+        case libcanopen::LssStatus::UNSUPPORTED:
+            return "UNSUPPORTED";
+        case libcanopen::LssStatus::SERVER_REJECTED:
+            return "SERVER_REJECTED";
+        case libcanopen::LssStatus::INVALID_RESPONSE:
+            return "INVALID_RESPONSE";
+        default:
+            return "UNKNOWN";
+    }
+}
+
+}  // namespace
+
 void AngleSensorModule::init() {
     _node = CanopenModule::getNode();
-    if (_node == nullptr) {
+    _lss_master = CanopenModule::getLssMaster();
+    if (_node == nullptr || _lss_master == nullptr) {
         set_health(Status::FATAL_MALFANCTION);
         set_mode(Mode::STANDBY);
         return;
     }
 
     set_mode(Mode::INITIALIZATION);
+    _lss_configuration_ok = configureNodeIdWithLss();
     (void)sendNmtStart();
+}
+
+void AngleSensorModule::logLssResult(const char* const operation,
+                                     const libcanopen::LssResult& result) const {
+    char message[112]{};
+    (void)snprintf(message,
+                   sizeof(message),
+                   "PIHER LSS %s: %s error=%u extension=%u",
+                   operation,
+                   lssStatusName(result.status),
+                   result.error_code,
+                   result.error_extension);
+    if (result.status == libcanopen::LssStatus::SUCCESS) {
+        _logger.log_info(message);
+    } else {
+        _logger.log_error(message);
+    }
+}
+
+bool AngleSensorModule::configureNodeIdWithLss() {
+    _logger.log_info("PIHER LSS test: global configuration, node 100 -> 127");
+    const libcanopen::LssResult enter_result =
+        _lss_master->switchStateGlobal(libcanopen::LssState::CONFIGURATION);
+    logLssResult("enter configuration", enter_result);
+
+    bool configuration_ok = enter_result.status == libcanopen::LssStatus::SUCCESS;
+    if (configuration_ok) {
+        const libcanopen::LssResult node_result =
+            _lss_master->configureNodeId(PIHER_NEW_NODE_ID, 10000);
+        logLssResult("configure node 127", node_result);
+        configuration_ok = node_result.status == libcanopen::LssStatus::SUCCESS;
+        if (configuration_ok) {
+            _node_id = PIHER_NEW_NODE_ID;
+            _tpdo_id = TPDO1_BASE_ID + PIHER_NEW_NODE_ID;
+            const libcanopen::LssResult store_result = _lss_master->storeConfiguration();
+            logLssResult("store configuration", store_result);
+            configuration_ok = store_result.status == libcanopen::LssStatus::SUCCESS;
+        }
+    }
+
+    const libcanopen::LssResult leave_result =
+        _lss_master->switchStateGlobal(libcanopen::LssState::WAITING);
+    logLssResult("enter waiting", leave_result);
+    configuration_ok = configuration_ok &&
+                       leave_result.status == libcanopen::LssStatus::SUCCESS;
+    if (!configuration_ok) {
+        set_health(Status::MAJOR_FAILURE);
+    }
+    return configuration_ok;
 }
 
 bool AngleSensorModule::sendNmtStart() {
     _nmt_attempts++;
     _last_nmt_ms = HAL_GetTick();
-    if (_node->sendNmtStart(PIHER_NODE_ID) < 0) {
+    if (_node->sendNmtStart(_node_id) < 0) {
         set_health(Status::MAJOR_FAILURE);
         return false;
     }
     if (_nmt_attempts == 1U) {
-        _logger.log_info("PIHER NMT start sent: 000#017F");
+        char message[64]{};
+        (void)snprintf(message,
+                       sizeof(message),
+                       "PIHER NMT start sent: 000#01%02X",
+                       _node_id);
+        _logger.log_info(message);
     }
     return true;
 }
@@ -56,7 +137,7 @@ bool AngleSensorModule::updateAngle() {
         logActivation(frame);
         _last_log_ms = HAL_GetTick();
     }
-    set_health(Status::OK);
+    set_health(_lss_configuration_ok ? Status::OK : Status::MAJOR_FAILURE);
     set_mode(Mode::STANDBY);
     return true;
 }
@@ -102,7 +183,7 @@ void AngleSensorModule::spin_once() {
     }
 
     const int16_t received =
-        _node->spinOnce(PIHER_TPDO_ID, PIHER_TPDO_DLC, MAX_RX_FRAMES_PER_SPIN);
+        _node->spinOnce(_tpdo_id, PIHER_TPDO_DLC, MAX_RX_FRAMES_PER_SPIN);
     if (received < 0) {
         set_health(Status::MAJOR_FAILURE);
         return;
