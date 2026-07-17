@@ -42,7 +42,8 @@ uint16_t BoardMonitor::temperature() {
 
     auto adc_12b = HAL::Adc::get(BoardAdc::RANK_TEMPERATURE);
     uint16_t temperature_kelvin;
-#ifdef STM32G0B1xx
+#if defined(STM32G0B1xx) || defined(STM32H753xx)
+    // Factory-calibrated (TS_CAL1/TS_CAL2) conversion.
     temperature_kelvin = __HAL_ADC_CALC_TEMPERATURE(3300, adc_12b, ADC_RESOLUTION_12B) + 273;
 #else  // STM32F103xB
     static const uint16_t TEMP_REF = 25;
