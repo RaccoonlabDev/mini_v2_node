@@ -39,14 +39,17 @@ if(DEFINED NC_TARGET AND NOT NC_TARGET STREQUAL "" AND
     set(RELEASE_BOARD_NAME "${BOARD_NAME}_${NC_TARGET}")
 endif()
 
-set(RELEASE_HW_VERSION "${PLATFORM_NAME}")
-if(NOT DEFINED RELEASE_HW_VERSION OR RELEASE_HW_VERSION STREQUAL "")
-    set(RELEASE_HW_VERSION "unknown")
-endif()
-
+# BOARD_NAME already identifies the hardware (mini_v2, mini_v3, node_v4), so
+# PLATFORM_NAME is deliberately not part of the file name: it would repeat the
+# board suffix, and for a custom framework board it would name an unrelated
+# MCU family. IMAGE_KIND is abbreviated here only - build dirs and make target
+# names keep the full spelling.
 set(RELEASE_FW_TYPE "${IMAGE_KIND}")
 if(NOT DEFINED RELEASE_FW_TYPE OR RELEASE_FW_TYPE STREQUAL "")
     set(RELEASE_FW_TYPE "standalone")
+endif()
+if(RELEASE_FW_TYPE STREQUAL "application")
+    set(RELEASE_FW_TYPE "app")
 endif()
 
 set(RELEASE_COMMIT_HASH "${GIT_HASH_SHORT_8_DIGITS}")
@@ -100,7 +103,7 @@ if(NOT DEFINED RELEASE_FW_VERSION OR RELEASE_FW_VERSION STREQUAL "")
 endif()
 
 string(TIMESTAMP RELEASE_DATE "%Y.%m.%d")
-set(DESTINATION_BIN "${DESTINATION_DIR}/${BOARD_VENDOR}_${RELEASE_BOARD_NAME}_${RELEASE_HW_VERSION}_${RELEASE_FW_TYPE}_${RELEASE_FW_VERSION}_${RELEASE_DATE}_${RELEASE_COMMIT_HASH}.bin")
+set(DESTINATION_BIN "${DESTINATION_DIR}/${BOARD_VENDOR}_${RELEASE_BOARD_NAME}_${RELEASE_FW_TYPE}_${RELEASE_FW_VERSION}_${RELEASE_DATE}_${RELEASE_COMMIT_HASH}.bin")
 
 # Create the release directory if it doesn't exist
 file(MAKE_DIRECTORY "${DESTINATION_DIR}")
