@@ -11,6 +11,11 @@ elseif(NOT APPLICATION_DIR)
     message(SEND_ERROR "APPLICATION_DIR is unknown.")
 endif()
 
+# The generators below run at configure time, so CMake must re-configure whenever a
+# params.yaml changes. Without this a yaml edit is silently ignored: the build reuses
+# the previously generated params.cpp and the firmware keeps the old defaults.
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${LIBPARAMS_PARAMS})
+
 execute_process(
     COMMAND python ${LIBPARAMS_PATH}/scripts/generate_params.py --out-dir ${BUILD_SRC_DIR} -f ${LIBPARAMS_PARAMS}
     RESULT_VARIABLE result

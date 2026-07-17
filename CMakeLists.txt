@@ -348,8 +348,6 @@ set(BUILD_OBJ_DIR ${BUILD_TARGET_DIR}/obj)
 
 if(USE_PLATFORM_UBUNTU)
     add_definitions(-DLIBPARAMS_PARAMS_DIR="${BUILD_SRC_DIR}")
-    add_definitions(-DLIBPARAMS_INIT_PARAMS_FILE_NAME="default_params")
-    add_definitions(-DLIBPARAMS_TEMP_PARAMS_FILE_NAME="temp_params")
 endif()
 
 include(${LIBPARAMS_PATH}/${LIBPARAMS_CMAKE})
