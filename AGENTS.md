@@ -6,3 +6,11 @@
 - Firmware contract: [docs/embedded_firmware_contract.md](docs/embedded_firmware_contract.md).
 - Match the code style: [docs/code_style.md](docs/code_style.md).
 - When writing docs, follow [docs/documentation_guidelines.md](docs/documentation_guidelines.md).
+- Treat Git as read-only: you may run inspection commands like `git status`,
+  `git diff`, and `git log`, but never modify Git state, including
+  staging/unstaging files, committing, branching, rebasing, resetting, checking
+  out, stashing, tagging, or changing config.
+- Never touch remotes: no `git push`, `git pull`, `git fetch`, or any
+  equivalent through other tools (`gh`, scripts, CI triggers). This applies to
+  every branch, including the current one. Pushing is done only by a human,
+  ever.
