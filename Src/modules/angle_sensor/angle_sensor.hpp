@@ -21,12 +21,14 @@ protected:
     void spin_once() override;
 
 private:
-    static constexpr uint8_t PIHER_OLD_NODE_ID = 25U;
-    static constexpr uint8_t PIHER_NEW_NODE_ID = 0x7F;
+    static constexpr uint8_t PIHER_OLD_NODE_ID = 127U;
+    static constexpr uint8_t PIHER_NEW_NODE_ID = 52U;
     static constexpr uint16_t TPDO1_BASE_ID = 0x180U;
     static constexpr uint8_t PIHER_TPDO_DLC = 8U;
     static constexpr uint8_t MAX_RX_FRAMES_PER_SPIN = 8U;
     static constexpr uint8_t MAX_NMT_ATTEMPTS = 5U;
+    static constexpr uint32_t LSS_TIMEOUT_MS = 1000U;
+    static constexpr uint32_t LSS_SETTLE_DELAY_MS = 100U;
     static constexpr uint32_t NMT_RETRY_INTERVAL_MS = 700U;
     static constexpr uint32_t LOG_INTERVAL_MS = 1000U;
     static constexpr uint16_t ANGLE_RAW_MAX = 4095U;

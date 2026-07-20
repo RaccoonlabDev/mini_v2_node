@@ -69,21 +69,42 @@ void AngleSensorModule::logLssResult(const char* const operation,
 }
 
 bool AngleSensorModule::configureNodeIdWithLss() {
-    _logger.log_info("PIHER LSS test: global configuration, node 100 -> 127");
+    char message[72]{};
+    (void)snprintf(message,
+                   sizeof(message),
+                   "PIHER LSS test: global configuration, node %u -> %u",
+                   PIHER_OLD_NODE_ID,
+                   PIHER_NEW_NODE_ID);
+    _logger.log_info(message);
+
+    if (_node->sendNmtPreOperational(PIHER_OLD_NODE_ID) < 0) {
+        _logger.log_error("PIHER LSS NMT pre-operational: TRANSPORT_ERROR");
+        set_health(Status::MAJOR_FAILURE);
+        return false;
+    }
+    _logger.log_info("PIHER LSS NMT pre-operational sent");
+    HAL_Delay(LSS_SETTLE_DELAY_MS);
+
     const libcanopen::LssResult enter_result =
         _lss_master->switchStateGlobal(libcanopen::LssState::CONFIGURATION);
     logLssResult("enter configuration", enter_result);
 
     bool configuration_ok = enter_result.status == libcanopen::LssStatus::SUCCESS;
     if (configuration_ok) {
+        HAL_Delay(LSS_SETTLE_DELAY_MS);
         const libcanopen::LssResult node_result =
-            _lss_master->configureNodeId(PIHER_NEW_NODE_ID, 10000);
-        logLssResult("configure node 127", node_result);
+            _lss_master->configureNodeId(PIHER_NEW_NODE_ID, LSS_TIMEOUT_MS);
+        (void)snprintf(message,
+                       sizeof(message),
+                       "configure node %u",
+                       PIHER_NEW_NODE_ID);
+        logLssResult(message, node_result);
         configuration_ok = node_result.status == libcanopen::LssStatus::SUCCESS;
         if (configuration_ok) {
             _node_id = PIHER_NEW_NODE_ID;
             _tpdo_id = TPDO1_BASE_ID + PIHER_NEW_NODE_ID;
-            const libcanopen::LssResult store_result = _lss_master->storeConfiguration();
+            const libcanopen::LssResult store_result =
+                _lss_master->storeConfiguration(LSS_TIMEOUT_MS);
             logLssResult("store configuration", store_result);
             configuration_ok = store_result.status == libcanopen::LssStatus::SUCCESS;
         }
@@ -156,8 +177,8 @@ void AngleSensorModule::logActivation(const libcanopen::Frame& frame) const {
                    frame.data[5],
                    frame.data[6],
                    frame.data[7],
-                   static_cast<uint64_t>(_angle_millidegrees / 1000U),
-                   static_cast<uint64_t>(_angle_millidegrees % 1000U));
+                   static_cast<uint32_t>(_angle_millidegrees / 1000U),
+                   static_cast<uint32_t>(_angle_millidegrees % 1000U));
     _logger.log_info(message);
 }
 
@@ -166,8 +187,8 @@ void AngleSensorModule::logAngle() const {
     (void)snprintf(message,
                    sizeof(message),
                    "PIHER angle=%lu.%03lu deg",
-                   static_cast<uint64_t>(_angle_millidegrees / 1000U),
-                   static_cast<uint64_t>(_angle_millidegrees % 1000U));
+                   static_cast<uint32_t>(_angle_millidegrees / 1000U),
+                   static_cast<uint32_t>(_angle_millidegrees % 1000U));
     _logger.log_info(message);
 }
 
