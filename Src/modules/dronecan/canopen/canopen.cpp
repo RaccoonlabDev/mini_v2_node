@@ -18,7 +18,7 @@ void CanopenModule::init() {
     _node = &node;
     _lss_master = &lss_master;
     const int16_t result = _node->init(CANOPEN_BITRATE);
-    set_health(result >= 0 ? Status::OK : Status::FATAL_MALFANCTION);
+    set_health(result >= 0 ? Status::OK : Status::MINOR_FAILURE);
     set_mode(Mode::STANDBY);
 }
 
