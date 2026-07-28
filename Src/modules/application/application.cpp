@@ -73,9 +73,13 @@ static int8_t init_board_periphery() {
     if (paramsLoad() != 0) {
         return -1;
     }
-    if (!paramsIsCrcValid()) {
-        (void)paramsSave();
+    bool is_erased = false;
+    (void)is_params_erased(&is_erased);
+
+    if (!paramsIsCrcValid() && is_erased) {
+        (void)paramsResetToDefault();
     }
+
 
 #if defined(CAN1_TERMINATOR_Pin) && defined(CAN2_TERMINATOR_Pin)
     auto teminator_param = paramsGetIntegerValue(IntParamsIndexes::PARAM_SYSTEM_CAN_TEMINATOR);
