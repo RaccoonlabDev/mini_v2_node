@@ -74,7 +74,7 @@ static int8_t init_board_periphery() {
         return -1;
     }
     bool is_erased = false;
-    (void)is_params_erased(&is_erased);
+    (void)paramsIsErased(&is_erased);
 
     if (!paramsIsCrcValid() && is_erased) {
         (void)paramsResetToDefault();
