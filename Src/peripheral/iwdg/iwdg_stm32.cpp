@@ -19,6 +19,22 @@
     extern FDCAN_HandleTypeDef hfdcan1;
 #endif  // FDCAN1
 
+#ifdef FDCAN2
+    extern FDCAN_HandleTypeDef hfdcan2;
+#endif  // FDCAN2
+
+#if defined(FDCAN1) || defined(FDCAN2)
+static bool is_bus_off(FDCAN_HandleTypeDef& handle) {
+    FDCAN_ProtocolStatusTypeDef status{};
+
+    if (HAL_FDCAN_GetProtocolStatus(&handle, &status) != HAL_OK) {
+        return true;
+    }
+
+    return status.BusOff != 0U;
+}
+#endif
+
 namespace HAL {
 
 void Watchdog::refresh() {
@@ -26,16 +42,20 @@ void Watchdog::refresh() {
     if (reboot_required) {
         return;
     }
-#endif  // HAL_IWDG_MODULE_ENABLED
 
-#if defined(HAL_IWDG_MODULE_ENABLED) && defined(STM32H753xx)
-    HAL_IWDG_Refresh(&IWDG_HANDLE);
-#elif defined(HAL_IWDG_MODULE_ENABLED) && defined(FDCAN1)
-    if (!__HAL_FDCAN_GET_FLAG(&hfdcan1, FDCAN_FLAG_BUS_OFF)) {
+    bool can_is_healthy = true;
+
+#ifdef FDCAN1
+    can_is_healthy = can_is_healthy && !is_bus_off(hfdcan1);
+#endif
+
+#ifdef FDCAN2
+    can_is_healthy = can_is_healthy && !is_bus_off(hfdcan2);
+#endif
+
+    if (can_is_healthy) {
         HAL_IWDG_Refresh(&IWDG_HANDLE);
     }
-#elif defined(HAL_IWDG_MODULE_ENABLED)
-    HAL_IWDG_Refresh(&IWDG_HANDLE);
 #endif  // HAL_IWDG_MODULE_ENABLED
 }
 
