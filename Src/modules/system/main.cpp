@@ -12,7 +12,9 @@ REGISTER_MODULE(SystemModule)
 
 void SystemModule::init() {
     need_notification = paramsGetIntegerValue(IntParamsIndexes::PARAM_LOG_LEVEL) <= 1;
-    set_health(Status::OK);
+    set_health(paramsIsCrcValid()
+               ? Status::OK
+               : Status::MINOR_FAILURE);
     set_mode(Mode::STANDBY);
 }
 
