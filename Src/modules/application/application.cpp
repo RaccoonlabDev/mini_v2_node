@@ -19,6 +19,10 @@
 #include "module.hpp"
 #include "main.h"
 
+#if defined(CAN1_TERMINATOR_Pin) && defined(CAN2_TERMINATOR_Pin)
+#include "gpio_mapping.hpp"
+#endif
+
 #ifndef LIBPARAMS_HAS_REDUNDANT_STORAGE
 #define LIBPARAMS_HAS_REDUNDANT_STORAGE 1
 #endif
@@ -85,8 +89,8 @@ static int8_t init_board_periphery() {
     auto teminator_param = paramsGetIntegerValue(IntParamsIndexes::PARAM_SYSTEM_CAN_TEMINATOR);
 
     std::bitset<2> terminator_mask(teminator_param);
-    HAL::GPIO::set(HAL::GPIO::Pin::CAN1_TERMINATOR, terminator_mask[0]);
-    HAL::GPIO::set(HAL::GPIO::Pin::CAN2_TERMINATOR, terminator_mask[1]);
+    HAL::GPIO::set(BoardGpio::CAN1_TERMINATOR, terminator_mask[0]);
+    HAL::GPIO::set(BoardGpio::CAN2_TERMINATOR, terminator_mask[1]);
 #endif
     return 0;
 }

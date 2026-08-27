@@ -40,3 +40,11 @@ endfunction()
 
 gen_test(fft     ${UNIT_TESTS_DIR}/common/test_fft.cpp)
 gen_test(algorithms ${UNIT_TESTS_DIR}/common/test_algorithms.cpp)
+
+add_executable(gpio
+    ${UNIT_TESTS_DIR}/peripheral/test_gpio.cpp
+    ${ROOT_DIR}/Src/peripheral/gpio/gpio_ubuntu.cpp
+)
+target_include_directories(gpio PUBLIC ${ROOT_DIR}/Src)
+target_link_libraries(gpio GTest::gtest GTest::gtest_main)
+add_test(NAME gpio COMMAND gpio)
