@@ -47,7 +47,10 @@ make code_style
 
 - Build every target you touched: [build_system.md](build_system.md).
 - Run `make code_style` and the tests: [python_test_guide.md](python_test_guide.md).
-- Fill in the firmware size difference in the pull request template.
+- Open the pull request to get a CI run. A branch without one is built only on
+  demand, from the Actions tab.
+- Review the firmware size comment CI posts on the pull request, and say in the
+  description why anything grew.
 
 ## Writing docs
 
