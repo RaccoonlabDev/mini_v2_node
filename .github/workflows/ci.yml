@@ -113,6 +113,9 @@ jobs:
           pytest -s Tests/test_issue_0001_pwm_same_channel_apply.py
 
   build_and_deploy:
+    permissions:
+      contents: read        # checkout and the CubeMX archive download
+      pull-requests: write  # required for gh pr comment
     needs: [sitl_matrix]
     strategy:
       matrix:
@@ -167,6 +170,55 @@ jobs:
       - name: Build
         shell: bash
         run: make $BUILD_TARGET
+
+      - name: Collect firmware size metrics
+        if: always()
+        shell: bash
+        run: |
+          python3 scripts/ci_report.py --collect \
+            --label "${GITHUB_REF_NAME}@${GITHUB_SHA::7}" \
+            --out build/ci/metrics.json
+
+      - name: Restore size baseline
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/cache/restore@v4
+        with:
+          path: build/ci/baseline_metrics.json
+          key: fw-size-${{ github.sha }}
+          restore-keys: fw-size-
+
+      - name: Render size report
+        if: always() && github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          python3 scripts/ci_report.py \
+            --metrics build/ci/metrics.json \
+            --baseline build/ci/baseline_metrics.json \
+            --out "$RUNNER_TEMP/pr-report.md"
+
+      # A pull request from a fork gets a read-only token, so the comment cannot
+      # be posted there. That must not fail the build for an outside contributor.
+      - name: Post size report as a pull request comment
+        if: always() && github.event_name == 'pull_request'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          gh pr comment "${{ github.event.pull_request.number }}" \
+            --body-file "$RUNNER_TEMP/pr-report.md" --edit-last --create-if-none
+
+      - name: Refresh size baseline
+        if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: bash
+        run: cp build/ci/metrics.json build/ci/baseline_metrics.json
+
+      - name: Save size baseline to cache
+        if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/cache/save@v4
+        with:
+          path: build/ci/baseline_metrics.json
+          key: fw-size-${{ github.sha }}
 
       # Only vX.Y.Z tags are releases. Other tags (e.g. cubemx-v0.1.0) must not deploy.
       - name: Check for a release tag
