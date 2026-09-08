@@ -29,11 +29,14 @@ public:
         MAINTENANCE         = 3,    // Calibration, self-test
     };
 
+    // CYPHAL and DRONECAN double as the system.protocol parameter values, so they cannot be
+    // renumbered. ANY stays outside of that parameter range on purpose.
     enum class Protocol: uint8_t {
         UNKNOWN             = 0,    // Nor Cyphal or DroneCAN
         CYPHAL              = 1,    // Only Cyphal
         DRONECAN            = 2,    // Only DroneCAN
         CYPHAL_AND_DRONECAN = 3,    // Both Cyphal and DroneCAN
+        ANY                 = 4,    // Protocol agnostic, see is_enabled()
     };
 
     /**

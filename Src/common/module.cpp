@@ -20,6 +20,13 @@ void Module::init() {
 }
 
 bool Module::is_enabled() const {
+    if (_protocol == Protocol::ANY) {
+        // Such a module never touches the bus itself, so it stays enabled whatever the active
+        // protocol is, including a protocol that does not exist yet. CYPHAL_AND_DRONECAN cannot
+        // say that: it enumerates the two protocols and would disable the module under a third.
+        return true;
+    }
+
     auto active_protocol = ModuleManager::get_active_protocol();
     return _protocol == Protocol::CYPHAL_AND_DRONECAN || _protocol == active_protocol;
 }
