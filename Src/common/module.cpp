@@ -38,11 +38,16 @@ uint32_t Module::period_ms_from_frequency(float frequency) {
 }
 
 void ModuleManager::register_module(Module* app_module) {
-    if (modules_amount < MAX_MODULES_AMOUNT) {
-        modules[modules_amount] = app_module;
-        modules_amount++;
-        active_modules = std::span<Module*>(modules.data(), modules_amount);
+    if (modules_amount >= MAX_MODULES_AMOUNT) {
+        // Registration runs in static constructors, before the LED, the parameters and the
+        // protocol stack exist, so an overflow can only be latched here and reported later.
+        dropped_modules_amount++;
+        return;
     }
+
+    modules[modules_amount] = app_module;
+    modules_amount++;
+    active_modules = std::span<Module*>(modules.data(), modules_amount);
 }
 
 void ModuleManager::init() {
@@ -81,7 +86,10 @@ Module::Protocol ModuleManager::get_active_protocol() {
 }
 
 Module::Status ModuleManager::get_global_status() {
-    auto global_status = Module::Status::OK;
+    // A dropped module is absent from init() and process() while the rest of the node keeps
+    // running, so without this the node would report healthy with a part of it missing.
+    auto global_status = (dropped_modules_amount == 0) ? Module::Status::OK
+                                                       : Module::Status::FATAL_MALFANCTION;
 
     for (auto app_module : active_modules) {
         if (app_module->is_enabled() && app_module->get_health() > global_status) {
