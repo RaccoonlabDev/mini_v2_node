@@ -124,11 +124,23 @@ public:
     static Module::Mode get_global_mode();
     static uint8_t get_vssc();
 
+    /**
+     * @brief The amount of modules that did not fit into the registry.
+     * A non-zero value means the target links more modules than the registry can hold, so some
+     * of them are never initialized nor spinned.
+     */
+    static uint8_t get_dropped_modules_amount() {
+        return dropped_modules_amount;
+    }
+
 private:
-    static constexpr uint8_t MAX_MODULES_AMOUNT{10};
+    // A registered module costs one pointer, so headroom is cheap even on the smallest MCU.
+    // It has to fit a module that is split into a logic module plus one frontend per protocol.
+    static constexpr uint8_t MAX_MODULES_AMOUNT{32};
     static inline std::array<Module*, MAX_MODULES_AMOUNT> modules;
     static inline std::span<Module*> active_modules;
     static inline uint8_t modules_amount{0};
+    static inline uint8_t dropped_modules_amount{0};
     static inline Module::Protocol active_protocol;
 };
 
