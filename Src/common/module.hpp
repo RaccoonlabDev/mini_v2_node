@@ -37,12 +37,29 @@ public:
     };
 
     /**
+     * @brief The bit a module occupies in the vendor specific status code.
+     * The VSSC is a single byte on the wire, so only the first VSSC_BITS_AMOUNT bits are
+     * reported and the rest of the modules are silently left out of it.
+     * AUTO numbers the bits by registration order. It keeps the historical layout, but the bit
+     * of every module shifts as soon as another module is registered before it, which breaks
+     * whoever decodes the byte. Prefer an explicit bit for anything long-lived.
+     * NONE keeps a module out of the byte without consuming a bit, so adding such a module does
+     * not renumber the others. It suits a frontend, whose health belongs to its logic module.
+     */
+    static constexpr uint8_t VSSC_BITS_AMOUNT{8};
+    static constexpr uint8_t VSSC_BIT_NONE{0xFE};
+    static constexpr uint8_t VSSC_BIT_AUTO{0xFF};
+
+    /**
      * @brief The constructor is responsible only for allocating resources and registering
      * the object with a manager or ModuleManager. It doesn't perform any heavyweight operations
      * or initialization that might depend on peripheral or communication protocols.
      * @param[in] frequency is how many times per second the module should be spinned
+     * @param[in] vssc_bit is the bit the module occupies in the vendor specific status code
      */
-    explicit Module(float frequency, Protocol proto = Protocol::UNKNOWN);
+    explicit Module(float frequency,
+                    Protocol proto = Protocol::UNKNOWN,
+                    uint8_t vssc_bit = VSSC_BIT_AUTO);
 
     /**
      * @brief The function performs more complex initialization tasks. For instance, init might
@@ -70,6 +87,9 @@ public:
     }
     Protocol get_protocol() const {
         return _protocol;
+    }
+    uint8_t get_vssc_bit() const {
+        return _vssc_bit;
     }
 
     bool is_enabled() const;
@@ -108,6 +128,7 @@ private:
     uint32_t _next_spin_time_ms{0};
 
     Protocol _protocol;
+    uint8_t _vssc_bit;
     Status _health{Status::OK};
     Mode _mode{Mode::INITIALIZATION};
 };

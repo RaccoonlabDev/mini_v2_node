@@ -8,8 +8,10 @@
 #include <span>
 #include "params.hpp"
 
-Module::Module(float frequency, Protocol proto) : _period_ms(period_ms_from_frequency(frequency)),
-                                                  _protocol(proto) {
+Module::Module(float frequency, Protocol proto, uint8_t vssc_bit)
+    : _period_ms(period_ms_from_frequency(frequency)),
+      _protocol(proto),
+      _vssc_bit(vssc_bit) {
     ModuleManager::register_module(this);
 }
 
@@ -114,19 +116,36 @@ Module::Mode ModuleManager::get_global_mode() {
 
 uint8_t ModuleManager::get_vssc() {
     uint8_t vssc = 0;
+    uint8_t auto_bit = 0;
 
-    uint8_t module_idx = 0;
     for (auto app_module : active_modules) {
         if (!app_module->is_enabled()) {
+            continue;
+        }
+
+        auto vssc_bit = app_module->get_vssc_bit();
+        if (vssc_bit == Module::VSSC_BIT_NONE) {
+            // An opted out module must not consume an automatic bit, otherwise adding one would
+            // shift the bit of every module registered after it.
+            continue;
+        }
+
+        if (vssc_bit == Module::VSSC_BIT_AUTO) {
+            vssc_bit = auto_bit;
+            auto_bit++;
+        }
+
+        if (vssc_bit >= Module::VSSC_BITS_AMOUNT) {
+            // The byte is full. Shifting further is undefined behaviour, while the previous
+            // implementation shifted out of the byte and quietly reported nothing.
             continue;
         }
 
         auto is_health_bad = app_module->get_health() > Module::Status::OK;
         auto is_mode_not_operational = app_module->get_mode() > Module::Mode::ENGAGED;
         if (is_health_bad || is_mode_not_operational) {
-            vssc += 1 << module_idx;
+            vssc |= static_cast<uint8_t>(1U << vssc_bit);
         }
-        module_idx++;
     }
 
     return vssc;
