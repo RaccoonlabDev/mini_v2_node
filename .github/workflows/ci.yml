@@ -1,5 +1,21 @@
 name: CI
-on: push
+
+# pull_request lets a job see the pull request it belongs to, which a push event
+# cannot. Both triggers fire on a branch that has an open pull request, which
+# would run every job twice, so push is limited to the branches that never have
+# one. Tags stay listed because only a tag push reaches the release deploy.
+on:
+  push:
+    branches: [main, dev]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+# A new commit makes the previous pull request run pointless, so cancel it. A
+# push to a branch or a tag has to finish instead: those runs deploy a release.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   code_style:
