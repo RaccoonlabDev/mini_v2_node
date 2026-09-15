@@ -45,11 +45,7 @@ enum class BoardType : uint8_t {
 class BoardMonitor{
 public:
     static int8_t init(){
-#if defined(STM32F103xB) || defined(STM32H753xx)
-        return HAL::Adc::init();
-#else
         return HAL::Adc::init(BoardAdc::DMA_CHANNEL_COUNT);
-#endif
     }
 
     /**

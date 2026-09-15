@@ -84,8 +84,7 @@ int8_t Adc::init(uint8_t channel_count) {
     const auto channels = adc_channels();
 
     if (!channels.empty()) {
-        if (channels.size() > ADC_MAX_DMA_CHANNELS
-            || (channel_count != 0 && channel_count != channels.size())) {
+        if (channels.size() > ADC_MAX_DMA_CHANNELS || channel_count > ADC_MAX_DMA_CHANNELS) {
             return -1;
         }
         // Calibrate every distinct ADC referenced by the board's channel table.
@@ -114,13 +113,14 @@ int8_t Adc::init(uint8_t channel_count) {
     }
 
 #if defined(STM32F103xB) || defined(STM32H753xx)
-    const uint32_t configured_count = hadc1.Init.ScanConvMode == ADC_SCAN_DISABLE
-                                      ? 1U : hadc1.Init.NbrOfConversion;
-    if (configured_count == 0 || configured_count > ADC_MAX_DMA_CHANNELS
-        || (channel_count != 0 && channel_count != configured_count)) {
-        return -1;
+    if (channel_count == 0) {
+        const uint32_t configured_count = hadc1.Init.ScanConvMode == ADC_SCAN_DISABLE
+                                          ? 1U : hadc1.Init.NbrOfConversion;
+        if (configured_count == 0 || configured_count > ADC_MAX_DMA_CHANNELS) {
+            return -1;
+        }
+        channel_count = static_cast<uint8_t>(configured_count);
     }
-    channel_count = static_cast<uint8_t>(configured_count);
 #endif
     if (channel_count == 0 || channel_count > ADC_MAX_DMA_CHANNELS) {
         return -1;
