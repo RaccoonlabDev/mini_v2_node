@@ -14,7 +14,8 @@ namespace HAL {
 
 class Adc {
 public:
-    static int8_t init(uint8_t channel_count);
+    // Zero selects the HAL sequence length on F1/H7 or the board polling table length.
+    static int8_t init(uint8_t channel_count = 0);
     static uint16_t get(uint8_t rank);
     static uint8_t channel_count() { return _channel_count; }
 #ifdef USE_PLATFORM_UBUNTU

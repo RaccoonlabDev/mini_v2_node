@@ -79,13 +79,15 @@ uint16_t read_channel(const AdcChannel& input) {
 }  // namespace
 
 int8_t Adc::init(uint8_t channel_count) {
-    if (channel_count == 0 || channel_count > ADC_MAX_DMA_CHANNELS) {
-        return -1;
-    }
-
+    _is_adc_already_inited = false;
+    _channel_count = 0;
     const auto channels = adc_channels();
 
     if (!channels.empty()) {
+        if (channels.size() > ADC_MAX_DMA_CHANNELS
+            || (channel_count != 0 && channel_count != channels.size())) {
+            return -1;
+        }
         // Calibrate every distinct ADC referenced by the board's channel table.
         for (size_t idx = 0; idx < channels.size(); idx++) {
             auto* hadc = channels[idx].hadc;
@@ -111,15 +113,30 @@ int8_t Adc::init(uint8_t channel_count) {
         return 0;
     }
 
+#if defined(STM32F103xB) || defined(STM32H753xx)
+    const uint32_t configured_count = hadc1.Init.ScanConvMode == ADC_SCAN_DISABLE
+                                      ? 1U : hadc1.Init.NbrOfConversion;
+    if (configured_count == 0 || configured_count > ADC_MAX_DMA_CHANNELS
+        || (channel_count != 0 && channel_count != configured_count)) {
+        return -1;
+    }
+    channel_count = static_cast<uint8_t>(configured_count);
+#endif
+    if (channel_count == 0 || channel_count > ADC_MAX_DMA_CHANNELS) {
+        return -1;
+    }
+
     if (calibrate(&hadc1) != 0) {
         return -1;
     }
 
+    // The completion callback can run before HAL_ADC_Start_DMA returns.
+    _channel_count = channel_count;
     if (HAL_ADC_Start_DMA(&hadc1, (uint32_t*)(void*)&adc_dma_buffer, channel_count) != HAL_OK) {
+        _channel_count = 0;
         return -1;
     }
 
-    _channel_count = channel_count;
     _is_adc_already_inited = true;
     return 0;
 }

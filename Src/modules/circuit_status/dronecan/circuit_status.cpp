@@ -45,7 +45,7 @@ void DronecanCircuitStatus::spin_once() {
         circuit_status.msg = {
             .circuit_id = static_cast<uint16_t>(node_id * 10),
             .voltage = BoardMonitor::voltage_5v(),
-            .current = BoardMonitor::current(),
+            .current = BoardMonitor::current_5v(),
             .error_flags = static_cast<CircuitStatusErrorFlags_t>(error_flags),
         };
         circuit_status.publish();

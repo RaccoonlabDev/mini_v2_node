@@ -25,8 +25,8 @@ struct AdcChannel {
 // ADC3 lives in D3 and could otherwise only be served by BDMA out of SRAM4.
 //
 // The default returns an empty span: the driver then keeps the legacy
-// DMA-scanned ADC1 behaviour driven by Adc::init(channel_count), so existing
-// boards are unaffected.
+// DMA-scanned ADC1 behaviour. F1/H7 derive its length from the HAL configuration;
+// an explicit nonzero count must match. Other DMA platforms still supply a count.
 std::span<const AdcChannel> adc_channels();
 
 }  // namespace HAL
