@@ -12,6 +12,19 @@
 #include <utility>
 #include "peripheral/adc/adc.hpp"
 #include "adc_mapping.hpp"
+#include "config.hpp"
+
+#if __has_include("board_monitor_config.hpp")
+#include "board_monitor_config.hpp"
+#else
+inline constexpr BoardMonitorConfig BOARD_MONITOR_CONFIG{};
+#endif
+
+static_assert(BOARD_MONITOR_CONFIG.vin_volts_per_count > 0.0F);
+static_assert(BOARD_MONITOR_CONFIG.v5_volts_per_count > 0.0F);
+static_assert(BOARD_MONITOR_CONFIG.current_amps_per_count > 0.0F);
+static_assert(BOARD_MONITOR_CONFIG.current_version_adc_min
+              <= BOARD_MONITOR_CONFIG.current_version_adc_max);
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,26 +57,31 @@ public:
      * @return The current in Amperes if the hardware supports it, otherwise NaN.
      */
     static float current() {
-        if (BoardAdc::RANK_CURRENT == BoardAdc::INVALID_RANK) {
+        if (BoardAdc::RANK_CURRENT == BoardAdc::INVALID_RANK
+            || BoardAdc::RANK_CURRENT >= HAL::Adc::channel_count()) {
             return std::numeric_limits<float>::quiet_NaN();
         }
 
-        // The INA169 calibration below only holds for the kirpi revisions that carry a
-        // hardware-version divider. Boards without one (RANK_VERSION unmapped) have their
-        // own current sense, so the version gate would reject them forever.
-        if constexpr (BoardAdc::RANK_VERSION != BoardAdc::INVALID_RANK) {
-            if (auto hw_version = hardware_version(); hw_version < 2403 || hw_version > 2450) {
+        if constexpr (BOARD_MONITOR_CONFIG.current_requires_version_match
+                      && BoardAdc::RANK_VERSION != BoardAdc::INVALID_RANK) {
+            if (BoardAdc::RANK_VERSION >= HAL::Adc::channel_count()) {
+                return std::numeric_limits<float>::quiet_NaN();
+            }
+            const auto version = hardware_version();
+            if (version < BOARD_MONITOR_CONFIG.current_version_adc_min
+                || version > BOARD_MONITOR_CONFIG.current_version_adc_max) {
                 return std::numeric_limits<float>::quiet_NaN();
             }
         }
 
-        // Current sensor: INA169NA/3K, R = 33K ohm
-        // Calibration coefficient was measured experimentally
-        constexpr float MAX_SENSOR_CURRENT = 10.0f;
-        constexpr float CALIBRATION_COEF = 0.6666667f;
-        constexpr float ADC_CURRENT_MULTIPLIER = MAX_SENSOR_CURRENT * CALIBRATION_COEF / 4095.0f;
-        uint16_t curr = HAL::Adc::get(BoardAdc::RANK_CURRENT);
-        return curr * ADC_CURRENT_MULTIPLIER;
+        const auto raw = HAL::Adc::get(BoardAdc::RANK_CURRENT);
+        return raw * BOARD_MONITOR_CONFIG.current_amps_per_count
+               + BOARD_MONITOR_CONFIG.current_offset_amps;
+    }
+
+    static float current_5v() {
+        return BOARD_MONITOR_CONFIG.current_on_5v ? current()
+               : std::numeric_limits<float>::quiet_NaN();
     }
 
     static float voltage_vin() {
@@ -71,9 +89,8 @@ public:
             return std::numeric_limits<float>::quiet_NaN();
         }
 
-        constexpr float ADC_VIN_MULTIPLIER = 1.0f / 64.0f;
         uint16_t volt = HAL::Adc::get(BoardAdc::RANK_VIN);
-        return volt * ADC_VIN_MULTIPLIER;
+        return volt * BOARD_MONITOR_CONFIG.vin_volts_per_count;
     }
 
     static float voltage_5v() {
@@ -81,9 +98,8 @@ public:
             return std::numeric_limits<float>::quiet_NaN();
         }
 
-        constexpr float ADC_5V_MULTIPLIER = 1.0f / 640.0f;
         uint16_t volt = HAL::Adc::get(BoardAdc::RANK_5V);
-        return volt * ADC_5V_MULTIPLIER;
+        return volt * BOARD_MONITOR_CONFIG.v5_volts_per_count;
     }
 
     static uint16_t hardware_version() {
