@@ -60,12 +60,9 @@ static int8_t init_board_periphery() {
     if (paramsEnableCrc(IntParamsIndexes::PARAM_SYSTEM_CRC) != 0) {
         return -1;
     }
-    // H7 parameters use SPI FRAM; other backends retain their redundant erase page.
-#if !defined(USE_PLATFORM_NODE_V4)
     if (paramsInitRedundantPage() != 0) {
         return -1;
     }
-#endif
     if (paramsLoad() != 0) {
         return -1;
     }
