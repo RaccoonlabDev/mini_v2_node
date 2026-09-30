@@ -23,18 +23,9 @@
 #include "gpio_mapping.hpp"
 #endif
 
-#ifndef LIBPARAMS_HAS_REDUNDANT_STORAGE
-#define LIBPARAMS_HAS_REDUNDANT_STORAGE 1
-#endif
-
-// It's quite ugly
-// but it let's automatically take needed flash driver for params
-// preserving us from accidental wrong flash driver usage
 static const FlashDriverOps* get_params_flash_ops() {
-#if defined(USE_PLATFORM_NODE_V4) && defined(LIBPARAMS_STORAGE_BACKEND_SPIFRAM)
+#if defined(USE_PLATFORM_NODE_V4)
     return stm32h753xxSpiFramGetOps();
-#elif defined(USE_PLATFORM_NODE_V4)
-    return stm32h753xxInternalFlashGetOps();
 #elif defined(USE_PLATFORM_NODE_V3)
     return stm32g0b1InternalFlashGetOps();
 #elif defined(USE_PLATFORM_NODE_V2)
@@ -69,11 +60,9 @@ static int8_t init_board_periphery() {
     if (paramsEnableCrc(IntParamsIndexes::PARAM_SYSTEM_CRC) != 0) {
         return -1;
     }
-#if LIBPARAMS_HAS_REDUNDANT_STORAGE
     if (paramsInitRedundantPage() != 0) {
         return -1;
     }
-#endif
     if (paramsLoad() != 0) {
         return -1;
     }
