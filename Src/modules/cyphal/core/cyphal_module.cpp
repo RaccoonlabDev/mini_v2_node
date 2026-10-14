@@ -7,7 +7,7 @@
 #include "cyphal_module.hpp"
 #include <algorithm>
 #include <cstring>
-#include "libcpnode/cyphal.hpp"
+#include "libcpnode/libcpnode.hpp"
 #include "params.hpp"
 #include "drivers/board_monitor/board_monitor.hpp"
 

@@ -10,7 +10,7 @@
 #ifndef SRC_MODULES_PWM_CYPHAL_FRONTEND_HPP_
 #define SRC_MODULES_PWM_CYPHAL_FRONTEND_HPP_
 
-#include "libcpnode/cyphal.hpp"
+#include "libcpnode/libcpnode.hpp"
 #include "reg.udral.service.actuator.common.sp.Vector31_0_1.h"
 
 

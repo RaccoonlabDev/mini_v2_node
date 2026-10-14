@@ -7,7 +7,7 @@
 #ifndef SRC_CYPHAL_APPLICATION_FEEDBACK_HPP_
 #define SRC_CYPHAL_APPLICATION_FEEDBACK_HPP_
 
-#include "libcpnode/cyphal.hpp"
+#include "libcpnode/libcpnode.hpp"
 #include <array>
 #include "modules/rcout/main.hpp"
 #include "module.hpp"

@@ -9,7 +9,7 @@
 
 #include <optional>
 #include "module.hpp"
-#include "libcpnode/cyphal.hpp"
+#include "libcpnode/libcpnode.hpp"
 
 #ifdef __cplusplus
 extern "C" {

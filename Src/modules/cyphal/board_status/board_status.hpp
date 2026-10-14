@@ -8,7 +8,7 @@
 #define SRC_MODULES_CYPHAL_BOARD_STATUS_BOARD_STATUS_HPP_
 
 #include "common/datapool.hpp"
-#include "libcpnode/cyphal.hpp"
+#include "libcpnode/libcpnode.hpp"
 #include "module.hpp"
 #include "topics/board_status.hpp"
 #include "uavcan/si/unit/temperature/Scalar_1_0.h"
