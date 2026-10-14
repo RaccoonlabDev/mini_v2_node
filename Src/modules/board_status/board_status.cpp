@@ -11,10 +11,12 @@
 REGISTER_MODULE(BoardStatusModule)
 
 static topics::CurrentRail current_rail() {
-    if (BoardAdc::RANK_CURRENT == BoardAdc::INVALID_RANK) {
-        return topics::CurrentRail::NONE;
+    using enum topics::CurrentRail;
+    if constexpr (BoardAdc::RANK_CURRENT == BoardAdc::INVALID_RANK) {
+        return NONE;
+    } else {
+        return BOARD_MONITOR_CONFIG.current_on_5v ? V5 : VIN;
     }
-    return BOARD_MONITOR_CONFIG.current_on_5v ? topics::CurrentRail::V5 : topics::CurrentRail::VIN;
 }
 
 // A NaN fails every comparison, so a quantity the board can't measure never raises a flag.
