@@ -173,7 +173,7 @@ git submodule update --init --recursive
 
 ```bash
 rm .github/workflows/cyphal_sitl.yml
-rm -rf Src/modules/cyphal Src/modules/feedback/cyphal Src/modules/rcout/cyphal_frontend
+rm -rf Src/modules/backends/cyphal Src/modules/cyphal Src/modules/feedback/cyphal Src/modules/rcout/cyphal_frontend
 rm -rf Src/applications/cyphal
 ```
 

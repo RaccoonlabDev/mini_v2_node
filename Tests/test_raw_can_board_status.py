@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SITL check of the raw CAN example frontend (Src/modules/raw_can/board_status).
+"""SITL check of the raw CAN example frontend (Src/modules/backends/raw_can/board_status).
 
 make rl_sitl_raw_can create_slcan0
 ./build/rl_sitl_raw_can_sitl/obj/node &

@@ -4,8 +4,8 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#ifndef SRC_MODULES_CYPHAL_BOARD_STATUS_BOARD_STATUS_HPP_
-#define SRC_MODULES_CYPHAL_BOARD_STATUS_BOARD_STATUS_HPP_
+#ifndef SRC_MODULES_BACKENDS_CYPHAL_BOARD_STATUS_BOARD_STATUS_HPP_
+#define SRC_MODULES_BACKENDS_CYPHAL_BOARD_STATUS_BOARD_STATUS_HPP_
 
 #include "common/datapool.hpp"
 #include "libcpnode/libcpnode.hpp"
@@ -38,4 +38,4 @@ private:
     Publisher<uavcan_si_unit_temperature_Scalar_1_0> temperature_pub;
 };
 
-#endif  // SRC_MODULES_CYPHAL_BOARD_STATUS_BOARD_STATUS_HPP_
+#endif  // SRC_MODULES_BACKENDS_CYPHAL_BOARD_STATUS_BOARD_STATUS_HPP_
