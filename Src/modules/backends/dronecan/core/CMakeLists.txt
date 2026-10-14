@@ -1,12 +1,9 @@
 # Copyright (C) 2023 Dmitry Ponomarev <ponomarevda96@gmail.com>
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 
-include(cmake/use_external_github_library.cmake)
-
 # 1. libdcnode
-use_external_github_library(libdcnode
-    submodule ${NC_LIBDCNODE_PATH} -
-)
+nc_use_dependency(libdcnode)
+add_subdirectory(${NC_LIBDCNODE_PATH} ${CMAKE_BINARY_DIR}/libdcnode)
 
 # 2. libcanver
 include(${NC_LIBDCNODE_PATH}/platform_specific/${CAN_PLATFORM}/config.cmake)

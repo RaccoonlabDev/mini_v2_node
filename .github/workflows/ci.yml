@@ -96,7 +96,8 @@ jobs:
       - name: Run Cyphal SITL checks
         if: ${{ env.SKIP_THIS_SUITE != 'true' && matrix.suite == 'rl_sitl_cyphal' }}
         run: |
-          export REG_DATA_TYPE_PATH="$PWD/build/downloads/libcpnode/Libs/public_regulated_data_types/uavcan $PWD/build/downloads/libcpnode/Libs/public_regulated_data_types/reg"
+          DSDL_DIR=$(ls -d "$PWD"/build/third_party/libcpnode-*/)Libs/public_regulated_data_types
+          export REG_DATA_TYPE_PATH="$DSDL_DIR/uavcan $DSDL_DIR/reg"
           make run &
           cd scripts/tools/cyphal
           source init.sh -i slcan0 -n 127 -v

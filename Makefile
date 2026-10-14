@@ -1,6 +1,6 @@
 # Copyright (C) 2023-2024 Dmitry Ponomarev <ponomarevda96@gmail.com>
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
-.PHONY: require_target all checks code_style tests upload run clean_releases clean distclean build \
+.PHONY: require_target all checks code_style tests upload run clean_releases clean distclean build deps \
 	ensure_node_v4_cubemx cubemx_archives \
 	rl_mini_v2_dronecan rl_mini_v2_dronecan_application rl_mini_v2_dronecan_standalone \
 	rl_mini_v2_cyphal rl_mini_v2_cyphal_application rl_mini_v2_cyphal_standalone \
@@ -241,6 +241,10 @@ code_style:
 
 tests:
 	${ROOT_DIR}/scripts/tests.sh
+
+# Clone the libraries that are not submodules, e.g. on the host before a Docker build. See README.md, Libraries
+deps:
+	cmake ${EXTRA_CMAKE_ARGS} -P ${ROOT_DIR}/cmake/fetch_dependencies.cmake
 
 upload:
 	LATEST_TARGET=$$(ls -td ${ROOT_DIR}/release/*.bin | head -1) && ./scripts/flash.sh $$LATEST_TARGET

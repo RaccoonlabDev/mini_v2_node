@@ -16,6 +16,8 @@ if(APP_PLATFORM STREQUAL "stm32g0b1")
 elseif(APP_PLATFORM STREQUAL "stm32h753xx")
     list(APPEND PERIPHERAL_SOURCES ${CMAKE_CURRENT_LIST_DIR}/can_stm32h7.cpp)
 elseif(APP_PLATFORM STREQUAL "stm32f103")
+    # The bxCAN driver comes from libdcnode, whatever the protocol
+    nc_use_dependency(libdcnode)
     list(APPEND PERIPHERAL_SOURCES
         ${CMAKE_CURRENT_LIST_DIR}/can_stm32f103.cpp
         ${NC_LIBDCNODE_PATH}/platform_specific/bxcan/canard_stm32.c

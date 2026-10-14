@@ -6,11 +6,12 @@ cmake_minimum_required(VERSION 3.15.3)
 set(ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
 set(SRC_DIR ${ROOT_DIR}/Src)
 set(CMAKE_DIR ${ROOT_DIR}/cmake)
-set(LIBPARAMS_PATH ${ROOT_DIR}/Libs/libparams)
-set(NC_LIBDCNODE_PATH "${ROOT_DIR}/Libs/Dronecan" CACHE PATH "Path to libdcnode/DroneCAN source tree")
 set(BUILD_ROOT_DIR ${ROOT_DIR}/build)
 
 include(${CMAKE_DIR}/module.cmake)
+include(${CMAKE_DIR}/dependencies.cmake)
+nc_use_dependency(libparams)
+set(LIBPARAMS_PATH ${NC_LIBPARAMS_PATH})
 
 # Option 1. Choose board and target
 set(NC_BOARD "" CACHE STRING "Board path under Src/boards or app boards in form vendor/name")
