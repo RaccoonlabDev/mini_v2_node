@@ -33,6 +33,8 @@ target_include_directories(${EXECUTABLE} PRIVATE
 # Add fftw library for FFT execution
 target_link_libraries(${EXECUTABLE} PRIVATE ${FFTW_LIBRARIES})
 
+target_link_libraries(${EXECUTABLE} PRIVATE libparams::libparams)
+
 if(CAN_PROTOCOL STREQUAL "dronecan" OR CAN_PROTOCOL STREQUAL "both")
     target_link_libraries(${EXECUTABLE} PRIVATE libdcnode::libdcnode)
 endif()

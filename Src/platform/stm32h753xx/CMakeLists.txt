@@ -38,6 +38,8 @@ target_include_directories(${EXECUTABLE} PRIVATE
     ${stm32cubeMxProjectPath}/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc
 )
 
+target_link_libraries(${EXECUTABLE} PRIVATE libparams::libparams)
+
 if(CAN_PROTOCOL STREQUAL "dronecan" OR CAN_PROTOCOL STREQUAL "both")
     target_link_libraries(${EXECUTABLE} PRIVATE libdcnode::libdcnode)
 endif()

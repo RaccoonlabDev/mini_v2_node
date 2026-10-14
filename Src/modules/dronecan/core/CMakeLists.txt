@@ -12,13 +12,13 @@ use_external_github_library(libdcnode
 include(${NC_LIBDCNODE_PATH}/platform_specific/${CAN_PLATFORM}/config.cmake)
 
 list(APPEND APPLICATION_SOURCES
-    ${libparamsSrc}
+    ${LIBPARAMS_PLATFORM_SOURCES}
     ${DRONECAN_PLATFORM_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/dronecan_module.cpp
 )
 
 list(APPEND APPLICATION_HEADERS
-    ${libparamsHeaders}
+    ${LIBPARAMS_PLATFORM_HEADERS}
     ${DRONECAN_PLATFORM_HEADERS}
     ${CMAKE_CURRENT_LIST_DIR}
 )
