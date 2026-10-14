@@ -25,7 +25,7 @@ void RawCanBoardStatus::spin_once() {
     const auto data = raw_can::encode_board_status(status);
     CanardCANFrame frame{};
     frame.id = raw_can::BOARD_STATUS_BASE_ID + node_id;  // no CANARD_CAN_FRAME_EFF: an 11-bit id
-    std::copy(data.begin(), data.end(), frame.data);
+    std::ranges::copy(data, frame.data);
     frame.data_len = raw_can::FRAME_SIZE;
     canDriverTransmit(&frame, CAN_DRIVER_FIRST);
 }
