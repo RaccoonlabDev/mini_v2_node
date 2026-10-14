@@ -4,15 +4,13 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#include "circuit_status.hpp"
-#include <algorithm>
+#include "board_status.hpp"
 #include "libcpnode/cyphal.hpp"
-#include "drivers/board_monitor/board_monitor.hpp"
 #include "params.hpp"
 
-REGISTER_MODULE(CyphalCircuitStatus)
+REGISTER_MODULE(CyphalBoardStatus)
 
-void CyphalCircuitStatus::init() {
+void CyphalBoardStatus::init() {
     set_mode(Mode::STANDBY);
     auto cyphal = libcpnode::Cyphal::get_instance();
 
@@ -27,7 +25,7 @@ void CyphalCircuitStatus::init() {
     );
 }
 
-void CyphalCircuitStatus::update_params() {
+void CyphalBoardStatus::update_params() {
     uint16_t port_id;
 
     port_id = static_cast<uint16_t>(paramsGetIntegerValue(PARAM_PUB_CRCT_5V_ID));
@@ -40,21 +38,26 @@ void CyphalCircuitStatus::update_params() {
     temperature_pub.setPortId(port_id);
 }
 
-void CyphalCircuitStatus::spin_once() {
+void CyphalBoardStatus::spin_once() {
+    topics::BoardStatus status;
+    if (!status_sub.update(&status)) {
+        return;
+    }
+
     if (voltage_5v_pub.isEnabled()) {
-        voltage_5v_pub.msg.volt = BoardMonitor::voltage_5v();
+        voltage_5v_pub.msg.volt = status.voltage_5v;
         voltage_5v_pub.publish();
     }
 
     if (voltage_vin_pub.isEnabled()) {
-        voltage_vin_pub.msg.volt = BoardMonitor::voltage_vin();
+        voltage_vin_pub.msg.volt = status.voltage_vin;
         voltage_vin_pub.publish();
     }
 
     if (temperature_pub.isEnabled()) {
-        temperature_pub.msg.kelvin = BoardMonitor::temperature();
+        temperature_pub.msg.kelvin = status.temperature;
         temperature_pub.publish();
     }
 
-    set_health(BoardMonitor::is_failure() ? Status::MINOR_FAILURE : Status::OK);
+    set_health(status.error_flags != 0 ? Status::MINOR_FAILURE : Status::OK);
 }

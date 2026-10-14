@@ -87,3 +87,4 @@ if (status_sub.update(&status)) { /* a new sample: put it on the bus */ }
 |---|---|
 | `board_status` | with any of its frontends |
 | `dronecan/board_status` | DroneCAN targets: dev.Temperature and two CircuitStatus |
+| `cyphal/board_status` | Cyphal targets: three `uavcan.si.unit` scalars |
