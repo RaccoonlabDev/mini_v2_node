@@ -12,25 +12,18 @@
 #include "common/logging.hpp"
 
 void DronecanPwmFrontend::init() {
-    uint8_t counterInit = 0;
-    uint8_t counterFail = 0;
-    raw_command_sub.init(raw_command_callback) >= 0 ? 
-            counterInit++ : counterFail++;
+    bool are_subs_ok = raw_command_sub.init(raw_command_callback) >= 0;
+    are_subs_ok &= array_command_sub.init(array_command_callback) >= 0;
+    are_subs_ok &= hardpoint_sub.init(hardpoint_callback) >= 0;
+    are_subs_ok &= arming_status_sub.init(arming_status_callback) >= 0;
+    are_subs_ok &= gimbal_angular_command_sub.init(gimbal_angular_command_callback) >= 0;
 
-    array_command_sub.init(array_command_callback)  >= 0 ? 
-            counterInit++ : counterFail++;
-
-    hardpoint_sub.init(hardpoint_callback) >= 0 ? 
-            counterInit++ : counterFail++;
-
-    arming_status_sub.init(arming_status_callback)  >= 0 ? 
-            counterInit++ : counterFail++;
-
-    gimbal_angular_command_sub.init(gimbal_angular_command_callback)  >= 0 ? 
-            counterInit++ : counterFail++;
-    char buffer[35];
-    sprintf(buffer, "Rcout subs init: %d, subs failed: %d", counterInit, counterFail);
-    logger.log_info(buffer);
+    // A formatted message would need sprintf, which pulls newlib stdio and the heap into the image.
+    if (are_subs_ok) {
+        logger.log_info("Rcout subs init: ok");
+    } else {
+        logger.log_error("Rcout subs init: failed");
+    }
 }
 
 void DronecanPwmFrontend::update_params() {
