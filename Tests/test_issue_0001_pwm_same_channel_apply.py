@@ -26,7 +26,8 @@ PARAM_SET_ATTEMPTS = 5
 PARAM_SET_TIMEOUT_S = 0.4
 PARAM_SET_GAP_S = 0.03
 RANDOM_SEED = 1001
-PARAM_SETUP_PRIME_TIMEOUT_S = 0.8
+# Longer than the 1 s NodeStatus period: discovery may have just consumed the latest one
+PARAM_SETUP_PRIME_TIMEOUT_S = 1.5
 
 SELECTED_IFACE = None
 DISCOVERED_TARGET_NODE_ID = None
