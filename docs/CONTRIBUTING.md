@@ -43,6 +43,8 @@ align-reference=type
 make code_style
 ```
 
+Don't use `sprintf`/`snprintf` on STM32F103 and other small targets: newlib's formatter adds ~3 KB of flash and links `malloc`, so log a fixed string instead.
+
 ## Before opening a pull request
 
 - Build every target you touched: [build_system.md](build_system.md).
