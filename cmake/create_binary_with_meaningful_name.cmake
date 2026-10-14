@@ -32,10 +32,10 @@ else()
     set(RELEASE_APP_ROOT_DIR "")
 endif()
 
+# The target stays in the name even when it is the protocol: rl/mini_v3 has dronecan, cyphal and
+# both targets, and without it their images would overwrite each other in release/.
 set(RELEASE_BOARD_NAME "${BOARD_NAME}")
-if(DEFINED NC_TARGET AND NOT NC_TARGET STREQUAL "" AND
-   NOT NC_TARGET STREQUAL "default" AND
-   NOT NC_TARGET STREQUAL CAN_PROTOCOL)
+if(DEFINED NC_TARGET AND NOT NC_TARGET STREQUAL "" AND NOT NC_TARGET STREQUAL "default")
     set(RELEASE_BOARD_NAME "${BOARD_NAME}_${NC_TARGET}")
 endif()
 
