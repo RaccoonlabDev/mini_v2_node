@@ -11,7 +11,7 @@ one more protocol then means writing one more frontend.
 |---|---|
 | `Src/topics/<topic>.hpp` | one topic: the message and its tag |
 | `Src/modules/<module>/` | logic modules, which publish and read topics |
-| `Src/modules/<protocol>/<topic>/` | the frontend of a protocol: `dronecan`, `cyphal` |
+| `Src/modules/<protocol>/<topic>/` | the frontend of a protocol: `dronecan`, `cyphal`, `raw_can` |
 
 A topic may have several publishers and several subscribers, so a module is not
 tied to one topic. Naming the module after the topic it publishes, as
@@ -88,3 +88,4 @@ if (status_sub.update(&status)) { /* a new sample: put it on the bus */ }
 | `board_status` | with any of its frontends |
 | `dronecan/board_status` | DroneCAN targets: dev.Temperature and two CircuitStatus |
 | `cyphal/board_status` | Cyphal targets: three `uavcan.si.unit` scalars |
+| `raw_can/board_status` | `rl_sitl_raw_can` only: an example of a custom protocol |
