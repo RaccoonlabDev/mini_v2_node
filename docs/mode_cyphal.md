@@ -216,7 +216,7 @@ By default it just blinks the RGB LED, subscribes to the setpoint topic to contr
 
 ### 6.4. Add custom Cyphal-topics
 
-You may consider [Src/modules/cyphal](Src/modules/cyphal) and [Src/modules/feedback/cyphal](Src/modules/feedback/cyphal) as examples of Cyphal-subscriber and Cyphal-publisher. If you create subjects by inhereting from CyphalPublisher and CyphalSubscriber, it will automatically add all topics to the port.List array, so the node is able to advertise its capabilities. This approach doesn't automatically create registers, so you need to add them in yaml file as shown in the examples.
+You may consider [Src/modules/backends/cyphal](Src/modules/backends/cyphal) and [Src/modules/feedback/cyphal](Src/modules/feedback/cyphal) as examples of Cyphal-subscriber and Cyphal-publisher. If you create subjects by inhereting from CyphalPublisher and CyphalSubscriber, it will automatically add all topics to the port.List array, so the node is able to advertise its capabilities. This approach doesn't automatically create registers, so you need to add them in yaml file as shown in the examples.
 
 ### 6.5. Add custom registers
 

@@ -4,8 +4,8 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#ifndef SRC_MODULES_RAW_CAN_BOARD_STATUS_FRAME_HPP_
-#define SRC_MODULES_RAW_CAN_BOARD_STATUS_FRAME_HPP_
+#ifndef SRC_MODULES_BACKENDS_RAW_CAN_BOARD_STATUS_FRAME_HPP_
+#define SRC_MODULES_BACKENDS_RAW_CAN_BOARD_STATUS_FRAME_HPP_
 
 #include <array>
 #include <cmath>
@@ -76,4 +76,4 @@ inline std::array<uint8_t, FRAME_SIZE> encode_board_status(const topics::BoardSt
 
 }  // namespace raw_can
 
-#endif  // SRC_MODULES_RAW_CAN_BOARD_STATUS_FRAME_HPP_
+#endif  // SRC_MODULES_BACKENDS_RAW_CAN_BOARD_STATUS_FRAME_HPP_

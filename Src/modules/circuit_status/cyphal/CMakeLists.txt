@@ -1,6 +1,6 @@
 # Copyright (C) 2023 Dmitry Ponomarev <ponomarevda96@gmail.com>
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 
-# Deprecated: the module moved to cyphal/board_status. This path stays for the applications that
-# still include it.
-rl_include_module(cyphal/board_status)
+# Deprecated: the module moved to backends/cyphal/board_status. This path stays for the
+# applications that still include it.
+rl_include_module(backends/cyphal/board_status)

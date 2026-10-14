@@ -8,7 +8,7 @@
 #include <array>
 #include <cmath>
 #include <cstdint>
-#include "modules/raw_can/board_status/frame.hpp"
+#include "modules/backends/raw_can/board_status/frame.hpp"
 
 namespace {
 

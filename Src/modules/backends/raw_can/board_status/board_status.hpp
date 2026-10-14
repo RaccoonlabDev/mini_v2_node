@@ -4,8 +4,8 @@
  * Author: Dmitry Ponomarev <ponomarevda96@gmail.com>
  */
 
-#ifndef SRC_MODULES_RAW_CAN_BOARD_STATUS_BOARD_STATUS_HPP_
-#define SRC_MODULES_RAW_CAN_BOARD_STATUS_BOARD_STATUS_HPP_
+#ifndef SRC_MODULES_BACKENDS_RAW_CAN_BOARD_STATUS_BOARD_STATUS_HPP_
+#define SRC_MODULES_BACKENDS_RAW_CAN_BOARD_STATUS_BOARD_STATUS_HPP_
 
 #include "common/datapool.hpp"
 #include "common/module.hpp"
@@ -32,4 +32,4 @@ private:
     uint8_t node_id{0};
 };
 
-#endif  // SRC_MODULES_RAW_CAN_BOARD_STATUS_BOARD_STATUS_HPP_
+#endif  // SRC_MODULES_BACKENDS_RAW_CAN_BOARD_STATUS_BOARD_STATUS_HPP_

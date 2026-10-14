@@ -8,6 +8,9 @@ At the CAN layer the firmware is protocol-agnostic — in principle any CAN prot
 | Cyphal/CAN | `cyphal` | [mode_cyphal.md](mode_cyphal.md) |
 | Both at once | `both` | [both.md](both.md) |
 
+A backend lives in `Src/modules/backends/<backend>/`: its `core` and one frontend per topic, see
+[datapool.md](datapool.md).
+
 Also available:
 - A **CANopen** module (runs under the DroneCAN backend).
 - Bridging to other CAN protocols (e.g. CANopen motor, CAN BMS) — see the *CAN-CAN converter* use case in the README.

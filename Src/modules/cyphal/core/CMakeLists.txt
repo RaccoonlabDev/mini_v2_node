@@ -1,32 +1,6 @@
 # Copyright (C) 2023 Dmitry Ponomarev <ponomarevda96@gmail.com>
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 
-set(DOWNLOAD_DIR ${ROOT_DIR}/build/downloads)
-set(EXTRACT_DIR ${CMAKE_BINARY_DIR}/external)
-include(cmake/use_external_github_library.cmake)
-
-#
-# 1. libcpnode
-#
-add_definitions(-DBXCAN_MAX_IFACE_INDEX=0)
-use_external_github_library(libcpnode
-    source PonomarevDA/libcpnode v0.13.2 # Oct 14, 2026
-)
-
-#
-# 2. libcanver
-#
-include(${DOWNLOAD_DIR}/libcpnode/cmake/transport_specific.cmake)
-
-
-list(APPEND APPLICATION_SOURCES
-    ${LIBCPNODE_TRANSPORT_SOURCES}
-    ${LIBPARAMS_PLATFORM_SOURCES}
-    ${CMAKE_CURRENT_LIST_DIR}/cyphal_module.cpp
-)
-
-list(APPEND APPLICATION_HEADERS
-    ${LIBCPNODE_TRANSPORT_HEADERS}
-    ${LIBPARAMS_PLATFORM_HEADERS}
-    ${ROOT_DIR}/build/nunavut_out
-)
+# Deprecated: the module moved to backends/cyphal/core. This path stays for the applications that
+# still include it.
+rl_include_module(backends/cyphal/core)

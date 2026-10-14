@@ -9,9 +9,9 @@ add_definitions(-DCONFIG_USE_DRONECAN=1)
 rl_include_module(application)
 rl_include_module(system)
 
-rl_include_module(dronecan/core)
+rl_include_module(backends/dronecan/core)
 
 if(NOT NODE_V4_DIAG_MINIMAL_MODULES)
-    rl_include_module(dronecan/arming)
-    rl_include_module(dronecan/board_status)
+    rl_include_module(backends/dronecan/arming)
+    rl_include_module(backends/dronecan/board_status)
 endif()
