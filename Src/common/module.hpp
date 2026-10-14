@@ -47,7 +47,8 @@ public:
      * of every module shifts as soon as another module is registered before it, which breaks
      * whoever decodes the byte. Prefer an explicit bit for anything long-lived.
      * NONE keeps a module out of the byte without consuming a bit, so adding such a module does
-     * not renumber the others. It suits a frontend, whose health belongs to its logic module.
+     * not renumber the others. It suits a datapool logic module, whose protocol frontends report
+     * the health (see docs/datapool.md).
      */
     static constexpr uint8_t VSSC_BITS_AMOUNT{8};
     static constexpr uint8_t VSSC_BIT_NONE{0xFE};

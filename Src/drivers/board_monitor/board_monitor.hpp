@@ -109,20 +109,28 @@ public:
         return HAL::Adc::get(BoardAdc::RANK_VERSION);
     }
 
+    // The limits of the board standard, see Src/topics/board_status.hpp
+    static constexpr double V5_MIN_V{4.2};
+    static constexpr double V5_MAX_V{5.5};
+    static constexpr double VIN_MIN_V{4.5};
+    static constexpr double VIN_MAX_V{60.0};
+    static constexpr double CURRENT_MAX_A{60.0};
+    static constexpr float TEMPERATURE_MAX_K{273.5f + 80.0f};
+
     static bool overvoltage() {
-        return voltage_5v() > 5.5 || voltage_vin() > 60.0;
+        return voltage_5v() > V5_MAX_V || voltage_vin() > VIN_MAX_V;
     }
 
     static bool undervoltage() {
-        return voltage_5v() < 4.2 || voltage_vin() < 4.5;
+        return voltage_5v() < V5_MIN_V || voltage_vin() < VIN_MIN_V;
     }
 
     static bool overcurrent() {
-        return current() > 60.0;
+        return current() > CURRENT_MAX_A;
     }
 
     static bool overheat() {
-        return temperature() > (273.5f + 80.0f);
+        return temperature() > TEMPERATURE_MAX_K;
     }
 
     static bool is_failure() {

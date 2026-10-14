@@ -14,6 +14,7 @@ SOURCE_PATTERNS=(
     "${REPOSITORY_PATH}/Src/peripheral/*/*.*pp"
     "${REPOSITORY_PATH}/Src/platform/*/*.*pp"
     "${REPOSITORY_PATH}/Src/common/*.*pp"
+    "${REPOSITORY_PATH}/Src/topics/*.*pp"
     "${REPOSITORY_PATH}/Src/drivers/*/*.*pp"
 )
 
