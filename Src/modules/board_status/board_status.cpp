@@ -6,17 +6,18 @@
  */
 
 #include "board_status.hpp"
+#include <cmath>
 #include "drivers/board_monitor/board_monitor.hpp"
 
 REGISTER_MODULE(BoardStatusModule)
 
-static topics::CurrentRail current_rail() {
+// NONE when the current is not measured: no sensor, or a hardware version without it
+static topics::CurrentRail current_rail(float current) {
     using enum topics::CurrentRail;
-    if constexpr (BoardAdc::RANK_CURRENT == BoardAdc::INVALID_RANK) {
+    if (std::isnan(current)) {
         return NONE;
-    } else {
-        return BOARD_MONITOR_CONFIG.current_on_5v ? V5 : VIN;
     }
+    return BOARD_MONITOR_CONFIG.current_on_5v ? V5 : VIN;
 }
 
 // A NaN fails every comparison, so a quantity the board can't measure never raises a flag.
@@ -44,12 +45,13 @@ static uint8_t error_flags(const topics::BoardStatus& status) {
 }
 
 void BoardStatusModule::spin_once() {
+    const auto current = BoardMonitor::current();
     topics::BoardStatus status{
         .temperature = static_cast<float>(BoardMonitor::temperature()),
         .voltage_5v = BoardMonitor::voltage_5v(),
         .voltage_vin = BoardMonitor::voltage_vin(),
-        .current = BoardMonitor::current(),
-        .current_rail = current_rail(),
+        .current = current,
+        .current_rail = current_rail(current),
         .hardware_version_adc = BoardMonitor::hardware_version(),
         .error_flags = 0,
     };
