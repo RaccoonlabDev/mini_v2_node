@@ -53,3 +53,8 @@ add_executable(datapool ${UNIT_TESTS_DIR}/common/test_datapool.cpp)
 target_include_directories(datapool PUBLIC ${ROOT_DIR}/Src/common)
 target_link_libraries(datapool GTest::gtest GTest::gtest_main)
 add_test(NAME datapool COMMAND datapool)
+
+add_executable(raw_can_frame ${UNIT_TESTS_DIR}/modules/test_raw_can_frame.cpp)
+target_include_directories(raw_can_frame PUBLIC ${ROOT_DIR}/Src)
+target_link_libraries(raw_can_frame GTest::gtest GTest::gtest_main)
+add_test(NAME raw_can_frame COMMAND raw_can_frame)

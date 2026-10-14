@@ -51,6 +51,7 @@ jobs:
         include:
           - suite: rl_sitl_cyphal
           - suite: rl_sitl_dronecan
+          - suite: rl_sitl_raw_can
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     # GitHub Actions does not allow the secrets context inside if expression
@@ -111,6 +112,16 @@ jobs:
           trap 'kill $SITL_PID || true' EXIT
           sleep 2
           pytest -s Tests/test_issue_0001_pwm_same_channel_apply.py
+
+      - name: Run raw CAN example checks
+        if: ${{ matrix.suite == 'rl_sitl_raw_can' }}
+        run: |
+          make create_slcan0
+          ./build/rl_sitl_raw_can_sitl/obj/node > sitl.log 2>&1 &
+          SITL_PID=$!
+          trap 'kill $SITL_PID || true' EXIT
+          sleep 2
+          pytest -s Tests/test_raw_can_board_status.py
 
   build_and_deploy:
     permissions:

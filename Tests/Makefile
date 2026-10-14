@@ -17,7 +17,7 @@ CMAKE_FLAGS := -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CC} -DCMAKE_C_FLA
 
 all: test_common
 
-test_common: fft algorithms datapool
+test_common: fft algorithms datapool raw_can_frame
 
 create_build_dir:
 	mkdir -p ${BUILD_DIR}
@@ -27,6 +27,7 @@ coverage: create_build_dir
 	cd ${BUILD_DIR} && ./algorithms
 	cd ${BUILD_DIR} && ./fft
 	cd ${BUILD_DIR} && ./datapool
+	cd ${BUILD_DIR} && ./raw_can_frame
 
 	echo "\n1. Algorithms:"
 	cd ${BUILD_DIR} && gcov ${BUILD_DIR}/CMakeFiles/algorithms.dir/common/test_algorithms.cpp.gcda
@@ -37,6 +38,9 @@ coverage: create_build_dir
 	echo "\n3. Datapool:"
 	cd ${BUILD_DIR} && gcov ${BUILD_DIR}/CMakeFiles/datapool.dir/common/test_datapool.cpp.gcda
 
+	echo "\n4. Raw CAN frame:"
+	cd ${BUILD_DIR} && gcov ${BUILD_DIR}/CMakeFiles/raw_can_frame.dir/modules/test_raw_can_frame.cpp.gcda
+
 algorithms: create_build_dir
 	cd ${BUILD_DIR} && cmake -S ${CRNT_DIR} && make && ./algorithms
 
@@ -45,3 +49,6 @@ fft: create_build_dir
 
 datapool: create_build_dir
 	cd ${BUILD_DIR} && cmake -S ${CRNT_DIR} && make datapool && ./datapool
+
+raw_can_frame: create_build_dir
+	cd ${BUILD_DIR} && cmake -S ${CRNT_DIR} && make raw_can_frame && ./raw_can_frame

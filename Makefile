@@ -11,7 +11,7 @@
 	rl_node_v4_dronecan rl_node_v4_dronecan_application rl_node_v4_dronecan_standalone \
 	rl_node_v4_cyphal rl_node_v4_cyphal_application rl_node_v4_cyphal_standalone \
 	rl_node_v4_both rl_node_v4_both_application rl_node_v4_both_standalone \
-	rl_sitl_dronecan rl_sitl_cyphal \
+	rl_sitl_dronecan rl_sitl_cyphal rl_sitl_raw_can \
 	cyphal cyphal_v2 cyphal_v3 dronecan dronecan_v2 dronecan_v3 v2 v3 sitl_dronecan sitl_cyphal
 .DEFAULT_GOAL := require_target
 
@@ -206,6 +206,9 @@ rl_sitl_dronecan: checks
 	$(MAKE) build BOARD=rl/sitl TARGET=dronecan IMAGE_KIND=sitl BUILD_VARIANT=rl_sitl_dronecan_sitl
 rl_sitl_cyphal: checks
 	$(MAKE) build BOARD=rl/sitl TARGET=cyphal IMAGE_KIND=sitl BUILD_VARIANT=rl_sitl_cyphal_sitl
+# Example of a custom protocol frontend, see docs/datapool.md. Not part of "all".
+rl_sitl_raw_can: checks
+	$(MAKE) build BOARD=rl/sitl TARGET=raw_can IMAGE_KIND=sitl BUILD_VARIANT=rl_sitl_raw_can_sitl
 
 #
 # Optional vendor/local extensions
