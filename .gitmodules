@@ -4,9 +4,6 @@
 [submodule "Libs/libparams"]
 	path = Libs/libparams
 	url = https://github.com/PonomarevDA/libparams.git
-[submodule "scripts/tools"]
-	path = scripts/tools
-	url = https://github.com/PonomarevDA/tools.git
 [submodule "Libs/stm32-cube-project"]
 	path = Libs/stm32-cube-project
 	url = https://github.com/RaccoonLabHardware/mini-v2-software.git
