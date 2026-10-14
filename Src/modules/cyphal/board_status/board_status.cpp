@@ -5,7 +5,7 @@
  */
 
 #include "board_status.hpp"
-#include "libcpnode/cyphal.hpp"
+#include "libcpnode/libcpnode.hpp"
 #include "params.hpp"
 
 REGISTER_MODULE(CyphalBoardStatus)

@@ -6,7 +6,7 @@
 
 #include "cyphal_frontend.hpp"
 #include <algorithm>
-#include "libcpnode/cyphal.hpp"
+#include "libcpnode/libcpnode.hpp"
 #include "modules/rcout/router.hpp"
 #include "params.hpp"
 #include "drivers/rcpwm/rcpwm.hpp"

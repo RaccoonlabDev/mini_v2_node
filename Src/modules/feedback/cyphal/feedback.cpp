@@ -7,7 +7,7 @@
 #include "feedback.hpp"
 #include <algorithm>
 #include <array>
-#include "libcpnode/cyphal.hpp"
+#include "libcpnode/libcpnode.hpp"
 #include "params.hpp"
 #include "drivers/board_monitor/board_monitor.hpp"
 
