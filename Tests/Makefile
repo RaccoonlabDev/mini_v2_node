@@ -17,7 +17,7 @@ CMAKE_FLAGS := -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CC} -DCMAKE_C_FLA
 
 all: test_common
 
-test_common: fft algorithms
+test_common: fft algorithms datapool
 
 create_build_dir:
 	mkdir -p ${BUILD_DIR}
@@ -26,6 +26,7 @@ coverage: create_build_dir
 	cd ${BUILD_DIR} && cmake -DCOVERAGE=1 ${CRNT_DIR} && make
 	cd ${BUILD_DIR} && ./algorithms
 	cd ${BUILD_DIR} && ./fft
+	cd ${BUILD_DIR} && ./datapool
 
 	echo "\n1. Algorithms:"
 	cd ${BUILD_DIR} && gcov ${BUILD_DIR}/CMakeFiles/algorithms.dir/common/test_algorithms.cpp.gcda
@@ -33,8 +34,14 @@ coverage: create_build_dir
 	echo "\n2. FFT:"
 	cd ${BUILD_DIR} && gcov ${BUILD_DIR}/CMakeFiles/fft.dir/common/test_fft.cpp.gcda
 
+	echo "\n3. Datapool:"
+	cd ${BUILD_DIR} && gcov ${BUILD_DIR}/CMakeFiles/datapool.dir/common/test_datapool.cpp.gcda
+
 algorithms: create_build_dir
 	cd ${BUILD_DIR} && cmake -S ${CRNT_DIR} && make && ./algorithms
 
 fft: create_build_dir
 	cd ${BUILD_DIR} && cmake ${CRNT_DIR} ${CMAKE_FLAGS} && make && ./fft
+
+datapool: create_build_dir
+	cd ${BUILD_DIR} && cmake -S ${CRNT_DIR} && make datapool && ./datapool

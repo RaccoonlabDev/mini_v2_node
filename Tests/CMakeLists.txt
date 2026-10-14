@@ -48,3 +48,8 @@ add_executable(gpio
 target_include_directories(gpio PUBLIC ${ROOT_DIR}/Src)
 target_link_libraries(gpio GTest::gtest GTest::gtest_main)
 add_test(NAME gpio COMMAND gpio)
+
+add_executable(datapool ${UNIT_TESTS_DIR}/common/test_datapool.cpp)
+target_include_directories(datapool PUBLIC ${ROOT_DIR}/Src/common)
+target_link_libraries(datapool GTest::gtest GTest::gtest_main)
+add_test(NAME datapool COMMAND datapool)
