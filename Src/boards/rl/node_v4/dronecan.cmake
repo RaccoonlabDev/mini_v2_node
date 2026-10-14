@@ -13,5 +13,5 @@ rl_include_module(dronecan/core)
 
 if(NOT NODE_V4_DIAG_MINIMAL_MODULES)
     rl_include_module(dronecan/arming)
-    rl_include_module(circuit_status/dronecan)
+    rl_include_module(dronecan/board_status)
 endif()
