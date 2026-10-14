@@ -6,11 +6,10 @@
 
 #include "dronecan_module.hpp"
 #include <algorithm>
-#include <cstring>
 #include "params.hpp"
 #include "libdcnode/dronecan.h"
 #include "libdcnode/can_driver.h"
-#include "drivers/board_monitor/board_monitor.hpp"
+#include "common/node_name.hpp"
 #include "peripheral/iwdg/iwdg.hpp"
 
 #ifndef GIT_HASH
@@ -79,33 +78,6 @@ static int8_t paramsSaveWithWatchdogMargin() {
     return res;
 }
 
-static bool shouldUseDefaultNodeName(const char *node_name) {
-    return node_name == nullptr || strlen(node_name) == 0;
-}
-
-static bool shouldUseConfiguredDefaultNodeName(const char *node_name) {
-    if (shouldUseDefaultNodeName(node_name)) {
-        return true;
-    }
-#ifdef NC_DEFAULT_NODE_NAME
-    return strcmp(node_name, "co.rl.mini") == 0;
-#else
-    return false;
-#endif
-}
-
-static void setDefaultNodeName(ParamIndex_t node_name_param_idx) {
-#ifdef NC_DEFAULT_NODE_NAME
-    constexpr const char *default_node_name = NC_DEFAULT_NODE_NAME;
-    paramsSetStringValue(node_name_param_idx, strlen(default_node_name), (const uint8_t*)default_node_name);
-#else
-    if (shouldUseDefaultNodeName((const char*)paramsGetStringValue(node_name_param_idx))) {
-        const auto& [board_name, name_length] = BoardMonitor::get_board_name();
-        paramsSetStringValue(node_name_param_idx, name_length, (const uint8_t*)board_name);
-    }
-#endif
-}
-
 void DronecanModule::init() {
 
     ParamsApi params_api = {
@@ -144,9 +116,7 @@ void DronecanModule::init() {
     };
 
     auto node_name_param_idx = static_cast<ParamIndex_t>(StrParamsIndexes::PARAM_SYSTEM_NAME);
-    if (shouldUseConfiguredDefaultNodeName((const char*)paramsGetStringValue(node_name_param_idx))) {
-        setDefaultNodeName(node_name_param_idx);
-    }
+    apply_default_node_name(node_name_param_idx);
     int param_node_id_value = paramsGetIntegerValue(IntParamsIndexes::PARAM_UAVCAN_NODE_ID);
     AppInfo app_info{
         .node_id = static_cast<uint8_t>(std::clamp(param_node_id_value, 1, 126)),
