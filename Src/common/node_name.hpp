@@ -8,6 +8,7 @@
 #define SRC_COMMON_NODE_NAME_HPP_
 
 #include <cstring>
+#include <string_view>
 #include "params.hpp"
 #include "drivers/board_monitor/board_monitor.hpp"
 
@@ -20,13 +21,13 @@
  */
 inline void apply_default_node_name(ParamIndex_t node_name_param_idx) {
     const auto* name = reinterpret_cast<const char*>(paramsGetStringValue(node_name_param_idx));
-    const bool is_empty = name == nullptr || std::strlen(name) == 0;
+    const bool is_empty = name == nullptr || name[0] == '\0';
 
 #ifdef NC_DEFAULT_NODE_NAME
-    if (is_empty || std::strcmp(name, "co.rl.mini") == 0) {
-        constexpr const char* default_node_name = NC_DEFAULT_NODE_NAME;
-        paramsSetStringValue(node_name_param_idx, std::strlen(default_node_name),
-                             reinterpret_cast<const uint8_t*>(default_node_name));
+    if (is_empty || std::strncmp(name, "co.rl.mini", MAX_STRING_LENGTH) == 0) {
+        constexpr std::string_view default_node_name{NC_DEFAULT_NODE_NAME};
+        paramsSetStringValue(node_name_param_idx, default_node_name.size(),
+                             reinterpret_cast<const uint8_t*>(default_node_name.data()));
     }
 #else
     if (is_empty) {
