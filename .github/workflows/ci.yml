@@ -44,6 +44,27 @@ jobs:
       - name: Build and run unit tests
         run: cd Tests && make coverage
 
+  # A pin to a pull request branch builds until that branch is squash merged or deleted
+  dependency_pins:
+    timeout-minutes: 5
+    runs-on: ubuntu-24.04
+    # GitHub Actions does not allow the secrets context inside if expression
+    env:
+      LIBCPNODE_DEPLOY_KEY: ${{ secrets.LIBCPNODE_DEPLOY_KEY }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup SSH (private libcpnode)
+        if: ${{ env.LIBCPNODE_DEPLOY_KEY != '' }}
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: |
+            ${{ secrets.LIBCPNODE_DEPLOY_KEY }}
+
+      # A pull request from a fork has no key, so the private libcpnode is skipped there
+      - name: Check that every pin is on the main branch of its repository
+        run: python3 scripts/check_dependency_pins.py ${{ env.LIBCPNODE_DEPLOY_KEY == '' && '--skip-inaccessible' || '' }}
+
   sitl_matrix:
     needs: [code_style, unit_tests]
     strategy:
