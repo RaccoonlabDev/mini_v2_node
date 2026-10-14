@@ -1,7 +1,7 @@
 # Copyright (C) 2025 Dmitry Ponomarev <ponomarevda96@gmail.com>
 # Distributed under the terms of the GPL v3 license, available in the file LICENSE.
 # Dockerfile
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -19,11 +19,14 @@ RUN apt-get update && \
     ca-certificates \
     gcc-arm-none-eabi \
     python-is-python3 \
+    pkg-config \
+    libfftw3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python packages
 COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+# Ubuntu 24.04 protects its system Python (PEP 668); the container has nothing else to break
+RUN pip install --break-system-packages -r requirements.txt
 
 WORKDIR /workspace
 
