@@ -18,7 +18,7 @@ set(CMAKE_SYSTEM_PROCESSOR x86_64)
 # ==================================
 #  Compilation and Linker Flags
 # ==================================
-set(WARNING_FLAGS "-Wall -Wextra -Wfloat-equal -Werror -Wundef -Wshadow -Wpointer-arith -Wunreachable-code -Wstrict-overflow=5 -Wwrite-strings -Wswitch-default")  # these could be also useful: -Wconversion -Wsign-conversion
+set(WARNING_FLAGS "-Wall -Wextra -Wfloat-equal -Werror -Wundef -Wshadow -Wpointer-arith -Wunreachable-code -Wwrite-strings -Wswitch-default")  # these could be also useful: -Wconversion -Wsign-conversion
 
 set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} ${COMMON_FLAGS} ${WARNING_FLAGS}")  # these could be also useful: -Wmissing-prototypes -Wstrict-prototypes
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNING_FLAGS} -Wno-volatile")
