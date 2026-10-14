@@ -73,7 +73,8 @@ jobs:
           - suite: rl_sitl_cyphal
           - suite: rl_sitl_dronecan
           - suite: rl_sitl_raw_can
-    runs-on: ubuntu-24.04
+    # SITL on the newest LTS, firmware images on the previous one: both are covered at no extra cost
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     # GitHub Actions does not allow the secrets context inside if expression
     # So, let's copy the secret into env
