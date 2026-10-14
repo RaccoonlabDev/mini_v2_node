@@ -21,12 +21,12 @@ include(${DOWNLOAD_DIR}/libcpnode/cmake/transport_specific.cmake)
 
 list(APPEND APPLICATION_SOURCES
     ${LIBCPNODE_TRANSPORT_SOURCES}
-    ${libparamsSrc}
+    ${LIBPARAMS_PLATFORM_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/cyphal_module.cpp
 )
 
 list(APPEND APPLICATION_HEADERS
     ${LIBCPNODE_TRANSPORT_HEADERS}
-    ${libparamsHeaders}
+    ${LIBPARAMS_PLATFORM_HEADERS}
     ${ROOT_DIR}/build/nunavut_out
 )
