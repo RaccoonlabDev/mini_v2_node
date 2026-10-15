@@ -1,11 +1,8 @@
 # Agent Instructions
 
-- Build system: [docs/build_system.md](docs/build_system.md).
-- When using as a framework (submodule, custom boards/targets), follow [docs/framework.md](docs/framework.md).
-- Prebuilt CubeMX HAL archives (CI without CubeMX): [docs/cubemx.md](docs/cubemx.md).
-- Firmware contract: [docs/embedded_firmware_contract.md](docs/embedded_firmware_contract.md).
-- Commit naming and code style: [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
-- When writing docs, follow [docs/documentation_guidelines.md](docs/documentation_guidelines.md).
+- Layers, build system, CubeMX HAL and libraries: README.md, section 6 ([build system](README.md#build-system), [libraries](README.md#libraries)).
+- When using as a framework (submodule, custom boards/targets), follow [README.md, framework workflow](README.md#framework-workflow).
+- Commit naming, code style, firmware rules, tests and docs: [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
 - Treat Git as read-only: you may run inspection commands like `git status`,
   `git diff`, and `git log`, but never modify Git state, including
   staging/unstaging files, committing, branching, rebasing, resetting, checking
