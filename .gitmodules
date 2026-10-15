@@ -1,6 +1,0 @@
-[submodule "Libs/Dronecan"]
-	path = Libs/Dronecan
-	url = https://github.com/PonomarevDA/dronecan_application.git
-[submodule "Libs/libparams"]
-	path = Libs/libparams
-	url = https://github.com/PonomarevDA/libparams.git

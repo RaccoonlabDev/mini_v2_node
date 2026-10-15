@@ -2,7 +2,6 @@
 """
 This script checks whether the project is ready for use:
 - skip the check if the build folder is not empty (repo was alredy used)
-- check submodules are initialized
 - check python dependencies are installed
 """
 import os
@@ -18,7 +17,6 @@ import pkg_resources # pylint: disable=C0413
 SCRIPT_NAME = os.path.splitext(os.path.basename(__file__))[0]
 REPO_DIR = Path(os.path.dirname(os.path.realpath(__file__))).parent.absolute()
 BUILD_DIR = os.path.join(REPO_DIR, "build")
-LIBPARAMS_DIR = os.path.join(REPO_DIR, "Libs", "libparams")
 
 logger = logging.getLogger(SCRIPT_NAME)
 
@@ -97,38 +95,6 @@ class PrebuildChecker:
             logger.error(str(err))
             sys.exit(1)
 
-    def check_submodules(self) -> None:
-        """
-        All submodules must be initialized
-        """
-        if is_dir_nonempty(LIBPARAMS_DIR):
-            return
-
-        if not sys.stdin.isatty():
-            logger.error(
-                "Submodules are nto found. "
-                "Please update them with git submodule update --init --recursive"
-            )
-            sys.exit(1)
-
-        cmd = ['git', 'submodule', 'update', '--init', '--recursive']
-        logger.error("Submodules do not exist. Run: '%s'", ' '.join(cmd))
-        if not self.prompt:
-            sys.exit(1)
-
-        try:
-            user_input = input("Do you want to run this command now? [y/N]:\n").strip().lower()
-            if user_input == 'y':
-                subprocess.run(cmd, check=True)
-                logger.info("Submodules initialized successfully.")
-            else:
-                sys.exit(1)
-        except subprocess.CalledProcessError as err:
-            logger.error("Failed to initialize submodules: %s", err)
-            sys.exit(1)
-        except KeyboardInterrupt:
-            sys.exit(1)
-
     def check_pre_commit_hook(self) -> None:
         """
         Check if the pre-commit hook is configured. If not, prompt the user to create it.
@@ -183,5 +149,4 @@ if __name__ == "__main__":
         checker.check_platform()
         checker.check_branch_tags()
         checker.check_python_requirements()
-        checker.check_submodules()
         checker.check_pre_commit_hook()

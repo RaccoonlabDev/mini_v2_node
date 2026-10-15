@@ -33,7 +33,6 @@ WORKDIR /workspace
 RUN git config --global --add safe.directory /workspace
 
 COPY .git .git
-COPY Libs Libs
 COPY Src Src
 COPY cmake cmake
 COPY scripts scripts

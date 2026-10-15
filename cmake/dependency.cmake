@@ -9,15 +9,15 @@ set_property(GLOBAL PROPERTY NC_ROOT_DIR "${_nc_root_dir}")
 set(NC_THIRD_PARTY_DIR "${_nc_root_dir}/build/third_party" CACHE PATH
     "Where libraries are cloned, one directory per version")
 
-# nc_declare_dependency(<name> <owner/repo> SUBMODULE <path> | VERSION <tag or commit>)
+# nc_declare_dependency(<name> <owner/repo> VERSION <tag or commit>)
 #
-# Declares a library and its default source: a submodule of node-core, or a version cloned at
-# configure time. Creates the cache variables an application overrides the default with:
+# Declares a library and the version cloned by default at configure time. Creates the cache
+# variables an application overrides the default with:
 #   NC_<NAME>_VERSION - a tag or commit to clone instead
 #   NC_<NAME>_PATH    - a local checkout to use as is
 function(nc_declare_dependency name repository kind default)
-    if(NOT kind MATCHES "^(SUBMODULE|VERSION)$")
-        message(FATAL_ERROR "nc_declare_dependency(${name}): expected SUBMODULE or VERSION, got ${kind}")
+    if(NOT kind STREQUAL "VERSION")
+        message(FATAL_ERROR "nc_declare_dependency(${name}): expected VERSION, got ${kind}")
     endif()
     string(TOUPPER "${name}" upper)
     set_property(GLOBAL APPEND PROPERTY NC_DEPENDENCIES ${name})
@@ -40,7 +40,6 @@ function(nc_use_dependency name)
     endif()
 
     get_property(repository GLOBAL PROPERTY NC_DEPENDENCY_${name}_REPOSITORY)
-    get_property(submodule GLOBAL PROPERTY NC_DEPENDENCY_${name}_SUBMODULE)
     get_property(default_version GLOBAL PROPERTY NC_DEPENDENCY_${name}_VERSION)
     get_property(root_dir GLOBAL PROPERTY NC_ROOT_DIR)
     if(NOT repository)
@@ -49,8 +48,9 @@ function(nc_use_dependency name)
 
     set(path "$CACHE{NC_${upper}_PATH}")
     set(version "$CACHE{NC_${upper}_VERSION}")
-    # A build dir configured before these variables existed keeps the submodule as its path
-    if(submodule AND path STREQUAL "${root_dir}/${submodule}")
+    # A build dir configured when the libraries were submodules keeps their old path in Libs/
+    string(FIND "${path}" "${root_dir}/Libs/" stale_submodule_path)
+    if(stale_submodule_path EQUAL 0)
         set(path "")
     endif()
 
@@ -64,12 +64,6 @@ function(nc_use_dependency name)
     elseif(version)
         _nc_clone_dependency(${name} ${repository} ${version} path)
         set(origin "NC_${upper}_VERSION")
-    elseif(submodule)
-        set(path "${root_dir}/${submodule}")
-        if(NOT EXISTS "${path}/CMakeLists.txt")
-            message(FATAL_ERROR "${submodule} is empty, run: git submodule update --init --recursive")
-        endif()
-        set(origin "submodule")
     else()
         _nc_clone_dependency(${name} ${repository} ${default_version} path)
         set(origin "default")
@@ -149,14 +143,27 @@ function(_nc_clone_dependency name repository version out_var)
             "commit. Pin a tag or a commit instead.")
     endif()
 
-    execute_process(
-        COMMAND git submodule update --init --recursive --quiet
-        WORKING_DIRECTORY ${tmp}
-        RESULT_VARIABLE result
-    )
+    # A submodule URL like git@github.com:org/repo needs an SSH key even for a public repository, so
+    # try GitHub over HTTPS first and the URLs as written second, as for the clone itself
+    foreach(https_rewrite ON OFF)
+        set(config "")
+        if(https_rewrite)
+            set(config -c url.https://github.com/.insteadOf=git@github.com:)
+        endif()
+        execute_process(
+            COMMAND ${CMAKE_COMMAND} -E env GIT_TERMINAL_PROMPT=0 GCM_INTERACTIVE=never
+                    git ${config} submodule update --init --recursive --quiet
+            WORKING_DIRECTORY ${tmp}
+            RESULT_VARIABLE result
+            ERROR_VARIABLE error
+        )
+        if(result EQUAL 0)
+            break()
+        endif()
+    endforeach()
     if(NOT result EQUAL 0)
         file(REMOVE_RECURSE "${tmp}")
-        message(FATAL_ERROR "Could not fetch the submodules of ${repository} ${version}")
+        message(FATAL_ERROR "Could not fetch the submodules of ${repository} ${version}: ${error}")
     endif()
 
     file(RENAME "${tmp}" "${dir}")
